@@ -20,7 +20,8 @@ pikadots backup-init  set up encrypted daily backups
    `~/.config/hypr`). Files in the way are moved to `~/.local/state/pikadots/backups/<date>/`.
 3. Asks for your git name and email (saved to `~/.config/git/user`, outside the repo).
 4. Enables NetworkManager, Bluetooth, power-profiles-daemon and the SSH agent.
-5. Generates colors from the current wallpaper.
+5. Copies the [wallpapers](../wallpapers/CREDITS.md) into `~/Pictures/Wallpapers` (existing files are
+   left alone) and generates colors from the current one.
 
 ## health and repair
 

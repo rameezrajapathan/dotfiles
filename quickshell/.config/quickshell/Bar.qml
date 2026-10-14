@@ -53,6 +53,11 @@ PanelWindow {
         bar: bar
     }
 
+    DisplayPanel {
+        id: displayPanel
+        bar: bar
+    }
+
     CapturePanel {
         id: capturePanel
         bar: bar
@@ -168,6 +173,7 @@ PanelWindow {
 
         CaptureButton { onClicked: capturePanel.toggle() }
         WallpaperButton {}
+        DisplayButton { onClicked: displayPanel.toggle() }
         Network { onClicked: networkPanel.toggle() }
         Bluetooth { onClicked: bluetoothPanel.toggle() }
         Volume { onClicked: audioPanel.toggle() }

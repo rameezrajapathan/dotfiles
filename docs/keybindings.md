@@ -2,7 +2,7 @@
 
 [← README](../README.md)
 
-Super + ? shows all of these on screen. Change them in `hypr/.config/hypr/keybinds.lua`.
+Super + ? shows these on screen. Change them in `hypr/.config/hypr/keybinds.lua`.
 
 ## Apps and system
 
@@ -67,5 +67,4 @@ Super + ? shows all of these on screen. Change them in `hypr/.config/hypr/keybin
 | Super + Shift + R | Record a region (again to stop) |
 | Super + Alt + R | Record the screen (again to stop) |
 
-Recordings go to `~/Videos/Recordings`. Media, volume and brightness keys work as expected,
-including on the lock screen.
+Recordings go to `~/Videos/Recordings`.

@@ -4,54 +4,45 @@
 
 ## The bar
 
-Rounded pills across the top with the desktop blurred behind them. Most items open a panel when
-clicked.
+Left: distro logo, workspaces, music. Center: clock, next meeting, window title. Right: tray, then
+the status icons below, in order. Most of them open a panel; click outside it to close.
 
-| Where | Item | Click | Also |
-|---|---|---|---|
-| Left | Distro logo | App launcher | |
-| Left | Workspaces | Switch workspace | |
-| Left | Music | Music panel | Right click play/pause, scroll skips |
-| Center | Clock | Calendar | |
-| Center | Next meeting | Join the call | Only when a [calendar](developer.md#next-meeting) is set |
-| Center | Window title | | |
-| Right | Tray | Open the app | Right click for its menu |
-| Right | Capture | Capture menu | Right click: region screenshot; shows a timer while recording |
-| Right | Palette | Wallpaper picker | |
-| Right | Network | Network panel | |
-| Right | Bluetooth | Bluetooth panel | Right click turns it on or off |
-| Right | Volume | Audio panel | Right click mutes, scroll changes volume |
-| Right | System | System panel | |
-| Right | Battery | Battery panel | |
-| Right | GitHub | GitHub panel | Only after `gh auth login` |
-| Right | Bell | Notifications | Right click toggles Do Not Disturb |
-| Right | Quick settings | Quick settings panel | |
-| Right | Power | Power menu | |
+| Item | Click | Right click / scroll |
+|---|---|---|
+| Distro logo | Launcher | |
+| Music | Art, seek bar, controls, shuffle, repeat, volume, player switcher | Play/pause; scroll skips |
+| Clock | Calendar (scroll changes the month) | |
+| Next meeting | Joins the call; only when a [calendar](developer.md#next-meeting) is set | |
+| Tray | Opens the app | Its menu |
+| Capture | Screenshot or record a region, window or screen; shows a timer while recording | Region screenshot |
+| Palette | Wallpaper picker (Super + Shift + W); type to search by name | |
+| Monitor | [Displays](#displays); filled while an external monitor is on | |
+| Network | Wired, Wi-Fi (asks for passwords), VPN switches | |
+| Bluetooth | Paired devices (connect, battery, forget), nearby devices to pair | Power on/off |
+| Volume | Output and input devices, per-app volume | Mute; scroll changes volume |
+| System | CPU, memory, GPU and disk with temperatures, busiest processes, last backup | |
+| Battery | Time left, charge limit, power mode, GPU mode on ROG laptops | |
+| GitHub | Notifications; only after `gh auth login` | |
+| Bell | Notifications not yet dismissed | Do Not Disturb |
+| Coffee | Shown while keep awake is on; click turns it off | |
+| Quick settings | Do Not Disturb, keep awake, night light, color picker | |
+| Power | Power menu | |
 
-## Panels
+## Displays
 
-Click outside a panel to close it.
+The monitor icon opens a card per screen: on/off, resolution, refresh rate and scale, and with two
+screens, which side of the other it sits on, or mirroring. Changes apply at once and are remembered
+per monitor, so it comes back the same when plugged in again. **reset** returns it to the defaults.
 
-- **Music**: art, seek bar, controls, shuffle, repeat, volume, and a switcher when several apps
-  play. Works with any MPRIS player (Spotify, browsers, VLC, mpv).
-- **Calendar**: month view; scroll to change the month.
-- **Network**: wired status, Wi-Fi networks (secured ones ask for the password), VPN switches.
-- **Bluetooth**: paired devices (connect, battery, forget) and nearby devices to pair.
-- **Audio**: output and input devices, per-app volume.
-- **System**: CPU, memory, GPU and disk with temperatures, busiest processes, last backup.
-- **Battery**: time left, charge limit, power mode, GPU mode on ROG laptops.
-- **GitHub**: notifications; click to open, or mark all read.
-- **Notifications**: everything not yet dismissed.
-- **Capture**: screenshot or record a region, window or screen.
-- **Quick settings**: Do Not Disturb, keep awake, night light, color picker.
+The panel saves to `~/.local/state/pikadots/monitors.lua`, which `hypr/.config/hypr/monitors.lua`
+loads after its own rules. Edit `monitors.lua` only to change those defaults.
 
 ## Launcher (Super + A)
 
-Apps, most used first. Type to search; a first character switches mode:
+Apps, most used first. A first character switches mode:
 
 | Prefix | Mode | Enter | Shift + Enter |
 |---|---|---|---|
-| | Apps | Open | |
 | `=` | Calculator (`=5 GiB to MB`) | Copy result | |
 | `>` | Command | Run | Run in a terminal |
 | `:` | Emoji | Copy | |
@@ -65,21 +56,18 @@ Apps, most used first. Type to search; a first character switches mode:
 - **Overview** (Super + Tab): every workspace with live previews.
 - **Drop-down terminal** (Super + \`): stays running while hidden.
 - **Cheatsheet** (Super + ?): every shortcut, read live from Hyprland.
-- **Wallpaper picker** (Super + Shift + W): picking one recolors everything.
 - **Volume and brightness indicator** when those keys are used.
 
 ## Notifications
 
-Quickshell shows notifications: popups at the top right with actions and a timeout line
-(hover pauses it). Critical ones stay until dismissed. Do Not Disturb (Super + Shift + N) holds
-back everything but critical ones.
+Popups at the top right; hovering pauses the timeout. Critical ones stay until dismissed and get
+through Do Not Disturb (Super + Shift + N).
 
 ## Lock screen
 
-hyprlock with the blurred wallpaper, a large clock, and now playing and battery in the corners.
-Locks after 10 minutes idle, before suspend, or with Super + Alt + L.
+hyprlock with the blurred wallpaper, now playing and battery. Locks after 10 minutes idle, before
+suspend, or with Super + Alt + L.
 
 ## Terminal
 
-kitty, translucent and blurred, with starship, eza and zoxide. Super + T opens it with fastfetch;
-Super + Return opens a plain one.
+kitty with starship, eza and zoxide. Super + T opens it with fastfetch.

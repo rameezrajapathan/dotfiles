@@ -17,6 +17,7 @@
 	navigate = true
 	line-numbers = true
 	syntax-theme = ansi
+	side-by-side = true
 [diff]
 	colorMoved = default
 [merge]

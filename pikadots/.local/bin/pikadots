@@ -248,6 +248,16 @@ wallpaper() { # current wallpaper, or any image in ~/Pictures/Wallpapers
 	find "$HOME/Pictures/Wallpapers" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | head -1
 }
 
+copy_wallpapers() { # the repo's wallpapers into ~/Pictures/Wallpapers, never overwriting
+	local dir=$HOME/Pictures/Wallpapers n=0 f
+	mkdir -p "$dir"
+	for f in "$repo"/wallpapers/*.jpg; do
+		[[ -e $dir/${f##*/} ]] || { cp "$f" "$dir/" && n=$((n + 1)); }
+	done
+	((n)) && ok "$n wallpapers in ~/Pictures/Wallpapers"
+	return 0
+}
+
 generate_colors() {
 	local img
 	img=$(wallpaper)
@@ -287,6 +297,7 @@ cmd_install() {
 	enable_services
 	step "Colors"
 	mkdir -p "$HOME/.local/state/quickshell" "$HOME/Pictures/Screenshots" "$HOME/Videos/Recordings"
+	copy_wallpapers
 	generate_colors
 	mkdir -p "$state" && date +%s >"$state/installed"
 	step "Done"
@@ -295,7 +306,7 @@ cmd_install() {
 	else
 		info "log out and pick the Hyprland session"
 	fi
-	info "check the machine-specific bits in README.md (monitors, VPN name)"
+	info "set up displays from the monitor icon in the bar, VPNs in docs/laptop.md"
 	info "optional: pikadots backup-init · gh auth login · pikadots health"
 }
 

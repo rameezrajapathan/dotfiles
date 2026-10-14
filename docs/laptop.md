@@ -16,9 +16,8 @@ Keep awake (quick settings) holds this off. Times are in `hypr/.config/hypr/hypr
 ## Power
 
 - **Power mode** in the battery panel: power saver, balanced, performance.
-- **Night light** in quick settings.
 - **Lid**: with an external monitor, closing the lid turns the laptop screen off instead of
-  suspending.
+  suspending. Arrange the screens from the [monitor icon](desktop.md#displays) in the bar.
 
 ## ASUS ROG
 

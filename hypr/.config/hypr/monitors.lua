@@ -14,3 +14,6 @@ hl.monitor({
 	position = "auto",
 	scale = 1,
 })
+
+-- Changes made in the bar's display panel (Quickshell writes this file)
+pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/monitors.lua")

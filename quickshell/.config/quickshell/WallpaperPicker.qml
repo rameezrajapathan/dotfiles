@@ -6,8 +6,9 @@ import Qt.labs.folderlistmodel
 import QtQuick
 import QtQuick.Layouts
 
-// Strip of ~/Pictures/Wallpapers thumbnails that slides down from under the bar. Click or Enter
-// applies one with hypr/scripts/theme.sh, which also recolors everything from it.
+// Strip of ~/Pictures/Wallpapers thumbnails with their names that slides down from under the bar.
+// Typing filters by name, arrows move, click or Enter applies one with hypr/scripts/theme.sh, which
+// also recolors everything from it.
 // Toggled with `qs ipc call wallpaper toggle`.
 PanelWindow {
     id: root
@@ -18,8 +19,27 @@ PanelWindow {
     // Drives the slide; the window hides once the strip is back up
     property bool open: false
 
+    // Matching images as { path, name }: every word typed must appear in the name
+    readonly property var shown: {
+        const words = search.text.toLowerCase().split(/\s+/).filter(w => w);
+        const out = [];
+        for (let i = 0; i < files.count; i++) {
+            const name = displayName(files.get(i, "fileName"));
+            const haystack = name.toLowerCase();
+            if (words.every(w => haystack.includes(w)))
+                out.push({ path: files.get(i, "filePath"), name: name });
+        }
+        return out;
+    }
+
+    // "orange-forest.jpg" → "orange forest"
+    function displayName(file) {
+        return file.replace(/\.[^.]+$/, "").replace(/[-_.]+/g, " ").trim();
+    }
+
     function toggle() {
         if (!open) {
+            search.text = "";
             reader.running = true;
             visible = true;
         }
@@ -38,7 +58,7 @@ PanelWindow {
         stdout: StdioCollector {
             onStreamFinished: {
                 root.current = text.trim().replace(/^~/, Quickshell.env("HOME"));
-                const i = files.indexOf("file://" + root.current);
+                const i = root.shown.findIndex(w => w.path === root.current);
                 if (i >= 0)
                     list.positionViewAtIndex(list.currentIndex = i, ListView.Center);
             }
@@ -117,6 +137,61 @@ PanelWindow {
                         text: "Wallpapers"
                         font.bold: true
                     }
+                    // Search field; keeps the keyboard so typing always filters
+                    Rectangle {
+                        implicitWidth: 260
+                        implicitHeight: 30
+                        radius: height / 2
+                        color: Theme.surface
+                        border.width: 2
+                        border.color: search.text !== "" ? Qt.alpha(Theme.accent, 0.6) : "transparent"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 10
+                            anchors.rightMargin: 12
+                            spacing: 6
+
+                            Icon {
+                                name: "search"
+                                size: 18
+                                color: Theme.overlay
+                            }
+
+                            TextInput {
+                                id: search
+                                Layout.fillWidth: true
+                                color: Theme.text
+                                selectionColor: Theme.accent
+                                selectedTextColor: Theme.accentText
+                                font.family: Theme.font
+                                font.pixelSize: Theme.fontSize
+                                clip: true
+                                focus: root.open
+                                onTextChanged: list.currentIndex = 0
+
+                                Keys.onEscapePressed: {
+                                    if (text !== "")
+                                        text = "";
+                                    else
+                                        root.open = false;
+                                }
+                                Keys.onReturnPressed: if (root.shown.length) root.apply(root.shown[list.currentIndex].path)
+                                Keys.onEnterPressed: if (root.shown.length) root.apply(root.shown[list.currentIndex].path)
+                                Keys.onLeftPressed: list.decrementCurrentIndex()
+                                Keys.onRightPressed: list.incrementCurrentIndex()
+                                Keys.onTabPressed: list.incrementCurrentIndex()
+                                Keys.onBacktabPressed: list.decrementCurrentIndex()
+
+                                Label {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    visible: search.text === ""
+                                    text: "Search by name…"
+                                    color: Theme.overlay
+                                }
+                            }
+                        }
+                    }
                     Pill {
                         text: "open folder"
                         onClicked: {
@@ -132,44 +207,62 @@ PanelWindow {
                     color: Theme.overlay
                 }
 
+                Label {
+                    visible: files.count > 0 && root.shown.length === 0
+                    Layout.preferredHeight: list.implicitHeight
+                    verticalAlignment: Text.AlignVCenter
+                    text: `No wallpaper matches "${search.text}"`
+                    color: Theme.overlay
+                }
+
                 ListView {
                     id: list
                     Layout.fillWidth: true
-                    implicitHeight: 180
+                    implicitHeight: 206
                     visible: count > 0
                     orientation: ListView.Horizontal
                     spacing: 10
                     clip: true
-                    focus: root.open
                     keyNavigationWraps: true
                     highlightMoveDuration: 150
-                    model: files
+                    model: root.shown
 
-                    Keys.onEscapePressed: root.open = false
-                    Keys.onReturnPressed: root.apply(files.get(currentIndex, "filePath"))
-
-                    delegate: Rectangle {
+                    delegate: Item {
                         id: cell
-                        required property string filePath
+                        required property var modelData
                         required property int index
-                        readonly property bool active: filePath === root.current
+                        readonly property bool active: modelData.path === root.current
+                        readonly property bool selected: list.currentIndex === index || mouse.containsMouse
 
-                        width: height * 16 / 10
+                        width: thumb.width
                         height: ListView.view.height
-                        radius: 8
-                        color: Theme.surface
-                        border.width: 3
-                        border.color: active ? Theme.accent
-                            : list.currentIndex === index || mouse.containsMouse ? Theme.overlay
-                            : "transparent"
 
-                        Image {
-                            anchors.fill: parent
-                            anchors.margins: 3
-                            source: "file://" + cell.filePath
-                            sourceSize.width: 400
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
+                        Rectangle {
+                            id: thumb
+                            width: height * 16 / 10
+                            height: parent.height - 26
+                            radius: 8
+                            color: Theme.surface
+                            border.width: 3
+                            border.color: cell.active ? Theme.accent : cell.selected ? Theme.overlay : "transparent"
+
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 3
+                                source: "file://" + cell.modelData.path
+                                sourceSize.width: 400
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                            }
+                        }
+
+                        Label {
+                            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
+                            text: cell.modelData.name
+                            color: cell.active ? Theme.accent : cell.selected ? Theme.text : Theme.subtext
+                            font.bold: cell.active
                         }
 
                         MouseArea {
@@ -178,7 +271,7 @@ PanelWindow {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onEntered: list.currentIndex = cell.index
-                            onClicked: root.apply(cell.filePath)
+                            onClicked: root.apply(cell.modelData.path)
                             onWheel: wheel => list.flick(wheel.angleDelta.y * 8, 0)
                         }
                     }
