@@ -2,9 +2,8 @@ import Quickshell
 import QtQuick
 
 // Opens the wallpaper picker.
-Label {
-    font.pixelSize: Theme.fontSize + 3
-    text: "󰸉"
+Icon {
+    name: "wallpaper"
 
     MouseArea {
         anchors.fill: parent

@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Services.SystemTray
 import QtQuick
 import QtQuick.Layouts
 
@@ -10,7 +11,7 @@ PanelWindow {
 
     anchors { top: true; left: true; right: true }
     implicitHeight: Theme.barHeight
-    color: Theme.base
+    color: "transparent"
 
     NetworkPanel {
         id: networkPanel
@@ -45,31 +46,68 @@ PanelWindow {
         bar: bar
     }
 
-    Workspaces {
-        id: workspaces
+    MediaPanel {
+        id: mediaPanel
+        bar: bar
+        anchorX: media.x
+    }
+
+    Connections {
+        target: Media
+        function onPanelToggleRequested() {
+            if (Hyprland.focusedMonitor?.name === bar.screen.name)
+                mediaPanel.toggle();
+        }
+    }
+
+    Island {
+        id: left
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
+
+        OsIcon {}
+        Workspaces {}
     }
 
-    ActiveWindow {
-        anchors.left: workspaces.right
-        anchors.leftMargin: 16
+    // Music, between the workspaces and the window title
+    Island {
+        id: media
+        anchors.left: left.right
+        anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
-        screen: bar.screen
-        // Stop short of the centered clock
-        maxWidth: clock.x - x - 40
+
+        MediaButton { onClicked: mediaPanel.toggle() }
     }
 
-    Clock {
-        id: clock
+    Island {
         anchors.centerIn: parent
-        onClicked: calendarPanel.toggle()
+        visible: title.toplevel !== null
+
+        ActiveWindow {
+            id: title
+            screen: bar.screen
+            // Keep clear of the left and right groups
+            maxWidth: bar.width - 2 * Math.max(left.width + media.width + 8, right.width + (tray.visible ? tray.width + 8 : 0)) - 120
+        }
     }
 
-    RowLayout {
+    // Background apps (hidden Thunderbird / Chrome apps, then tray icons), left of the status group
+    Island {
+        id: tray
+        anchors.right: right.left
+        anchors.rightMargin: 8
+        anchors.verticalCenter: parent.verticalCenter
+        visible: SystemTray.items.values.length > 0 || backgroundApps.count > 0
+
+        BackgroundApps { id: backgroundApps; bar: bar }
+        Tray { bar: bar }
+    }
+
+    Island {
+        id: right
         anchors.right: parent.right
-        anchors.rightMargin: 12
+        anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         spacing: 14
 
@@ -79,5 +117,7 @@ PanelWindow {
         Volume { onClicked: audioPanel.toggle() }
         Battery { onClicked: batteryPanel.toggle() }
         NotificationButton { onClicked: notificationPanel.toggle() }
+        Clock { onClicked: calendarPanel.toggle() }
+        PowerButton {}
     }
 }

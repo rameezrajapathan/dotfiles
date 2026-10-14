@@ -3,15 +3,17 @@ import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
 
-// One notification: icon, app and time, summary, body, action buttons and a dismiss ✕.
-// Clicking the card runs the app's default action. As a popup it hides itself after the timeout
-// (paused while hovered); the notification stays in the list until dismissed.
+// One notification: app icon tile, app name and time, summary, body, action buttons and a close
+// button, tinted with the wallpaper's accent (red when critical). Clicking the card runs the
+// app's default action. As a popup it slides in, shows a shrinking timeout line and hides itself
+// when that runs out (paused while hovered); the notification stays in the list until dismissed.
 Rectangle {
     id: root
     required property var notification
     property bool popup: false
 
     readonly property bool critical: notification.urgency === NotificationUrgency.Critical
+    readonly property color tint: critical ? Theme.red : Theme.accent
     readonly property var actions: notification.actions.filter(a => a.identifier !== "default")
     readonly property string iconSource: {
         const n = notification;
@@ -24,19 +26,47 @@ Rectangle {
             return "";
         return icon.startsWith("/") ? "file://" + icon : Quickshell.hasThemeIcon(icon) ? Quickshell.iconPath(icon) : "";
     }
+    // expireTimeout is in seconds; 0 means never, -1 means the server's default
+    readonly property bool expires: popup && !critical && notification.expireTimeout !== 0
+    property real remaining: 1
 
-    implicitHeight: layout.implicitHeight + 24
-    radius: 10
-    color: Theme.base
-    border.width: 2
-    border.color: critical ? Theme.red : popup ? Theme.accent : Theme.surface
+    implicitHeight: layout.implicitHeight + 28
+    radius: 18
+    color: Qt.alpha(Theme.base, 0.92)
+    border.width: 1
+    border.color: Qt.alpha(root.tint, critical ? 0.7 : 0.35)
+    clip: true
 
-    Timer {
-        // expireTimeout is in seconds; 0 means never, -1 means the server's default
-        readonly property real seconds: root.notification.expireTimeout > 0 ? root.notification.expireTimeout : 5
-        running: root.popup && !root.critical && root.notification.expireTimeout !== 0 && !hover.hovered
-        interval: seconds * 1000
-        onTriggered: NotificationService.hidePopup(root.notification)
+    // Slide in from the right
+    transform: Translate { id: slide; x: root.popup ? 420 : 0 }
+    Component.onCompleted: if (popup) slideIn.start()
+    NumberAnimation {
+        id: slideIn
+        target: slide
+        property: "x"
+        to: 0
+        duration: 260
+        easing.type: Easing.OutCubic
+    }
+
+    // Accent wash from the top-left corner
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop { position: 0; color: Qt.alpha(root.tint, root.critical ? 0.2 : 0.12) }
+            GradientStop { position: 0.6; color: "transparent" }
+        }
+    }
+
+    NumberAnimation on remaining {
+        running: root.expires
+        paused: running && hover.hovered
+        from: 1
+        to: 0
+        duration: (root.notification.expireTimeout > 0 ? root.notification.expireTimeout : 6) * 1000
+        onFinished: NotificationService.hidePopup(root.notification)
     }
 
     HoverHandler {
@@ -51,18 +81,36 @@ Rectangle {
 
     RowLayout {
         id: layout
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
-        spacing: 12
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+        spacing: 14
 
-        Image {
+        // App icon tile
+        Rectangle {
             Layout.alignment: Qt.AlignTop
-            Layout.preferredWidth: 36
-            Layout.preferredHeight: 36
-            visible: root.iconSource !== "" && status === Image.Ready
-            source: root.iconSource
-            sourceSize: Qt.size(72, 72)
-            fillMode: Image.PreserveAspectFit
-            asynchronous: true
+            implicitWidth: 44
+            implicitHeight: 44
+            radius: 14
+            color: Qt.alpha(root.tint, 0.16)
+
+            Image {
+                id: icon
+                anchors.centerIn: parent
+                width: 30
+                height: 30
+                visible: status === Image.Ready
+                source: root.iconSource
+                sourceSize: Qt.size(60, 60)
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+            }
+            Icon {
+                anchors.centerIn: parent
+                visible: !icon.visible
+                name: root.critical ? "warning" : "notifications"
+                filled: true
+                color: root.tint
+                size: 24
+            }
         }
 
         ColumnLayout {
@@ -74,21 +122,40 @@ Rectangle {
                 spacing: 6
 
                 Label {
-                    Layout.fillWidth: true
-                    text: [root.notification.appName, NotificationService.ago(root.notification)]
-                        .filter(s => s).join(" · ")
-                    color: Theme.subtext
+                    text: root.notification.appName || "Notification"
+                    color: root.tint
                     font.pixelSize: Theme.fontSize - 2
+                    font.bold: true
                     elide: Text.ElideRight
+                    Layout.maximumWidth: 200
                 }
                 Label {
-                    text: "󰅖"
-                    color: close.containsMouse ? Theme.red : Theme.overlay
+                    visible: NotificationService.ago(root.notification) !== ""
+                    text: "· " + NotificationService.ago(root.notification)
+                    color: Theme.overlay
+                    font.pixelSize: Theme.fontSize - 2
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                // Close
+                Rectangle {
+                    implicitWidth: 24
+                    implicitHeight: 24
+                    radius: 12
+                    color: close.containsMouse ? Qt.alpha(Theme.red, 0.2) : "transparent"
+
+                    Icon {
+                        anchors.centerIn: parent
+                        name: "close"
+                        size: 16
+                        color: close.containsMouse ? Theme.red : Theme.overlay
+                    }
 
                     MouseArea {
                         id: close
                         anchors.fill: parent
-                        anchors.margins: -4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.notification.dismiss()
@@ -100,6 +167,7 @@ Rectangle {
                 Layout.fillWidth: true
                 text: root.notification.summary
                 font.bold: true
+                font.pixelSize: Theme.fontSize + 1
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
@@ -117,23 +185,59 @@ Rectangle {
 
             Flow {
                 Layout.fillWidth: true
-                Layout.topMargin: 4
+                Layout.topMargin: 6
                 visible: root.actions.length > 0
                 spacing: 6
 
                 Repeater {
                     model: root.actions
 
-                    Pill {
+                    Rectangle {
+                        id: action
                         required property var modelData
-                        text: modelData.text
-                        onClicked: {
-                            modelData.invoke();
-                            NotificationService.hidePopup(root.notification);
+
+                        implicitWidth: actionLabel.implicitWidth + 24
+                        implicitHeight: 28
+                        radius: 14
+                        color: actionMouse.containsMouse ? root.tint : Qt.alpha(root.tint, 0.18)
+
+                        Label {
+                            id: actionLabel
+                            anchors.centerIn: parent
+                            text: action.modelData.text
+                            color: actionMouse.containsMouse ? Theme.accentText : Theme.text
+                            font.pixelSize: Theme.fontSize - 1
+                        }
+
+                        MouseArea {
+                            id: actionMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                // Invoking can close the notification and destroy this card
+                                const n = root.notification;
+                                const a = action.modelData;
+                                NotificationService.hidePopup(n);
+                                a.invoke();
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    // Time left before the popup hides
+    Rectangle {
+        visible: root.expires
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 14
+        anchors.bottomMargin: 6
+        width: (parent.width - 28) * root.remaining
+        height: 3
+        radius: 1.5
+        color: Qt.alpha(root.tint, 0.7)
     }
 }

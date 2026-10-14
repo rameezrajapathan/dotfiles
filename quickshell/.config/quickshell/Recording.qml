@@ -3,13 +3,13 @@ import Quickshell.Io
 import QtQuick
 
 // Red dot while wf-recorder runs; click to stop.
-Label {
+Icon {
     id: root
     property bool active: false
 
     visible: active
-    font.pixelSize: Theme.fontSize + 3
-    text: "󰑊"
+    name: "radio_button_checked"
+    filled: true
     color: Theme.red
 
     Process {

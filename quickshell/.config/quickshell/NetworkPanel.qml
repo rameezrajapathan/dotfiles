@@ -75,7 +75,7 @@ PanelWindow {
         anchors.rightMargin: 8
         width: 360
         height: content.implicitHeight + 28
-        color: Theme.base
+        color: Theme.baseTranslucent
         radius: 10
         border.color: Theme.surface
         border.width: 2
@@ -116,7 +116,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 visible: root.wiredDevice !== null
                 clickable: false
-                icon: "󰈀"
+                icon: "lan"
                 title: root.wiredDevice?.name ?? ""
                 highlighted: root.wiredDevice?.connected ?? false
                 detail: !root.wiredDevice?.connected ? "disconnected"
@@ -162,9 +162,16 @@ PanelWindow {
                     highlighted: modelData.connected
                     detail: modelData.stateChanging ? "connecting…"
                         : modelData.connected ? "connected"
-                        : modelData.security !== WifiSecurityType.Open ? "󰌾" : ""
+                        : ""
                     onClicked: root.activate(modelData)
 
+                    Icon {
+                        visible: !modelData.connected && !modelData.stateChanging
+                            && modelData.security !== WifiSecurityType.Open
+                        name: "lock"
+                        size: 16
+                        color: Theme.subtext
+                    }
                     Pill {
                         visible: modelData.known && !modelData.connected
                         text: "forget"
@@ -199,7 +206,7 @@ PanelWindow {
                     required property var modelData
                     readonly property bool switching: modelData.name in VpnService.pending
                     Layout.fillWidth: true
-                    icon: "󰖂"
+                    icon: "vpn_key"
                     title: modelData.name
                     highlighted: modelData.active
                     detail: switching ? (VpnService.pending[modelData.name] ? "connecting…" : "disconnecting…")

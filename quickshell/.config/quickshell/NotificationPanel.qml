@@ -36,7 +36,7 @@ PanelWindow {
         anchors.rightMargin: 8
         width: 400
         height: content.implicitHeight + 28
-        color: Theme.base
+        color: Theme.baseTranslucent
         radius: 10
         border.color: Theme.surface
         border.width: 2

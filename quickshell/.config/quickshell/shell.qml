@@ -9,4 +9,6 @@ ShellRoot {
     Cheatsheet {}
     WallpaperPicker {}
     NotificationPopups {}
+    Launcher {}
+    PowerMenu {}
 }

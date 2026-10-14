@@ -1,14 +1,14 @@
 import QtQuick
 
 // Bell with a count of unread notifications; click for the list.
-Label {
+Icon {
     id: root
     signal clicked()
 
     readonly property int count: NotificationService.list.length
 
-    font.pixelSize: Theme.fontSize + 3
-    text: count > 0 ? "󰂚" : "󰂜"
+    name: count > 0 ? "notifications_unread" : "notifications"
+    filled: count > 0
     color: count > 0 ? Theme.text : Theme.overlay
 
     Rectangle {

@@ -1,7 +1,7 @@
 import Quickshell.Services.UPower
 import QtQuick
 
-Label {
+Icon {
     id: root
     signal clicked()
 
@@ -11,8 +11,10 @@ Label {
         || dev.state === UPowerDeviceState.FullyCharged
 
     visible: dev.isLaptopBattery
-    font.pixelSize: Theme.fontSize + 3
-    text: charging ? "󰂄" : ["󰁺", "󰁼", "󰁾", "󰂀", "󰂂", "󰁹"][Math.min(5, Math.floor(percent / 20))]
+    name: charging ? "battery_android_frame_bolt"
+        : percent <= 10 ? "battery_android_frame_alert"
+        : percent >= 95 ? "battery_android_frame_full"
+        : "battery_android_frame_" + Math.max(1, Math.min(6, Math.round(percent / 100 * 6)))
     color: charging ? Theme.green : percent <= 15 ? Theme.red : percent <= 30 ? Theme.yellow : Theme.text
 
     MouseArea {

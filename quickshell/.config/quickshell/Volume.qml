@@ -1,7 +1,7 @@
 import Quickshell.Services.Pipewire
 import QtQuick
 
-Label {
+Icon {
     id: root
     signal clicked()
 
@@ -11,8 +11,7 @@ Label {
 
     PwObjectTracker { objects: [sink] }
 
-    font.pixelSize: Theme.fontSize + 3
-    text: muted ? "󰝟" : volume < 0.34 ? "󰕿" : volume < 0.67 ? "󰖀" : "󰕾"
+    name: muted ? "volume_off" : volume < 0.01 ? "volume_mute" : volume < 0.5 ? "volume_down" : "volume_up"
     color: muted ? Theme.overlay : Theme.text
 
     MouseArea {

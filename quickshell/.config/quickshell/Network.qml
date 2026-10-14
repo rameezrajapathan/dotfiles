@@ -1,7 +1,8 @@
 import Quickshell.Networking
 import QtQuick
 
-Label {
+// Wired, Wi-Fi strength or offline, plus a key while a VPN is connected. Click for NetworkPanel.
+Item {
     id: root
     signal clicked()
 
@@ -12,13 +13,27 @@ Label {
         ? device.networks.values.find(n => n.connected) ?? null
         : null
 
-    font.pixelSize: Theme.fontSize + 3
-    text: (!device ? "󰤮"
-        : wifi ? Theme.wifiIcon(wifi.signalStrength)
-        : "󰈀") + vpnMark
-    // Shown while a VPN is connected; set to "" to hide it.
-    readonly property string vpnMark: VpnService.anyActive ? "  󰖂" : ""
-    color: device ? Theme.text : Theme.overlay
+    implicitWidth: row.implicitWidth
+    implicitHeight: row.implicitHeight
+
+    Row {
+        id: row
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 4
+
+        Icon {
+            name: !root.device ? "wifi_off"
+                : root.wifi ? Theme.wifiIcon(root.wifi.signalStrength)
+                : "lan"
+            color: root.device ? Theme.text : Theme.overlay
+        }
+        // Shown while a VPN is connected
+        Icon {
+            visible: VpnService.anyActive
+            name: "vpn_key"
+            size: 17
+        }
+    }
 
     MouseArea {
         anchors.fill: parent

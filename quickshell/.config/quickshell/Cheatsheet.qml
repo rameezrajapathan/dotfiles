@@ -5,38 +5,57 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Keybinding cheatsheet, read live from `hyprctl binds -j`.
-// Toggled with `qs ipc call cheatsheet toggle`. Type to filter, Esc or click outside to close.
+// Keybinding cheatsheet, read live from `hyprctl binds -j` and grouped into cards by what the
+// binds do. Toggled with `qs ipc call cheatsheet toggle` (Super + ?). Type to filter, Esc or a
+// click outside closes it.
 PanelWindow {
     id: root
 
     readonly property int columns: 3
-    readonly property int columnWidth: 560
+
+    // Card order; each bind goes in the first group whose pattern matches its description
+    readonly property var groups: [
+        { title: "Apps & system", icon: "apps", pattern: /^Open|launcher|clipboard|Lock|power|wallpaper|keybind|notification/i },
+        { title: "Screenshots & recording", icon: "screenshot_region", pattern: /screenshot|record|capture/i },
+        { title: "Media & hardware", icon: "graphic_eq", pattern: /volume|mute|media|track|brightness/i },
+        { title: "Workspaces & monitors", icon: "space_dashboard", pattern: /workspace|monitor/i },
+        { title: "Windows", icon: "select_window", pattern: /./ }
+    ]
 
     property var binds: []
-    readonly property var filtered: {
+    readonly property var cards: {
         const q = search.text.toLowerCase();
-        return q === "" ? binds
-            : binds.filter(b => b.desc.toLowerCase().includes(q) || b.keys.toLowerCase().includes(q));
+        const shown = q === "" ? binds
+            : binds.filter(b => b.desc.toLowerCase().includes(q) || b.keys.join(" ").toLowerCase().includes(q));
+        return groups
+            .map(g => ({ title: g.title, icon: g.icon, rows: shown.filter(b => b.group === g.title) }))
+            .filter(c => c.rows.length > 0);
     }
 
     function toggle() {
-        if (visible) {
-            visible = false;
-        } else {
-            search.text = "";
-            reader.running = true;
-            visible = true;
+        if (open) {
+            open = false;
+            return;
         }
+        search.text = "";
+        reader.running = true;
+        visible = true;
+        open = true;
     }
+
+    property bool open: false
 
     function keyName(key) {
         const names = {
             Return: "Enter", Escape: "Esc", left: "←", right: "→", up: "↑", down: "↓",
             Page_Up: "PgUp", Page_Down: "PgDn", bracketleft: "[", bracketright: "]",
-            minus: "-", equal: "=", slash: "/", question: "?",
+            minus: "−", equal: "=", slash: "/", question: "?", Print: "PrtSc",
             "mouse:272": "Left drag", "mouse:273": "Right drag", mouse_up: "Scroll ↑", mouse_down: "Scroll ↓",
-            "code:20": "-", "code:21": "=", "code:61": "/"
+            XF86AudioRaiseVolume: "Vol +", XF86AudioLowerVolume: "Vol −", XF86AudioMute: "Mute",
+            XF86AudioMicMute: "Mic mute", XF86AudioPlay: "Play", XF86AudioPause: "Pause",
+            XF86AudioNext: "Next", XF86AudioPrev: "Prev",
+            XF86MonBrightnessUp: "Bright +", XF86MonBrightnessDown: "Bright −",
+            XF86KbdBrightnessUp: "Kbd light +", XF86KbdBrightnessDown: "Kbd light −"
         };
         if (key in names)
             return names[key];
@@ -65,9 +84,8 @@ PanelWindow {
                 mask &= ~1;
             }
             let desc = b.description;
-            const digit = /^[1-9]$/.test(b.key) && desc.endsWith(" " + b.key);
-            if (digit) {
-                key = "1…9";
+            if (/^[1-9]$/.test(b.key) && desc.endsWith(" " + b.key)) {
+                key = "1 – 9";
                 desc = desc.slice(0, -1) + "1–9";
             }
             const id = mask + "|" + desc;
@@ -79,7 +97,11 @@ PanelWindow {
                 row.alts.push(key);
             }
         }
-        binds = rows.map(r => ({ desc: r.desc, keys: r.mods.concat([r.alts.join(" / ")]).join(" + ") }));
+        binds = rows.map(r => ({
+            desc: r.desc,
+            keys: r.mods.concat([r.alts.join(" / ")]),
+            group: groups.find(g => g.pattern.test(r.desc)).title
+        }));
     }
 
     Process {
@@ -102,112 +124,134 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "quickshell-cheatsheet"
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "#99000000"
+    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    color: "transparent"
     visible: false
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: root.visible = false
-    }
-
     Rectangle {
-        anchors.centerIn: parent
-        width: root.columns * root.columnWidth + 40
-        height: Math.min(parent.height - 80, layout.implicitHeight + 40)
-        color: Theme.base
-        radius: 12
-        border.color: Theme.surface
-        border.width: 2
+        anchors.fill: parent
+        color: Qt.alpha(Theme.base, 0.82)
+        opacity: root.open ? 1 : 0
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 160
+                onRunningChanged: if (!running && !root.open) root.visible = false
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
+            onClicked: root.open = false
         }
 
         ColumnLayout {
             id: layout
-            anchors.fill: parent
-            anchors.margins: 20
-            spacing: 14
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 80, 1500)
+            height: Math.min(parent.height - 80, implicitHeight)
+            spacing: 18
+            scale: root.open ? 1 : 0.96
+            Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
+            // Header: title and search
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 12
+                spacing: 16
 
-                Label {
-                    text: "Keybindings"
-                    font.bold: true
-                    font.pixelSize: Theme.fontSize + 3
+                Icon {
+                    name: "keyboard"
+                    filled: true
+                    color: Theme.accent
+                    size: 30
                 }
+                Label {
+                    text: "Keyboard shortcuts"
+                    font.pixelSize: 24
+                    font.bold: true
+                }
+                Item { Layout.fillWidth: true }
 
                 Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 30
-                    radius: 8
-                    color: Theme.surface
+                    Layout.preferredWidth: 360
+                    implicitHeight: 42
+                    radius: 21
+                    color: Theme.baseTranslucent
+                    border.width: 1
+                    border.color: search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : Qt.alpha(Theme.text, 0.1)
 
-                    TextInput {
-                        id: search
+                    MouseArea {
                         anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        verticalAlignment: TextInput.AlignVCenter
-                        color: Theme.text
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize
-                        focus: root.visible
-                        Keys.onEscapePressed: root.visible = false
+                    }
 
-                        Label {
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: search.text === ""
-                            text: "Type to filter…"
-                            color: Theme.overlay
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 14
+                        anchors.rightMargin: 14
+                        spacing: 10
+
+                        Icon {
+                            name: "search"
+                            color: Theme.subtext
+                        }
+                        TextInput {
+                            id: search
+                            Layout.fillWidth: true
+                            color: Theme.text
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize + 1
+                            focus: root.open
+                            Keys.onEscapePressed: root.open = false
+
+                            Label {
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: search.text === ""
+                                text: "Search shortcuts…"
+                                color: Theme.overlay
+                                font.pixelSize: Theme.fontSize + 1
+                            }
                         }
                     }
                 }
             }
 
+            // Cards, packed into the shortest column
             Flickable {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 implicitHeight: columnsRow.implicitHeight
                 contentHeight: columnsRow.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
                 clip: true
 
                 Row {
                     id: columnsRow
-                    spacing: 0
+                    width: parent.width
+                    spacing: 16
+
+                    readonly property real columnWidth: (width - spacing * (root.columns - 1)) / root.columns
+                    // Greedy packing: each card goes to the column with the fewest rows so far
+                    readonly property var packed: {
+                        const cols = Array.from({ length: root.columns }, () => ({ cards: [], rows: 0 }));
+                        for (const card of root.cards) {
+                            const col = cols.reduce((a, b) => b.rows < a.rows ? b : a);
+                            col.cards.push(card);
+                            col.rows += card.rows.length + 2;
+                        }
+                        return cols.map(c => c.cards);
+                    }
 
                     Repeater {
                         model: root.columns
 
                         Column {
                             required property int index
-                            readonly property int perColumn: Math.ceil(root.filtered.length / root.columns)
-                            width: root.columnWidth
-                            spacing: 2
+                            width: columnsRow.columnWidth
+                            spacing: 16
 
                             Repeater {
-                                model: root.filtered.slice(index * perColumn, (index + 1) * perColumn)
+                                model: columnsRow.packed[index]
 
-                                RowLayout {
-                                    required property var modelData
-                                    width: root.columnWidth - 16
-                                    spacing: 12
-
-                                    Label {
-                                        Layout.preferredWidth: 230
-                                        text: modelData.keys
-                                        color: Theme.accent
-                                        elide: Text.ElideRight
-                                    }
-                                    Label {
-                                        Layout.fillWidth: true
-                                        text: modelData.desc
-                                        elide: Text.ElideRight
-                                    }
-                                }
+                                CheatsheetCard {}
                             }
                         }
                     }
@@ -215,9 +259,10 @@ PanelWindow {
             }
 
             Label {
-                visible: root.filtered.length === 0
-                text: "No matching keybindings"
-                color: Theme.overlay
+                Layout.alignment: Qt.AlignHCenter
+                visible: root.cards.length === 0
+                text: "No shortcuts match “" + search.text + "”"
+                color: Theme.subtext
             }
         }
     }

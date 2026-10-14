@@ -1,133 +1,51 @@
+// The distro's logo beside three sections. Colors are terminal color names, so they
+// follow kitty's palette, which comes from the wallpaper (matugen).
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
 
+  // The running distro's built-in logo, detected automatically
   "logo": {
-    "type": "none"
+    "padding": { "top": 1, "left": 2, "right": 4 }
   },
 
   "display": {
-    "separator": "  "
+    "separator": "  ",
+    "key": { "width": 15 },
+    "color": { "output": "white" },
+    "percent": { "type": 3 },
+    "bar": { "width": 12, "char": { "elapsed": "■", "total": "·" } }
   },
 
   "modules": [
-    {
-      "type": "custom",
-      "format": ""
-    },
-    {
-      "type": "custom",
-      "format": "{##89b4fa}pika.{#}"
-    },
-    {
-      "type": "custom",
-      "format": "{##89b4fa}────────────────────────────────────────────{#}"
-    },
-    {
-      "type": "custom",
-      "format": ""
-    },
+    "break",
+    { "type": "title", "format": "{#bold_blue}{user-name}{#}{#bright_black} at {#}{#bold_magenta}{host-name}{#}" },
+    "break",
 
-    {
-      "type": "os",
-      "key": "󰣇  os       ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-    {
-      "type": "kernel",
-      "key": "󰒋  kernel   ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-    {
-      "type": "wm",
-      "key": "󱂬  session  ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-    {
-      "type": "shell",
-      "key": "󰆍  shell    ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
+    { "type": "custom", "format": "{#blue}╭─ 󰌢  {#bold_blue}Software{#}" },
+    { "type": "os", "key": "│ 󰣇  OS", "keyColor": "blue", "format": "{pretty-name} {arch}" },
+    { "type": "kernel", "key": "│ 󰒋  Kernel", "keyColor": "blue" },
+    { "type": "wm", "key": "│ 󱂬  WM", "keyColor": "blue" },
+    { "type": "shell", "key": "│ 󰆍  Shell", "keyColor": "blue" },
+    { "type": "terminal", "key": "│ 󰞷  Terminal", "keyColor": "blue" },
+    { "type": "packages", "key": "│ 󰏖  Packages", "keyColor": "blue" },
+    { "type": "custom", "format": "{#blue}╰─" },
 
-    {
-      "type": "custom",
-      "format": ""
-    },
-    {
-      "type": "custom",
-      "format": "{##89b4fa}hardware{#}"
-    },
-    {
-      "type": "custom",
-      "format": "{##89b4fa}────────────────────────────────────────────{#}"
-    },
-    {
-      "type": "custom",
-      "format": ""
-    },
+    { "type": "custom", "format": "{#magenta}╭─ 󰍹  {#bold_magenta}Hardware{#}" },
+    { "type": "host", "key": "│ 󰌢  Model", "keyColor": "magenta", "format": "{family}" },
+    { "type": "cpu", "key": "│ 󰻠  CPU", "keyColor": "magenta", "format": "{name} · {cores-logical} threads" },
+    { "type": "gpu", "key": "│ 󰢮  GPU", "keyColor": "magenta", "hideType": "integrated", "format": "{name}" },
+    { "type": "display", "key": "│ 󰍹  Display", "keyColor": "magenta", "compactType": "original-with-refresh-rate" },
+    { "type": "memory", "key": "│ 󰍛  Memory", "keyColor": "magenta" },
+    { "type": "disk", "key": "│ 󰋊  Disk", "keyColor": "magenta", "folders": "/" },
+    { "type": "battery", "key": "│ 󰁹  Battery", "keyColor": "magenta" },
+    { "type": "custom", "format": "{#magenta}╰─" },
 
-    {
-      "type": "cpu",
-      "key": "󰻠  cpu      ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-    {
-      "type": "gpu",
-      "key": "󰢮  gpu      ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-    {
-      "type": "memory",
-      "key": "󰍛  memory   ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-    {
-      "type": "disk",
-      "key": "󰋊  disk     ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9",
-      "folders": "/"
-    },
+    { "type": "custom", "format": "{#green}╭─ 󰔟  {#bold_green}Session{#}" },
+    { "type": "uptime", "key": "│ 󰅐  Uptime", "keyColor": "green" },
+    { "type": "localip", "key": "│ 󰩟  Local IP", "keyColor": "green", "showIpv6": false, "compact": true },
+    { "type": "custom", "format": "{#green}╰─" },
 
-    {
-      "type": "custom",
-      "format": ""
-    },
-    {
-      "type": "custom",
-      "format": "{##89b4fa}state{#}"
-    },
-    {
-      "type": "custom",
-      "format": "{##89b4fa}────────────────────────────────────────────{#}"
-    },
-    {
-      "type": "custom",
-      "format": ""
-    },
-
-    {
-      "type": "uptime",
-      "key": "󰅐  uptime   ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-    {
-      "type": "packages",
-      "key": "󰏖  packages ",
-      "keyColor": "#afd18c",
-      "outputColor": "#d8dee9"
-    },
-
-    {
-      "type": "custom",
-      "format": ""
-    }
+    "break",
+    { "type": "colors", "symbol": "circle", "paddingLeft": 2 }
   ]
 }

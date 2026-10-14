@@ -13,9 +13,9 @@ PanelWindow {
     readonly property var dev: UPower.displayDevice
     readonly property int percent: Math.round(dev.percentage * 100)
     readonly property var modes: [
-        { profile: PowerProfile.PowerSaver, icon: "󰌪", title: "Power saver" },
-        { profile: PowerProfile.Balanced, icon: "󰾅", title: "Balanced" },
-        { profile: PowerProfile.Performance, icon: "󰓅", title: "Performance" }
+        { profile: PowerProfile.PowerSaver, icon: "energy_savings_leaf", title: "Power saver" },
+        { profile: PowerProfile.Balanced, icon: "balance", title: "Balanced" },
+        { profile: PowerProfile.Performance, icon: "speed", title: "Performance" }
     ].filter(m => m.profile !== PowerProfile.Performance || PowerProfiles.hasPerformanceProfile)
 
     function toggle() {
@@ -61,7 +61,7 @@ PanelWindow {
         anchors.rightMargin: 8
         width: 320
         height: content.implicitHeight + 28
-        color: Theme.base
+        color: Theme.baseTranslucent
         radius: 10
         border.color: Theme.surface
         border.width: 2

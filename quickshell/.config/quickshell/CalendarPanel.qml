@@ -3,7 +3,7 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Month calendar under the clock. Arrows or scroll change the month, the month name returns to today.
+// Full time and month calendar under the date. Arrows or scroll change the month, the month name returns to today.
 // A transparent full-screen overlay: clicks outside the panel close it.
 PanelWindow {
     id: root
@@ -57,11 +57,12 @@ PanelWindow {
 
     Rectangle {
         anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.right: parent.right
         anchors.topMargin: Theme.barHeight + 6
+        anchors.rightMargin: 8
         width: 300
         height: content.implicitHeight + 28
-        color: Theme.base
+        color: Theme.baseTranslucent
         radius: 10
         border.color: Theme.surface
         border.width: 2
@@ -76,8 +77,20 @@ PanelWindow {
             anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
             spacing: 10
 
+            SystemClock {
+                id: clock
+                precision: SystemClock.Seconds
+                enabled: root.visible
+            }
+
             Label {
-                text: Qt.formatDate(root.today, "dddd, d MMMM yyyy")
+                text: Qt.formatTime(clock.date, "h:mm:ss AP")
+                font.pixelSize: 32
+                font.bold: true
+            }
+
+            Label {
+                text: Qt.formatDate(clock.date, "dddd, d MMMM yyyy")
                 color: Theme.subtext
             }
 

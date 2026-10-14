@@ -8,6 +8,8 @@ import QtQuick
 // (hypr/scripts/theme.sh) and reloaded live. The defaults are Catppuccin Mocha.
 Singleton {
     readonly property color base: colors.base
+    // Semi-transparent base for the bar islands and dropdown panels
+    readonly property color baseTranslucent: Qt.alpha(colors.base, 0.8)
     readonly property color surface: colors.surface
     readonly property color overlay: colors.overlay
     readonly property color text: colors.text
@@ -21,10 +23,13 @@ Singleton {
 
     readonly property string font: "FiraCode Nerd Font Propo"
     readonly property int fontSize: 13
-    readonly property int barHeight: 30
+    readonly property int barHeight: 38
+    // Material Symbols Rounded (ttf-material-symbols-variable), used through Icon.qml
+    readonly property string iconFont: "Material Symbols Rounded"
+    readonly property int iconSize: 20
 
     function wifiIcon(strength) {
-        return ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"][Math.min(4, Math.floor(strength * 5))];
+        return ["signal_wifi_0_bar", "wifi_1_bar", "wifi_2_bar", "wifi", "wifi"][Math.min(4, Math.floor(strength * 5))];
     }
 
     FileView {

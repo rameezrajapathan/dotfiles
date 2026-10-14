@@ -31,8 +31,11 @@ Rectangle {
         anchors.rightMargin: 8
         spacing: 10
 
-        Label {
-            text: root.icon
+        Icon {
+            visible: root.icon !== ""
+            name: root.icon
+            size: 18
+            filled: root.highlighted
             color: root.highlighted ? Theme.accent : Theme.text
         }
         Label {

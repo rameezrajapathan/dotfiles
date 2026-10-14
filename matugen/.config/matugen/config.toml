@@ -11,6 +11,15 @@ yellow = "#f9e2af"
 blue = "#89b4fa"
 magenta = "#f5c2e7"
 cyan = "#94e2d5"
+# The rest of the Catppuccin palette, for Neovim
+peach = "#fab387"
+maroon = "#eba0ac"
+mauve = "#cba6f7"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+lavender = "#b4befe"
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
 
 [templates.quickshell]
 input_path = "~/.config/matugen/templates/quickshell.json"
@@ -43,3 +52,7 @@ output_path = "~/.local/state/theme/gtk.css"
 [templates.starship]
 input_path = "~/.config/matugen/templates/starship-palette.toml"
 output_path = "~/.local/state/theme/starship-palette.toml"
+
+[templates.nvim]
+input_path = "~/.config/matugen/templates/nvim.lua"
+output_path = "~/.local/state/theme/nvim.lua"

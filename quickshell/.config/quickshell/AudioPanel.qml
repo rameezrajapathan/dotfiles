@@ -50,7 +50,7 @@ PanelWindow {
         anchors.rightMargin: 8
         width: 380
         height: content.implicitHeight + 28
-        color: Theme.base
+        color: Theme.baseTranslucent
         radius: 10
         border.color: Theme.surface
         border.width: 2
@@ -86,7 +86,7 @@ PanelWindow {
             SectionLabel { text: "Output" }
             VolumeRow {
                 node: Pipewire.defaultAudioSink
-                icon: muted ? "󰝟" : "󰕾"
+                icon: muted ? "volume_off" : "volume_up"
             }
             Repeater {
                 model: root.sinks
@@ -94,7 +94,7 @@ PanelWindow {
                 PanelRow {
                     required property var modelData
                     Layout.fillWidth: true
-                    icon: "󰓃"
+                    icon: "speaker"
                     title: root.deviceName(modelData)
                     highlighted: modelData === Pipewire.defaultAudioSink
                     onClicked: Pipewire.preferredDefaultAudioSink = modelData
@@ -105,7 +105,7 @@ PanelWindow {
             SectionLabel { text: "Input" }
             VolumeRow {
                 node: Pipewire.defaultAudioSource
-                icon: muted ? "󰍭" : "󰍬"
+                icon: muted ? "mic_off" : "mic"
             }
             Repeater {
                 model: root.sources
@@ -113,7 +113,7 @@ PanelWindow {
                 PanelRow {
                     required property var modelData
                     Layout.fillWidth: true
-                    icon: "󰍬"
+                    icon: "mic"
                     title: root.deviceName(modelData)
                     highlighted: modelData === Pipewire.defaultAudioSource
                     onClicked: Pipewire.preferredDefaultAudioSource = modelData
@@ -143,7 +143,7 @@ PanelWindow {
                     }
                     VolumeRow {
                         node: modelData
-                        icon: muted ? "󰝟" : "󰕾"
+                        icon: muted ? "volume_off" : "volume_up"
                     }
                 }
             }
@@ -171,10 +171,9 @@ PanelWindow {
         spacing: 10
         visible: node !== null
 
-        Label {
-            text: row.icon
+        Icon {
+            name: row.icon
             color: row.muted ? Theme.overlay : Theme.text
-            font.pixelSize: Theme.fontSize + 3
 
             MouseArea {
                 anchors.fill: parent

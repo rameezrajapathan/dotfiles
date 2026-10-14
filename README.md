@@ -8,7 +8,8 @@ and a handful of single-purpose tools. Colors follow the wallpaper (Material You
 |---|---|
 | Compositor | Hyprland (Lua config, 0.56+) |
 | Bar, panels, notifications | Quickshell |
-| App launcher, clipboard picker, power menu, password prompts | fuzzel |
+| App launcher, power menu | Quickshell (`Launcher.qml`, `PowerMenu.qml`) |
+| Clipboard picker, password prompts | fuzzel |
 | Wallpaper | hyprpaper |
 | Colors from the wallpaper | matugen |
 | Idle / lock | hypridle + hyprlock |
@@ -25,7 +26,7 @@ and a handful of single-purpose tools. Colors follow the wallpaper (Material You
 
    ```sh
    sudo pacman -S --needed hyprland quickshell hypridle hyprlock hyprpaper hyprpolkitagent \
-       fuzzel kitty starship fastfetch stow matugen adw-gtk-theme \
+       fuzzel kitty starship fastfetch stow matugen adw-gtk-theme ttf-material-symbols-variable \
        grim slurp wl-clipboard cliphist wf-recorder jq brightnessctl libnotify \
        networkmanager networkmanager-openvpn wireplumber pipewire-pulse upower \
        ttf-firacode-nerd papirus-icon-theme
@@ -66,6 +67,7 @@ hypr/.config/hypr/
   rules.lua           window rules
   keybinds.lua        all keybindings
   autostart.lua       programs started with Hyprland
+  background.lua      apps that Super + Q hides instead of closing (Thunderbird, Chrome apps)
   hypridle.conf       idle timeouts
   hyprlock.conf       lock screen
   hyprpaper.conf      wallpaper
@@ -73,13 +75,17 @@ hypr/.config/hypr/
     screenshot.sh     region | full | active [save]
     record.sh         region | full; run again to stop
     clipboard.sh      cliphist history in fuzzel
-    powermenu.sh      lock / logout / suspend / reboot / shutdown in fuzzel
+    lock-status.sh    battery and now-playing lines on the lock screen
     vpn.sh            toggle a NetworkManager VPN, saving its password on first use
+    tray-apps.sh      starts OneDriveGUI and Remmina's applet once the bar's tray is up
 quickshell/.config/quickshell/
   shell.qml           one Bar per screen
   Bar.qml             bar layout
   Theme.qml           colors, font, sizes (singleton)
   Workspaces.qml  Clock.qml  Recording.qml  Network.qml  Volume.qml  Battery.qml
+  Media.qml  MediaButton.qml  MediaPanel.qml   music (MPRIS: Spotify, browsers, any player)
+  PowerButton.qml  Launcher.qml  PowerMenu.qml
+  Icon.qml   Material Symbols Rounded icon by name (Icon { name: "wifi"; filled: true })
   NetworkPanel.qml    dropdown for wired / Wi-Fi / VPN
   AudioPanel.qml      dropdown for audio devices and volumes
   CalendarPanel.qml   month calendar under the clock
@@ -87,6 +93,8 @@ quickshell/.config/quickshell/
   Notification*.qml   notification daemon (Service), toasts (Popups, Card), bell (Button), list (Panel)
   WallpaperPicker.qml Super + Shift + W wallpaper strip (WallpaperButton.qml opens it from the bar)
   ActiveWindow.qml    icon and title of the focused window
+  Tray.qml            tray icons of background apps
+  BackgroundApps.qml  icons for running Thunderbird / Chrome-app windows (shown or hidden)
   Cheatsheet.qml      Super + ? keybinding overlay
   VpnService.qml      VPN state from nmcli (singleton)
   Label.qml  Pill.qml  Switch.qml  Slider.qml  PanelRow.qml  small shared widgets
@@ -103,12 +111,13 @@ fuzzel/  mako/  kitty/  matugen/  gtk/  starship/  fastfetch/  fontconfig/
 |---|---|
 | Super + T / Super + Return | Terminal (kitty) |
 | Super + N | Notification list |
-| Super + A | App launcher (fuzzel) |
+| Super + A | App launcher |
 | Super + B | Browser (Zen) |
 | Super + C | VS Code |
 | Super + E | File manager (Thunar) |
 | Super + V | Clipboard history |
 | Super + Escape | Power menu |
+| Play / Next / Prev keys | Control the player shown in the music panel |
 | Super + Alt + L | Lock |
 | Super + ? | Keybinding cheatsheet (type to filter, Esc to close) |
 | Super + Shift + W | Wallpaper picker |
@@ -169,6 +178,21 @@ window's icon and title, clock (click for a calendar), then icons only: 󰑊 (on
 click to stop), 󰸉 wallpaper picker, network, volume (click for the audio panel, right-click to mute, scroll to change)
 battery (click for the battery panel) and 󰂚 notifications (with an unread count). The network icon gets a 󰖂 while a VPN is connected; set
 `vpnMark` in `Network.qml` to `""` to hide it.
+
+Background apps (OneDrive, Remmina, ...) get their own pill just left of the status icons; it's
+hidden when no app has a tray icon. Left click opens the app, right click shows its menu, middle
+click is the app's secondary action. OneDriveGUI and `remmina -i` start from
+`hypr/scripts/tray-apps.sh`, which waits for the tray first: Qt apps that start before it exists
+open a window instead, and closing that window quits them. With the tray up, closing the
+OneDrive or Remmina window just hides it to the tray.
+
+Thunderbird and Chrome apps (Teams, WhatsApp, ...) have no tray icon on Linux, so they're kept
+running another way: **Super + Q hides them** in the `special:background` workspace instead of
+closing them, and they keep sending notifications. Their icons show at the start of the same
+pill, with a dot while the window is shown. Click to bring a hidden window to the current
+workspace (or hide it if it's focused); right click quits the app. Thunderbird, Teams and
+WhatsApp start hidden at login. Edit the class list in `hypr/background.lua` and the regex in
+`BackgroundApps.qml` to change which apps behave this way. The app's own ✕ button still quits it.
 
 ### Wallpaper picker
 
@@ -260,7 +284,7 @@ argument to regenerate from the current wallpaper. It:
 | Alacritty | `~/.config/alacritty/alacritty.toml` imports `alacritty.toml` | live |
 | Hyprland borders | `settings.lua` loads `hyprland.lua` | live (`hyprctl reload`) |
 | Lock screen (blurred wallpaper + colors) | `hyprlock.conf` sources `hyprlock.conf` | next lock |
-| fuzzel (launcher, clipboard, power menu) | `fuzzel.ini` includes `fuzzel.ini` | next launch |
+| fuzzel (clipboard, passwords) | `fuzzel.ini` includes `fuzzel.ini` | next launch |
 | Thunar and other GTK apps | `gtk/` (`gtk-3.0`/`gtk-4.0/gtk.css`) imports `gtk.css` | GTK3 live, GTK4 on restart |
 | starship | `STARSHIP_CONFIG` → `starship.toml` (your config + generated palette) | next prompt |
 

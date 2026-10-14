@@ -9,16 +9,16 @@ local function shot(args)
 end
 
 -- Application launchers
-hl.bind(mod .. " + T", hl.dsp.exec_cmd("kitty"), { description = "Open terminal (Kitty)" })
+hl.bind(mod .. " + T", hl.dsp.exec_cmd("FASTFETCH=1 kitty"), { description = "Open terminal with fastfetch (Kitty)" })
 hl.bind(mod .. " + Return", hl.dsp.exec_cmd("kitty"), { description = "Open terminal (Kitty)" })
 hl.bind(mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "Show notifications" })
 hl.bind(mod .. " + C", hl.dsp.exec_cmd("code"), { description = "Open code editor (Visual Studio Code)" })
 hl.bind(mod .. " + B", hl.dsp.exec_cmd("zen-browser"), { description = "Open web browser (Zen)" })
 hl.bind(mod .. " + SHIFT + F", shot("region save"), { description = "Capture and save a region screenshot" })
 hl.bind(mod .. " + E", hl.dsp.exec_cmd("thunar"), { description = "Open file manager (Thunar)" })
-hl.bind(mod .. " + A", hl.dsp.exec_cmd("fuzzel"), { description = "Open app launcher" })
+hl.bind(mod .. " + A", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "Open app launcher" })
 hl.bind(mod .. " + V", script("clipboard.sh"), { description = "Open clipboard history" })
-hl.bind(mod .. " + Escape", script("powermenu.sh"), { description = "Open power menu" })
+hl.bind(mod .. " + Escape", hl.dsp.exec_cmd("qs ipc call power toggle"), { description = "Open power menu" })
 hl.bind(mod .. " + SHIFT + slash", hl.dsp.exec_cmd("qs ipc call cheatsheet toggle"), { description = "Show keybindings" })
 hl.bind(mod .. " + SHIFT + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"), { description = "Pick wallpaper" })
 hl.bind(mod .. " + ALT + L", hl.dsp.exec_cmd("loginctl lock-session"), { description = "Lock session" })
@@ -33,7 +33,7 @@ hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true, description = "Lower display brightness" })
 
 -- Window management
-hl.bind(mod .. " + Q", hl.dsp.window.close(), { description = "Close active window" })
+hl.bind(mod .. " + Q", require("background").hide_or_close, { description = "Close active window (background apps hide to the tray)" })
 hl.bind(mod .. " + F", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating window" })
 hl.bind(mod .. " + SHIFT + M", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle maximized window" })
 hl.bind(mod .. " + W", hl.dsp.group.toggle(), { description = "Toggle window group" })
@@ -144,3 +144,7 @@ hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%-"), { locked = true, repeating = true, description = "Lower volume" })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, description = "Toggle audio mute" })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, description = "Toggle microphone mute" })
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("qs ipc call media next"), { locked = true, description = "Next track" })
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("qs ipc call media previous"), { locked = true, description = "Previous track" })

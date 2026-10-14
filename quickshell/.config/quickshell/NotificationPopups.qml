@@ -11,7 +11,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "quickshell-notifications"
-    implicitWidth: 380
+    implicitWidth: 400
     implicitHeight: Math.max(1, column.implicitHeight)
     color: "transparent"
     visible: NotificationService.popups.length > 0

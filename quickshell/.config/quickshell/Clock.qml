@@ -10,7 +10,7 @@ Label {
         precision: SystemClock.Minutes
     }
 
-    text: Qt.formatDateTime(clock.date, "ddd d MMM   HH:mm")
+    text: Qt.formatDateTime(clock.date, "h:mm AP")
 
     MouseArea {
         anchors.fill: parent
