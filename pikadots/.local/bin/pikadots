@@ -10,7 +10,7 @@
 #   pikadots backup       back up now (restic; see pikadots-backup)
 #   pikadots backup-init  create the backup password and repository, enable the daily backup
 #
-# On a new machine: git clone <repo> ~/dotfiles && ~/dotfiles/install.sh
+# On a new machine: git clone https://github.com/rameezrajapathan/dotfiles.git ~/dotfiles && ~/dotfiles/install.sh
 set -uo pipefail
 
 # The repo: this script lives in <repo>/pikadots/.local/bin
