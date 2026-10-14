@@ -33,7 +33,6 @@ PanelWindow {
         spacing: 16
 
         Recording {}
-        Vpn { onClicked: networkPanel.toggle() }
         Network { onClicked: networkPanel.toggle() }
         Volume {}
         Battery {}

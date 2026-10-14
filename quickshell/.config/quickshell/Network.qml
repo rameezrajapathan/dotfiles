@@ -12,9 +12,11 @@ Label {
         ? device.networks.values.find(n => n.connected) ?? null
         : null
 
-    text: !device ? "󰤮 offline"
+    text: (!device ? "󰤮 offline"
         : wifi ? Theme.wifiIcon(wifi.signalStrength) + " " + wifi.name
-        : "󰈀 wired"
+        : "󰈀 wired") + vpnMark
+    // Shown while a VPN is connected; set to "" to hide it.
+    readonly property string vpnMark: VpnService.anyActive ? "  󰖂" : ""
     color: device ? Theme.text : Theme.overlay
 
     MouseArea {

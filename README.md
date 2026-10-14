@@ -72,10 +72,10 @@ quickshell/.config/quickshell/
   shell.qml           one Bar per screen
   Bar.qml             bar layout
   Theme.qml           colors, font, sizes (singleton)
-  Workspaces.qml  Clock.qml  Recording.qml  Vpn.qml  Network.qml  Volume.qml  Battery.qml
+  Workspaces.qml  Clock.qml  Recording.qml  Network.qml  Volume.qml  Battery.qml
   NetworkPanel.qml    dropdown for wired / Wi-Fi / VPN
   VpnService.qml      VPN state from nmcli (singleton)
-  Label.qml  Pill.qml  PanelRow.qml   small shared widgets
+  Label.qml  Pill.qml  Switch.qml  PanelRow.qml   small shared widgets
 fuzzel/  mako/  kitty/  starship/  fastfetch/  fontconfig/
 ```
 
@@ -148,19 +148,21 @@ keyboard brightness also work on the lock screen.
 ## The bar
 
 Left to right: workspaces (click to switch), clock, then **rec** (only while recording),
-**vpn**, network, volume (click to mute, scroll to change) and battery.
+network, volume (click to mute, scroll to change) and battery. The network label gets a 󰖂
+while a VPN is connected; set `vpnMark` in `Network.qml` to `""` to hide it.
 
 ### Network panel
 
-Click **vpn** or the network label to open the panel. Click anywhere else to close it.
+Click the network label to open the panel. Click anywhere outside it to close it.
 
 - **Wired**: the Ethernet device and its link speed.
-- **Wi-Fi**: on/off switch and nearby networks, strongest first. The connected one is highlighted
+- **Wi-Fi**: an on/off switch and nearby networks, strongest first. The connected one is highlighted
   and 󰌾 marks secured networks.
   - Click a network to connect, or click the connected one to disconnect.
   - New secured networks ask for their password in a fuzzel prompt.
   - **forget** removes a saved network.
-- **VPN**: every NetworkManager VPN or WireGuard connection. Click one to connect or disconnect.
+- **VPN**: every NetworkManager VPN or WireGuard connection, each with an on/off switch. It shows
+  "connecting…" until NetworkManager reports the new state.
 - **settings** opens `nmtui` in kitty for anything else (editing connections, hidden networks,
   static IPs).
 

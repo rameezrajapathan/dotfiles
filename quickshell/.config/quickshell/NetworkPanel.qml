@@ -1,12 +1,13 @@
 import Quickshell
 import Quickshell.Io
-import Quickshell.Hyprland
 import Quickshell.Networking
+import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
 // Dropdown under the bar: wired status, Wi-Fi networks and VPN connections.
-PopupWindow {
+// A transparent full-screen overlay: clicks outside the panel close it.
+PanelWindow {
     id: root
     required property var bar
 
@@ -35,11 +36,11 @@ PopupWindow {
         }
     }
 
-    anchor.window: bar
-    anchor.rect.x: bar.width - implicitWidth - 8
-    anchor.rect.y: bar.height + 6
-    implicitWidth: 360
-    implicitHeight: content.implicitHeight + 28
+    screen: bar.screen
+    anchors { top: true; bottom: true; left: true; right: true }
+    exclusionMode: ExclusionMode.Ignore
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.namespace: "quickshell-network"
     color: "transparent"
     visible: false
 
@@ -50,11 +51,9 @@ PopupWindow {
             VpnService.refresh();
     }
 
-    // Close when clicking anywhere outside the panel and the bar.
-    HyprlandFocusGrab {
-        active: root.visible
-        windows: [root, root.bar]
-        onCleared: root.visible = false
+    MouseArea {
+        anchors.fill: parent
+        onClicked: root.visible = false
     }
 
     Process {
@@ -70,11 +69,20 @@ PopupWindow {
     }
 
     Rectangle {
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: Theme.barHeight + 6
+        anchors.rightMargin: 8
+        width: 360
+        height: content.implicitHeight + 28
         color: Theme.base
         radius: 10
         border.color: Theme.surface
         border.width: 2
+
+        MouseArea {
+            anchors.fill: parent
+        }
 
         ColumnLayout {
             id: content
@@ -124,10 +132,10 @@ PopupWindow {
                     Layout.fillWidth: true
                     text: "Wi-Fi"
                 }
-                Pill {
-                    text: Networking.wifiEnabled ? "on" : "off"
-                    active: Networking.wifiEnabled
-                    onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
+                Switch {
+                    Layout.rightMargin: 8
+                    checked: Networking.wifiEnabled
+                    onToggled: Networking.wifiEnabled = !Networking.wifiEnabled
                 }
             }
 
@@ -187,13 +195,21 @@ PopupWindow {
                 model: VpnService.connections
 
                 PanelRow {
+                    id: vpnRow
                     required property var modelData
+                    readonly property bool switching: modelData.name in VpnService.pending
                     Layout.fillWidth: true
                     icon: "󰖂"
                     title: modelData.name
                     highlighted: modelData.active
-                    detail: modelData.active ? "connected" : ""
+                    detail: switching ? (VpnService.pending[modelData.name] ? "connecting…" : "disconnecting…")
+                        : modelData.active ? "connected" : ""
                     onClicked: VpnService.toggle(modelData.name)
+
+                    Switch {
+                        checked: vpnRow.switching ? VpnService.pending[vpnRow.modelData.name] : vpnRow.modelData.active
+                        onToggled: VpnService.toggle(vpnRow.modelData.name)
+                    }
                 }
             }
         }

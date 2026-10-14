@@ -10,14 +10,19 @@ Singleton {
 
     property var connections: [] // [{ name, active }]
     readonly property bool anyActive: connections.some(c => c.active)
+    // Connections being switched, name -> wanted state; cleared once nmcli reports it.
+    property var pending: ({})
 
     function refresh() {
         poll.running = true;
     }
 
     function toggle(name) {
+        const conn = connections.find(c => c.name === name);
+        pending = Object.assign({}, pending, { [name]: !(conn?.active ?? false) });
         Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/vpn.sh", name]);
         refreshSoon.restart();
+        pendingTimeout.restart();
     }
 
     Process {
@@ -35,6 +40,11 @@ Singleton {
                         result.push({ name: fields.join(":").replace(/\\/g, ""), active });
                 }
                 root.connections = result;
+                const still = {};
+                for (const c of result)
+                    if (c.name in root.pending && root.pending[c.name] !== c.active)
+                        still[c.name] = root.pending[c.name];
+                root.pending = still;
             }
         }
     }
@@ -45,6 +55,13 @@ Singleton {
         repeat: true
         triggeredOnStart: true
         onTriggered: poll.running = true
+    }
+
+    // Give up on "connecting…" if the state never changes (e.g. the password prompt was cancelled).
+    Timer {
+        id: pendingTimeout
+        interval: 30000
+        onTriggered: root.pending = {}
     }
 
     Timer {
