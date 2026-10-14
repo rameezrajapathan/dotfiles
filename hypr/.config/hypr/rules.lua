@@ -18,6 +18,15 @@ hl.window_rule({ match = { class = "xdg-desktop-portal-gtk", title = "^(Open|Sav
 hl.window_rule({ match = { class = "blueman-manager" }, float = true })
 hl.window_rule({ match = { class = "steam" }, float = true })
 
--- Quickshell launcher, power menu, cheatsheet, notification popups and OSD blur what's behind them. ignore_alpha skips the faint
--- launcher backdrop, so only its card is blurred; the power menu's backdrop is opaque enough.
-hl.layer_rule({ match = { namespace = "^quickshell-(launcher|power|cheatsheet|notifications|osd)$" }, blur = true, ignore_alpha = 0.4, no_anim = true })
+-- Blur behind every Quickshell surface (bar pills, panels, launcher, menus, popups, OSD).
+-- ignore_alpha skips nearly transparent pixels, so full-screen overlays only blur under their content.
+hl.layer_rule({ match = { namespace = "^quickshell.*$" }, blur = true, ignore_alpha = 0.4, no_anim = true })
+
+-- Drop-down terminal (scripts/dropterm.sh, Super + `): floats across the top on its own special workspace
+hl.window_rule({
+	match = { class = "^dropterm$" },
+	float = true,
+	size = "monitor_w*0.7 monitor_h*0.45",
+	move = "monitor_w*0.15 50",
+	workspace = "special:dropterm silent",
+})

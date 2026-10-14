@@ -1,0 +1,2 @@
+# AUR packages, installed with yay or paru when one is available (skipped otherwise)
+bibata-cursor-theme-bin

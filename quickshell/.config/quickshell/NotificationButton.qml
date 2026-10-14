@@ -1,14 +1,15 @@
 import QtQuick
 
-// Bell with a count of unread notifications; click for the list.
+// Bell with a count of unread notifications (crossed out during Do Not Disturb); click for the
+// list, right click toggles Do Not Disturb.
 Icon {
     id: root
     signal clicked()
 
     readonly property int count: NotificationService.list.length
 
-    name: count > 0 ? "notifications_unread" : "notifications"
-    filled: count > 0
+    name: NotificationService.dnd ? "notifications_off" : count > 0 ? "notifications_unread" : "notifications"
+    filled: count > 0 && !NotificationService.dnd
     color: count > 0 ? Theme.text : Theme.overlay
 
     Rectangle {
@@ -35,6 +36,12 @@ Icon {
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: root.clicked()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton)
+                NotificationService.dnd = !NotificationService.dnd;
+            else
+                root.clicked();
+        }
     }
 }

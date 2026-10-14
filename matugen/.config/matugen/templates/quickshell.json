@@ -7,6 +7,6 @@
     "accent": "{{colors.primary.default.hex}}",
     "accentText": "{{colors.on_primary.default.hex}}",
     "red": "{{colors.error.default.hex}}",
-    "green": "{{colors.green.default.hex}}",
-    "yellow": "{{colors.yellow.default.hex}}"
+    "green": "{{ansi.green}}",
+    "yellow": "{{ansi.yellow}}"
 }

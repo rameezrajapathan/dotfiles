@@ -14,4 +14,6 @@ ShellRoot {
     Launcher {}
     PowerMenu {}
     Osd {}
+    WindowSwitcher {}
+    Overview {}
 }

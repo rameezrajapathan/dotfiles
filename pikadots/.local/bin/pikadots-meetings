@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Upcoming meetings from a published calendar (Outlook/Teams, Google, …) as JSON for the bar.
+
+Reads the ICS link from ~/.config/pikadots/calendar.url, caches the download for 5 minutes in
+~/.cache/pikadots/calendar.ics, expands recurring events and prints the meetings of the next
+24 hours (and any in progress):
+  [{"title", "start", "end", "location", "join"}]   (start/end in Unix seconds)
+"join" is the Teams/Zoom/Meet link when the invite has one. Prints [] without a link.
+"""
+import json
+import os
+import re
+import sys
+import time
+import urllib.request
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import icalendar
+import recurring_ical_events
+
+URL_FILE = Path.home() / ".config/pikadots/calendar.url"
+CACHE = Path.home() / ".cache/pikadots/calendar.ics"
+MAX_AGE = 300
+JOIN = re.compile(r"https://(?:teams\.microsoft\.com/l/meetup-join|teams\.live\.com/meet|[\w.-]*zoom\.us/j|meet\.google\.com)/[^\s<>\"]+")
+
+
+def calendar_bytes():
+    if not URL_FILE.exists():
+        return None
+    if CACHE.exists() and time.time() - CACHE.stat().st_mtime < MAX_AGE:
+        return CACHE.read_bytes()
+    url = URL_FILE.read_text().strip().replace("webcal://", "https://", 1)
+    try:
+        with urllib.request.urlopen(url, timeout=20) as response:
+            data = response.read()
+    except Exception:
+        # Offline: fall back to the last download
+        return CACHE.read_bytes() if CACHE.exists() else None
+    CACHE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE.write_bytes(data)
+    return data
+
+
+def to_utc(value):
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.astimezone()
+    # All-day events (dates) aren't meetings
+    return None
+
+
+def main():
+    data = calendar_bytes()
+    if not data:
+        print("[]")
+        return
+    now = datetime.now(timezone.utc)
+    cal = icalendar.Calendar.from_ical(data)
+    meetings = []
+    for event in recurring_ical_events.of(cal).between(now - timedelta(hours=4), now + timedelta(hours=24)):
+        start, end = to_utc(event.get("DTSTART").dt), to_utc(event.get("DTEND").dt if event.get("DTEND") else None)
+        if start is None:
+            continue
+        end = end or start + timedelta(minutes=30)
+        if end <= now or str(event.get("STATUS", "")).upper() == "CANCELLED":
+            continue
+        text = " ".join(str(event.get(k, "")) for k in ("LOCATION", "DESCRIPTION", "X-MICROSOFT-SKYPETEAMSMEETINGURL"))
+        join = JOIN.search(text)
+        meetings.append({
+            "title": str(event.get("SUMMARY", "Meeting")).strip(),
+            "start": int(start.timestamp()),
+            "end": int(end.timestamp()),
+            "location": str(event.get("LOCATION", "")).strip(),
+            "join": join.group(0) if join else "",
+        })
+    meetings.sort(key=lambda m: m["start"])
+    print(json.dumps(meetings))
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:  # never break the bar
+        print("[]")
+        print(f"pikadots-meetings: {e}", file=sys.stderr)

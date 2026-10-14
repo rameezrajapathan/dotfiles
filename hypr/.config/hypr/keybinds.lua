@@ -10,14 +10,24 @@ end
 
 -- Application launchers
 hl.bind(mod .. " + T", hl.dsp.exec_cmd("FASTFETCH=1 kitty"), { description = "Open terminal with fastfetch (Kitty)" })
+hl.bind(mod .. " + grave", script("dropterm.sh"), { description = "Toggle drop-down terminal" })
+hl.bind(mod .. " + Tab", hl.dsp.exec_cmd("qs ipc call overview toggle"), { description = "Show all workspaces (overview)" })
+hl.bind("ALT + Tab", hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Switch windows (hold Alt)" })
+hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher prev"), { description = "Switch windows backwards" })
+-- Releasing Alt picks the selected window in the switcher
+hl.bind("ALT + Alt_L", hl.dsp.exec_cmd("qs ipc call switcher commit"), { release = true, transparent = true, non_consuming = true })
 hl.bind(mod .. " + Return", hl.dsp.exec_cmd("kitty"), { description = "Open terminal (Kitty)" })
 hl.bind(mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "Show notifications" })
+hl.bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs ipc call quicksettings dnd"), { description = "Toggle Do Not Disturb" })
+hl.bind(mod .. " + S", hl.dsp.exec_cmd("qs ipc call quicksettings toggle"), { description = "Open quick settings" })
+hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("qs ipc call quicksettings pickColor"), { description = "Pick a color from the screen (copies hex)" })
 hl.bind(mod .. " + C", hl.dsp.exec_cmd("code"), { description = "Open code editor (Visual Studio Code)" })
 hl.bind(mod .. " + B", hl.dsp.exec_cmd("zen-browser"), { description = "Open web browser (Zen)" })
 hl.bind(mod .. " + SHIFT + F", shot("region save"), { description = "Capture and save a region screenshot" })
 hl.bind(mod .. " + E", hl.dsp.exec_cmd("thunar"), { description = "Open file manager (Thunar)" })
 hl.bind(mod .. " + A", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "Open app launcher" })
-hl.bind(mod .. " + V", script("clipboard.sh"), { description = "Open clipboard history" })
+hl.bind(mod .. " + P", hl.dsp.exec_cmd("qs ipc call launcher open '~'"), { description = "Open a project (VS Code / Neovim)" })
+hl.bind(mod .. " + V", hl.dsp.exec_cmd("qs ipc call launcher open +"), { description = "Open clipboard history" })
 hl.bind(mod .. " + Escape", hl.dsp.exec_cmd("qs ipc call power toggle"), { description = "Open power menu" })
 hl.bind(mod .. " + SHIFT + slash", hl.dsp.exec_cmd("qs ipc call cheatsheet toggle"), { description = "Show keybindings" })
 hl.bind(mod .. " + SHIFT + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"), { description = "Pick wallpaper" })
@@ -148,3 +158,7 @@ hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("qs ipc call media playPause"), { locke
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("qs ipc call media next"), { locked = true, description = "Next track" })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("qs ipc call media previous"), { locked = true, description = "Previous track" })
+
+-- Lid: closing it while docked turns the laptop panel off; opening turns it back on
+hl.bind("switch:on:Lid Switch", script("lid.sh close"), { locked = true, description = "Laptop lid closed" })
+hl.bind("switch:off:Lid Switch", script("lid.sh open"), { locked = true, description = "Laptop lid opened" })

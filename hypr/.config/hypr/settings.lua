@@ -8,6 +8,8 @@ end
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
 hl.env("TERMINAL", "kitty")
+-- SSH keys through gnome-keyring's agent (systemd user socket gcr-ssh-agent.socket)
+hl.env("SSH_AUTH_SOCK", os.getenv("XDG_RUNTIME_DIR") .. "/gcr/ssh")
 hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("XCURSOR_SIZE", "28")
 

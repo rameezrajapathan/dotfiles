@@ -6,25 +6,110 @@ import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
 
-// App launcher: a grid of installed apps with icons. Most-used apps come first; typing filters
-// by name, then by description, keywords and category. Arrows move, Enter launches, Esc closes.
-// Toggled with `qs ipc call launcher toggle`. Launch counts live in ~/.local/state/quickshell.
+// Launcher. Plain text searches apps (most-used first; by name, then description, keywords and
+// category). A leading character switches mode:
+//   =  calculator (qalc; Enter copies the result)
+//   >  run a command (Enter runs it, Shift+Enter in a terminal)
+//   :  emoji (Enter copies it)
+//   ~  projects: zoxide's folders with a repo or project file (Enter opens VS Code,
+//      Shift+Enter Neovim in kitty)
+//   +  clipboard history (cliphist; Enter copies, Shift+Delete removes; Super + V)
+// Arrows move, Esc closes. Toggled with `qs ipc call launcher toggle`; `open <text>` starts with
+// text typed (Super + P opens projects). App launch counts live in
+// ~/.local/state/quickshell.
 PanelWindow {
     id: root
 
-    readonly property int columns: 6
     readonly property int cellSize: 128
     readonly property string usageFile: Quickshell.env("HOME") + "/.local/state/quickshell/launcher.json"
+    readonly property string home: Quickshell.env("HOME")
 
     property bool open: false
     property var usage: ({})
+
+    readonly property var modes: ({
+        "=": { name: "calc", hint: "Calculator", icon: "calculate" },
+        ">": { name: "run", hint: "Run command", icon: "terminal" },
+        ":": { name: "emoji", hint: "Emoji", icon: "mood" },
+        "~": { name: "projects", hint: "Projects", icon: "folder_code" },
+        "+": { name: "clipboard", hint: "Clipboard", icon: "content_paste" }
+    })
+    readonly property var modeInfo: modes[search.text.charAt(0)] ?? null
+    readonly property string mode: modeInfo?.name ?? "apps"
+    readonly property string query: (modeInfo ? search.text.slice(1) : search.text).trim()
+    readonly property int columns: mode === "apps" ? 6 : mode === "emoji" ? 10 : 1
 
     readonly property var apps: DesktopEntries.applications.values
         .filter(e => !e.noDisplay)
         .sort((a, b) => a.name.localeCompare(b.name))
 
+    property string calcResult: ""
+    property var emojis: []
+    property var projects: []
+    // cliphist entries: { id, text, image (size and type, for binary entries) }
+    property var clips: []
+    // Bumped when thumbnails are written, so images reload
+    property int thumbRevision: 0
+    readonly property string thumbDir: Quickshell.env("XDG_RUNTIME_DIR") + "/quickshell-clipboard"
+
+    // Every mode yields items: { title, subtitle, app | emoji | symbol, run(shift) }
     readonly property var results: {
-        const q = search.text.trim().toLowerCase();
+        const q = query.toLowerCase();
+        switch (mode) {
+        case "calc":
+            return q === "" ? [] : [{
+                title: calcResult || "…",
+                subtitle: query + "  ·  ↵ copy",
+                symbol: "calculate",
+                run: () => copy(calcResult)
+            }];
+        case "run":
+            return q === "" ? [] : [{
+                title: query,
+                subtitle: "↵ run  ·  shift+↵ run in a terminal",
+                symbol: "terminal",
+                run: shift => shift
+                    ? Quickshell.execDetached(["kitty", "--hold", "sh", "-c", query])
+                    : Quickshell.execDetached(["sh", "-c", query])
+            }];
+        case "emoji": {
+            const words = q.split(/\s+/).filter(w => w);
+            return emojis
+                .filter(e => words.every(w => e.name.includes(w)))
+                .slice(0, 300)
+                .map(e => ({ title: e.name, emoji: e.char, run: () => copy(e.char) }));
+        }
+        case "projects":
+            return projects
+                .filter(p => p.toLowerCase().includes(q))
+                .sort((a, b) => basename(b).toLowerCase().startsWith(q) - basename(a).toLowerCase().startsWith(q))
+                .slice(0, 50)
+                .map(p => ({
+                    title: basename(p),
+                    subtitle: p.replace(home, "~") + "  ·  ↵ VS Code  ·  shift+↵ Neovim",
+                    symbol: "folder_code",
+                    run: shift => shift
+                        ? Quickshell.execDetached(["kitty", "-d", p, "nvim", "."])
+                        : Quickshell.execDetached(["code", p])
+                }));
+        case "clipboard":
+            return clips
+                .filter(c => c.text.toLowerCase().includes(q))
+                .slice(0, 200)
+                .map(c => ({
+                    title: c.image ? "Image" : c.text,
+                    subtitle: c.image ? c.image + "  ·  ↵ copy  ·  shift+del remove" : "↵ copy  ·  shift+del remove",
+                    symbol: c.image ? "image" : "content_paste",
+                    thumb: c.image ? "file://" + thumbDir + "/" + c.id + ".png?" + thumbRevision : "",
+                    clip: c,
+                    run: () => Quickshell.execDetached(["sh", "-c", "cliphist list | grep -m1 \"^" + c.id + "\t\" | cliphist decode | wl-copy"])
+                }));
+        default:
+            return appResults(q).map(e => ({ title: e.name, app: e, run: () => launch(e) }));
+        }
+    }
+
+    function appResults(q) {
         // Ties fall back to the name; QML's sort isn't stable
         if (q === "")
             return apps.slice().sort((a, b) => (usage[b.id] ?? 0) - (usage[a.id] ?? 0) || a.name.localeCompare(b.name));
@@ -52,6 +137,10 @@ PanelWindow {
         return extra.includes(q) ? 3 : -1;
     }
 
+    function basename(path) {
+        return path.slice(path.lastIndexOf("/") + 1) || path;
+    }
+
     function iconFor(e) {
         if (e.icon.startsWith("/"))
             return "file://" + e.icon;
@@ -66,13 +155,24 @@ PanelWindow {
         search.text = "";
         grid.currentIndex = 0;
         grid.positionViewAtBeginning();
+        projectReader.running = true;
         visible = true;
         open = true;
     }
 
-    function launch(e) {
-        if (!e)
+    function activate(item, shift) {
+        if (!item)
             return;
+        item.run(shift);
+        open = false;
+    }
+
+    function copy(text) {
+        if (text)
+            Quickshell.execDetached(["wl-copy", "--", text]);
+    }
+
+    function launch(e) {
         const counts = Object.assign({}, usage);
         counts[e.id] = (counts[e.id] ?? 0) + 1;
         usage = counts;
@@ -81,7 +181,6 @@ PanelWindow {
             Quickshell.execDetached(["kitty", "--"].concat(e.command));
         else
             e.execute();
-        open = false;
     }
 
     FileView {
@@ -100,10 +199,105 @@ PanelWindow {
     // FileView can't create the folder for the usage file
     Component.onCompleted: Quickshell.execDetached(["mkdir", "-p", Quickshell.env("HOME") + "/.local/state/quickshell"])
 
+    // Calculator, re-run shortly after typing stops
+    onQueryChanged: if (mode === "calc") calcTimer.restart()
+    Timer {
+        id: calcTimer
+        interval: 120
+        onTriggered: {
+            calc.command = ["qalc", "-t", "--", root.query];
+            calc.running = true;
+        }
+    }
+    Process {
+        id: calc
+        stdout: StdioCollector {
+            onStreamFinished: root.calcResult = text.trim()
+        }
+    }
+
+    // Emoji list from unicode-emoji, read in the background at startup (it takes a moment)
+    FileView {
+        path: "/usr/share/unicode/emoji/emoji-test.txt"
+        printErrors: false
+        onLoaded: {
+            const list = [];
+            // 1F600 ; fully-qualified # 😀 E1.0 grinning face
+            for (const line of text().split("\n")) {
+                const m = line.match(/; fully-qualified\s+# (\S+) E[\d.]+ (.+)$/);
+                if (m)
+                    list.push({ char: m[1], name: m[2].toLowerCase() });
+            }
+            root.emojis = list;
+        }
+    }
+
+    // Clipboard history, read whenever clipboard mode opens; image entries get thumbnails
+    onModeChanged: if (mode === "clipboard") clipReader.running = true
+    Process {
+        id: clipReader
+        command: ["cliphist", "list"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const list = [];
+                for (const line of text.split("\n")) {
+                    const tab = line.indexOf("\t");
+                    if (tab < 0)
+                        continue;
+                    const body = line.slice(tab + 1);
+                    // [[ binary data 383 KiB png 1074x917 ]]
+                    const bin = body.match(/^\[\[ binary data (.+) ]]$/);
+                    list.push({ id: line.slice(0, tab), text: bin ? "image " + bin[1] : body, image: bin ? bin[1] : "" });
+                }
+                root.clips = list;
+                const ids = list.filter(c => c.image).slice(0, 40).map(c => c.id);
+                if (ids.length > 0) {
+                    thumbWriter.command = ["sh", "-c", `mkdir -p "$0" && for id in "$@"; do
+                        [ -s "$0/$id.png" ] || cliphist list | grep -m1 "^$id	" | cliphist decode > "$0/$id.png"
+                    done`, root.thumbDir].concat(ids);
+                    thumbWriter.running = true;
+                }
+            }
+        }
+    }
+    Process {
+        id: thumbWriter
+        onExited: root.thumbRevision++
+    }
+    Process {
+        id: clipDeleter
+        onExited: clipReader.running = true
+    }
+    function deleteClip(item) {
+        if (!item?.clip)
+            return;
+        clipDeleter.command = ["sh", "-c", "cliphist list | grep -m1 \"^" + item.clip.id + "\t\" | cliphist delete"];
+        clipDeleter.running = true;
+    }
+
+    // Projects: folders zoxide knows (most used first) that hold a git repo or a project file
+    Process {
+        id: projectReader
+        command: ["sh", "-c", `zoxide query -l | while IFS= read -r d; do
+            for f in "$d"/.git "$d"/package.json "$d"/Cargo.toml "$d"/go.mod "$d"/pyproject.toml "$d"/*.sln "$d"/*.csproj; do
+                if [ -e "$f" ]; then echo "$d"; break; fi
+            done
+        done`]
+        stdout: StdioCollector {
+            onStreamFinished: root.projects = text.split("\n").filter(p => p && p !== root.home)
+        }
+    }
+
     IpcHandler {
         target: "launcher"
         function toggle(): void {
             root.toggle();
+        }
+        // Opens with text already typed, e.g. "~" for projects or "=" for the calculator
+        function open(text: string): void {
+            if (!root.open)
+                root.toggle();
+            search.text = text;
         }
     }
 
@@ -132,7 +326,7 @@ PanelWindow {
     Rectangle {
         id: card
         anchors.centerIn: parent
-        width: root.columns * root.cellSize + 40
+        width: 6 * root.cellSize + 40
         height: 600
         radius: 24
         color: Theme.baseTranslucent
@@ -156,7 +350,7 @@ PanelWindow {
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: 20
-            spacing: 16
+            spacing: 14
 
             // Search field
             Rectangle {
@@ -174,7 +368,7 @@ PanelWindow {
                     spacing: 14
 
                     Icon {
-                        name: "search"
+                        name: root.modeInfo?.icon ?? "search"
                         color: Theme.accent
                         size: 24
                     }
@@ -191,15 +385,21 @@ PanelWindow {
                         onTextChanged: grid.currentIndex = 0
 
                         Keys.onEscapePressed: root.open = false
-                        Keys.onReturnPressed: root.launch(root.results[grid.currentIndex])
-                        Keys.onEnterPressed: root.launch(root.results[grid.currentIndex])
+                        Keys.onReturnPressed: event => root.activate(root.results[grid.currentIndex], event.modifiers & Qt.ShiftModifier)
+                        Keys.onEnterPressed: event => root.activate(root.results[grid.currentIndex], event.modifiers & Qt.ShiftModifier)
                         Keys.onUpPressed: grid.moveCurrentIndexUp()
                         Keys.onDownPressed: grid.moveCurrentIndexDown()
                         Keys.onTabPressed: grid.moveCurrentIndexRight()
                         Keys.onBacktabPressed: grid.moveCurrentIndexLeft()
                         Keys.onPressed: event => {
-                            // Left/Right move the selection; they only move the cursor while selecting text
-                            if (event.modifiers & Qt.ShiftModifier)
+                            if (root.mode === "clipboard" && event.key === Qt.Key_Delete && event.modifiers & Qt.ShiftModifier) {
+                                root.deleteClip(root.results[grid.currentIndex]);
+                                event.accepted = true;
+                                return;
+                            }
+                            // Left/Right move the selection in grids; they only move the cursor
+                            // while selecting text or in list modes
+                            if (event.modifiers & Qt.ShiftModifier || root.columns === 1)
                                 return;
                             if (event.key === Qt.Key_Left) {
                                 grid.moveCurrentIndexLeft();
@@ -220,8 +420,63 @@ PanelWindow {
                     }
 
                     Label {
-                        text: root.results.length + " apps"
+                        text: root.mode === "apps" ? root.results.length + " apps" : root.modeInfo.hint
                         color: Theme.overlay
+                    }
+                }
+            }
+
+            // Mode hints while the field is empty
+            RowLayout {
+                Layout.fillWidth: true
+                visible: search.text === ""
+                spacing: 8
+
+                Repeater {
+                    model: Object.keys(root.modes)
+
+                    Rectangle {
+                        id: chip
+                        required property string modelData
+                        readonly property var info: root.modes[modelData]
+
+                        implicitWidth: chipRow.implicitWidth + 20
+                        implicitHeight: 30
+                        radius: 15
+                        color: chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.surface, 0.6)
+
+                        RowLayout {
+                            id: chipRow
+                            anchors.centerIn: parent
+                            spacing: 6
+
+                            Label {
+                                text: chip.modelData
+                                color: Theme.accent
+                                font.bold: true
+                            }
+                            Icon {
+                                name: chip.info.icon
+                                size: 16
+                                color: Theme.subtext
+                            }
+                            Label {
+                                text: chip.info.hint
+                                color: Theme.subtext
+                                font.pixelSize: Theme.fontSize - 1
+                            }
+                        }
+
+                        MouseArea {
+                            id: chipMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                search.text = chip.modelData;
+                                search.forceActiveFocus();
+                            }
+                        }
                     }
                 }
             }
@@ -231,7 +486,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 cellWidth: width / root.columns
-                cellHeight: root.cellSize
+                cellHeight: root.mode === "apps" ? root.cellSize : root.mode === "emoji" ? 76 : 60
                 clip: true
                 model: root.results
                 highlightMoveDuration: 0
@@ -243,14 +498,15 @@ PanelWindow {
                     required property var modelData
                     required property int index
                     readonly property bool selected: GridView.isCurrentItem
+                    readonly property bool list: root.columns === 1
 
                     width: grid.cellWidth
                     height: grid.cellHeight
 
                     Rectangle {
                         anchors.fill: parent
-                        anchors.margins: 4
-                        radius: 18
+                        anchors.margins: cell.list ? 2 : 4
+                        radius: cell.list ? 14 : 18
                         color: cell.selected ? Qt.alpha(Theme.accent, 0.22)
                             : mouse.containsMouse ? Qt.alpha(Theme.surface, 0.8)
                             : "transparent"
@@ -259,27 +515,87 @@ PanelWindow {
                         Behavior on color { ColorAnimation { duration: 100 } }
                     }
 
+                    // App tile
                     ColumnLayout {
                         anchors.centerIn: parent
                         width: parent.width - 20
                         spacing: 10
+                        visible: cell.modelData.app !== undefined
 
                         IconImage {
                             Layout.alignment: Qt.AlignHCenter
                             implicitSize: 52
-                            source: root.iconFor(cell.modelData)
+                            source: cell.modelData.app ? root.iconFor(cell.modelData.app) : ""
                             asynchronous: true
                             scale: cell.selected ? 1.08 : 1
                             Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
                         }
-
                         Label {
                             Layout.fillWidth: true
                             horizontalAlignment: Text.AlignHCenter
-                            text: cell.modelData.name
+                            text: cell.modelData.title
                             color: cell.selected ? Theme.text : Theme.subtext
                             font.pixelSize: Theme.fontSize - 1
                             elide: Text.ElideRight
+                        }
+                    }
+
+                    // Emoji tile
+                    Text {
+                        anchors.centerIn: parent
+                        visible: cell.modelData.emoji !== undefined
+                        text: cell.modelData.emoji ?? ""
+                        font.pixelSize: 36
+                        scale: cell.selected ? 1.15 : 1
+                        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                    }
+
+                    // List row (calculator, command, project)
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 16
+                        anchors.rightMargin: 16
+                        spacing: 14
+                        visible: cell.list
+
+                        Icon {
+                            visible: !cell.modelData.thumb || thumb.status !== Image.Ready
+                            name: cell.modelData.symbol ?? ""
+                            filled: cell.selected
+                            color: cell.selected ? Theme.accent : Theme.subtext
+                            size: 24
+                        }
+                        // Clipboard image preview
+                        Image {
+                            id: thumb
+                            Layout.preferredWidth: 72
+                            Layout.preferredHeight: 44
+                            visible: !!cell.modelData.thumb && status === Image.Ready
+                            source: cell.modelData.thumb ?? ""
+                            sourceSize.width: 144
+                            fillMode: Image.PreserveAspectCrop
+                            asynchronous: true
+                            cache: false
+                        }
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 1
+
+                            Label {
+                                Layout.fillWidth: true
+                                text: cell.modelData.title
+                                font.bold: true
+                                font.pixelSize: root.mode === "calc" ? Theme.fontSize + 6 : Theme.fontSize + 1
+                                elide: Text.ElideRight
+                            }
+                            Label {
+                                Layout.fillWidth: true
+                                visible: text !== ""
+                                text: cell.modelData.subtitle ?? ""
+                                color: Theme.overlay
+                                font.pixelSize: Theme.fontSize - 1
+                                elide: Text.ElideMiddle
+                            }
                         }
                     }
 
@@ -288,37 +604,39 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: root.launch(cell.modelData)
+                        onClicked: root.activate(cell.modelData, false)
                     }
                 }
 
                 Label {
                     anchors.centerIn: parent
                     visible: grid.count === 0
-                    text: "No apps match “" + search.text + "”"
+                    text: root.mode === "apps" ? "No apps match “" + search.text + "”"
+                        : root.query === "" ? "Type after “" + search.text.charAt(0) + "”"
+                        : "No matches"
                     color: Theme.overlay
                 }
             }
 
-            // Selected app's description
+            // Selected item's details
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 10
-                readonly property var app: root.results[grid.currentIndex] ?? null
-                visible: app !== null
+                readonly property var item: root.results[grid.currentIndex] ?? null
+                visible: item !== null && root.columns > 1
 
                 Label {
-                    text: parent.app?.name ?? ""
+                    text: parent.item?.emoji ? parent.item.title : parent.item?.title ?? ""
                     font.bold: true
                 }
                 Label {
                     Layout.fillWidth: true
-                    text: parent.app?.comment || parent.app?.genericName || ""
+                    text: parent.item?.app ? (parent.item.app.comment || parent.item.app.genericName || "") : ""
                     color: Theme.overlay
                     elide: Text.ElideRight
                 }
                 Label {
-                    text: "↵ open   esc close"
+                    text: root.mode === "emoji" ? "↵ copy   esc close" : "↵ open   esc close"
                     color: Theme.overlay
                     font.pixelSize: Theme.fontSize - 2
                 }

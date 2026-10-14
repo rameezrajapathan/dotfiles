@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
+import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
@@ -52,6 +53,40 @@ PanelWindow {
         bar: bar
     }
 
+    CapturePanel {
+        id: capturePanel
+        bar: bar
+    }
+
+    QuickSettingsPanel {
+        id: quickSettingsPanel
+        bar: bar
+    }
+
+    SystemPanel {
+        id: systemPanel
+        bar: bar
+    }
+
+    GitHubPanel {
+        id: gitHubPanel
+        bar: bar
+    }
+
+    Connections {
+        target: Toggles
+        function onPanelToggleRequested() {
+            if (Hyprland.focusedMonitor?.name === bar.screen.name)
+                quickSettingsPanel.toggle();
+        }
+    }
+
+    // Keep awake: hypridle won't dim, lock or suspend while this is enabled
+    IdleInhibitor {
+        window: bar
+        enabled: Toggles.keepAwake
+    }
+
     MediaPanel {
         id: mediaPanel
         bar: bar
@@ -96,6 +131,7 @@ PanelWindow {
             id: clockIsland
 
             Clock { onClicked: calendarPanel.toggle() }
+            NextMeeting {}
         }
 
         Island {
@@ -130,13 +166,17 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 14
 
-        Recording {}
+        CaptureButton { onClicked: capturePanel.toggle() }
         WallpaperButton {}
         Network { onClicked: networkPanel.toggle() }
         Bluetooth { onClicked: bluetoothPanel.toggle() }
         Volume { onClicked: audioPanel.toggle() }
+        SystemButton { onClicked: systemPanel.toggle() }
         Battery { onClicked: batteryPanel.toggle() }
+        GitHubButton { onClicked: gitHubPanel.toggle() }
         NotificationButton { onClicked: notificationPanel.toggle() }
+        KeepAwakeIndicator {}
+        QuickSettingsButton { onClicked: quickSettingsPanel.toggle() }
         PowerButton {}
     }
 }

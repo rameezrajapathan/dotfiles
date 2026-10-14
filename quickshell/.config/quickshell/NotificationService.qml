@@ -12,6 +12,14 @@ Singleton {
 
     readonly property var list: server.trackedNotifications.values.slice().reverse()
     property var popups: []
+    // Do Not Disturb: notifications go straight to the list; only critical ones pop up
+    property alias dnd: state.dnd
+
+    PersistentProperties {
+        id: state
+        reloadableId: "notifications"
+        property bool dnd: false
+    }
 
     // Asks the bar on the focused monitor to open or close its list (Super + N)
     signal panelToggleRequested()
@@ -71,7 +79,8 @@ Singleton {
         onNotification: n => {
             n.tracked = true;
             root.times[n.id] = new Date();
-            root.popups = [n].concat(root.popups);
+            if (!root.dnd || n.urgency === NotificationUrgency.Critical)
+                root.popups = [n].concat(root.popups);
             n.closed.connect(() => root.hidePopup(n));
         }
     }

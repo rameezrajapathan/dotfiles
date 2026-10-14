@@ -15,7 +15,7 @@ PanelWindow {
 
     // Card order; each bind goes in the first group whose pattern matches its description
     readonly property var groups: [
-        { title: "Apps & system", icon: "apps", pattern: /^Open|launcher|clipboard|Lock|power|wallpaper|keybind|notification/i },
+        { title: "Apps & system", icon: "apps", pattern: /^Open|launcher|clipboard|Lock|power|wallpaper|keybind|notification|Disturb|terminal|color|project/i },
         { title: "Screenshots & recording", icon: "screenshot_region", pattern: /screenshot|record|capture/i },
         { title: "Media & hardware", icon: "graphic_eq", pattern: /volume|mute|media|track|brightness/i },
         { title: "Workspaces & monitors", icon: "space_dashboard", pattern: /workspace|monitor/i },
@@ -75,7 +75,7 @@ PanelWindow {
         const rows = [];
         const byId = {};
         for (const b of JSON.parse(json)) {
-            if (!b.has_description || b.submap !== "" || b.key === "")
+            if (!b.has_description || b.submap !== "" || b.key === "" || b.key.startsWith("switch:"))
                 continue;
             let mask = b.modmask;
             let key = keyName(b.key);

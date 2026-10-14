@@ -2,24 +2,8 @@
 # sets the wallpaper and reloads the apps. Generated files go to ~/.local/state/theme/.
 
 [config]
-
-# Terminal/status hues (Catppuccin Mocha), shifted toward the wallpaper's colors
-[config.custom_colors]
-red = "#f38ba8"
-green = "#a6e3a1"
-yellow = "#f9e2af"
-blue = "#89b4fa"
-magenta = "#f5c2e7"
-cyan = "#94e2d5"
-# The rest of the Catppuccin palette, for Neovim
-peach = "#fab387"
-maroon = "#eba0ac"
-mauve = "#cba6f7"
-sky = "#89dceb"
-sapphire = "#74c7ec"
-lavender = "#b4befe"
-rosewater = "#f5e0dc"
-flamingo = "#f2cdcd"
+# Terminal/syntax hues (red, green, ... and the rest of Catppuccin's) aren't matugen custom colors:
+# hypr/scripts/theme-palette.py makes them from the wallpaper and passes them in as `ansi.*`.
 
 [templates.quickshell]
 input_path = "~/.config/matugen/templates/quickshell.json"
@@ -60,3 +44,7 @@ output_path = "~/.local/state/theme/nvim.lua"
 [templates.cava]
 input_path = "~/.config/matugen/templates/cava-theme"
 output_path = "~/.config/cava/themes/wallpaper"
+
+[templates.peaclock]
+input_path = "~/.config/matugen/templates/peaclock"
+output_path = "~/.peaclock/config"

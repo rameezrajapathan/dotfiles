@@ -1,0 +1,8 @@
+[Unit]
+Description=Back up home folders with restic (pikadots)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/pikadots-backup
+Nice=10
+IOSchedulingClass=idle

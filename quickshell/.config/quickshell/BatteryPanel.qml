@@ -4,7 +4,8 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Dropdown under the bar: battery status and power-profiles-daemon mode switcher.
+// Dropdown under the bar: battery status, charge limit, power-profiles-daemon mode and (on ROG
+// laptops) the GPU mode.
 // A transparent full-screen overlay: clicks outside the panel close it.
 PanelWindow {
     id: root
@@ -20,7 +21,15 @@ PanelWindow {
 
     function toggle() {
         visible = !visible;
+        if (visible)
+            Asus.refresh();
     }
+
+    readonly property var gpuModes: [
+        { mode: "ultimate", icon: "rocket_launch", title: "Ultimate", detail: "NVIDIA drives the screen" },
+        { mode: "hybrid", icon: "sync_alt", title: "Hybrid", detail: "NVIDIA when needed" },
+        { mode: "eco", icon: "energy_savings_leaf", title: "Eco", detail: "NVIDIA off" }
+    ]
 
     function duration(seconds) {
         const h = Math.floor(seconds / 3600);
@@ -59,7 +68,7 @@ PanelWindow {
         anchors.right: parent.right
         anchors.topMargin: Theme.barHeight + 6
         anchors.rightMargin: 8
-        width: 320
+        width: 340
         height: content.implicitHeight + 28
         color: Theme.baseTranslucent
         radius: 10
@@ -95,6 +104,29 @@ PanelWindow {
                 color: Theme.subtext
             }
 
+            // Charge limit
+            SectionLabel {
+                text: "Battery care"
+            }
+            PanelRow {
+                Layout.fillWidth: true
+                clickable: false
+                icon: "battery_android_frame_5"
+                title: "Charge to " + Asus.chargeLimit + "%"
+                detail: Asus.chargeLimit < 100 ? "protects the battery" : "no limit"
+
+                Switch {
+                    checked: Asus.chargeLimit < 100
+                    onToggled: Asus.setChargeLimit(Asus.chargeLimit < 100 ? 100 : 80)
+                }
+            }
+            Pill {
+                Layout.leftMargin: 8
+                visible: Asus.chargeLimit < 100
+                text: "charge to 100% once"
+                onClicked: Asus.chargeOnce()
+            }
+
             SectionLabel {
                 text: "Power mode"
             }
@@ -109,6 +141,33 @@ PanelWindow {
                     highlighted: PowerProfiles.profile === modelData.profile
                     onClicked: PowerProfiles.profile = modelData.profile
                 }
+            }
+
+            // GPU mode (ROG); Eco is only offered once Hybrid is active
+            SectionLabel {
+                visible: Asus.available
+                text: "GPU mode"
+            }
+            Repeater {
+                model: Asus.available ? root.gpuModes : []
+
+                PanelRow {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    visible: modelData.mode !== "eco" || Asus.mux === 1
+                    icon: modelData.icon
+                    title: modelData.title
+                    detail: Asus.requestedMode === modelData.mode && Asus.gpuMode !== modelData.mode ? "after restart" : modelData.detail
+                    highlighted: Asus.gpuMode === modelData.mode
+                    onClicked: if (Asus.gpuMode !== modelData.mode) Asus.setGpuMode(modelData.mode)
+                }
+            }
+            Label {
+                visible: Asus.available && (Asus.pendingReboot || (Asus.requestedMode !== "" && Asus.requestedMode !== Asus.gpuMode))
+                Layout.leftMargin: 8
+                text: "Restart to apply the new GPU mode"
+                color: Theme.yellow
+                font.pixelSize: Theme.fontSize - 2
             }
 
             Label {

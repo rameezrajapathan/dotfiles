@@ -25,7 +25,13 @@ else
 	img=$current
 fi
 
-matugen image "$img" --mode dark --source-color-index 0 --quiet
+# Light or dark and how colorful, from the wallpaper itself: black and white pictures give a grey
+# theme, bright ones a light theme (theme-palette.py)
+palette=$(python3 -I ~/.config/hypr/scripts/theme-palette.py "$img")
+mode=$(jq -r .theme.mode <<<"$palette")
+scheme=$(jq -r .theme.scheme <<<"$palette")
+matugen image "$img" --mode "$mode" --type "$scheme" --source-color-index 0 \
+	--import-json-string "$palette" --quiet
 
 # Starship has no include: base config with its palette swapped for the generated one
 sed '/^\[palettes\.main\]/,$d' ~/.config/starship.toml >"$state/starship.toml.tmp"
@@ -36,8 +42,29 @@ mv "$state/starship.toml.tmp" "$state/starship.toml"
 pkill -USR1 -x kitty || true
 # cava reloads its config (and so themes/wallpaper) on USR1
 pkill -USR1 -x cava || true
+# ROG keyboard lighting in the accent color (asusctl; skipped on other laptops)
+if command -v asusctl >/dev/null; then
+	accent=$(jq -r '.accent // empty' "$state/quickshell.json" | tr -d '#')
+	# A black and white theme's accent is black in light mode, which would switch the lights off
+	[[ $scheme == scheme-monochrome ]] && accent=ffffff
+	[[ -n $accent ]] && asusctl aura effect static -c "$accent" >/dev/null 2>&1 || true
+fi
 hyprctl reload >/dev/null
 # Re-applying the GTK theme makes running GTK3 apps (Thunar) reload gtk.css
-gtk_theme=$(gsettings get org.gnome.desktop.interface gtk-theme)
+# (light or dark variant to match); color-scheme is what libadwaita apps and websites follow
+if [[ $mode == light ]]; then
+	gtk_theme=adw-gtk3 icon_theme=Papirus
+else
+	gtk_theme=adw-gtk3-dark icon_theme=Papirus-Dark
+fi
 gsettings set org.gnome.desktop.interface gtk-theme "''"
 gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
+gsettings set org.gnome.desktop.interface color-scheme "prefer-$mode"
+gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
+# GTK3 also reads prefer-dark from settings.ini, which would keep adw-gtk3 dark
+prefer_dark=$([[ $mode == dark ]] && echo true || echo false)
+for ini in ~/.config/gtk-{3,4}.0/settings.ini; do
+	if [[ -f $ini ]]; then
+		sed -i --follow-symlinks "s/^\(gtk-application-prefer-dark-theme=\).*/\1$prefer_dark/" "$ini"
+	fi
+done

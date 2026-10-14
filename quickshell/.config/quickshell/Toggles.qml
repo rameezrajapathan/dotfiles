@@ -1,0 +1,55 @@
+pragma Singleton
+
+import Quickshell
+import Quickshell.Io
+import QtQuick
+
+// Quick settings state, kept across shell reloads: keep awake (the bars hold an IdleInhibitor
+// while it's on, so hypridle doesn't dim, lock or suspend), night light (hyprsunset) and the
+// color picker. Do Not Disturb lives in NotificationService.
+Singleton {
+    id: root
+
+    property alias keepAwake: state.keepAwake
+    property alias nightLight: state.nightLight
+    readonly property int nightTemperature: 4500
+
+    signal panelToggleRequested()
+
+    // Copies the picked color as hex and shows it in a notification
+    function pickColor() {
+        Quickshell.execDetached(["sh", "-c",
+            "sleep 0.3; c=$(hyprpicker -a -f hex) && [ -n \"$c\" ] && notify-send -a 'Color picker' \"$c\" 'Copied to the clipboard'"]);
+    }
+
+    PersistentProperties {
+        id: state
+        reloadableId: "toggles"
+        property bool keepAwake: false
+        property bool nightLight: false
+    }
+
+    Process {
+        running: root.nightLight
+        command: ["hyprsunset", "-t", String(root.nightTemperature)]
+    }
+
+    IpcHandler {
+        target: "quicksettings"
+        function toggle(): void {
+            root.panelToggleRequested();
+        }
+        function pickColor(): void {
+            root.pickColor();
+        }
+        function dnd(): void {
+            NotificationService.dnd = !NotificationService.dnd;
+        }
+        function keepAwake(): void {
+            root.keepAwake = !root.keepAwake;
+        }
+        function nightLight(): void {
+            root.nightLight = !root.nightLight;
+        }
+    }
+}

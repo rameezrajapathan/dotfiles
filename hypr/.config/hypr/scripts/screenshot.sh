@@ -12,7 +12,9 @@ esac
 if [[ ${2:-} == save ]]; then
     dir="$(xdg-user-dir PICTURES)/Screenshots"
     mkdir -p "$dir"
-    grim ${geom:+-g "$geom"} - | tee "$dir/$(date +%Y%m%d-%H%M%S).png" | wl-copy
+    file="$dir/$(date +%Y%m%d-%H%M%S).png"
+    grim ${geom:+-g "$geom"} - | tee "$file" | wl-copy
+    notify-send -a Screenshot -i "$file" "Screenshot saved" "Copied to the clipboard · ${file/#$HOME/\~}"
 else
     grim ${geom:+-g "$geom"} - | wl-copy
 fi

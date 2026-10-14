@@ -1,9 +1,9 @@
 import Quickshell
 import QtQuick
 
-// Opens the wallpaper picker.
+// Opens the wallpaper picker (which also recolors everything).
 Icon {
-    name: "wallpaper"
+    name: "palette"
 
     MouseArea {
         anchors.fill: parent

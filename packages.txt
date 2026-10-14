@@ -1,0 +1,74 @@
+# Packages pikadots installs (pacman, official Arch/CachyOS repos). One per line; # starts a comment.
+
+# Desktop
+hyprland
+quickshell
+hypridle
+hyprlock
+hyprpaper
+hyprpolkitagent
+hyprpicker
+hyprsunset
+xdg-desktop-portal-hyprland
+xdg-user-dirs
+matugen
+adw-gtk-theme
+papirus-icon-theme
+ttf-firacode-nerd
+ttf-fira-sans
+ttf-material-symbols-variable
+
+# Apps and tools the shell calls
+kitty
+fuzzel
+fastfetch
+starship
+cava
+btop
+grim
+slurp
+wl-clipboard
+cliphist
+wf-recorder
+jq
+brightnessctl
+libnotify
+libqalculate
+unicode-emoji
+zoxide
+eza
+stow
+xdg-utils
+pavucontrol
+thunar
+
+# System services
+networkmanager
+networkmanager-openvpn
+bluez
+bluez-utils
+pipewire-pulse
+wireplumber
+upower
+power-profiles-daemon
+
+# Shell
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+
+# Developer
+git
+neovim
+git-delta
+github-cli
+lazygit
+mise
+gnome-keyring
+seahorse
+libsecret
+
+# Backups and calendar
+restic
+python-icalendar
+python-recurring-ical-events
