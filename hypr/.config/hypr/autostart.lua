@@ -1,6 +1,5 @@
 hl.on("hyprland.start", function()
-	hl.exec_cmd("qs")
-	hl.exec_cmd("mako")
+	hl.exec_cmd("QS_ICON_THEME=Papirus-Dark qs")
 	hl.exec_cmd("hyprpaper")
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")

@@ -17,7 +17,7 @@ Rectangle {
         radius: 7
         anchors.verticalCenter: parent.verticalCenter
         x: root.checked ? parent.width - width - 3 : 3
-        color: root.checked ? Theme.base : Theme.subtext
+        color: root.checked ? Theme.accentText : Theme.subtext
 
         Behavior on x { NumberAnimation { duration: 120 } }
     }

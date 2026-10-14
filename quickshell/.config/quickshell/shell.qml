@@ -5,4 +5,8 @@ ShellRoot {
         model: Quickshell.screens
         Bar {}
     }
+
+    Cheatsheet {}
+    WallpaperPicker {}
+    NotificationPopups {}
 }

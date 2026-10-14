@@ -12,15 +12,17 @@ Label {
         ? device.networks.values.find(n => n.connected) ?? null
         : null
 
-    text: (!device ? "󰤮 offline"
-        : wifi ? Theme.wifiIcon(wifi.signalStrength) + " " + wifi.name
-        : "󰈀 wired") + vpnMark
+    font.pixelSize: Theme.fontSize + 3
+    text: (!device ? "󰤮"
+        : wifi ? Theme.wifiIcon(wifi.signalStrength)
+        : "󰈀") + vpnMark
     // Shown while a VPN is connected; set to "" to hide it.
     readonly property string vpnMark: VpnService.anyActive ? "  󰖂" : ""
     color: device ? Theme.text : Theme.overlay
 
     MouseArea {
         anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
 }

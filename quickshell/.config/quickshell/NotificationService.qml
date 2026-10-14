@@ -1,0 +1,78 @@
+pragma Singleton
+
+import Quickshell
+import Quickshell.Io
+import Quickshell.Services.Notifications
+import QtQuick
+
+// Notification daemon (replaces mako). Every notification is kept in `list` until dismissed;
+// `popups` holds the ones currently shown as toasts.
+Singleton {
+    id: root
+
+    readonly property var list: server.trackedNotifications.values.slice().reverse()
+    property var popups: []
+
+    // Asks the bar on the focused monitor to open or close its list (Super + N)
+    signal panelToggleRequested()
+    // Arrival times by notification id, for the "5m ago" labels
+    property var times: ({})
+
+    function hidePopup(n) {
+        popups = popups.filter(p => p !== n);
+    }
+
+    function clearPopups() {
+        popups = [];
+    }
+
+    function dismissAll() {
+        for (const n of server.trackedNotifications.values.slice())
+            n.dismiss();
+    }
+
+    // Default action if the app offered one, otherwise nothing
+    function activate(n) {
+        const action = n.actions.find(a => a.identifier === "default");
+        if (action)
+            action.invoke();
+        hidePopup(n);
+    }
+
+    function ago(n) {
+        const t = times[n.id];
+        if (!t)
+            return "";
+        const mins = Math.floor((clock.date - t) / 60000);
+        return mins < 1 ? "now" : mins < 60 ? mins + "m ago" : Math.floor(mins / 60) + "h ago";
+    }
+
+    IpcHandler {
+        target: "notifications"
+        function toggle(): void {
+            root.panelToggleRequested();
+        }
+    }
+
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
+    }
+
+    NotificationServer {
+        id: server
+        keepOnReload: true
+        actionsSupported: true
+        bodySupported: true
+        bodyMarkupSupported: true
+        imageSupported: true
+        persistenceSupported: true
+
+        onNotification: n => {
+            n.tracked = true;
+            root.times[n.id] = new Date();
+            root.popups = [n].concat(root.popups);
+            n.closed.connect(() => root.hidePopup(n));
+        }
+    }
+}

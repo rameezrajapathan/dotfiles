@@ -9,7 +9,9 @@ local function shot(args)
 end
 
 -- Application launchers
+hl.bind(mod .. " + T", hl.dsp.exec_cmd("kitty"), { description = "Open terminal (Kitty)" })
 hl.bind(mod .. " + Return", hl.dsp.exec_cmd("kitty"), { description = "Open terminal (Kitty)" })
+hl.bind(mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "Show notifications" })
 hl.bind(mod .. " + C", hl.dsp.exec_cmd("code"), { description = "Open code editor (Visual Studio Code)" })
 hl.bind(mod .. " + B", hl.dsp.exec_cmd("zen-browser"), { description = "Open web browser (Zen)" })
 hl.bind(mod .. " + SHIFT + F", shot("region save"), { description = "Capture and save a region screenshot" })
@@ -17,6 +19,8 @@ hl.bind(mod .. " + E", hl.dsp.exec_cmd("thunar"), { description = "Open file man
 hl.bind(mod .. " + A", hl.dsp.exec_cmd("fuzzel"), { description = "Open app launcher" })
 hl.bind(mod .. " + V", script("clipboard.sh"), { description = "Open clipboard history" })
 hl.bind(mod .. " + Escape", script("powermenu.sh"), { description = "Open power menu" })
+hl.bind(mod .. " + SHIFT + slash", hl.dsp.exec_cmd("qs ipc call cheatsheet toggle"), { description = "Show keybindings" })
+hl.bind(mod .. " + SHIFT + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"), { description = "Pick wallpaper" })
 hl.bind(mod .. " + ALT + L", hl.dsp.exec_cmd("loginctl lock-session"), { description = "Lock session" })
 
 -- Keyboard backlight
@@ -30,8 +34,8 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"
 
 -- Window management
 hl.bind(mod .. " + Q", hl.dsp.window.close(), { description = "Close active window" })
-hl.bind(mod .. " + F", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle maximized window" })
-hl.bind(mod .. " + T", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating window" })
+hl.bind(mod .. " + F", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating window" })
+hl.bind(mod .. " + SHIFT + M", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle maximized window" })
 hl.bind(mod .. " + W", hl.dsp.group.toggle(), { description = "Toggle window group" })
 hl.bind(mod .. " + M", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen window" })
 

@@ -1,16 +1,16 @@
 # dotfiles
 
 A minimal Hyprland desktop for CachyOS / Arch: Hyprland (Lua config), a small Quickshell bar,
-and a handful of single-purpose tools. Everything uses one fixed palette, **Catppuccin Mocha**,
-and **FiraCode Nerd Font**.
+and a handful of single-purpose tools. Colors follow the wallpaper (Material You colors from
+**matugen**, with Catppuccin Mocha as the fallback), and everything uses **FiraCode Nerd Font**.
 
 | Role | Tool |
 |---|---|
 | Compositor | Hyprland (Lua config, 0.56+) |
-| Bar + network panel | Quickshell |
+| Bar, panels, notifications | Quickshell |
 | App launcher, clipboard picker, power menu, password prompts | fuzzel |
-| Notifications | mako |
 | Wallpaper | hyprpaper |
+| Colors from the wallpaper | matugen |
 | Idle / lock | hypridle + hyprlock |
 | Polkit agent | hyprpolkitagent |
 | Terminal / prompt | kitty + starship |
@@ -25,7 +25,7 @@ and **FiraCode Nerd Font**.
 
    ```sh
    sudo pacman -S --needed hyprland quickshell hypridle hyprlock hyprpaper hyprpolkitagent \
-       fuzzel mako kitty starship fastfetch stow \
+       fuzzel kitty starship fastfetch stow matugen adw-gtk-theme \
        grim slurp wl-clipboard cliphist wf-recorder jq brightnessctl libnotify \
        networkmanager networkmanager-openvpn wireplumber pipewire-pulse upower \
        ttf-firacode-nerd papirus-icon-theme
@@ -36,7 +36,7 @@ and **FiraCode Nerd Font**.
 
    ```sh
    cd ~/dotfiles
-   stow hypr quickshell fuzzel mako kitty starship fastfetch fontconfig
+   stow hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk
    ```
 
    Each top-level folder is a stow package that mirrors `$HOME`. For example,
@@ -44,7 +44,14 @@ and **FiraCode Nerd Font**.
 
 3. Log into the **Hyprland** session. Everything starts from `hypr/autostart.lua`.
 
-4. Machine-specific bits to check:
+4. Generate the colors once (afterwards the wallpaper picker does it), and source the starship
+   line from [Colors](#colors-from-the-wallpaper) in your shell rc:
+
+   ```sh
+   ~/.config/hypr/scripts/theme.sh
+   ```
+
+5. Machine-specific bits to check:
    - `hypr/monitors.lua`: output name, resolution, refresh rate and scale.
    - `hypr/hyprpaper.conf`: wallpaper path.
    - `hypr/scripts/vpn.sh`: default VPN connection name (`Office VPN`).
@@ -74,9 +81,16 @@ quickshell/.config/quickshell/
   Theme.qml           colors, font, sizes (singleton)
   Workspaces.qml  Clock.qml  Recording.qml  Network.qml  Volume.qml  Battery.qml
   NetworkPanel.qml    dropdown for wired / Wi-Fi / VPN
+  AudioPanel.qml      dropdown for audio devices and volumes
+  CalendarPanel.qml   month calendar under the clock
+  BatteryPanel.qml    battery status and power mode
+  Notification*.qml   notification daemon (Service), toasts (Popups, Card), bell (Button), list (Panel)
+  WallpaperPicker.qml Super + Shift + W wallpaper strip (WallpaperButton.qml opens it from the bar)
+  ActiveWindow.qml    icon and title of the focused window
+  Cheatsheet.qml      Super + ? keybinding overlay
   VpnService.qml      VPN state from nmcli (singleton)
-  Label.qml  Pill.qml  Switch.qml  PanelRow.qml   small shared widgets
-fuzzel/  mako/  kitty/  starship/  fastfetch/  fontconfig/
+  Label.qml  Pill.qml  Switch.qml  Slider.qml  PanelRow.qml  small shared widgets
+fuzzel/  mako/  kitty/  matugen/  gtk/  starship/  fastfetch/  fontconfig/
 ```
 
 ## Keybindings
@@ -87,7 +101,8 @@ fuzzel/  mako/  kitty/  starship/  fastfetch/  fontconfig/
 
 | Keys | Action |
 |---|---|
-| Super + Return | Terminal (kitty) |
+| Super + T / Super + Return | Terminal (kitty) |
+| Super + N | Notification list |
 | Super + A | App launcher (fuzzel) |
 | Super + B | Browser (Zen) |
 | Super + C | VS Code |
@@ -95,15 +110,17 @@ fuzzel/  mako/  kitty/  starship/  fastfetch/  fontconfig/
 | Super + V | Clipboard history |
 | Super + Escape | Power menu |
 | Super + Alt + L | Lock |
+| Super + ? | Keybinding cheatsheet (type to filter, Esc to close) |
+| Super + Shift + W | Wallpaper picker |
 
 **Windows**
 
 | Keys | Action |
 |---|---|
 | Super + Q | Close window |
-| Super + F | Maximize |
+| Super + F | Toggle floating |
+| Super + Shift + M | Maximize |
 | Super + M / Super + Ctrl + F | Fullscreen |
-| Super + T | Toggle floating |
 | Super + W | Toggle group |
 | Super + Arrows | Move focus |
 | Super + Shift + Arrows | Move window |
@@ -147,9 +164,33 @@ keyboard brightness also work on the lock screen.
 
 ## The bar
 
-Left to right: workspaces (click to switch), clock, then **rec** (only while recording),
-network, volume (click to mute, scroll to change) and battery. The network label gets a 󰖂
-while a VPN is connected; set `vpnMark` in `Network.qml` to `""` to hide it.
+Left to right: workspace dots (the focused one is a wide pill; click to switch), the focused
+window's icon and title, clock (click for a calendar), then icons only: 󰑊 (only while recording;
+click to stop), 󰸉 wallpaper picker, network, volume (click for the audio panel, right-click to mute, scroll to change)
+battery (click for the battery panel) and 󰂚 notifications (with an unread count). The network icon gets a 󰖂 while a VPN is connected; set
+`vpnMark` in `Network.qml` to `""` to hide it.
+
+### Wallpaper picker
+
+Super + Shift + W or the 󰸉 icon slides down a strip of the images in `~/Pictures/Wallpapers` (scroll
+to see more). Click one (or pick with the arrow keys and press Enter) to set it on every monitor
+through hyprpaper; it's saved to `hyprpaper.conf`, so it stays after a restart. Esc or a click outside closes it.
+
+### Notifications
+
+Quickshell is the notification daemon (mako isn't started any more; its config is left in `mako/`).
+
+- New notifications pop up in the top-right corner for 5 seconds (or the app's own timeout).
+  Hovering pauses the timer. Critical ones have a red border and stay until dismissed.
+- Click a notification to run the app's default action (for example, open the chat). Other actions
+  show as buttons. ✕ dismisses it.
+- Notifications stay in the list after their popup goes away. Click the bell to see them all; ✕
+  dismisses one and **clear all** dismisses everything.
+
+### Battery panel
+
+Click the battery icon to see the charge and time left, and to switch the power-profiles-daemon
+mode: Power saver, Balanced or Performance. The current mode is highlighted.
 
 ### Network panel
 
@@ -165,6 +206,15 @@ Click the network label to open the panel. Click anywhere outside it to close it
   "connecting…" until NetworkManager reports the new state.
 - **settings** opens `nmtui` in kitty for anything else (editing connections, hidden networks,
   static IPs).
+
+### Audio panel
+
+Click the volume label to open the panel. Click anywhere outside it to close it.
+
+- **Output** and **Input**: a volume slider for the current device (click the icon to mute), then
+  every device; click one to make it the default. The current one is highlighted.
+- **Apps**: a slider for each app playing sound (only shown while something plays).
+- **settings** opens `pavucontrol` for anything else (profiles, ports, per-app routing).
 
 ### VPN
 
@@ -193,24 +243,57 @@ From `hypr/hypridle.conf`:
 
 The screen also locks before suspend.
 
+## Colors from the wallpaper
+
+Picking a wallpaper (Super + Shift + W) runs `hypr/scripts/theme.sh <image>`. Run it without an
+argument to regenerate from the current wallpaper. It:
+
+1. sets the wallpaper on every monitor and saves it to `hyprpaper.conf`;
+2. runs `matugen` (dark Material You scheme) with the templates in `matugen/templates/`, writing to
+   `~/.local/state/theme/`, so the repo doesn't change on every switch;
+3. reloads what's running.
+
+| What | Gets its colors from | Updates |
+|---|---|---|
+| Bar, panels, cheatsheet, notifications | `Theme.qml` reads `quickshell.json` | live |
+| kitty | `kitty.conf` includes `kitty.conf` | live (SIGUSR1) |
+| Alacritty | `~/.config/alacritty/alacritty.toml` imports `alacritty.toml` | live |
+| Hyprland borders | `settings.lua` loads `hyprland.lua` | live (`hyprctl reload`) |
+| Lock screen (blurred wallpaper + colors) | `hyprlock.conf` sources `hyprlock.conf` | next lock |
+| fuzzel (launcher, clipboard, power menu) | `fuzzel.ini` includes `fuzzel.ini` | next launch |
+| Thunar and other GTK apps | `gtk/` (`gtk-3.0`/`gtk-4.0/gtk.css`) imports `gtk.css` | GTK3 live, GTK4 on restart |
+| starship | `STARSHIP_CONFIG` → `starship.toml` (your config + generated palette) | next prompt |
+
+The 16 terminal colors are Catppuccin's hues shifted toward the wallpaper (matugen
+`custom_colors`), so red stays red. Every app falls back to Catppuccin Mocha if the generated
+files are missing.
+
+starship has no include, so `~/.zshrc` points it at the generated copy:
+
+```sh
+[[ -f ~/.local/state/theme/starship.toml ]] && export STARSHIP_CONFIG=~/.local/state/theme/starship.toml
+```
+
+Edit `starship/.config/starship.toml` as usual; the generated copy is rebuilt on the next theme
+change (or run `theme.sh`).
+
 ## Customizing
 
-- **Colors**: Catppuccin Mocha is set in `quickshell/Theme.qml`, `hypr/settings.lua` (borders),
-  `hypr/hyprlock.conf`, `fuzzel/fuzzel.ini`, `mako/config`, `kitty/Catppuccin-Mocha.conf` and
-  `starship.toml` (`[palettes.main]`). Change them together to switch themes.
+- **Colors**: see [Colors from the wallpaper](#colors-from-the-wallpaper). Which color goes where is
+  set in the templates in `matugen/templates/`.
 - **Font**: `Theme.font` in Quickshell, `font=` in fuzzel and mako, and fontconfig defaults
   (sans → FiraCode Nerd Font Propo, monospace → FiraCode Nerd Font Mono).
 - **Bar contents**: edit the `RowLayout` in `Bar.qml`. Each module is a short QML file.
-- **Wallpaper**: change `path` in `hyprpaper.conf`, then restart hyprpaper.
+- **Wallpaper**: Super + Shift + W, or `hypr/scripts/theme.sh <image>`.
 
 ## Reloading and troubleshooting
 
 | What | Command |
 |---|---|
 | Reload Hyprland config | `hyprctl reload`, then check `hyprctl configerrors` |
-| Restart the bar | `qs kill; hyprctl dispatch 'hl.dsp.exec_cmd("qs")'` |
+| Restart the bar | `qs kill; hyprctl dispatch 'hl.dsp.exec_cmd("QS_ICON_THEME=Papirus-Dark qs")'` |
 | Bar logs | `qs log` |
-| Restart notifications | `makoctl reload` |
+| Test notifications | `notify-send -A default=Open -A later=Later "Title" "Body"` |
 | Log out | Power menu, or `hyprctl dispatch 'hl.dsp.exit()'` |
 
 Notes:

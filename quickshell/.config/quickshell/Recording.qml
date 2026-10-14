@@ -8,7 +8,8 @@ Label {
     property bool active: false
 
     visible: active
-    text: "󰑊 rec"
+    font.pixelSize: Theme.fontSize + 3
+    text: "󰑊"
     color: Theme.red
 
     Process {
@@ -27,6 +28,7 @@ Label {
 
     MouseArea {
         anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
         onClicked: Quickshell.execDetached(["pkill", "-INT", "-x", "wf-recorder"])
     }
 }

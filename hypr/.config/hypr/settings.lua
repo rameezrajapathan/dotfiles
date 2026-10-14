@@ -1,4 +1,9 @@
--- Colors: Catppuccin Mocha (same palette as quickshell/Theme.qml)
+-- Border colors come from the wallpaper (matugen, see scripts/theme.sh); Catppuccin Mocha if missing.
+local colors = { active_border = "rgb(89b4fa)", inactive_border = "rgb(313244)" }
+local ok, generated = pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hyprland.lua")
+if ok then
+	colors = generated
+end
 
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
@@ -19,8 +24,8 @@ hl.config({
 		border_size = 2,
 		resize_on_border = true,
 		col = {
-			active_border = "rgb(89b4fa)",
-			inactive_border = "rgb(313244)",
+			active_border = colors.active_border,
+			inactive_border = colors.inactive_border,
 		},
 		layout = "dwindle",
 	},

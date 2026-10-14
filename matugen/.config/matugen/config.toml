@@ -1,0 +1,45 @@
+# Material You colors from the wallpaper. Run through ~/.config/hypr/scripts/theme.sh, which also
+# sets the wallpaper and reloads the apps. Generated files go to ~/.local/state/theme/.
+
+[config]
+
+# Terminal/status hues (Catppuccin Mocha), shifted toward the wallpaper's colors
+[config.custom_colors]
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+
+[templates.quickshell]
+input_path = "~/.config/matugen/templates/quickshell.json"
+output_path = "~/.local/state/theme/quickshell.json"
+
+[templates.kitty]
+input_path = "~/.config/matugen/templates/kitty.conf"
+output_path = "~/.local/state/theme/kitty.conf"
+
+[templates.alacritty]
+input_path = "~/.config/matugen/templates/alacritty.toml"
+output_path = "~/.local/state/theme/alacritty.toml"
+
+[templates.hyprland]
+input_path = "~/.config/matugen/templates/hyprland.lua"
+output_path = "~/.local/state/theme/hyprland.lua"
+
+[templates.hyprlock]
+input_path = "~/.config/matugen/templates/hyprlock.conf"
+output_path = "~/.local/state/theme/hyprlock.conf"
+
+[templates.fuzzel]
+input_path = "~/.config/matugen/templates/fuzzel.ini"
+output_path = "~/.local/state/theme/fuzzel.ini"
+
+[templates.gtk]
+input_path = "~/.config/matugen/templates/gtk.css"
+output_path = "~/.local/state/theme/gtk.css"
+
+[templates.starship]
+input_path = "~/.config/matugen/templates/starship-palette.toml"
+output_path = "~/.local/state/theme/starship-palette.toml"

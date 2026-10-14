@@ -15,7 +15,7 @@ Rectangle {
     Label {
         id: label
         anchors.centerIn: parent
-        color: root.active ? Theme.base : Theme.text
+        color: root.active ? Theme.accentText : Theme.text
         font.pixelSize: Theme.fontSize - 2
     }
 
@@ -23,6 +23,7 @@ Rectangle {
         id: mouse
         anchors.fill: parent
         hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
 }

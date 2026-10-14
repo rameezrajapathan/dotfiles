@@ -1,0 +1,156 @@
+import Quickshell
+import Quickshell.Wayland
+import QtQuick
+import QtQuick.Layouts
+
+// Month calendar under the clock. Arrows or scroll change the month, the month name returns to today.
+// A transparent full-screen overlay: clicks outside the panel close it.
+PanelWindow {
+    id: root
+    required property var bar
+
+    property date today: new Date()
+    property int year: today.getFullYear()
+    property int month: today.getMonth()
+
+    // 42 cells (6 weeks), weeks start on Monday
+    readonly property var days: {
+        const first = new Date(year, month, 1);
+        const offset = (first.getDay() + 6) % 7;
+        const cells = [];
+        for (let i = 0; i < 42; i++)
+            cells.push(new Date(year, month, 1 - offset + i));
+        return cells;
+    }
+
+    function toggle() {
+        if (!visible) {
+            today = new Date();
+            showToday();
+        }
+        visible = !visible;
+    }
+
+    function showToday() {
+        year = today.getFullYear();
+        month = today.getMonth();
+    }
+
+    function shift(delta) {
+        const d = new Date(year, month + delta, 1);
+        year = d.getFullYear();
+        month = d.getMonth();
+    }
+
+    screen: bar.screen
+    anchors { top: true; bottom: true; left: true; right: true }
+    exclusionMode: ExclusionMode.Ignore
+    WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.namespace: "quickshell-calendar"
+    color: "transparent"
+    visible: false
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: root.visible = false
+    }
+
+    Rectangle {
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: Theme.barHeight + 6
+        width: 300
+        height: content.implicitHeight + 28
+        color: Theme.base
+        radius: 10
+        border.color: Theme.surface
+        border.width: 2
+
+        MouseArea {
+            anchors.fill: parent
+            onWheel: wheel => root.shift(wheel.angleDelta.y > 0 ? -1 : 1)
+        }
+
+        ColumnLayout {
+            id: content
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            spacing: 10
+
+            Label {
+                text: Qt.formatDate(root.today, "dddd, d MMMM yyyy")
+                color: Theme.subtext
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+
+                Pill {
+                    text: "‹"
+                    onClicked: root.shift(-1)
+                }
+                Label {
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    text: Qt.formatDate(new Date(root.year, root.month, 1), "MMMM yyyy")
+                    font.bold: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.showToday()
+                    }
+                }
+                Pill {
+                    text: "›"
+                    onClicked: root.shift(1)
+                }
+            }
+
+            GridLayout {
+                Layout.fillWidth: true
+                columns: 7
+                rowSpacing: 2
+                columnSpacing: 2
+
+                Repeater {
+                    model: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+
+                    Label {
+                        required property string modelData
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        text: modelData
+                        color: Theme.overlay
+                        font.pixelSize: Theme.fontSize - 2
+                    }
+                }
+
+                Repeater {
+                    model: root.days
+
+                    Rectangle {
+                        required property var modelData
+                        required property int index
+                        readonly property bool isToday: modelData.toDateString() === root.today.toDateString()
+                        readonly property bool inMonth: modelData.getMonth() === root.month
+
+                        Layout.fillWidth: true
+                        implicitHeight: 30
+                        radius: 6
+                        color: isToday ? Theme.accent : "transparent"
+
+                        Label {
+                            anchors.centerIn: parent
+                            text: modelData.getDate()
+                            font.bold: parent.isToday
+                            color: parent.isToday ? Theme.accentText
+                                : !parent.inMonth ? Theme.surface
+                                : index % 7 >= 5 ? Theme.subtext
+                                : Theme.text
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

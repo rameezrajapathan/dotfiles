@@ -1,3 +1,6 @@
+-- Apps can't maximize themselves (kitty and Chrome ask to on open); Super + F still maximizes
+hl.window_rule({ match = { class = ".*" }, suppress_event = "maximize" })
+
 -- Zen
 hl.window_rule({ match = { class = "^zen$" }, float = true, center = true, size = "1920 1080" })
 hl.window_rule({ match = { class = "zen", title = "Picture-in-Picture" }, float = true })
