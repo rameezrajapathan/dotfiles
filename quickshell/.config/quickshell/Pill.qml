@@ -1,0 +1,28 @@
+import QtQuick
+
+// Small rounded button.
+Rectangle {
+    id: root
+    property alias text: label.text
+    property bool active: false
+    signal clicked()
+
+    implicitWidth: label.implicitWidth + 16
+    implicitHeight: 22
+    radius: height / 2
+    color: active ? Theme.accent : mouse.containsMouse ? Theme.overlay : Theme.surface
+
+    Label {
+        id: label
+        anchors.centerIn: parent
+        color: root.active ? Theme.base : Theme.text
+        font.pixelSize: Theme.fontSize - 2
+    }
+
+    MouseArea {
+        id: mouse
+        anchors.fill: parent
+        hoverEnabled: true
+        onClicked: root.clicked()
+    }
+}

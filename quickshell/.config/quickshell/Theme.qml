@@ -18,4 +18,8 @@ Singleton {
     readonly property string font: "FiraCode Nerd Font Propo"
     readonly property int fontSize: 13
     readonly property int barHeight: 30
+
+    function wifiIcon(strength) {
+        return ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"][Math.min(4, Math.floor(strength * 5))];
+    }
 }

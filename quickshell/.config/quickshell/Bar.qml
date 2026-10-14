@@ -3,12 +3,18 @@ import QtQuick
 import QtQuick.Layouts
 
 PanelWindow {
+    id: bar
     required property var modelData
     screen: modelData
 
     anchors { top: true; left: true; right: true }
     implicitHeight: Theme.barHeight
     color: Theme.base
+
+    NetworkPanel {
+        id: networkPanel
+        bar: bar
+    }
 
     Workspaces {
         anchors.left: parent.left
@@ -27,8 +33,8 @@ PanelWindow {
         spacing: 16
 
         Recording {}
-        Vpn {}
-        Network {}
+        Vpn { onClicked: networkPanel.toggle() }
+        Network { onClicked: networkPanel.toggle() }
         Volume {}
         Battery {}
     }
