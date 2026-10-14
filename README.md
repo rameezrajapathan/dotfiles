@@ -37,7 +37,7 @@ and a handful of single-purpose tools. Colors follow the wallpaper (Material You
 
    ```sh
    cd ~/dotfiles
-   stow hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk
+   stow hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk cava
    ```
 
    Each top-level folder is a stow package that mirrors `$HOME`. For example,
@@ -84,6 +84,8 @@ quickshell/.config/quickshell/
   Theme.qml           colors, font, sizes (singleton)
   Workspaces.qml  Clock.qml  Recording.qml  Network.qml  Volume.qml  Battery.qml
   Media.qml  MediaButton.qml  MediaPanel.qml   music (MPRIS: Spotify, browsers, any player)
+  Bluetooth.qml  BluetoothPanel.qml          Bluetooth on/off, paired devices, pairing nearby ones
+  Osd.qml   volume / mic / brightness / keyboard-light indicator (keys call `qs ipc call osd …`)
   PowerButton.qml  Launcher.qml  PowerMenu.qml
   Icon.qml   Material Symbols Rounded icon by name (Icon { name: "wifi"; filled: true })
   NetworkPanel.qml    dropdown for wired / Wi-Fi / VPN

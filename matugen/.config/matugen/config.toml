@@ -56,3 +56,7 @@ output_path = "~/.local/state/theme/starship-palette.toml"
 [templates.nvim]
 input_path = "~/.config/matugen/templates/nvim.lua"
 output_path = "~/.local/state/theme/nvim.lua"
+
+[templates.cava]
+input_path = "~/.config/matugen/templates/cava-theme"
+output_path = "~/.config/cava/themes/wallpaper"

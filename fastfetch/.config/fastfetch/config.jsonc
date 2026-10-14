@@ -1,11 +1,18 @@
-// The distro's logo beside three sections. Colors are terminal color names, so they
+// A pika photo beside three sections. Colors are terminal color names, so they
 // follow kitty's palette, which comes from the wallpaper (matugen).
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
 
-  // The running distro's built-in logo, detected automatically
+  // pika.png: a Royle's pika, cropped into a circle from "Royle's Pika in it's home" by Nikeet123,
+  // CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), via Wikimedia Commons:
+  // https://commons.wikimedia.org/wiki/File:Royle%27s_Pika_in_it%27s_home.jpg
+  // Terminals without kitty's image support get the distro's logo instead.
   "logo": {
-    "padding": { "top": 1, "left": 2, "right": 4 }
+    "type": "kitty-direct",
+    "source": "~/.config/fastfetch/pika.png",
+    "width": 24,
+    "height": 12,
+    "padding": { "top": 2, "left": 3, "right": 4 }
   },
 
   "display": {

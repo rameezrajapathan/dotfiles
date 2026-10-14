@@ -21,6 +21,7 @@ PanelWindow {
     CalendarPanel {
         id: calendarPanel
         bar: bar
+        anchorX: center.x + clockIsland.x + clockIsland.width / 2
     }
 
     BatteryPanel {
@@ -43,6 +44,11 @@ PanelWindow {
 
     AudioPanel {
         id: audioPanel
+        bar: bar
+    }
+
+    BluetoothPanel {
+        id: bluetoothPanel
         bar: bar
     }
 
@@ -80,15 +86,28 @@ PanelWindow {
         MediaButton { onClicked: mediaPanel.toggle() }
     }
 
-    Island {
+    // Clock, then the window title, centered together
+    Row {
+        id: center
         anchors.centerIn: parent
-        visible: title.toplevel !== null
+        spacing: 8
 
-        ActiveWindow {
-            id: title
-            screen: bar.screen
-            // Keep clear of the left and right groups
-            maxWidth: bar.width - 2 * Math.max(left.width + media.width + 8, right.width + (tray.visible ? tray.width + 8 : 0)) - 120
+        Island {
+            id: clockIsland
+
+            Clock { onClicked: calendarPanel.toggle() }
+        }
+
+        Island {
+            visible: title.toplevel !== null
+
+            ActiveWindow {
+                id: title
+                screen: bar.screen
+                // Keep clear of the left and right groups
+                maxWidth: bar.width - 2 * Math.max(left.width + media.width + 8, right.width + (tray.visible ? tray.width + 8 : 0))
+                    - clockIsland.width - 8 - 120
+            }
         }
     }
 
@@ -114,10 +133,10 @@ PanelWindow {
         Recording {}
         WallpaperButton {}
         Network { onClicked: networkPanel.toggle() }
+        Bluetooth { onClicked: bluetoothPanel.toggle() }
         Volume { onClicked: audioPanel.toggle() }
         Battery { onClicked: batteryPanel.toggle() }
         NotificationButton { onClicked: notificationPanel.toggle() }
-        Clock { onClicked: calendarPanel.toggle() }
         PowerButton {}
     }
 }

@@ -1,3 +1,5 @@
+//@ pragma UseQApplication
+// Needed for tray app menus (Tray.qml), which are native Qt menus
 import Quickshell
 
 ShellRoot {
@@ -11,4 +13,5 @@ ShellRoot {
     NotificationPopups {}
     Launcher {}
     PowerMenu {}
+    Osd {}
 }

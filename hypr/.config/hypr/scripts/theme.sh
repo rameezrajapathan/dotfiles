@@ -34,6 +34,8 @@ mv "$state/starship.toml.tmp" "$state/starship.toml"
 
 # Live reloads. Quickshell and Alacritty watch their files; fuzzel reads its config on launch.
 pkill -USR1 -x kitty || true
+# cava reloads its config (and so themes/wallpaper) on USR1
+pkill -USR1 -x cava || true
 hyprctl reload >/dev/null
 # Re-applying the GTK theme makes running GTK3 apps (Thunar) reload gtk.css
 gtk_theme=$(gsettings get org.gnome.desktop.interface gtk-theme)

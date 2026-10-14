@@ -1,0 +1,5 @@
+# Only what differs from cava's defaults (see `man cava` or the upstream example config).
+
+[color]
+# Gradient from the wallpaper: matugen writes themes/wallpaper (hypr/scripts/theme.sh)
+theme = 'wallpaper'

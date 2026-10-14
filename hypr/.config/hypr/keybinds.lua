@@ -25,12 +25,12 @@ hl.bind(mod .. " + ALT + L", hl.dsp.exec_cmd("loginctl lock-session"), { descrip
 
 -- Keyboard backlight
 -- Uses the standard Linux keyboard-backlight LED device when available.
-hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd("brightnessctl -d '*::kbd_backlight' set +1"), { repeating = true, description = "Raise keyboard brightness" })
-hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("brightnessctl -d '*::kbd_backlight' set 1-"), { repeating = true, description = "Lower keyboard brightness" })
+hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd("brightnessctl -d '*::kbd_backlight' set +1 && qs ipc call osd keyboard"), { repeating = true, description = "Raise keyboard brightness" })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("brightnessctl -d '*::kbd_backlight' set 1- && qs ipc call osd keyboard"), { repeating = true, description = "Lower keyboard brightness" })
 
 -- Display brightness
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true, description = "Raise display brightness" })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true, description = "Lower display brightness" })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+ && qs ipc call osd brightness"), { locked = true, repeating = true, description = "Raise display brightness" })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%- && qs ipc call osd brightness"), { locked = true, repeating = true, description = "Lower display brightness" })
 
 -- Window management
 hl.bind(mod .. " + Q", require("background").hide_or_close, { description = "Close active window (background apps hide to the tray)" })
@@ -140,10 +140,10 @@ hl.bind(mod .. " + SHIFT + R", script("record.sh region"), { description = "Reco
 hl.bind(mod .. " + ALT + R", script("record.sh full"), { description = "Record the full screen" })
 
 -- Audio
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 3%+"), { locked = true, repeating = true, description = "Raise volume" })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%-"), { locked = true, repeating = true, description = "Lower volume" })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, description = "Toggle audio mute" })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, description = "Toggle microphone mute" })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 3%+ && qs ipc call osd volume"), { locked = true, repeating = true, description = "Raise volume" })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%- && qs ipc call osd volume"), { locked = true, repeating = true, description = "Lower volume" })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && qs ipc call osd volume"), { locked = true, description = "Toggle audio mute" })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && qs ipc call osd mic"), { locked = true, description = "Toggle microphone mute" })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("qs ipc call media next"), { locked = true, description = "Next track" })

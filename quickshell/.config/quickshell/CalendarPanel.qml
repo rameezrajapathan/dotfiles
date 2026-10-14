@@ -3,11 +3,13 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Full time and month calendar under the date. Arrows or scroll change the month, the month name returns to today.
+// Full time and month calendar under the clock. Arrows or scroll change the month, the month name returns to today.
 // A transparent full-screen overlay: clicks outside the panel close it.
 PanelWindow {
     id: root
     required property var bar
+    // Horizontal center of the clock; the panel is centered under it
+    property real anchorX: 0
 
     property date today: new Date()
     property int year: today.getFullYear()
@@ -56,10 +58,8 @@ PanelWindow {
     }
 
     Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 6
-        anchors.rightMargin: 8
+        x: Math.max(8, Math.min(parent.width - width - 8, root.anchorX - width / 2))
+        y: Theme.barHeight + 6
         width: 300
         height: content.implicitHeight + 28
         color: Theme.baseTranslucent

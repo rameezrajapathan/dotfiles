@@ -1,8 +1,7 @@
 -- Apps can't maximize themselves (kitty and Chrome ask to on open); Super + F still maximizes
 hl.window_rule({ match = { class = ".*" }, suppress_event = "maximize" })
 
--- Zen
-hl.window_rule({ match = { class = "^zen$" }, float = true, center = true, size = "1920 1080" })
+-- Zen: tiled like other apps; only Picture-in-Picture and the Library window float
 hl.window_rule({ match = { class = "zen", title = "Picture-in-Picture" }, float = true })
 hl.window_rule({ match = { class = "zen", title = ".*Library.*" }, float = true })
 
@@ -19,6 +18,6 @@ hl.window_rule({ match = { class = "xdg-desktop-portal-gtk", title = "^(Open|Sav
 hl.window_rule({ match = { class = "blueman-manager" }, float = true })
 hl.window_rule({ match = { class = "steam" }, float = true })
 
--- Quickshell launcher, power menu, cheatsheet and notification popups blur what's behind them. ignore_alpha skips the faint
+-- Quickshell launcher, power menu, cheatsheet, notification popups and OSD blur what's behind them. ignore_alpha skips the faint
 -- launcher backdrop, so only its card is blurred; the power menu's backdrop is opaque enough.
-hl.layer_rule({ match = { namespace = "^quickshell-(launcher|power|cheatsheet|notifications)$" }, blur = true, ignore_alpha = 0.4, no_anim = true })
+hl.layer_rule({ match = { namespace = "^quickshell-(launcher|power|cheatsheet|notifications|osd)$" }, blur = true, ignore_alpha = 0.4, no_anim = true })
