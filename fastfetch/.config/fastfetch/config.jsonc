@@ -1,0 +1,133 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+
+  "logo": {
+    "type": "none"
+  },
+
+  "display": {
+    "separator": "  "
+  },
+
+  "modules": [
+    {
+      "type": "custom",
+      "format": ""
+    },
+    {
+      "type": "custom",
+      "format": "{##89b4fa}pika.{#}"
+    },
+    {
+      "type": "custom",
+      "format": "{##89b4fa}────────────────────────────────────────────{#}"
+    },
+    {
+      "type": "custom",
+      "format": ""
+    },
+
+    {
+      "type": "os",
+      "key": "󰣇  os       ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+    {
+      "type": "kernel",
+      "key": "󰒋  kernel   ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+    {
+      "type": "wm",
+      "key": "󱂬  session  ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+    {
+      "type": "shell",
+      "key": "󰆍  shell    ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+
+    {
+      "type": "custom",
+      "format": ""
+    },
+    {
+      "type": "custom",
+      "format": "{##89b4fa}hardware{#}"
+    },
+    {
+      "type": "custom",
+      "format": "{##89b4fa}────────────────────────────────────────────{#}"
+    },
+    {
+      "type": "custom",
+      "format": ""
+    },
+
+    {
+      "type": "cpu",
+      "key": "󰻠  cpu      ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+    {
+      "type": "gpu",
+      "key": "󰢮  gpu      ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+    {
+      "type": "memory",
+      "key": "󰍛  memory   ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+    {
+      "type": "disk",
+      "key": "󰋊  disk     ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9",
+      "folders": "/"
+    },
+
+    {
+      "type": "custom",
+      "format": ""
+    },
+    {
+      "type": "custom",
+      "format": "{##89b4fa}state{#}"
+    },
+    {
+      "type": "custom",
+      "format": "{##89b4fa}────────────────────────────────────────────{#}"
+    },
+    {
+      "type": "custom",
+      "format": ""
+    },
+
+    {
+      "type": "uptime",
+      "key": "󰅐  uptime   ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+    {
+      "type": "packages",
+      "key": "󰏖  packages ",
+      "keyColor": "#afd18c",
+      "outputColor": "#d8dee9"
+    },
+
+    {
+      "type": "custom",
+      "format": ""
+    }
+  ]
+}
