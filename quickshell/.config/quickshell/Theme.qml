@@ -9,7 +9,7 @@ import QtQuick
 Singleton {
     readonly property color base: colors.base
     // Semi-transparent base for the bar islands and dropdown panels
-    readonly property color baseTranslucent: Qt.alpha(colors.base, 0.8)
+    readonly property color baseTranslucent: Qt.alpha(colors.base, Settings.appearance.panelOpacity)
     readonly property color surface: colors.surface
     readonly property color overlay: colors.overlay
     readonly property color text: colors.text
@@ -21,9 +21,11 @@ Singleton {
     readonly property color green: colors.green
     readonly property color yellow: colors.yellow
 
-    readonly property string font: "FiraCode Nerd Font Propo"
-    readonly property int fontSize: 13
-    readonly property int barHeight: 44
+    // Fonts and sizes are chosen in the Settings app (Settings.qml)
+    readonly property string font: Settings.appearance.font
+    readonly property string displayFont: Settings.appearance.displayFont
+    readonly property int fontSize: Settings.appearance.fontSize
+    readonly property int barHeight: Settings.bar.height
     // The bar's pill, and the circles at its ends (workspace, profile picture): the same gap on
     // every side makes them sit concentric in the rounded ends
     readonly property int pillHeight: barHeight - 8
@@ -32,6 +34,7 @@ Singleton {
     // Material Symbols Rounded (ttf-material-symbols-variable), used through Icon.qml
     readonly property string iconFont: "Material Symbols Rounded"
     readonly property int iconSize: 20
+    readonly property int iconWeight: Settings.appearance.iconWeight
 
     function wifiIcon(strength) {
         return ["signal_wifi_0_bar", "wifi_1_bar", "wifi_2_bar", "wifi", "wifi"][Math.min(4, Math.floor(strength * 5))];

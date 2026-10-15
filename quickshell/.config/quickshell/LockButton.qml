@@ -55,7 +55,7 @@ Item {
             id: tip
             anchors.centerIn: parent
             text: root.armed ? "Click again to " + root.label.toLowerCase() : root.label
-            font.family: "Fira Sans"
+            font.family: Theme.displayFont
             color: root.armed ? Theme.red : Theme.text
         }
     }

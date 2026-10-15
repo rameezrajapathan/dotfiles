@@ -18,4 +18,5 @@ ShellRoot {
     Overview {}
     CursorGlide {}
     Lock {}
+    SettingsApp {}
 }

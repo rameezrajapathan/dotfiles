@@ -7,10 +7,12 @@ Label {
 
     SystemClock {
         id: clock
-        precision: SystemClock.Minutes
+        precision: Settings.bar.seconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 
-    text: Qt.formatDateTime(clock.date, "h:mm AP")
+    // 12 or 24 hours, with or without seconds (Settings app > Bar)
+    text: Qt.formatDateTime(clock.date, (Settings.bar.clock24 ? "HH:mm" : "h:mm")
+        + (Settings.bar.seconds ? ":ss" : "") + (Settings.bar.clock24 ? "" : " AP"))
 
     MouseArea {
         anchors.fill: parent

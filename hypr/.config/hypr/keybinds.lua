@@ -28,6 +28,7 @@ hl.bind(mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { de
 hl.bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs ipc call quicksettings dnd"), { description = "Toggle Do Not Disturb" })
 hl.bind(mod .. " + S", hl.dsp.exec_cmd("qs ipc call controlcenter toggle ''"), { description = "Open settings (control center)" })
 hl.bind(mod .. " + CTRL + W", hl.dsp.exec_cmd("qs ipc call weather toggle"), { description = "Show the weather" })
+hl.bind(mod .. " + comma", hl.dsp.exec_cmd("qs ipc call settings open ''"), { description = "Open the Settings app" })
 hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("qs ipc call quicksettings pickColor"), { description = "Pick a color from the screen (copies hex)" })
 hl.bind(mod .. " + C", app("editor"), { description = "Open text editor" })
 hl.bind(mod .. " + B", app("browser"), { description = "Open web browser" })

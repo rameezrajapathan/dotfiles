@@ -20,7 +20,7 @@ Island {
     // The clock, or while music plays a small spectrum in its place (same size, so the pill
     // doesn't change); click for the calendar or the Music tab
     Item {
-        readonly property bool music: Cava.active
+        readonly property bool music: Cava.active && Settings.bar.musicBars
         implicitWidth: clock.implicitWidth
         implicitHeight: clock.implicitHeight
 
@@ -46,6 +46,7 @@ Island {
         }
     }
     WeatherChip {
+        visible: Weather.ready && Settings.bar.weather
         onClicked: root.weatherClicked()
     }
     NextMeeting {}

@@ -12,6 +12,7 @@ Prints JSON for `matugen --import-json-string`:
 """
 import json
 import math
+import os
 import subprocess
 import sys
 
@@ -124,6 +125,11 @@ def main():
         scheme = "scheme-tonal-spot"
     else:
         scheme = "scheme-content"
+    # Choices from the Settings app (theme.sh passes them; "auto" keeps the wallpaper's)
+    if os.environ.get("THEME_MODE") in ("light", "dark"):
+        mode = os.environ["THEME_MODE"]
+    if os.environ.get("THEME_SCHEME", "auto") != "auto":
+        scheme = "scheme-" + os.environ["THEME_SCHEME"]
 
     # Terminal colors keep a little hue on grey wallpapers so red and green stay apart
     strength = min(1.15, max(0.15, (colorful - 0.01) / 0.13))

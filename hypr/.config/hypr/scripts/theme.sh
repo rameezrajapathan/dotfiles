@@ -27,6 +27,11 @@ fi
 
 # Light or dark and how colorful, from the wallpaper itself: black and white pictures give a grey
 # theme, bright ones a light theme (theme-palette.py)
+# The Settings app can pin the mode and scheme (Appearance page; "auto" = from the wallpaper)
+settings=~/.config/pikadots/settings.json
+THEME_MODE=$(jq -r '.appearance.themeMode // "auto"' "$settings" 2>/dev/null || echo auto)
+THEME_SCHEME=$(jq -r '.appearance.scheme // "auto"' "$settings" 2>/dev/null || echo auto)
+export THEME_MODE THEME_SCHEME
 palette=$(python3 -I ~/.config/hypr/scripts/theme-palette.py "$img")
 mode=$(jq -r .theme.mode <<<"$palette")
 scheme=$(jq -r .theme.scheme <<<"$palette")

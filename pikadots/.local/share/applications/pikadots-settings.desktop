@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Settings
+GenericName=Desktop settings
+Comment=Appearance, fonts, bar and more for the pikadots desktop
+Icon=preferences-desktop
+Exec=qs ipc call settings open ""
+Keywords=settings;preferences;appearance;wallpaper;theme;font;
+Categories=Settings;DesktopSettings;

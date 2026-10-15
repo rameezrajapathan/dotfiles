@@ -168,7 +168,7 @@ Item {
                 Label {
                     anchors.verticalCenter: parent.verticalCenter
                     text: User.hostName || "Locked"
-                    font.family: "Fira Sans"
+                    font.family: Theme.displayFont
                     font.weight: Font.Medium
                     color: Theme.subtext
                 }
@@ -202,7 +202,7 @@ Item {
                     Label {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Math.round(root.battery.percentage * 100) + "%"
-                        font.family: "Fira Sans"
+                        font.family: Theme.displayFont
                         font.weight: Font.Medium
                     }
                 }
@@ -231,7 +231,7 @@ Item {
                     text: Qt.formatDateTime(clock.date, "dddd, d MMMM")
                     color: Theme.text
                     opacity: 0.85
-                    font.family: "Fira Sans"
+                    font.family: Theme.displayFont
                     font.weight: Font.Medium
                     font.pixelSize: 24
                     font.letterSpacing: 0.5
@@ -249,7 +249,7 @@ Item {
                     Text {
                         text: time.parts[0]
                         color: Theme.text
-                        font.family: "Fira Sans"
+                        font.family: Theme.displayFont
                         font.weight: Font.Light
                         font.pixelSize: 190
                         font.features: { "tnum": 1 }
@@ -258,7 +258,7 @@ Item {
                     Text {
                         text: ":"
                         color: Theme.accent
-                        font.family: "Fira Sans"
+                        font.family: Theme.displayFont
                         font.weight: Font.Light
                         font.pixelSize: 190
                         anchors.baseline: parent.children[0].baseline
@@ -268,7 +268,7 @@ Item {
                     Text {
                         text: time.parts[1]
                         color: Theme.text
-                        font.family: "Fira Sans"
+                        font.family: Theme.displayFont
                         font.weight: Font.Light
                         font.pixelSize: 190
                         font.features: { "tnum": 1 }
@@ -276,7 +276,7 @@ Item {
                     Text {
                         text: Qt.formatDateTime(clock.date, "AP")
                         color: Theme.accent
-                        font.family: "Fira Sans"
+                        font.family: Theme.displayFont
                         font.weight: Font.Medium
                         font.pixelSize: 30
                         font.letterSpacing: 1
@@ -340,7 +340,7 @@ Item {
                         text: root.player?.trackTitle || "Unknown track"
                         color: Theme.text
                         elide: Text.ElideRight
-                        font.family: "Fira Sans"
+                        font.family: Theme.displayFont
                         font.weight: Font.DemiBold
                         font.pixelSize: 15
                     }
@@ -349,7 +349,7 @@ Item {
                         text: root.player?.trackArtist || root.player?.identity || ""
                         color: Theme.subtext
                         elide: Text.ElideRight
-                        font.family: "Fira Sans"
+                        font.family: Theme.displayFont
                         font.pixelSize: 13
                     }
                     MusicBars {
@@ -591,7 +591,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: root.greeting()
                 color: Theme.text
-                font.family: "Fira Sans"
+                font.family: Theme.displayFont
                 font.weight: Font.Medium
                 font.pixelSize: 20
                 layer.enabled: true
@@ -652,7 +652,7 @@ Item {
                     text: root.lock.checking ? "Checking…" : root.awake ? "Enter password" : "Press any key"
                     color: Theme.subtext
                     opacity: 0.8
-                    font.family: "Fira Sans"
+                    font.family: Theme.displayFont
                     font.pixelSize: 15
                 }
 
@@ -749,7 +749,7 @@ Item {
                 wrapMode: Text.Wrap
                 text: root.lock.failed ? root.lock.message : root.lock.capsLock ? "Caps Lock is on" : " "
                 color: root.lock.failed ? Theme.red : Theme.yellow
-                font.family: "Fira Sans"
+                font.family: Theme.displayFont
                 font.weight: Font.Medium
                 font.pixelSize: 14
             }

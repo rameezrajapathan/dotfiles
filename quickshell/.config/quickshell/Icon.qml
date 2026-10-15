@@ -6,7 +6,7 @@ Text {
     property string name
     property bool filled: false
     property int size: Theme.iconSize
-    property int weight: 400
+    property int weight: Theme.iconWeight
 
     text: name
     color: Theme.text

@@ -359,6 +359,13 @@ PanelWindow {
                             spacing: 6
 
                             FooterButton {
+                                icon: "settings"
+                                onClicked: {
+                                    root.close();
+                                    Settings.openRequested("");
+                                }
+                            }
+                            FooterButton {
                                 icon: "palette"
                                 onClicked: {
                                     root.close();

@@ -17,6 +17,8 @@ hl.window_rule({ match = { class = "thunar", title = ".*Rename.*" }, float = tru
 hl.window_rule({ match = { class = "xdg-desktop-portal-gtk", title = "^(Open|Save)" }, float = true })
 hl.window_rule({ match = { class = "blueman-manager" }, float = true })
 hl.window_rule({ match = { class = "steam" }, float = true })
+-- Settings app (quickshell/SettingsApp.qml)
+hl.window_rule({ match = { class = "^org.quickshell$", title = "^Settings$" }, float = true, center = true, size = "1040 720" })
 
 -- Blur behind every Quickshell surface (bar pills, panels, launcher, menus, popups, OSD).
 -- ignore_alpha skips nearly transparent pixels, so full-screen overlays only blur under their content.
