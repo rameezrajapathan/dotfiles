@@ -21,7 +21,7 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Super + N | Notifications |
 | Super + Shift + N | Do Not Disturb |
 | Super + S | Control center; Esc, arrows / Tab / J K and 1–9 work inside |
-| Super + , | Settings app (appearance, desktop, devices, power, default and startup apps); Ctrl+F searches |
+| Super + , | Settings app (appearance, desktop, shell, devices, power, apps); Ctrl+F searches |
 | Super + Ctrl + W | Weather |
 | Super + Shift + M | Music player (control center's Music tab) |
 | Super + Shift + C | Color picker (copies hex) |

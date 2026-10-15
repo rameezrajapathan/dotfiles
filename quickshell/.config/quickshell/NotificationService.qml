@@ -14,6 +14,22 @@ Singleton {
     property var popups: []
     // Do Not Disturb: notifications go straight to the list; only critical ones pop up
     property alias dnd: state.dnd
+    // Do Not Disturb by the clock (Settings app > Notifications: every day from–to)
+    readonly property bool scheduledQuiet: {
+        const n = Settings.notifications;
+        if (!n.schedule)
+            return false;
+        const minutes = t => {
+            const [h, m] = t.split(":").map(Number);
+            return h * 60 + (m || 0);
+        };
+        const now = clock.date.getHours() * 60 + clock.date.getMinutes();
+        const from = minutes(n.from), to = minutes(n.to);
+        // A range past midnight (22:00–07:00) wraps
+        return from <= to ? now >= from && now < to : now >= from || now < to;
+    }
+    // Popups are held back while either is on
+    readonly property bool quiet: dnd || scheduledQuiet
 
     PersistentProperties {
         id: state
@@ -79,7 +95,7 @@ Singleton {
         onNotification: n => {
             n.tracked = true;
             root.times[n.id] = new Date();
-            if (!root.dnd || n.urgency === NotificationUrgency.Critical)
+            if (!root.quiet || n.urgency === NotificationUrgency.Critical)
                 root.popups = [n].concat(root.popups);
             n.closed.connect(() => root.hidePopup(n));
         }

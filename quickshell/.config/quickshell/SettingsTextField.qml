@@ -1,12 +1,15 @@
 import QtQuick
 import QtQuick.Layouts
 
-// One-line text input; `accepted` fires on Enter or when focus leaves with a changed value.
+// One-line text input; `accepted` fires on Enter or when focus leaves with a changed value,
+// `edited` on every change.
 Rectangle {
     id: root
     property string text
     property string placeholder
     signal accepted(string text)
+    // Every keystroke, for live filters
+    signal edited(string text)
 
     function clear() {
         input.text = "";
@@ -32,6 +35,7 @@ Rectangle {
         selectionColor: Theme.accent
         selectedTextColor: Theme.accentText
         clip: true
+        onTextChanged: root.edited(text)
         onAccepted: {
             root.accepted(text);
             focus = false;

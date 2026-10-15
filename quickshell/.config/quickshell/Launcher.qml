@@ -23,24 +23,34 @@ PanelWindow {
     // Closes the other panels when this one opens, and the other way round
     Exclusive { panel: root }
 
-    readonly property int cellSize: 128
+    // Grid size and modes come from the Settings app (Launcher page)
+    readonly property int cellSize: Settings.launcher.cellSize
+    readonly property int appColumns: Settings.launcher.columns
     readonly property string usageFile: Quickshell.env("HOME") + "/.local/state/quickshell/launcher.json"
     readonly property string home: Quickshell.env("HOME")
 
     property bool open: false
     property var usage: ({})
 
-    readonly property var modes: ({
+    readonly property var allModes: ({
         "=": { name: "calc", hint: "Calculator", icon: "calculate" },
         ">": { name: "run", hint: "Run command", icon: "terminal" },
         ":": { name: "emoji", hint: "Emoji", icon: "mood" },
         "~": { name: "projects", hint: "Projects", icon: "folder_code" },
         "+": { name: "clipboard", hint: "Clipboard", icon: "content_paste" }
     })
+    // The ones turned on in the Settings app
+    readonly property var modes: {
+        const on = {};
+        for (const [prefix, m] of Object.entries(allModes))
+            if (Settings.launcher[m.name])
+                on[prefix] = m;
+        return on;
+    }
     readonly property var modeInfo: modes[search.text.charAt(0)] ?? null
     readonly property string mode: modeInfo?.name ?? "apps"
     readonly property string query: (modeInfo ? search.text.slice(1) : search.text).trim()
-    readonly property int columns: mode === "apps" ? 6 : mode === "emoji" ? 10 : 1
+    readonly property int columns: mode === "apps" ? appColumns : mode === "emoji" ? 10 : 1
 
     readonly property var apps: DesktopEntries.applications.values
         .filter(e => !e.noDisplay)
@@ -115,7 +125,9 @@ PanelWindow {
     function appResults(q) {
         // Ties fall back to the name; QML's sort isn't stable
         if (q === "")
-            return apps.slice().sort((a, b) => (usage[b.id] ?? 0) - (usage[a.id] ?? 0) || a.name.localeCompare(b.name));
+            return Settings.launcher.mostUsedFirst
+                ? apps.slice().sort((a, b) => (usage[b.id] ?? 0) - (usage[a.id] ?? 0) || a.name.localeCompare(b.name))
+                : apps;
         const scored = [];
         for (const e of apps) {
             const s = score(e, q);
@@ -296,6 +308,11 @@ PanelWindow {
         function toggle(): void {
             root.toggle();
         }
+        // Clears the most-used counts (Settings app > Launcher)
+        function forget(): void {
+            root.usage = {};
+            usageView.setText("{}");
+        }
         // Opens with text already typed, e.g. "~" for projects or "=" for the calculator
         function open(text: string): void {
             if (!root.open)
@@ -330,7 +347,7 @@ PanelWindow {
     Sheet {
         id: card
         open: root.open
-        sheetWidth: 6 * root.cellSize + 40
+        sheetWidth: Math.min(root.width - 56, root.appColumns * root.cellSize + 40)
         sheetHeight: Math.min(600, root.height - Theme.barHeight - 40)
         onClosed: root.visible = false
         onDismiss: root.open = false
@@ -523,7 +540,7 @@ PanelWindow {
 
                         IconImage {
                             Layout.alignment: Qt.AlignHCenter
-                            implicitSize: 52
+                            implicitSize: Math.round(root.cellSize * 0.4)
                             source: cell.modelData.app ? root.iconFor(cell.modelData.app) : ""
                             asynchronous: true
                             scale: cell.selected ? 1.08 : 1

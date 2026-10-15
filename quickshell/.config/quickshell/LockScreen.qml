@@ -63,8 +63,9 @@ Item {
 
     Timer {
         id: restTimer
-        interval: 15000
-        running: root.awake && root.lock.password === "" && !root.lock.checking
+        // Settings app > Lock screen; 0 never rests
+        interval: Math.max(1, Settings.lock.restSeconds) * 1000
+        running: Settings.lock.restSeconds > 0 && root.awake && root.lock.password === "" && !root.lock.checking
         onTriggered: root.awake = false
     }
 
@@ -86,7 +87,7 @@ Item {
         blurEnabled: true
         blurMax: 64
         // Starts sharp like the desktop it covers, blurs in, and sharpens again on the way out
-        blur: root.leaving || !root.shown ? 0 : root.awake ? 0.85 : 0.45
+        blur: root.leaving || !root.shown ? 0 : root.awake ? Settings.lock.blur : Settings.lock.blur * 0.53
         brightness: root.leaving || !root.shown ? 0 : root.awake ? -0.22 : -0.12
         saturation: root.leaving || !root.shown ? 0 : 0.15
         scale: root.leaving || !root.shown ? 1 : 1.06
@@ -242,7 +243,8 @@ Item {
                 Row {
                     id: time
                     anchors.horizontalCenter: parent.horizontalCenter
-                    readonly property var parts: Qt.formatDateTime(clock.date, "h:mm AP").split(" ")[0].split(":")
+                    // 12 or 24 hours, like the bar (Settings app > Bar)
+                    readonly property var parts: Qt.formatDateTime(clock.date, Settings.bar.clock24 ? "HH:mm" : "h:mm AP").split(" ")[0].split(":")
                     layer.enabled: true
                     layer.effect: MultiEffect { shadowEnabled: true; shadowOpacity: 0.4; shadowBlur: 1; shadowVerticalOffset: 4 }
 
@@ -274,6 +276,7 @@ Item {
                         font.features: { "tnum": 1 }
                     }
                     Text {
+                        visible: !Settings.bar.clock24
                         text: Qt.formatDateTime(clock.date, "AP")
                         color: Theme.accent
                         font.family: Theme.displayFont
@@ -297,7 +300,7 @@ Item {
                 border.width: 1
                 border.color: Qt.alpha(Theme.text, 0.08)
                 opacity: root.player ? 1 : 0
-                visible: root.player !== null
+                visible: root.player !== null && Settings.lock.showMedia
                 Behavior on opacity { NumberAnimation { duration: 300 } }
 
                 ClippingRectangle {
@@ -409,6 +412,7 @@ Item {
 
         // Power
             Row {
+                visible: Settings.lock.showPower
                 anchors.horizontalCenter: parent.horizontalCenter
                 topPadding: 4
                 spacing: 14

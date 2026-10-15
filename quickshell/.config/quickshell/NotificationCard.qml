@@ -37,16 +37,18 @@ Rectangle {
     border.color: Qt.alpha(root.tint, critical ? 0.7 : 0.35)
     clip: true
 
-    // Slide in from the right
-    transform: Translate { id: slide; x: root.popup ? 420 : 0 }
+    // Slides in from the screen edge it sits on (from above or below when centered)
+    readonly property string edge: Settings.notifications.position
+    transform: Translate {
+        id: slide
+        x: !root.popup ? 0 : root.edge.endsWith("right") ? root.width + 20 : root.edge.endsWith("left") ? -root.width - 20 : 0
+        y: !root.popup || root.edge.endsWith("right") || root.edge.endsWith("left") ? 0 : root.edge.startsWith("bottom") ? 60 : -60
+    }
     Component.onCompleted: if (popup) slideIn.start()
-    NumberAnimation {
+    ParallelAnimation {
         id: slideIn
-        target: slide
-        property: "x"
-        to: 0
-        duration: 260
-        easing.type: Easing.OutCubic
+        NumberAnimation { target: slide; property: "x"; to: 0; duration: 260; easing.type: Easing.OutCubic }
+        NumberAnimation { target: slide; property: "y"; to: 0; duration: 260; easing.type: Easing.OutCubic }
     }
 
     // Accent wash from the top-left corner
@@ -65,7 +67,8 @@ Rectangle {
         paused: running && hover.hovered
         from: 1
         to: 0
-        duration: (root.notification.expireTimeout > 0 ? root.notification.expireTimeout : 6) * 1000
+        duration: (Settings.notifications.appTimeout && root.notification.expireTimeout > 0
+            ? root.notification.expireTimeout : Settings.notifications.timeout) * 1000
         onFinished: NotificationService.hidePopup(root.notification)
     }
 

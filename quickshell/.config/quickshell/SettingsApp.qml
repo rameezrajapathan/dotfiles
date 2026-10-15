@@ -27,6 +27,16 @@ Scope {
             keywords: "blur opacity transparency dim shadows animations speed workspace", component: effectsPage },
         { key: "input", group: "Desktop", title: "Keyboard & mouse", icon: "keyboard",
             keywords: "keyboard layout language repeat mouse pointer sensitivity acceleration touchpad tap scroll cursor", component: inputPage },
+        { key: "notifications", group: "Shell", title: "Notifications", icon: "notifications",
+            keywords: "notifications popups do not disturb dnd quiet hours schedule position timeout", component: notificationsPage },
+        { key: "launcher", group: "Shell", title: "Launcher", icon: "apps",
+            keywords: "launcher app grid columns icons most used calculator emoji clipboard projects run", component: launcherPage },
+        { key: "weather", group: "Shell", title: "Weather", icon: "partly_cloudy_day",
+            keywords: "weather temperature celsius fahrenheit city location forecast", component: weatherPage },
+        { key: "lock", group: "Shell", title: "Lock screen", icon: "lock",
+            keywords: "lock screen blur password media power rest idle", component: lockPage },
+        { key: "keybinds", group: "Shell", title: "Keybindings", icon: "keyboard_command_key",
+            keywords: "keybindings shortcuts keys hotkeys cheatsheet", component: keybindsPage },
         { key: "network", group: "System", title: "Network", icon: "wifi",
             keywords: "network wifi wi-fi ethernet wired vpn internet speed test", component: networkPage },
         { key: "bluetooth", group: "System", title: "Bluetooth", icon: "bluetooth",
@@ -394,6 +404,11 @@ Scope {
     Component { id: windowsPage; SettingsWindowsPage {} }
     Component { id: effectsPage; SettingsEffectsPage {} }
     Component { id: inputPage; SettingsInputPage {} }
+    Component { id: notificationsPage; SettingsNotificationsPage {} }
+    Component { id: launcherPage; SettingsLauncherPage {} }
+    Component { id: weatherPage; SettingsWeatherPage {} }
+    Component { id: lockPage; SettingsLockPage {} }
+    Component { id: keybindsPage; SettingsKeybindsPage {} }
     Component { id: networkPage; SettingsNetworkPage {} }
     Component { id: bluetoothPage; SettingsBluetoothPage {} }
     Component { id: soundPage; SettingsSoundPage {} }
