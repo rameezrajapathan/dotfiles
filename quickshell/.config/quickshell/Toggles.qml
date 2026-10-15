@@ -15,6 +15,11 @@ Singleton {
     readonly property int nightTemperature: 4500
 
     signal panelToggleRequested()
+    // `qs ipc call controlcenter toggle <tab>` (account, music, notifications, network, bluetooth,
+    // audio, display, battery, system, capture, github; "" = last tab)
+    signal controlCenterRequested(string tab)
+    // `qs ipc call calendar toggle`
+    signal calendarRequested()
 
     // Copies the picked color as hex and shows it in a notification
     function pickColor() {
@@ -34,6 +39,21 @@ Singleton {
         command: ["hyprsunset", "-t", String(root.nightTemperature)]
     }
 
+    IpcHandler {
+        target: "controlcenter"
+        function toggle(tab: string): void {
+            root.controlCenterRequested(tab);
+        }
+    }
+
+    IpcHandler {
+        target: "calendar"
+        function toggle(): void {
+            root.calendarRequested();
+        }
+    }
+
+    // `toggle` opens the Account tab, which holds the quick settings now
     IpcHandler {
         target: "quicksettings"
         function toggle(): void {

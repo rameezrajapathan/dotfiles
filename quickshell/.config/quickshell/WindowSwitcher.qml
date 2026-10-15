@@ -6,11 +6,15 @@ import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
 
-// Alt + Tab: a row of live window previews, most recent first. Holding Alt, Tab / Shift + Tab
-// move; releasing Alt focuses the selection (Hyprland reports the release, so quick taps work).
-// Esc cancels. Driven by `qs ipc call switcher next|prev|commit|cancel` from keybinds.lua.
+// Alt + Tab: a row of live window previews, most recent first, coming out of the bar's pill.
+// Holding Alt, Tab / Shift + Tab move; releasing Alt focuses the selection (Hyprland reports the
+// release, so quick taps work). Esc cancels. Driven by `qs ipc call switcher
+// next|prev|commit|cancel` from keybinds.lua.
 PanelWindow {
     id: root
+
+    // Closes the other panels when this one opens, and the other way round
+    Exclusive { panel: root }
 
     property bool open: false
     property int current: 0
@@ -50,15 +54,24 @@ PanelWindow {
     function commit() {
         if (!open)
             return;
-        const t = items[current];
+        focusLater.target = items[current] ?? null;
         close();
-        if (t)
-            Windows.focus(t);
+        if (focusLater.target)
+            focusLater.restart();
     }
 
+    // Hyprland ignores focus changes while this window holds the keyboard (exclusive while open),
+    // and it stays mapped while it slides back into the pill; focus once the keyboard is released
+    Timer {
+        id: focusLater
+        property var target: null
+        interval: 50
+        onTriggered: Windows.focus(target)
+    }
+
+    // Slides back into the pill; the window hides when that ends
     function close() {
         open = false;
-        visible = false;
     }
 
     IpcHandler {
@@ -105,14 +118,13 @@ PanelWindow {
         }
     }
 
-    Rectangle {
-        anchors.centerIn: parent
-        width: Math.min(parent.width - 80, row.implicitWidth + 32)
-        height: row.implicitHeight + 32
-        radius: 24
-        color: Theme.baseTranslucent
-        border.color: Qt.alpha(Theme.text, 0.08)
-        border.width: 1
+    // Comes out of the bar's pill, like the launcher
+    Sheet {
+        open: root.open
+        sheetWidth: Math.min(root.width - 80, row.implicitWidth + 32)
+        sheetHeight: row.implicitHeight + 32
+        onClosed: root.visible = false
+        onDismiss: root.close()
 
         ListView {
             id: row
@@ -125,7 +137,17 @@ PanelWindow {
             clip: true
             model: root.items
             currentIndex: root.current
-            highlightMoveDuration: 120
+            // One highlight that glides to the selection
+            highlightFollowsCurrentItem: true
+            highlightMoveDuration: 160
+            highlight: Rectangle {
+                width: 260
+                height: 200
+                radius: 16
+                color: Qt.alpha(Theme.accent, 0.22)
+                border.width: 2
+                border.color: Theme.accent
+            }
             preferredHighlightBegin: width / 2 - 130
             preferredHighlightEnd: width / 2 + 130
             highlightRangeMode: ListView.ApplyRange
@@ -139,9 +161,7 @@ PanelWindow {
                 width: 260
                 height: 200
                 radius: 16
-                color: selected ? Qt.alpha(Theme.accent, 0.22) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
-                border.width: selected ? 2 : 0
-                border.color: Theme.accent
+                color: !selected && cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -157,7 +177,7 @@ PanelWindow {
                         // Sized by constraintSize, keeping the window's aspect ratio
                         ScreencopyView {
                             anchors.centerIn: parent
-                            captureSource: root.open ? card.modelData.wayland : null
+                            captureSource: root.visible ? card.modelData.wayland : null
                             live: card.selected
                             constraintSize: Qt.size(parent.width, parent.height)
                         }

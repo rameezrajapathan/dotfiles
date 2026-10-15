@@ -2,7 +2,8 @@
 
 [← README](../README.md)
 
-Super + ? shows these on screen. Change them in `hypr/.config/hypr/keybinds.lua`.
+Super + ? shows these on screen. Change them in `hypr/.config/hypr/keybinds.lua`. Terminal, browser,
+file manager and editor open your [default apps](desktop.md#default-apps).
 
 ## Apps and system
 
@@ -14,12 +15,13 @@ Super + ? shows these on screen. Change them in `hypr/.config/hypr/keybinds.lua`
 | Super + T | Terminal with fastfetch |
 | Super + Return | Terminal |
 | Super + \` | Drop-down terminal |
-| Super + B | Browser (Zen) |
-| Super + C | VS Code |
-| Super + E | File manager (Thunar) |
+| Super + B | Browser |
+| Super + C | Text editor |
+| Super + E | File manager |
 | Super + N | Notifications |
 | Super + Shift + N | Do Not Disturb |
-| Super + S | Quick settings |
+| Super + S | Settings (control center); Esc, arrows / Tab / J K and 1–9 work inside |
+| Super + Shift + M | Music player (control center's Music tab) |
 | Super + Shift + C | Color picker (copies hex) |
 | Super + Shift + W | Wallpaper picker |
 | Super + ? | Cheatsheet |
@@ -31,10 +33,10 @@ Super + ? shows these on screen. Change them in `hypr/.config/hypr/keybinds.lua`
 | Keys | Action |
 |---|---|
 | Alt + Tab | Switch windows |
-| Super + Tab | Overview |
+| Super + Tab | Switch workspaces (hold Super, Tab to move, release to switch) |
 | Super + Q | Close (Thunderbird and Chrome apps hide instead) |
 | Super + F | Floating |
-| Super + Shift + M | Maximize |
+| Super + Ctrl + M | Maximize |
 | Super + M | Fullscreen |
 | Super + W | Group windows |
 | Super + Arrows | Move focus |

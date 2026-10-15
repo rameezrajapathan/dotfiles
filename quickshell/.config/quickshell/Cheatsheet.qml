@@ -11,6 +11,9 @@ import QtQuick.Layouts
 PanelWindow {
     id: root
 
+    // Closes the other panels when this one opens, and the other way round
+    Exclusive { panel: root }
+
     readonly property int columns: 3
 
     // Card order; each bind goes in the first group whose pattern matches its description

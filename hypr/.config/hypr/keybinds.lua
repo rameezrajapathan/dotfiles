@@ -4,27 +4,34 @@ local mod = "SUPER"
 local function script(cmd)
 	return hl.dsp.exec_cmd("~/.config/hypr/scripts/" .. cmd)
 end
+-- Default apps (scripts/app.sh): whatever the system has set, never a named app
+local function app(kind)
+	return script("app.sh " .. kind)
+end
 local function shot(args)
 	return script("screenshot.sh " .. args)
 end
 
 -- Application launchers
-hl.bind(mod .. " + T", hl.dsp.exec_cmd("FASTFETCH=1 kitty"), { description = "Open terminal with fastfetch (Kitty)" })
+hl.bind(mod .. " + T", hl.dsp.exec_cmd("FASTFETCH=1 ~/.config/hypr/scripts/app.sh terminal"), { description = "Open terminal with fastfetch" })
 hl.bind(mod .. " + grave", script("dropterm.sh"), { description = "Toggle drop-down terminal" })
-hl.bind(mod .. " + Tab", hl.dsp.exec_cmd("qs ipc call overview toggle"), { description = "Show all workspaces (overview)" })
+hl.bind(mod .. " + Tab", hl.dsp.exec_cmd("qs ipc call overview next"), { description = "Switch workspaces (hold Super)" })
+hl.bind(mod .. " + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call overview prev"), { description = "Switch workspaces backwards" })
+-- Releasing Super switches to the workspace selected in the overview
+hl.bind(mod .. " + Super_L", hl.dsp.exec_cmd("qs ipc call overview commit"), { release = true, transparent = true, non_consuming = true })
 hl.bind("ALT + Tab", hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Switch windows (hold Alt)" })
 hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher prev"), { description = "Switch windows backwards" })
 -- Releasing Alt picks the selected window in the switcher
 hl.bind("ALT + Alt_L", hl.dsp.exec_cmd("qs ipc call switcher commit"), { release = true, transparent = true, non_consuming = true })
-hl.bind(mod .. " + Return", hl.dsp.exec_cmd("kitty"), { description = "Open terminal (Kitty)" })
+hl.bind(mod .. " + Return", app("terminal"), { description = "Open terminal" })
 hl.bind(mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "Show notifications" })
 hl.bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs ipc call quicksettings dnd"), { description = "Toggle Do Not Disturb" })
-hl.bind(mod .. " + S", hl.dsp.exec_cmd("qs ipc call quicksettings toggle"), { description = "Open quick settings" })
+hl.bind(mod .. " + S", hl.dsp.exec_cmd("qs ipc call controlcenter toggle ''"), { description = "Open settings (control center)" })
 hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("qs ipc call quicksettings pickColor"), { description = "Pick a color from the screen (copies hex)" })
-hl.bind(mod .. " + C", hl.dsp.exec_cmd("code"), { description = "Open code editor (Visual Studio Code)" })
-hl.bind(mod .. " + B", hl.dsp.exec_cmd("zen-browser"), { description = "Open web browser (Zen)" })
+hl.bind(mod .. " + C", app("editor"), { description = "Open text editor" })
+hl.bind(mod .. " + B", app("browser"), { description = "Open web browser" })
 hl.bind(mod .. " + SHIFT + F", shot("region save"), { description = "Capture and save a region screenshot" })
-hl.bind(mod .. " + E", hl.dsp.exec_cmd("thunar"), { description = "Open file manager (Thunar)" })
+hl.bind(mod .. " + E", app("files"), { description = "Open file manager" })
 hl.bind(mod .. " + A", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "Open app launcher" })
 hl.bind(mod .. " + P", hl.dsp.exec_cmd("qs ipc call launcher open '~'"), { description = "Open a project (VS Code / Neovim)" })
 hl.bind(mod .. " + V", hl.dsp.exec_cmd("qs ipc call launcher open +"), { description = "Open clipboard history" })
@@ -45,7 +52,7 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%- 
 -- Window management
 hl.bind(mod .. " + Q", require("background").hide_or_close, { description = "Close active window (background apps hide to the tray)" })
 hl.bind(mod .. " + F", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating window" })
-hl.bind(mod .. " + SHIFT + M", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle maximized window" })
+hl.bind(mod .. " + CTRL + M", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle maximized window" })
 hl.bind(mod .. " + W", hl.dsp.group.toggle(), { description = "Toggle window group" })
 hl.bind(mod .. " + M", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen window" })
 
@@ -154,6 +161,7 @@ hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%- && qs ipc call osd volume"), { locked = true, repeating = true, description = "Lower volume" })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && qs ipc call osd volume"), { locked = true, description = "Toggle audio mute" })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && qs ipc call osd mic"), { locked = true, description = "Toggle microphone mute" })
+hl.bind(mod .. " + SHIFT + M", hl.dsp.exec_cmd("qs ipc call media toggle"), { description = "Open music player" })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("qs ipc call media next"), { locked = true, description = "Next track" })

@@ -1,19 +1,17 @@
 import Quickshell
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Dropdown under the bar: one card per monitor with on/off, resolution, refresh rate, scale and,
+// Control center tab: one card per monitor with on/off, resolution, refresh rate, scale and,
 // with two or more screens, where it sits next to the other one (or mirrors it). Changes apply at
-// once and are remembered (Displays.qml); "reset" goes back to hypr/monitors.lua. A transparent
-// full-screen overlay: clicks outside the panel close it.
-PanelWindow {
+// once and are remembered (Displays.qml); "reset" goes back to hypr/monitors.lua.
+Item {
     id: root
-    required property var bar
+    // Set by ControlCenter while this tab is on screen
+    property bool shown: false
+    signal closeRequested()
 
-    function toggle() {
-        visible = !visible;
-    }
+    implicitHeight: content.implicitHeight + 40
 
     // Logical size (what positions are measured in)
     function size(m) {
@@ -61,43 +59,17 @@ PanelWindow {
         Displays.set(m, { position: `${x + dx}x${y + dy}`, mirror: undefined });
     }
 
-    screen: bar.screen
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-displays"
-    color: "transparent"
-    visible: false
-
-    onVisibleChanged: {
-        if (visible)
+    onShownChanged: {
+        if (shown)
             Displays.refresh();
     }
 
-    MouseArea {
+    Item {
         anchors.fill: parent
-        onClicked: root.visible = false
-    }
-
-    Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 6
-        anchors.rightMargin: 8
-        width: 420
-        height: content.implicitHeight + 28
-        color: Theme.baseTranslucent
-        radius: 10
-        border.color: Theme.surface
-        border.width: 2
-
-        MouseArea {
-            anchors.fill: parent
-        }
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
             spacing: 10
 
             Label {

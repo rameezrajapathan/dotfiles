@@ -12,6 +12,7 @@ hyprsunset
 xdg-desktop-portal-hyprland
 xdg-user-dirs
 matugen
+imagemagick
 adw-gtk-theme
 papirus-icon-theme
 ttf-firacode-nerd
@@ -47,6 +48,7 @@ networkmanager
 networkmanager-openvpn
 nm-connection-editor
 zenity
+xdg-terminal-exec
 bluez
 bluez-utils
 pipewire-pulse

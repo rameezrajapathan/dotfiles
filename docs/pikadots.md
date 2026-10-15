@@ -51,7 +51,7 @@ keyring, skipping build folders, and keeps 7 daily, 4 weekly and 6 monthly snaps
 - The location is in `~/.config/pikadots/backup-repo`. A OneDrive or Dropbox folder keeps a copy
   off the machine (it only sees encrypted data).
 - **Save `~/.config/restic/password` somewhere else.** Without it the backups can't be read.
-- The system panel shows the last backup; failures send a notification.
+- The System tab shows the last backup; failures send a notification.
 
 Restore:
 

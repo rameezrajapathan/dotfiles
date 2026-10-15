@@ -16,4 +16,5 @@ ShellRoot {
     Osd {}
     WindowSwitcher {}
     Overview {}
+    CursorGlide {}
 }

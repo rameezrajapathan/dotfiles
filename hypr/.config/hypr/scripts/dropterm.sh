@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Drop-down terminal: a kitty (class "dropterm") living on special:dropterm, shown and hidden
+# Drop-down terminal: the default terminal (app id "dropterm") living on special:dropterm, shown and hidden
 # with Super + `. Started on first use; rules.lua makes it float at the top of the screen.
 running=$(hyprctl clients -j | jq 'any(.[]; .class == "dropterm")')
 if [[ $running != true ]]; then
-	kitty --class dropterm &
+	"$(dirname "$0")/app.sh" terminal --app-id=dropterm &
 	# Wait for the window so the toggle below shows it
 	for _ in $(seq 20); do
 		sleep 0.1

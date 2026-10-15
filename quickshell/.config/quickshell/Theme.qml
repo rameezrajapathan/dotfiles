@@ -23,7 +23,12 @@ Singleton {
 
     readonly property string font: "FiraCode Nerd Font Propo"
     readonly property int fontSize: 13
-    readonly property int barHeight: 38
+    readonly property int barHeight: 44
+    // The bar's pill, and the circles at its ends (workspace, profile picture): the same gap on
+    // every side makes them sit concentric in the rounded ends
+    readonly property int pillHeight: barHeight - 8
+    readonly property int pillInset: 5
+    readonly property int pillCircle: pillHeight - 2 * pillInset
     // Material Symbols Rounded (ttf-material-symbols-variable), used through Icon.qml
     readonly property string iconFont: "Material Symbols Rounded"
     readonly property int iconSize: 20

@@ -3,28 +3,30 @@
 A Hyprland desktop for Arch Linux and CachyOS that takes its colors from the wallpaper, with a
 Quickshell bar and a `pikadots` command to install, check, repair and update it.
 
-![Desktop with fastfetch, Neovim and peaclock](docs/screenshots/desktop.webp)
+![Floating Neovim, btop, fastfetch, cava and peaclock under the bar's pill](docs/screenshots/desktop-v2.webp)
 
 ## One desktop, any wallpaper
 
 | | |
 |---|---|
-| ![Dark theme from a colorful wallpaper](docs/screenshots/theme-dark.webp) | ![Light theme from a bright wallpaper](docs/screenshots/theme-light.webp) |
-| ![Grey theme from a black and white photo](docs/screenshots/theme-mono.webp) | ![Light grey theme from a black and white painting](docs/screenshots/theme-mono-light.webp) |
+| ![Dark theme from a colorful wallpaper](docs/screenshots/theme-dark-v2.webp) | ![Light theme from a bright wallpaper](docs/screenshots/theme-light-v2.webp) |
+| ![Grey theme from a black and white forest photo](docs/screenshots/theme-mono-v2.webp) | ![Light grey theme from a black and white mountain photo](docs/screenshots/theme-mono-light-v2.webp) |
 
 ## Screenshots
 
 | | |
 |---|---|
-| ![Launcher](docs/screenshots/launcher.webp) Launcher | ![Power menu](docs/screenshots/power.webp) Power menu |
-| ![Keyboard shortcuts](docs/screenshots/cheatsheet.webp) Shortcuts (Super + ?) | ![Lock screen](docs/screenshots/lock.webp) Lock screen |
+| ![Control center](docs/screenshots/controlcenter-v2.webp) Control center (Super + S) | ![Launcher](docs/screenshots/launcher-v2.webp) Launcher (Super + A) |
+| ![Power menu](docs/screenshots/power-v2.webp) Power menu | ![Keyboard shortcuts](docs/screenshots/cheatsheet-v2.webp) Shortcuts (Super + ?) |
+| ![Lock screen](docs/screenshots/lock.webp) Lock screen | |
 
 ## Features
 
 - **Colors from the wallpaper**: the bar, terminal, Neovim, GTK apps, lock screen and keyboard
   lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
-- **One bar**: workspaces, music, clock and next meeting, tray, displays, network, Bluetooth,
-  audio, system monitor, battery, GitHub, notifications and quick settings, each with a panel.
+- **A minimal bar**: workspaces, clock (a live spectrum while music plays) and your profile picture,
+  which opens a control center with tabs for your account and quick settings, music,
+  notifications, network (with a speed test), Bluetooth, sound, displays, battery and more.
 - **Launcher** with a calculator, commands, emoji, projects and clipboard history.
 - **Alt + Tab with live previews**, a workspace overview and a drop-down terminal.
 - **Developer setup**: keyring and SSH agent, git with delta, GitHub notifications, per-project
@@ -45,8 +47,8 @@ Log out, choose **Hyprland**, then:
 
 1. Pick a wallpaper with **Super + Shift + W**. Seven [come with it](wallpapers/CREDITS.md); add
    your own to `~/Pictures/Wallpapers`.
-2. Set resolution, refresh rate, scale and layout from the monitor icon in the bar.
-3. Optional: `pikadots backup-init` for backups, `gh auth login` for GitHub in the bar.
+2. Set resolution, refresh rate, scale and layout from the Displays tab of the control center.
+3. Optional: `pikadots backup-init` for backups, `gh auth login` for GitHub notifications.
 4. Run `pikadots health` to check everything.
 
 Existing configs are backed up first; `pikadots uninstall` restores them. Super + ? shows every
@@ -54,7 +56,7 @@ shortcut.
 
 ## Docs
 
-- [The desktop](docs/desktop.md): bar, panels, launcher, overlays
+- [The desktop](docs/desktop.md): bar, control center, launcher, overlays
 - [Keybindings](docs/keybindings.md)
 - [Colors from the wallpaper](docs/theming.md)
 - [The pikadots command and backups](docs/pikadots.md)

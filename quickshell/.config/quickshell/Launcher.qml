@@ -11,14 +11,17 @@ import QtQuick.Layouts
 //   =  calculator (qalc; Enter copies the result)
 //   >  run a command (Enter runs it, Shift+Enter in a terminal)
 //   :  emoji (Enter copies it)
-//   ~  projects: zoxide's folders with a repo or project file (Enter opens VS Code,
-//      Shift+Enter Neovim in kitty)
+//   ~  projects: zoxide's folders with a repo or project file (Enter opens the default editor,
+//      Shift+Enter a terminal there)
 //   +  clipboard history (cliphist; Enter copies, Shift+Delete removes; Super + V)
 // Arrows move, Esc closes. Toggled with `qs ipc call launcher toggle`; `open <text>` starts with
 // text typed (Super + P opens projects). App launch counts live in
 // ~/.local/state/quickshell.
 PanelWindow {
     id: root
+
+    // Closes the other panels when this one opens, and the other way round
+    Exclusive { panel: root }
 
     readonly property int cellSize: 128
     readonly property string usageFile: Quickshell.env("HOME") + "/.local/state/quickshell/launcher.json"
@@ -69,7 +72,7 @@ PanelWindow {
                 subtitle: "↵ run  ·  shift+↵ run in a terminal",
                 symbol: "terminal",
                 run: shift => shift
-                    ? Quickshell.execDetached(["kitty", "--hold", "sh", "-c", query])
+                    ? Apps.terminal(["sh", "-c", query], ["--hold"])
                     : Quickshell.execDetached(["sh", "-c", query])
             }];
         case "emoji": {
@@ -86,11 +89,11 @@ PanelWindow {
                 .slice(0, 50)
                 .map(p => ({
                     title: basename(p),
-                    subtitle: p.replace(home, "~") + "  ·  ↵ VS Code  ·  shift+↵ Neovim",
+                    subtitle: p.replace(home, "~") + "  ·  ↵ editor  ·  shift+↵ terminal",
                     symbol: "folder_code",
                     run: shift => shift
-                        ? Quickshell.execDetached(["kitty", "-d", p, "nvim", "."])
-                        : Quickshell.execDetached(["code", p])
+                        ? Apps.terminal([], ["--dir=" + p])
+                        : Apps.editor(p)
                 }));
         case "clipboard":
             return clips
@@ -178,7 +181,7 @@ PanelWindow {
         usage = counts;
         usageView.setText(JSON.stringify(counts));
         if (e.runInTerminal)
-            Quickshell.execDetached(["kitty", "--"].concat(e.command));
+            Apps.terminal(e.command);
         else
             e.execute();
     }
@@ -323,29 +326,14 @@ PanelWindow {
         onClicked: root.open = false
     }
 
-    Rectangle {
+    // Drops down from under the bar
+    Sheet {
         id: card
-        anchors.centerIn: parent
-        width: 6 * root.cellSize + 40
-        height: 600
-        radius: 24
-        color: Theme.baseTranslucent
-        border.color: Qt.alpha(Theme.text, 0.08)
-        border.width: 1
-
-        opacity: root.open ? 1 : 0
-        scale: root.open ? 1 : 0.94
-        Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 160
-                onRunningChanged: if (!running && !root.open) root.visible = false
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-        }
+        open: root.open
+        sheetWidth: 6 * root.cellSize + 40
+        sheetHeight: Math.min(600, root.height - Theme.barHeight - 40)
+        onClosed: root.visible = false
+        onDismiss: root.open = false
 
         ColumnLayout {
             anchors.fill: parent
@@ -489,7 +477,22 @@ PanelWindow {
                 cellHeight: root.mode === "apps" ? root.cellSize : root.mode === "emoji" ? 76 : 60
                 clip: true
                 model: root.results
-                highlightMoveDuration: 0
+                // One highlight that glides to the selection
+                highlightFollowsCurrentItem: true
+                highlightMoveDuration: 160
+                highlight: Item {
+                    width: grid.cellWidth
+                    height: grid.cellHeight
+
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: root.columns === 1 ? 2 : 4
+                        radius: root.columns === 1 ? 14 : 18
+                        color: Qt.alpha(Theme.accent, 0.22)
+                        border.width: 1
+                        border.color: Qt.alpha(Theme.accent, 0.5)
+                    }
+                }
                 keyNavigationWraps: false
                 boundsBehavior: Flickable.StopAtBounds
 
@@ -507,11 +510,7 @@ PanelWindow {
                         anchors.fill: parent
                         anchors.margins: cell.list ? 2 : 4
                         radius: cell.list ? 14 : 18
-                        color: cell.selected ? Qt.alpha(Theme.accent, 0.22)
-                            : mouse.containsMouse ? Qt.alpha(Theme.surface, 0.8)
-                            : "transparent"
-                        border.width: cell.selected ? 1 : 0
-                        border.color: Qt.alpha(Theme.accent, 0.5)
+                        color: !cell.selected && mouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                         Behavior on color { ColorAnimation { duration: 100 } }
                     }
 

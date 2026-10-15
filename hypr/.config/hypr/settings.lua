@@ -51,6 +51,11 @@ hl.config({
 		key_press_enables_dpms = false,
 		mouse_move_enables_dpms = false,
 	},
+
+	-- The pointer glides to keyboard-focused windows instead (quickshell/CursorGlide.qml)
+	cursor = {
+		no_warps = true,
+	},
 })
 
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })

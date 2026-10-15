@@ -1,15 +1,17 @@
 import Quickshell
 import Quickshell.Bluetooth
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Dropdown under the bar: Bluetooth on/off, paired devices (click to connect or disconnect) and,
-// while the panel is open, nearby devices to pair. A transparent full-screen overlay: clicks
-// outside the panel close it.
-PanelWindow {
+// Control center tab: Bluetooth on/off, paired devices (click to connect or disconnect) and,
+// while the panel is open, nearby devices to pair.
+Item {
     id: root
-    required property var bar
+    // Set by ControlCenter while this tab is on screen
+    property bool shown: false
+    signal closeRequested()
+
+    implicitHeight: content.implicitHeight + 40
 
     readonly property var adapter: Bluetooth.defaultAdapter
     readonly property var devices: (adapter?.devices.values ?? []).filter(d => d.name !== "")
@@ -18,10 +20,6 @@ PanelWindow {
     // Devices that don't broadcast a name show up as their address; skip those
     readonly property var nearby: devices.filter(d => !d.paired && !/^([0-9A-F]{2}[-:]){5}[0-9A-F]{2}$/i.test(d.name))
         .sort((a, b) => a.name.localeCompare(b.name))
-
-    function toggle() {
-        visible = !visible;
-    }
 
     // Material Symbols name for BlueZ's device icon (audio-headset, input-mouse, phone, …)
     function deviceIcon(device) {
@@ -59,44 +57,18 @@ PanelWindow {
         return "";
     }
 
-    screen: bar.screen
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-bluetooth"
-    color: "transparent"
-    visible: false
-
     // Look for nearby devices only while the panel is open
-    onVisibleChanged: {
+    onShownChanged: {
         if (adapter?.enabled)
-            adapter.discovering = visible;
+            adapter.discovering = shown;
     }
 
-    MouseArea {
+    Item {
         anchors.fill: parent
-        onClicked: root.visible = false
-    }
-
-    Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 6
-        anchors.rightMargin: 8
-        width: 360
-        height: content.implicitHeight + 28
-        color: Theme.baseTranslucent
-        radius: 10
-        border.color: Theme.surface
-        border.width: 2
-
-        MouseArea {
-            anchors.fill: parent
-        }
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
             spacing: 4
 
             RowLayout {
@@ -112,8 +84,8 @@ PanelWindow {
                 Pill {
                     icon: "settings"
                     onClicked: {
-                        root.visible = false;
-                        Quickshell.execDetached(["kitty", "-e", "bluetoothctl"]);
+                        root.closeRequested();
+                        Apps.terminal(["bluetoothctl"]);
                     }
                 }
                 Switch {
@@ -182,7 +154,7 @@ PanelWindow {
                     color: Theme.accent
 
                     SequentialAnimation on opacity {
-                        running: root.visible && (root.adapter?.discovering ?? false)
+                        running: root.shown && (root.adapter?.discovering ?? false)
                         loops: Animation.Infinite
                         NumberAnimation { to: 0.3; duration: 700 }
                         NumberAnimation { to: 1; duration: 700 }

@@ -253,6 +253,20 @@ setup_pywalfox() {
 	ok "Pywalfox helper for Zen and Firefox (add the Pywalfox extension in each)"
 }
 
+# Default apps (hypr/scripts/app.sh opens these for the keybinds and the bar). Fills in only what
+# isn't set, or a folder handler that is a terminal (kitty's "open with kitty" grabs folders);
+# choices made with xdg-settings / xdg-mime or in xdg-terminals.list are kept.
+setup_default_apps() {
+	local list="$HOME/.config/xdg-terminals.list" folders
+	[[ -s $list ]] || echo kitty.desktop >"$list"
+	folders=$(xdg-mime query default inode/directory 2>/dev/null)
+	if [[ -z $folders || $folders == kitty-open.desktop ]] && [[ -f /usr/share/applications/thunar.desktop ]]; then
+		xdg-mime default thunar.desktop inode/directory
+	fi
+	[[ -n $(xdg-mime query default text/plain 2>/dev/null) ]] || xdg-mime default nvim.desktop text/plain
+	ok "default apps: terminal $(head -1 "$list"), browser $(xdg-settings get default-web-browser 2>/dev/null || echo none), files $(xdg-mime query default inode/directory), editor $(xdg-mime query default text/plain)"
+}
+
 # Zen draws its own interface colors and ignores Firefox themes by default, so each Zen profile
 # loads the generated ~/.local/state/theme/zen-userChrome.css (matugen), which maps Zen's colors to
 # Pywalfox's live theme, through chrome/userChrome.css. user.js turns on userChrome.css and themes.
@@ -349,6 +363,7 @@ cmd_install() {
 	enable_services
 	setup_pywalfox
 	setup_zen
+	setup_default_apps
 	step "Colors"
 	mkdir -p "$HOME/.local/state/quickshell" "$HOME/Pictures/Screenshots" "$HOME/Videos/Recordings"
 	copy_wallpapers
@@ -500,6 +515,7 @@ cmd_repair() {
 	enable_services
 	setup_pywalfox
 	setup_zen
+	setup_default_apps
 	step "Colors"
 	generate_colors
 	step "Reload"

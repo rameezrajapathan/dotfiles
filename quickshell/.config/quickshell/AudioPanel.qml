@@ -1,23 +1,21 @@
 import Quickshell
 import Quickshell.Services.Pipewire
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Dropdown under the bar: output/input device pickers with volume sliders, plus per-app volume.
-// A transparent full-screen overlay: clicks outside the panel close it.
-PanelWindow {
+// Control center tab: output/input device pickers with volume sliders, plus per-app volume.
+Item {
     id: root
-    required property var bar
+    // Set by ControlCenter while this tab is on screen
+    property bool shown: false
+    signal closeRequested()
+
+    implicitHeight: content.implicitHeight + 40
 
     readonly property var nodes: Pipewire.nodes.values.filter(n => n.audio)
     readonly property var sinks: nodes.filter(n => n.isSink && !n.isStream)
     readonly property var sources: nodes.filter(n => !n.isSink && !n.isStream)
     readonly property var streams: nodes.filter(n => n.isSink && n.isStream)
-
-    function toggle() {
-        visible = !visible;
-    }
 
     function deviceName(node) {
         return node.description || node.nickname || node.name;
@@ -30,38 +28,12 @@ PanelWindow {
 
     PwObjectTracker { objects: root.nodes }
 
-    screen: bar.screen
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-audio"
-    color: "transparent"
-    visible: false
-
-    MouseArea {
+    Item {
         anchors.fill: parent
-        onClicked: root.visible = false
-    }
-
-    Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 6
-        anchors.rightMargin: 8
-        width: 380
-        height: content.implicitHeight + 28
-        color: Theme.baseTranslucent
-        radius: 10
-        border.color: Theme.surface
-        border.width: 2
-
-        MouseArea {
-            anchors.fill: parent
-        }
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
             spacing: 4
 
             RowLayout {
@@ -76,7 +48,7 @@ PanelWindow {
                 Pill {
                     icon: "settings"
                     onClicked: {
-                        root.visible = false;
+                        root.closeRequested();
                         Quickshell.execDetached(["pavucontrol"]);
                     }
                 }

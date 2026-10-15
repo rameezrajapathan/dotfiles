@@ -1,56 +1,29 @@
 import Quickshell
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Dropdown listing GitHub notifications (GitHub.qml). Click one to open it in the browser and
-// mark it read. A transparent full-screen overlay: clicks outside the panel close it.
-PanelWindow {
+// Control center tab listing GitHub notifications (GitHub.qml). Click one to open it in the browser and
+// mark it read.
+Item {
     id: root
-    required property var bar
+    // Set by ControlCenter while this tab is on screen
+    property bool shown: false
+    signal closeRequested()
 
-    function toggle() {
-        visible = !visible;
-    }
+    implicitHeight: content.implicitHeight + 40
 
     function typeIcon(type) {
         return { PullRequest: "merge", Issue: "adjust", CheckSuite: "rule", Release: "commit", Discussion: "forum" }[type] ?? "inbox";
     }
 
-    screen: bar.screen
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-github"
-    color: "transparent"
-    visible: false
+    onShownChanged: if (shown) GitHub.refresh()
 
-    onVisibleChanged: if (visible) GitHub.refresh()
-
-    MouseArea {
+    Item {
         anchors.fill: parent
-        onClicked: root.visible = false
-    }
-
-    Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 6
-        anchors.rightMargin: 8
-        width: 420
-        height: content.implicitHeight + 28
-        color: Theme.baseTranslucent
-        radius: 10
-        border.color: Theme.surface
-        border.width: 2
-
-        MouseArea {
-            anchors.fill: parent
-        }
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
             spacing: 6
 
             RowLayout {
@@ -70,7 +43,7 @@ PanelWindow {
                 Pill {
                     icon: "open_in_new"
                     onClicked: {
-                        root.visible = false;
+                        root.closeRequested();
                         Quickshell.execDetached(["xdg-open", "https://github.com/notifications"]);
                     }
                 }
@@ -137,7 +110,7 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.visible = false;
+                            root.closeRequested();
                             GitHub.open(row.modelData);
                         }
                     }

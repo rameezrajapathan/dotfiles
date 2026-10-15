@@ -3,13 +3,14 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Full time and month calendar under the clock. Arrows or scroll change the month, the month name returns to today.
-// A transparent full-screen overlay: clicks outside the panel close it.
+// Full time and month calendar, dropping down under the clock. Arrows or scroll change the
+// month, the month name returns to today. Clicks outside close it.
 PanelWindow {
     id: root
+
+    // Closes the other panels when this one opens, and the other way round
+    Exclusive { panel: root }
     required property var bar
-    // Horizontal center of the clock; the panel is centered under it
-    property real anchorX: 0
 
     property date today: new Date()
     property int year: today.getFullYear()
@@ -25,12 +26,16 @@ PanelWindow {
         return cells;
     }
 
+    // The window stays mapped until the close animation ends
+    property bool open: false
+
     function toggle() {
-        if (!visible) {
+        if (!open) {
             today = new Date();
             showToday();
+            visible = true;
         }
-        visible = !visible;
+        open = !open;
     }
 
     function showToday() {
@@ -54,18 +59,17 @@ PanelWindow {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: root.visible = false
+        onClicked: root.open = false
     }
 
-    Rectangle {
-        x: Math.max(8, Math.min(parent.width - width - 8, root.anchorX - width / 2))
-        y: Theme.barHeight + 6
-        width: 300
-        height: content.implicitHeight + 28
-        color: Theme.baseTranslucent
-        radius: 10
-        border.color: Theme.surface
-        border.width: 2
+    // Drops down from under the bar, like the launcher
+    Sheet {
+        open: root.open
+        kind: "calendar"
+        sheetWidth: 320
+        sheetHeight: content.implicitHeight + 28
+        onClosed: root.visible = false
+        onDismiss: root.open = false
 
         MouseArea {
             anchors.fill: parent

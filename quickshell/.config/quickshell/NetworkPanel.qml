@@ -1,15 +1,17 @@
 import Quickshell
 import Quickshell.Io
 import Quickshell.Networking
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Dropdown under the bar: wired status, Wi-Fi networks and VPN connections.
-// A transparent full-screen overlay: clicks outside the panel close it.
-PanelWindow {
+// Control center tab: live speed, wired status, Wi-Fi networks and VPN connections.
+Item {
     id: root
-    required property var bar
+    // Set by ControlCenter while this tab is on screen
+    property bool shown: false
+    signal closeRequested()
+
+    implicitHeight: content.implicitHeight + 40
 
     readonly property var wifiDevice: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
     readonly property var wiredDevice: Networking.devices.values.find(d => d.type === DeviceType.Wired) ?? null
@@ -19,16 +21,14 @@ PanelWindow {
 
     property var passwordTarget: null
 
-    function toggle() {
-        visible = !visible;
-    }
-
     function activate(network) {
         if (network.connected) {
             network.disconnect();
         } else if (network.known || network.security === WifiSecurityType.Open) {
             network.connect();
         } else {
+            // Closes first: the control center holds the keyboard while open
+            root.closeRequested();
             passwordTarget = network;
             passwordPrompt.command = ["fuzzel", "--dmenu", "--password", "--lines", "0",
                 "--prompt", network.name + " password: "];
@@ -37,28 +37,15 @@ PanelWindow {
     }
 
     function addVpn(mode) {
-        visible = false;
+        root.closeRequested();
         Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/vpn-add.sh", mode]);
     }
 
-    screen: bar.screen
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-network"
-    color: "transparent"
-    visible: false
-
-    onVisibleChanged: {
+    onShownChanged: {
         if (wifiDevice)
-            wifiDevice.scannerEnabled = visible;
-        if (visible)
+            wifiDevice.scannerEnabled = shown;
+        if (shown)
             VpnService.refresh();
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: root.visible = false
     }
 
     Process {
@@ -73,25 +60,12 @@ PanelWindow {
         }
     }
 
-    Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 6
-        anchors.rightMargin: 8
-        width: 360
-        height: content.implicitHeight + 28
-        color: Theme.baseTranslucent
-        radius: 10
-        border.color: Theme.surface
-        border.width: 2
-
-        MouseArea {
-            anchors.fill: parent
-        }
+    Item {
+        anchors.fill: parent
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
             spacing: 4
 
             RowLayout {
@@ -103,13 +77,25 @@ PanelWindow {
                     text: "Network"
                     font.bold: true
                 }
+                // Speed test; click again to stop it
+                Pill {
+                    icon: SpeedTest.running ? "stop" : "speed"
+                    active: SpeedTest.running
+                    onClicked: SpeedTest.running ? SpeedTest.cancel() : SpeedTest.start()
+                }
                 Pill {
                     icon: "settings"
                     onClicked: {
-                        root.visible = false;
-                        Quickshell.execDetached(["kitty", "-e", "nmtui"]);
+                        root.closeRequested();
+                        Apps.terminal(["nmtui"]);
                     }
                 }
+            }
+
+            NetSpeed {
+                Layout.fillWidth: true
+                Layout.bottomMargin: 6
+                active: root.shown
             }
 
             // Wired
@@ -239,7 +225,7 @@ PanelWindow {
                         visible: !vpnRow.modelData.active && !vpnRow.switching
                         icon: "delete"
                         onClicked: {
-                            root.visible = false;
+                            root.closeRequested();
                             VpnService.remove(vpnRow.modelData.name);
                         }
                     }

@@ -1,16 +1,18 @@
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Dropdown with CPU, memory, GPU and disk usage, temperatures, fans and the busiest processes,
+// Control center tab: CPU, memory, GPU and disk usage, temperatures, fans and the busiest processes,
 // from hypr/scripts/sysinfo.sh every 2 s while open. A sleeping NVIDIA GPU is left asleep.
 // Also the last backup (pikadots-backup, ~/.local/state/pikadots/backup.json).
-// A transparent full-screen overlay: clicks outside the panel close it.
-PanelWindow {
+Item {
     id: root
-    required property var bar
+    // Set by ControlCenter while this tab is on screen
+    property bool shown: false
+    signal closeRequested()
+
+    implicitHeight: content.implicitHeight + 40
 
     property var info: ({})
     property var backup: null
@@ -35,10 +37,6 @@ PanelWindow {
     }
     property var lastCpu: null
     property real cpu: 0
-
-    function toggle() {
-        visible = !visible;
-    }
 
     function gib(bytes) {
         return (bytes / 1073741824).toFixed(1);
@@ -84,15 +82,7 @@ PanelWindow {
         info = next;
     }
 
-    screen: bar.screen
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-system"
-    color: "transparent"
-    visible: false
-
-    onVisibleChanged: if (visible) reader.running = true
+    onShownChanged: if (shown) reader.running = true
 
     Process {
         id: reader
@@ -105,34 +95,16 @@ PanelWindow {
     Timer {
         interval: 2000
         repeat: true
-        running: root.visible
+        running: root.shown
         onTriggered: reader.running = true
     }
 
-    MouseArea {
+    Item {
         anchors.fill: parent
-        onClicked: root.visible = false
-    }
-
-    Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 6
-        anchors.rightMargin: 8
-        width: 380
-        height: content.implicitHeight + 28
-        color: Theme.baseTranslucent
-        radius: 10
-        border.color: Theme.surface
-        border.width: 2
-
-        MouseArea {
-            anchors.fill: parent
-        }
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
             spacing: 12
 
             RowLayout {
@@ -146,8 +118,8 @@ PanelWindow {
                 Pill {
                     icon: "monitoring"
                     onClicked: {
-                        root.visible = false;
-                        Quickshell.execDetached(["kitty", "-e", "btop"]);
+                        root.closeRequested();
+                        Apps.terminal(["btop"]);
                     }
                 }
             }

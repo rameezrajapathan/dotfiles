@@ -24,7 +24,7 @@ The thresholds are at the top of `main()` in that script.
 
 | Colorful → dark | Bright → light | Black and white → grey |
 |---|---|---|
-| ![](screenshots/theme-dark.webp) | ![](screenshots/theme-light.webp) | ![](screenshots/theme-mono.webp) |
+| ![](screenshots/theme-dark-v2.webp) | ![](screenshots/theme-light-v2.webp) | ![](screenshots/theme-mono-v2.webp) |
 
 ## What gets recolored
 

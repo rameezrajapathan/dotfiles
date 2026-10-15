@@ -5,11 +5,14 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// Full-screen power menu over a blurred, dimmed desktop (rules.lua). Click a tile, press its
-// letter, or move with arrows and press Enter. Esc or a click outside closes it.
+// Power menu coming out of the bar's pill. Click a tile, press its letter, or move with arrows
+// and press Enter. Esc or a click outside closes it.
 // Toggled with `qs ipc call power toggle`.
 PanelWindow {
     id: root
+
+    // Closes the other panels when this one opens, and the other way round
+    Exclusive { panel: root }
 
     readonly property var actions: [
         { key: "L", label: "Lock", icon: "lock", command: ["loginctl", "lock-session"] },
@@ -66,21 +69,26 @@ PanelWindow {
     color: "transparent"
     visible: false
 
+    // Dim backdrop; below the blur's alpha cutoff so only the sheet is blurred (rules.lua)
     Rectangle {
         anchors.fill: parent
-        color: Qt.alpha(Theme.base, 0.55)
-        opacity: root.open ? 1 : 0
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 180
-                onRunningChanged: if (!running && !root.open) root.visible = false
-            }
-        }
+        color: "black"
+        opacity: root.open ? 0.3 : 0
+        Behavior on opacity { NumberAnimation { duration: 180 } }
+    }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.open = false
-        }
+    MouseArea {
+        anchors.fill: parent
+        onClicked: root.open = false
+    }
+
+    // Comes out of the bar's pill, like the launcher
+    Sheet {
+        open: root.open
+        sheetWidth: tiles.implicitWidth + 56
+        sheetHeight: content.implicitHeight + 52
+        onClosed: root.visible = false
+        onDismiss: root.open = false
 
         Item {
             anchors.fill: parent
@@ -102,98 +110,97 @@ PanelWindow {
         }
 
         ColumnLayout {
+            id: content
             anchors.centerIn: parent
-            spacing: 40
-            scale: root.open ? 1 : 0.92
-            Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+            spacing: 22
 
             ColumnLayout {
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 6
+                spacing: 4
 
                 Label {
                     Layout.alignment: Qt.AlignHCenter
                     text: "See you soon, " + Quickshell.env("USER")
-                    font.pixelSize: 32
+                    font.pixelSize: 22
                     font.bold: true
                 }
                 Label {
                     Layout.alignment: Qt.AlignHCenter
                     text: root.uptime
                     color: Theme.subtext
-                    font.pixelSize: Theme.fontSize + 1
                 }
             }
 
             RowLayout {
+                id: tiles
                 Layout.alignment: Qt.AlignHCenter
-                spacing: 20
+                spacing: 14
 
                 Repeater {
                     model: root.actions
 
-                    Rectangle {
-                        id: tile
-                        required property var modelData
-                        required property int index
-                        readonly property bool selected: root.current === index
-                        readonly property color tint: modelData.danger ? Theme.red : Theme.accent
+                Rectangle {
+                    id: tile
+                    required property var modelData
+                    required property int index
+                    readonly property bool selected: root.current === index
+                    readonly property color tint: modelData.danger ? Theme.red : Theme.accent
 
-                        implicitWidth: 148
-                        implicitHeight: 160
-                        radius: 28
-                        color: selected ? tint : Theme.baseTranslucent
-                        border.width: 1
-                        border.color: selected ? tint : Qt.alpha(Theme.text, 0.08)
-                        scale: selected ? 1.06 : 1
-                        Behavior on color { ColorAnimation { duration: 140 } }
-                        Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+                    implicitWidth: 120
+                    implicitHeight: 132
+                    radius: 22
+                    color: selected ? tint : Qt.alpha(Theme.surface, 0.5)
+                    border.width: 1
+                    border.color: selected ? tint : Qt.alpha(Theme.text, 0.08)
+                    scale: selected ? 1.06 : 1
+                    Behavior on color { ColorAnimation { duration: 140 } }
+                    Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
 
-                        ColumnLayout {
-                            anchors.centerIn: parent
-                            spacing: 14
+                    ColumnLayout {
+                        anchors.centerIn: parent
+                        spacing: 14
 
-                            Icon {
-                                Layout.alignment: Qt.AlignHCenter
-                                name: tile.modelData.icon
-                                filled: tile.selected
-                                color: tile.selected ? Theme.accentText : tile.tint
-                                size: 48
-                            }
-                            Label {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: tile.modelData.label
-                                color: tile.selected ? Theme.accentText : Theme.text
-                                font.pixelSize: Theme.fontSize + 1
-                                font.bold: tile.selected
-                            }
+                        Icon {
+                            Layout.alignment: Qt.AlignHCenter
+                            name: tile.modelData.icon
+                            filled: tile.selected
+                            color: tile.selected ? Theme.accentText : tile.tint
+                            size: 40
                         }
-
-                        // Shortcut letter
-                        Rectangle {
-                            anchors { top: parent.top; right: parent.right; margins: 12 }
-                            width: 24
-                            height: 24
-                            radius: 8
-                            color: tile.selected ? Qt.alpha(Theme.accentText, 0.15) : Qt.alpha(Theme.surface, 0.8)
-
-                            Label {
-                                anchors.centerIn: parent
-                                text: tile.modelData.key
-                                color: tile.selected ? Theme.accentText : Theme.subtext
-                                font.pixelSize: Theme.fontSize - 2
-                                font.bold: true
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: root.current = tile.index
-                            onClicked: root.run(tile.modelData)
+                        Label {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: tile.modelData.label
+                            color: tile.selected ? Theme.accentText : Theme.text
+                            font.pixelSize: Theme.fontSize + 1
+                            font.bold: tile.selected
                         }
                     }
+
+                    // Shortcut letter
+                    Rectangle {
+                        anchors { top: parent.top; right: parent.right; margins: 10 }
+                        width: 24
+                        height: 24
+                        radius: 8
+                        color: tile.selected ? Qt.alpha(Theme.accentText, 0.15) : Qt.alpha(Theme.surface, 0.8)
+
+                        Label {
+                            anchors.centerIn: parent
+                            text: tile.modelData.key
+                            color: tile.selected ? Theme.accentText : Theme.subtext
+                            font.pixelSize: Theme.fontSize - 2
+                            font.bold: true
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onEntered: root.current = tile.index
+                        onClicked: root.run(tile.modelData)
+                    }
+                }
                 }
             }
 
