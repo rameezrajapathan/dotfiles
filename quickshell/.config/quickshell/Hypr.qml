@@ -47,6 +47,9 @@ Singleton {
 
     property var pending: ({})
 
+    // The bar's workspace indicator uses animations.enabled before the app is ever opened
+    Component.onCompleted: refresh()
+
     function value(key) {
         return Settings.hypr[key] ?? values[key] ?? defaults[key];
     }
