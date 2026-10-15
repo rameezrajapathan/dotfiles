@@ -4,10 +4,11 @@ import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
 
-// Control center music tab for the active player (Media.qml), minimal and Material 3 flavored:
-// the cover in a slowly turning scalloped shape with the spectrum (Cava) radiating around it;
-// title, artist and album; a wavy seek bar; round tonal buttons around a wide play button that
-// squares off while playing. Below: the players (when there are several), "open app" and volume.
+// Control center music tab for the active player (Media.qml), minimal and Material 3 flavored,
+// top to bottom: the cover in a slowly turning scalloped shape with the spectrum (Cava) radiating
+// around it; title, artist and album; a wavy seek bar; round tonal buttons around a wide play button
+// that squares off while playing. At the bottom: the players (when there are several), "open app"
+// and volume.
 Item {
     id: root
     // Set by ControlCenter while this tab is on screen
@@ -60,30 +61,38 @@ Item {
         anchors.fill: parent
         anchors.margins: 24
         visible: root.player !== null
-        spacing: 16
+        spacing: 12
 
         Item { Layout.fillHeight: true }
 
-        RowLayout {
+        ColumnLayout {
             Layout.fillWidth: true
-            spacing: 18
+            spacing: 8
+
+            // Lets this column take the full width (a layout is otherwise only as wide as its
+            // children allow), so the items below center in it
+            Item { Layout.fillWidth: true }
 
             MediaCover {
                 id: cover
-                Layout.alignment: Qt.AlignVCenter
-                coverSize: 215
+                Layout.alignment: Qt.AlignHCenter
+                // Shrinks on short screens so the controls stay in view
+                coverSize: Math.max(130, Math.min(220, root.height - 400))
                 art: root.player?.trackArtUrl ?? ""
                 playing: root.playing && root.shown
             }
 
+            // Track info, seek bar and controls, centered and kept to a comfortable width
             ColumnLayout {
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
+                Layout.maximumWidth: 440
+                Layout.alignment: Qt.AlignHCenter
                 spacing: 2
 
                 Text {
                     Layout.fillWidth: true
                     text: root.player?.trackTitle || "Unknown title"
+                    horizontalAlignment: Text.AlignHCenter
                     color: Theme.text
                     font.family: Theme.displayFont
                     font.pixelSize: 24
@@ -93,6 +102,7 @@ Item {
                 Label {
                     Layout.fillWidth: true
                     text: root.player?.trackArtist || "Unknown artist"
+                    horizontalAlignment: Text.AlignHCenter
                     color: Theme.subtext
                     font.pixelSize: Theme.fontSize + 2
                     elide: Text.ElideRight
@@ -101,6 +111,7 @@ Item {
                     Layout.fillWidth: true
                     visible: text !== ""
                     text: root.player?.trackAlbum ?? ""
+                    horizontalAlignment: Text.AlignHCenter
                     color: Theme.accent
                     font.pixelSize: Theme.fontSize + 1
                     elide: Text.ElideRight
@@ -109,7 +120,7 @@ Item {
                 // Seek bar between the elapsed and total times (fixed widths, so it doesn't jiggle)
                 RowLayout {
                     Layout.fillWidth: true
-                    Layout.topMargin: 22
+                    Layout.topMargin: 16
                     spacing: 10
                     visible: root.hasLength
 

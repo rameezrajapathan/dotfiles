@@ -119,6 +119,8 @@ through Do Not Disturb (Super + Shift + N).
 
 ## Lock screen
 
+![Lock screen](screenshots/lock-v2.webp)
+
 Part of the shell (`quickshell/Lock.qml`), split in two over the blurred wallpaper. The left half
 has the date and a big clock, now playing (controls and a live spectrum) and suspend, restart and
 power off (restart and power off ask for a second click). The right half has your profile picture

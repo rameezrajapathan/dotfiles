@@ -18,7 +18,7 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
 |---|---|
 | ![Control center](docs/screenshots/controlcenter-v2.webp) Control center (Super + S) | ![Launcher](docs/screenshots/launcher-v2.webp) Launcher (Super + A) |
 | ![Power menu](docs/screenshots/power-v2.webp) Power menu | ![Keyboard shortcuts](docs/screenshots/cheatsheet-v2.webp) Shortcuts (Super + ?) |
-| ![Lock screen](docs/screenshots/lock.webp) Lock screen | ![Settings app](docs/screenshots/settings-effects.webp) Settings (Super + ,) |
+| ![Lock screen](docs/screenshots/lock-v2.webp) Lock screen (Super + Alt + L) | ![Settings app](docs/screenshots/settings-effects.webp) Settings (Super + ,) |
 
 ## Features
 
