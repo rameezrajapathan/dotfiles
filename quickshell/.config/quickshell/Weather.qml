@@ -117,6 +117,14 @@ Singleton {
         refresh();
     }
 
+    // Off keeps the place found last and stops following the connection (Settings app)
+    function setAutoLocation(on) {
+        if (on)
+            useMyLocation();
+        else
+            settings.auto = false;
+    }
+
     // Back to the place from the IP address
     function useMyLocation() {
         settings.auto = true;

@@ -22,6 +22,16 @@ Rectangle {
     border.width: input.activeFocus ? 1 : 0
     border.color: Theme.accent
 
+    // Focus on a click anywhere in the field (the input itself is only one line high)
+    MouseArea {
+        anchors.fill: parent
+        cursorShape: Qt.IBeamCursor
+        onPressed: mouse => {
+            input.forceActiveFocus();
+            mouse.accepted = false;
+        }
+    }
+
     TextInput {
         id: input
         anchors.fill: parent

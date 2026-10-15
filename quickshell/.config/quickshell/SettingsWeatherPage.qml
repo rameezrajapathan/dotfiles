@@ -7,6 +7,8 @@ SettingsPage {
     title: "Weather"
     subtitle: "Forecasts from Open-Meteo."
 
+    property string query: ""
+
     SettingsSection {
         title: "Display"
 
@@ -48,7 +50,7 @@ SettingsPage {
             description: "From your internet connection."
             Switch {
                 checked: Weather.autoLocation
-                onToggled: { if (!checked) Weather.useMyLocation(); }
+                onToggled: Weather.setAutoLocation(!checked)
             }
         }
         SettingsRow {
@@ -58,9 +60,31 @@ SettingsPage {
             ColumnLayout {
                 spacing: 4
                 SettingsTextField {
+                    id: cityField
                     Layout.fillWidth: true
-                    placeholder: Weather.searching ? "Searching…" : "Type a city and press Enter"
-                    onAccepted: t => Weather.search(t)
+                    placeholder: "Type a city"
+                    // Searches as you type, once you pause
+                    onEdited: t => {
+                        root.query = t;
+                        searchTimer.restart();
+                    }
+                    onAccepted: t => {
+                        searchTimer.stop();
+                        Weather.search(t);
+                    }
+                }
+                Timer {
+                    id: searchTimer
+                    interval: 400
+                    onTriggered: Weather.search(root.query)
+                }
+                Label {
+                    visible: text !== ""
+                    Layout.leftMargin: 4
+                    text: Weather.searching ? "Searching…"
+                        : root.query.trim().length >= 2 && Weather.results.length === 0 ? "No places found" : ""
+                    color: Theme.subtext
+                    font.pixelSize: Theme.fontSize - 2
                 }
                 Repeater {
                     model: Weather.results
@@ -89,7 +113,11 @@ SettingsPage {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Weather.choose(result.modelData)
+                            onClicked: {
+                                Weather.choose(result.modelData);
+                                cityField.clear();
+                                root.query = "";
+                            }
                         }
                     }
                 }
