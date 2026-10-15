@@ -50,6 +50,8 @@ hl.config({
 		vrr = 1,
 		key_press_enables_dpms = false,
 		mouse_move_enables_dpms = false,
+		-- A restarted Quickshell can take over the lock if it crashed while locked (Lock.qml)
+		allow_session_lock_restore = true,
 	},
 
 	-- The pointer glides to keyboard-focused windows instead (quickshell/CursorGlide.qml)

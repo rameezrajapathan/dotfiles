@@ -17,4 +17,5 @@ ShellRoot {
     WindowSwitcher {}
     Overview {}
     CursorGlide {}
+    Lock {}
 }

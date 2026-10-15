@@ -89,8 +89,17 @@ through Do Not Disturb (Super + Shift + N).
 
 ## Lock screen
 
-hyprlock with the blurred wallpaper, now playing and battery. Locks after 10 minutes idle, before
-suspend, or with Super + Alt + L.
+Part of the shell (`quickshell/Lock.qml`), split in two over the blurred wallpaper. The left half
+has the date and a big clock, now playing (controls and a live spectrum) and suspend, restart and
+power off (restart and power off ask for a second click). The right half has your profile picture
+and the password pill: dots pop in, it shakes on a wrong password, and Caps Lock warns. Between them
+runs a fading line with a glowing accent diamond and a light travelling down it. After 15 seconds
+without input it rests: the blur softens and the right half dims to "Press any key". Any key or
+mouse movement wakes it; Esc clears the pill.
+
+Locks after 10 minutes idle, before suspend, or with Super + Alt + L. `hypr/scripts/lock.sh` falls
+back to hyprlock if the shell isn't running, and a restarted shell locks again if it crashed while
+locked.
 
 ## Default apps
 

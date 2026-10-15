@@ -40,7 +40,7 @@ The thresholds are at the top of `main()` in that script.
 | Keyboard lighting (ASUS) | Live |
 | starship | Next prompt |
 | fuzzel, peaclock | Next launch |
-| Lock screen | Next lock |
+| Lock screen | Live |
 
 Without generated files everything falls back to Catppuccin Mocha. To change which color goes
 where, edit the template for that app.
