@@ -11,7 +11,8 @@
 | 11 min | Screen off |
 | 30 min | Suspend |
 
-Keep awake (Account tab) holds this off. Times are in `hypr/.config/hypr/hypridle.conf`.
+These are the defaults; change them in Settings > Power (`hypr/scripts/idle.sh` writes the hypridle
+config from your choices at login). Keep awake (Account tab or the Power page) holds this off.
 
 ## Power
 

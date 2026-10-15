@@ -460,6 +460,16 @@ cmd_health() {
 		info "not in a Hyprland session; skipped"
 	fi
 	[[ -f $HOME/.local/state/theme/quickshell.json ]] && ok "wallpaper colors generated" || bad "no wallpaper colors (run repair)"
+	# Settings app: choices file, Hyprland overrides it writes, hypridle with its timers
+	local settings=$HOME/.config/pikadots/settings.json
+	if [[ ! -f $settings ]]; then
+		ok "Settings app: defaults (nothing changed yet)"
+	elif jq -e . "$settings" >/dev/null 2>&1; then
+		ok "Settings app choices ($(jq '[.hypr // {} | keys[]] | length' "$settings") Hyprland option(s) changed)"
+	else
+		bad "Settings app file is not valid JSON: ${settings/#$HOME/\~} (fix or delete it)"
+	fi
+	pgrep -x hypridle >/dev/null && ok "hypridle running (idle timers)" || warn "hypridle isn't running (~/.config/hypr/scripts/idle.sh starts it)"
 	if command -v pywalfox >/dev/null; then
 		grep -qs pywalfox-host "${pywalfox_manifests[0]}" && ok "browser colors (Pywalfox helper)" ||
 			bad "Pywalfox helper not set up for the browsers (run repair)"

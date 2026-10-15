@@ -5,6 +5,8 @@ import QtQuick.Layouts
 // (put it inside). With `below: true` the control gets the full width under the text.
 Item {
     id: root
+    // Found by the Settings app's search, which jumps here and calls flash()
+    objectName: "settingsRow"
     property string icon
     // An app's icon (desktop entry Icon=) instead of a Material Symbol
     property string appIcon
@@ -16,6 +18,26 @@ Item {
 
     Layout.fillWidth: true
     implicitHeight: layout.implicitHeight + 24
+
+    function flash() {
+        flashAnimation.restart();
+    }
+
+    // Search result highlight: the row glows twice
+    Rectangle {
+        id: glow
+        anchors.fill: parent
+        anchors.margins: 4
+        radius: 12
+        color: Theme.accent
+        opacity: 0
+    }
+    SequentialAnimation {
+        id: flashAnimation
+        loops: 2
+        NumberAnimation { target: glow; property: "opacity"; to: 0.22; duration: 260; easing.type: Easing.OutQuad }
+        NumberAnimation { target: glow; property: "opacity"; to: 0; duration: 420; easing.type: Easing.InQuad }
+    }
 
     Rectangle {
         // Line above every row but the first

@@ -93,6 +93,65 @@ Scope {
                 return root.pages.filter(p => root.available(p.key) && words.every(w => (p.title + " " + p.keywords).toLowerCase().includes(w)));
             }
 
+            // Individual settings matching the search: { key, page, title, row }
+            property var hits: []
+            readonly property bool searching: search.text.trim() !== ""
+
+            function collectRows(item, out) {
+                for (const child of item.children) {
+                    if (child.objectName === "settingsRow" && child.title)
+                        out.push(child);
+                    collectRows(child, out);
+                }
+            }
+
+            function findHits() {
+                const words = search.text.toLowerCase().split(/\s+/).filter(w => w);
+                const out = [];
+                if (words.length) {
+                    for (let i = 0; i < pageRepeater.count; i++) {
+                        const flick = pageRepeater.itemAt(i);
+                        if (!flick?.page || !root.available(flick.modelData.key))
+                            continue;
+                        const rows = [];
+                        collectRows(flick.page, rows);
+                        for (const row of rows) {
+                            const text = (row.title + " " + row.description).toLowerCase();
+                            if (words.every(w => text.includes(w)))
+                                out.push({ key: flick.modelData.key, page: flick.modelData.title, title: row.title, row: row, flick: flick });
+                        }
+                    }
+                }
+                hits = out.slice(0, 8);
+            }
+
+            // Opens the hit's page, scrolls its row into view and makes it glow
+            function jump(hit) {
+                root.page = hit.key;
+                pendingHit = hit;
+                jumpTimer.restart();
+            }
+            property var pendingHit: null
+
+            Timer {
+                id: hitTimer
+                // Lets pages built for the search finish loading
+                interval: 120
+                onTriggered: window.findHits()
+            }
+            Timer {
+                id: jumpTimer
+                interval: 60
+                onTriggered: {
+                    const hit = window.pendingHit;
+                    if (!hit)
+                        return;
+                    const y = hit.row.mapToItem(hit.flick.contentItem, 0, 0).y;
+                    hit.flick.contentY = Math.max(0, Math.min(hit.flick.contentHeight - hit.flick.height, y - 80));
+                    hit.row.flash();
+                }
+            }
+
             function step(delta) {
                 const list = shownPages.length ? shownPages : root.pages;
                 const i = list.findIndex(p => p.key === root.page);
@@ -200,8 +259,13 @@ Scope {
                                     selectedTextColor: Theme.accentText
                                     clip: true
                                     // The first match opens as you type
-                                    onTextChanged: if (window.shownPages.length && !window.shownPages.some(p => p.key === root.page))
-                                        root.page = window.shownPages[0].key
+                                    onTextChanged: {
+                                        if (window.shownPages.length && !window.shownPages.some(p => p.key === root.page))
+                                            root.page = window.shownPages[0].key;
+                                        hitTimer.restart();
+                                    }
+                                    // Enter jumps to the first matching setting
+                                    Keys.onReturnPressed: if (window.hits.length) window.jump(window.hits[0])
                                     Keys.onDownPressed: window.step(1)
                                     Keys.onUpPressed: window.step(-1)
 
@@ -253,6 +317,61 @@ Scope {
                                 id: categories
                                 width: parent.width
                                 spacing: 4
+
+                                // Matching settings, above the matching pages
+                                Label {
+                                    visible: window.hits.length > 0
+                                    Layout.leftMargin: 12
+                                    Layout.bottomMargin: 2
+                                    text: "SETTINGS"
+                                    color: Theme.overlay
+                                    font.pixelSize: Theme.fontSize - 3
+                                    font.bold: true
+                                    font.letterSpacing: 1.2
+                                }
+                                Repeater {
+                                    model: window.hits
+
+                                    Rectangle {
+                                        id: hitRow
+                                        required property var modelData
+                                        required property int index
+                                        Layout.fillWidth: true
+                                        implicitHeight: hitColumn.implicitHeight + 14
+                                        radius: 12
+                                        color: hitMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8)
+                                            : index === 0 ? Qt.alpha(Theme.accent, 0.12) : "transparent"
+
+                                        ColumnLayout {
+                                            id: hitColumn
+                                            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: 12; rightMargin: 12 }
+                                            spacing: 0
+                                            Label {
+                                                Layout.fillWidth: true
+                                                text: hitRow.modelData.title
+                                                elide: Text.ElideRight
+                                            }
+                                            Label {
+                                                Layout.fillWidth: true
+                                                text: hitRow.modelData.page + (hitRow.index === 0 ? "  ·  ↵" : "")
+                                                color: Theme.accent
+                                                font.pixelSize: Theme.fontSize - 3
+                                                elide: Text.ElideRight
+                                            }
+                                        }
+                                        MouseArea {
+                                            id: hitMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: window.jump(hitRow.modelData)
+                                        }
+                                    }
+                                }
+                                Item {
+                                    visible: window.hits.length > 0
+                                    implicitHeight: 8
+                                }
 
                                 Repeater {
                                     model: window.shownPages
@@ -327,7 +446,7 @@ Scope {
                                 }
 
                                 Label {
-                                    visible: window.shownPages.length === 0
+                                    visible: window.shownPages.length === 0 && window.hits.length === 0
                                     Layout.leftMargin: 12
                                     text: "Nothing matches"
                                     color: Theme.subtext
@@ -353,15 +472,25 @@ Scope {
                     anchors { top: parent.top; bottom: parent.bottom; left: sidebar.right; right: parent.right }
 
                     Repeater {
+                        id: pageRepeater
                         model: root.pages
 
                         Flickable {
                             id: flick
+                            readonly property Item page: loader.item
                             required property var modelData
                             readonly property bool current: root.page === modelData.key
                             property bool visited: false
                             onCurrentChanged: if (current) visited = true
                             Component.onCompleted: visited = current
+                            // Searching builds every page so its settings can be found
+                            Connections {
+                                target: window
+                                function onSearchingChanged() {
+                                    if (window.searching)
+                                        flick.visited = true;
+                                }
+                            }
 
                             anchors.fill: parent
                             opacity: current ? 1 : 0

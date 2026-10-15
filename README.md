@@ -18,7 +18,7 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
 |---|---|
 | ![Control center](docs/screenshots/controlcenter-v2.webp) Control center (Super + S) | ![Launcher](docs/screenshots/launcher-v2.webp) Launcher (Super + A) |
 | ![Power menu](docs/screenshots/power-v2.webp) Power menu | ![Keyboard shortcuts](docs/screenshots/cheatsheet-v2.webp) Shortcuts (Super + ?) |
-| ![Lock screen](docs/screenshots/lock.webp) Lock screen | |
+| ![Lock screen](docs/screenshots/lock.webp) Lock screen | ![Settings app](docs/screenshots/settings-effects.webp) Settings (Super + ,) |
 
 ## Features
 
@@ -28,6 +28,9 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
   forecast panel) and your profile picture, which opens a control center with tabs for your
   account and quick settings, music, notifications, network (with a speed test), Bluetooth, sound,
   displays, battery and more.
+- **A Settings app** (Super + ,): wallpaper, light/dark, palette, fonts, bar, gaps, borders,
+  blur, animations, input, notifications, lock screen, idle timers, default and startup apps, all
+  applied live and searchable.
 - **Launcher** with a calculator, commands, emoji, projects and clipboard history.
 - **Alt + Tab with live previews**, a workspace overview and a drop-down terminal.
 - **Developer setup**: keyring and SSH agent, git with delta, GitHub notifications, per-project
@@ -58,6 +61,7 @@ shortcut.
 ## Docs
 
 - [The desktop](docs/desktop.md): bar, control center, launcher, overlays
+- [The Settings app](docs/settings.md)
 - [Keybindings](docs/keybindings.md)
 - [Colors from the wallpaper](docs/theming.md)
 - [The pikadots command and backups](docs/pikadots.md)

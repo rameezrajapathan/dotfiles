@@ -111,11 +111,15 @@ runs a fading line with a glowing accent diamond and a light travelling down it.
 without input it rests: the blur softens and the right half dims to "Press any key". Any key or
 mouse movement wakes it; Esc clears the pill.
 
-Locks after 10 minutes idle, before suspend, or with Super + Alt + L. `hypr/scripts/lock.sh` falls
+Locks after 10 minutes idle (Settings > Power), before suspend, or with Super + Alt + L. Settings >
+Lock screen sets the blur, rest delay and what it shows. `hypr/scripts/lock.sh` falls
 back to hyprlock if the shell isn't running, and a restarted shell locks again if it crashed while
 locked.
 
 ## Default apps
+
+The easiest way to change these is the Settings app's Default apps page
+([settings.md](settings.md)); the commands below do the same.
 
 Keybinds, the bar and the launcher never name an app: they open the system's default terminal,
 browser, file manager and editor through `hypr/scripts/app.sh`. Change them with:
