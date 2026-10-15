@@ -7,10 +7,24 @@
 One pill in the middle, always the same width: the current workspace number in a circle (click for
 the overview, scroll to go through workspaces; a red ring means another workspace wants attention),
 the clock (click for the calendar, scroll changes the month; `qs ipc call calendar toggle` opens it
-too) and your profile picture, which opens the control center. A dot on the picture means there are
+too), the weather (icon and temperature; click for the forecast) and your profile picture, which
+opens the control center. A dot on the picture means there are
 notifications; upload a picture from the Account tab. While music plays, a small spectrum takes the
 clock's place; clicking it opens the Music tab. The recording timer shows while recording (click to
 stop), and the [next meeting](developer.md#next-meeting) shows once a calendar is set.
+
+## Weather (Super + Ctrl + W)
+
+Comes out of the pill from the weather next to the clock, in the same plain style as the other
+panels: the temperature, conditions, feels like and today's high and low; the next 24 hours as a
+thin line (scroll sideways) with the chance of rain; 7 days with each day's range against the
+week's; and humidity, wind, UV, air quality, the next sunrise or sunset, and pressure.
+
+Data comes from [Open-Meteo](https://open-meteo.com) (no account or key) and refreshes every 15
+minutes. The place is found from your connection (ipinfo.io); click it to search for a city, or
+pick "Use my location" to go back. °C / °F switches the units (wind follows: km/h or mph). Both
+are saved in `~/.local/state/quickshell/weather.json`. `qs ipc call weather toggle` opens it,
+`qs ipc call weather refresh` reloads it.
 
 ## Control center
 
@@ -42,7 +56,7 @@ on, and the power menu. The launcher is Super + A.
 ## Motion
 
 Panels slide or fade both ways, and selection highlights (control center tabs, launcher, Alt + Tab,
-workspace pill) glide instead of jumping. The control center, calendar, launcher, wallpaper picker,
+workspace pill) glide instead of jumping. The control center, calendar, weather, launcher, wallpaper picker,
 power menu, overview (one row of workspaces) and Alt + Tab switcher come out of the bar's pill: its
 bottom squares off and the panel slides out from under it. Only one is open at a time: opening
 another (or the cheatsheet) closes it. When the keyboard moves focus to another window (arrows, Alt

@@ -16,7 +16,7 @@ Item {
     property real radius: 24
     property real ear: 14
     property color color: Theme.baseTranslucent
-    // "settings" or "calendar" for those panels: clicking their own pill item just closes them
+    // "settings", "calendar" or "weather" for those panels: clicking their own pill item just closes them
     property string kind: ""
     default property alias content: inner.data
     signal closed()
@@ -134,6 +134,7 @@ Item {
         settingsActive: root.kind === "settings"
         // Opening another panel closes this one (Exclusive)
         onClockClicked: root.kind === "calendar" ? root.dismiss() : Toggles.calendarRequested()
+        onWeatherClicked: root.kind === "weather" ? root.dismiss() : Weather.panelToggleRequested()
         onMusicClicked: Toggles.controlCenterRequested("music")
         onCaptureClicked: Toggles.controlCenterRequested("capture")
         onSettingsClicked: root.kind === "settings" ? root.dismiss() : Toggles.controlCenterRequested("")

@@ -1,12 +1,13 @@
 import QtQuick
 
-// The bar's pill: workspaces, clock (spectrum while music plays), next meeting, recording timer and the user's picture
-// (opens the control center).
+// The bar's pill: workspaces, clock (spectrum while music plays), weather, next meeting, recording
+// timer and the user's picture (opens the control center).
 // Bar.qml shows it; Sheet.qml draws a copy on top of drop-down sheets so they look attached.
 Island {
     id: root
     property bool settingsActive: false
     signal clockClicked()
+    signal weatherClicked()
     signal musicClicked()
     signal captureClicked()
     signal settingsClicked()
@@ -43,6 +44,9 @@ Island {
             cursorShape: Qt.PointingHandCursor
             onClicked: parent.music ? root.musicClicked() : root.clockClicked()
         }
+    }
+    WeatherChip {
+        onClicked: root.weatherClicked()
     }
     NextMeeting {}
     CaptureButton {

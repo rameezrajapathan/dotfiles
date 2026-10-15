@@ -24,9 +24,10 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
 
 - **Colors from the wallpaper**: the bar, terminal, Neovim, GTK apps, lock screen and keyboard
   lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
-- **A minimal bar**: workspaces, clock (a live spectrum while music plays) and your profile picture,
-  which opens a control center with tabs for your account and quick settings, music,
-  notifications, network (with a speed test), Bluetooth, sound, displays, battery and more.
+- **A minimal bar**: workspaces, clock (a live spectrum while music plays), the weather (with a
+  forecast panel) and your profile picture, which opens a control center with tabs for your
+  account and quick settings, music, notifications, network (with a speed test), Bluetooth, sound,
+  displays, battery and more.
 - **Launcher** with a calculator, commands, emoji, projects and clipboard history.
 - **Alt + Tab with live previews**, a workspace overview and a drop-down terminal.
 - **Developer setup**: keyring and SSH agent, git with delta, GitHub notifications, per-project
