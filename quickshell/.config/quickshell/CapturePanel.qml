@@ -45,6 +45,8 @@ Item {
                 Tile { icon: "screenshot_region"; label: "Region"; onClicked: root.run(() => Capture.screenshot("region")) }
                 Tile { icon: "web_asset"; label: "Window"; onClicked: root.run(() => Capture.screenshot("active")) }
                 Tile { icon: "screenshot_monitor"; label: "Screen"; onClicked: root.run(() => Capture.screenshot("full")) }
+                Tile { icon: "draw"; label: "Annotate"; onClicked: root.run(() => Capture.annotate()) }
+                Tile { icon: "document_scanner"; label: "Text"; onClicked: root.run(() => Capture.copyText()) }
             }
 
             RowLayout {
@@ -90,7 +92,7 @@ Item {
         implicitHeight: 64
         radius: 12
         color: tileMouse.containsMouse ? Qt.alpha(Theme.accent, 0.25) : Qt.alpha(Theme.surface, 0.7)
-        Behavior on color { ColorAnimation { duration: 100 } }
+        Behavior on color { ColorAnimation { duration: Theme.ms(100) } }
 
         ColumnLayout {
             anchors.centerIn: parent

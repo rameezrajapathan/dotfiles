@@ -35,6 +35,7 @@ Singleton {
             return (sink?.audio?.muted ?? true) ? "volume_off" : v < 0.01 ? "volume_mute" : v < 0.5 ? "volume_down" : "volume_up";
         }
         case "display": return "monitor";
+        case "drives": return "usb";
         case "battery": return charging ? "battery_android_frame_bolt"
             : batteryPercent <= 10 ? "battery_android_frame_alert"
             : batteryPercent >= 95 ? "battery_android_frame_full"
@@ -54,6 +55,7 @@ Singleton {
         case "bluetooth": return !btAdapter?.enabled ? "Off" : btConnected ? "Connected" : "On";
         case "audio": return (sink?.audio?.muted ?? true) ? "Muted" : Math.round((sink?.audio?.volume ?? 0) * 100) + "%";
         case "battery": return batteryPercent + "%";
+        case "drives": return Drives.mountedCount > 0 ? Drives.mountedCount + " open" : "";
         case "capture": return Recorder.active ? Recorder.elapsedText : "";
         }
         return "";

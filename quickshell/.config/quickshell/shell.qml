@@ -5,7 +5,7 @@ import QtQuick
 
 ShellRoot {
     // Background services that nothing else wakes up at start (singletons load on first use)
-    Component.onCompleted: [Updates.checked, TimeDate.timezone]
+    Component.onCompleted: [Updates.checked, TimeDate.timezone, Drives.loaded]
 
     Variants {
         model: Quickshell.screens
@@ -22,5 +22,6 @@ ShellRoot {
     Overview {}
     CursorGlide {}
     Lock {}
+    PolkitDialog {}
     SettingsApp {}
 }

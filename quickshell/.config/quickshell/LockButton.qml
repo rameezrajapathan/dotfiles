@@ -28,8 +28,8 @@ Item {
         border.width: 1
         border.color: Qt.alpha(Theme.text, root.armed ? 0 : 0.12)
         scale: mouse.pressed ? 0.92 : 1
-        Behavior on color { ColorAnimation { duration: 160 } }
-        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+        Behavior on color { ColorAnimation { duration: Theme.ms(160) } }
+        Behavior on scale { NumberAnimation { duration: Theme.ms(120); easing.type: Easing.OutCubic } }
 
         Icon {
             anchors.centerIn: parent
@@ -49,7 +49,7 @@ Item {
         radius: 14
         color: Qt.alpha(Theme.base, 0.8)
         opacity: mouse.containsMouse || root.armed ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 150 } }
+        Behavior on opacity { NumberAnimation { duration: Theme.ms(150) } }
 
         Label {
             id: tip

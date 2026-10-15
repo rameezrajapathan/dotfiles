@@ -38,7 +38,7 @@ SettingsPage {
                         color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
                         border.width: selected ? 2 : 1
                         border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
-                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
                         ColumnLayout {
                             id: cardColumn
@@ -112,7 +112,7 @@ SettingsPage {
         SettingsRow {
             icon: "apps"
             title: "Use in apps"
-            description: "GTK apps use the interface and terminal fonts too."
+            description: "GTK, Qt and KDE apps use the interface and terminal fonts too."
             Switch {
                 checked: Settings.appearance.appFonts
                 onToggled: {

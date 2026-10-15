@@ -6,9 +6,12 @@
 #                         then optionally remove the packages pikadots installed
 #   pikadots health       check packages, links, services, configs, keyring, backups, …
 #   pikadots repair       fix what health finds: packages, links, services, colors, reloads
-#   pikadots update       pull the repo, then repair (new packages and links included)
+#   pikadots update       pull the repo, then repair if anything new came in
 #   pikadots backup       back up now (restic; see pikadots-backup)
 #   pikadots backup-init  create the backup password and repository, enable the daily backup
+#   pikadots export [FILE]  save the Settings app's choices, wallpaper and profile picture to one
+#                         file (default ~/pikadots-settings-DATE.tar.gz) to set up another machine
+#   pikadots import FILE  apply an exported file (or a settings.json); your current ones are backed up
 #
 # On a new machine: git clone https://github.com/rameezrajapathan/dotfiles.git ~/dotfiles && ~/dotfiles/install.sh
 set -uo pipefail
@@ -20,7 +23,7 @@ state=$HOME/.local/state/pikadots
 backups=$state/backups
 
 # Stow packages, in link order
-packages=(hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk cava git zsh pikadots)
+packages=(hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk cava git zsh plasma pikadots)
 services=(gcr-ssh-agent.socket)
 # System services the bar relies on (enabled with sudo when off)
 system_services=(NetworkManager.service bluetooth.service power-profiles-daemon.service)
@@ -385,6 +388,9 @@ cmd_uninstall() {
 	confirm "Continue?" || exit 0
 	step "Services"
 	systemctl --user disable --now pikadots-backup.timer >/dev/null 2>&1 && ok "backup timer stopped"
+	# Plasma's own colors back into kdeglobals while the script is still linked
+	python3 -I "$repo/hypr/.config/hypr/scripts/kde-theme.py" restore >/dev/null 2>&1 &&
+		ok "Qt/KDE theme restored"
 	step "Links"
 	local pkg
 	for ((i = ${#packages[@]} - 1; i >= 0; i--)); do
@@ -543,13 +549,16 @@ cmd_update() {
 		git -C "$repo" pull --rebase --autostash --quiet || die "git pull failed; resolve it in $repo"
 		if [[ $(git -C "$repo" rev-parse HEAD) == "$before" ]]; then
 			ok "already up to date"
-		else
-			ok "updated:"
-			git -C "$repo" log --oneline "$before..HEAD" | sed 's/^/    /'
+			info "nothing new, so no repair; run pikadots repair to check anyway"
+			return
 		fi
+		ok "updated:"
+		git -C "$repo" log --oneline "$before..HEAD" | sed 's/^/    /'
 	else
 		warn "no remote set; nothing to pull"
+		return
 	fi
+	# Only when something new came in: new packages, links and services
 	cmd_repair
 }
 
@@ -585,8 +594,90 @@ cmd_backup() {
 	"$HOME/.local/bin/pikadots-backup" && ok "backed up ($(jq -r '.snapshots' "$state/backup.json") snapshots)"
 }
 
+# What an export holds, relative to $HOME: the Settings app's file and the Hyprland files it
+# writes from it (Window, Effects and Input options, startup apps, window rules)
+settings_files=(.config/pikadots/settings.json .local/state/pikadots/hypr-settings.lua
+	.local/state/pikadots/autostart.lua .local/state/pikadots/window-rules.lua)
+
+cmd_export() {
+	local out=${1:-$HOME/pikadots-settings-$(date +%F).tar.gz} tmp img f
+	[[ -f $HOME/.config/pikadots/settings.json ]] || die "no settings yet (~/.config/pikadots/settings.json)"
+	tmp=$(mktemp -d)
+	trap 'rm -rf "$tmp"' RETURN
+	for f in "${settings_files[@]}" .face; do
+		[[ -f $HOME/$f ]] || continue
+		mkdir -p "$tmp/$(dirname "$f")"
+		cp "$HOME/$f" "$tmp/$f"
+	done
+	img=$(wallpaper)
+	if [[ -n $img ]]; then
+		mkdir -p "$tmp/wallpaper"
+		cp "$img" "$tmp/wallpaper/"
+	fi
+	jq -n --arg host "$(cat /etc/hostname 2>/dev/null)" --arg date "$(date -Iseconds)" \
+		--arg wallpaper "${img##*/}" '{version: 1, host: $host, date: $date, wallpaper: $wallpaper}' >"$tmp/pikadots-export.json"
+	tar -czf "$out" -C "$tmp" . || die "couldn't write $out"
+	ok "saved ${out/#$HOME/\~} ($(du -h "$out" | cut -f1))"
+	info "on the new machine, after install: pikadots import ${out##*/}"
+}
+
+cmd_import() {
+	local file=${1:-} tmp backup f img
+	[[ -f $file ]] || die "usage: pikadots import FILE (from pikadots export, or a settings.json)"
+	tmp=$(mktemp -d)
+	trap 'rm -rf "$tmp"' RETURN
+	if jq -e .appearance "$file" >/dev/null 2>&1; then
+		mkdir -p "$tmp/.config/pikadots"
+		cp "$file" "$tmp/.config/pikadots/settings.json"
+	else
+		tar -xzf "$file" -C "$tmp" 2>/dev/null || die "not a pikadots export: $file"
+		jq -e .appearance "$tmp/.config/pikadots/settings.json" >/dev/null 2>&1 || die "no settings in $file"
+	fi
+	printf '%spikadots import%s\n' "$bold" "$reset"
+	[[ -f $tmp/pikadots-export.json ]] && info "from $(jq -r '"\(.host) on \(.date[:10])"' "$tmp/pikadots-export.json")"
+
+	step "Files"
+	# The shell would write its own settings back over the new ones
+	qs kill >/dev/null 2>&1
+	backup=$backups/import-$(date +%Y%m%d-%H%M%S)
+	for f in "${settings_files[@]}" .face; do
+		[[ -f $tmp/$f ]] || continue
+		if [[ -f $HOME/$f ]]; then
+			mkdir -p "$backup/$(dirname "$f")"
+			cp "$HOME/$f" "$backup/$f"
+		fi
+		mkdir -p "$HOME/$(dirname "$f")"
+		cp "$tmp/$f" "$HOME/$f"
+		ok "${f}"
+	done
+	[[ -d $backup ]] && info "previous files: ${backup/#$HOME/\~}"
+	img=$(find "$tmp/wallpaper" -maxdepth 1 -type f 2>/dev/null | head -1)
+	if [[ -n $img ]]; then
+		mkdir -p "$HOME/Pictures/Wallpapers"
+		[[ -e $HOME/Pictures/Wallpapers/${img##*/} ]] || cp "$img" "$HOME/Pictures/Wallpapers/"
+		img=$HOME/Pictures/Wallpapers/${img##*/}
+		printf 'wallpaper {\n    monitor =\n    path = %s\n    fit_mode = cover\n}\n' "${img/#$HOME/\~}" >"$HOME/.config/hypr/wallpaper.conf"
+		ok "wallpaper ${img/#$HOME/\~}"
+	fi
+
+	step "Apply"
+	generate_colors
+	if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+		local scripts=$HOME/.config/hypr/scripts s
+		for s in fonts.sh icons.sh accessibility.sh "clipboard.sh watch"; do
+			$scripts/$s >/dev/null 2>&1 || warn "${s%% *} failed"
+		done
+		setsid -f "$scripts/idle.sh" >/dev/null 2>&1
+		ok "fonts, icons, accessibility, clipboard, idle timers"
+		reload_desktop
+	else
+		# Picked up at the next Hyprland login
+		info "log in to Hyprland to see everything applied"
+	fi
+}
+
 usage() {
-	sed -n '2,12p' "$self" | sed 's/^# \{0,1\}//'
+	sed -n '2,15p' "$self" | sed 's/^# \{0,1\}//'
 }
 
 case ${1:-help} in
@@ -597,6 +688,8 @@ case ${1:-help} in
 	update) cmd_update ;;
 	backup) cmd_backup ;;
 	backup-init) cmd_backup_init ;;
+	export) cmd_export "${2:-}" ;;
+	import) cmd_import "${2:-}" ;;
 	help | -h | --help) usage ;;
 	*) usage; exit 1 ;;
 esac

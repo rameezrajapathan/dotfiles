@@ -29,3 +29,5 @@ elif [ -e "$state/app-fonts" ]; then
     gsettings reset org.gnome.desktop.interface monospace-font-name
     rm -f "$state/app-fonts"
 fi
+# Qt and KDE apps get the same interface fonts (kdeglobals)
+python3 -I ~/.config/hypr/scripts/kde-theme.py || true

@@ -49,6 +49,12 @@ output_path = "~/.config/cava/themes/wallpaper"
 input_path = "~/.config/matugen/templates/peaclock"
 output_path = "~/.peaclock/config"
 
+# Qt and KDE apps through ~/.config/kdeglobals (hypr/scripts/kde-theme.py, which keeps Plasma's own
+# colors for the Plasma session)
+[templates.kde]
+input_path = "~/.config/matugen/templates/kde.json"
+output_path = "~/.local/state/theme/kde.json"
+
 # Zen through the Pywalfox extension, which only reads pywal's file. Pywalfox makes its own dark and
 # light themes from one palette (dark mode: background color0, accents 10/13, text 15; light mode:
 # accents 3/5, background from color7), so this is always the dark scheme plus light accents.

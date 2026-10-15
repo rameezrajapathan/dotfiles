@@ -22,8 +22,11 @@ Singleton {
     readonly property JsonObject lock: adapter.lock
     readonly property JsonObject datetime: adapter.datetime
     readonly property JsonObject updates: adapter.updates
+    readonly property JsonObject drives: adapter.drives
+    readonly property JsonObject accessibility: adapter.accessibility
     // Apps started at login: [{ name, icon, command, enabled }] (Startup apps page); reassign to change
     property alias startup: adapter.startup
+    property alias windowRules: adapter.windowRules
 
     signal openRequested(string page)
 
@@ -54,6 +57,13 @@ Singleton {
         fontTimer.stop();
         file.writeAdapter();
         Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/icons.sh", "--restart-shell"]);
+    }
+
+    // Writes or undoes the Qt/KDE theme in kdeglobals (hypr/scripts/kde-theme.py reads this file)
+    function applyQtTheme() {
+        saveTimer.stop();
+        file.writeAdapter();
+        Quickshell.execDetached(["python3", "-I", Quickshell.env("HOME") + "/.config/hypr/scripts/kde-theme.py"]);
     }
 
     IpcHandler {
@@ -97,6 +107,8 @@ Singleton {
                 // App icon theme family (Papirus, breeze, ...); hypr/scripts/icons.sh picks the
                 // dark or light variant
                 property string iconTheme: "Papirus"
+                // Wallpaper colors, icons and fonts for Qt/KDE apps (hypr/scripts/kde-theme.py)
+                property bool qtTheme: true
                 // Bar pill and panel background opacity
                 property real panelOpacity: 0.8
                 // auto (from the wallpaper), dark, light
@@ -107,6 +119,8 @@ Singleton {
 
             property var hypr: ({})
             property var startup: []
+            // Window rules page: [{ cls, name, icon, float, center, size, pin, fullscreen, workspace, silent, opacity, noBlur }]
+            property var windowRules: []
 
             // hypridle timers in minutes, 0 = never (hypr/scripts/idle.sh reads these)
             property JsonObject idle: JsonObject {
@@ -119,6 +133,11 @@ Singleton {
 
             property JsonObject display: JsonObject {
                 property int nightTemperature: 4500
+                // Night light on a schedule: off, sun (sunset to sunrise at Weather's place) or
+                // custom (nightFrom–nightTo, 24-hour); Toggles.qml switches it at the edges
+                property string nightSchedule: "off"
+                property string nightFrom: "20:00"
+                property string nightTo: "07:00"
             }
 
             property JsonObject notifications: JsonObject {
@@ -145,6 +164,10 @@ Singleton {
                 property bool emoji: true
                 property bool projects: true
                 property bool clipboard: true
+                // Clipboard history entries kept, and keeping copied text after its app closes
+                // (wl-clip-persist); hypr/scripts/clipboard.sh watch applies both
+                property int clipboardSize: 750
+                property bool clipboardPersist: true
             }
 
             property JsonObject lock: JsonObject {
@@ -167,6 +190,19 @@ Singleton {
             }
 
             // Checks for pikadots and system updates (Updates.qml)
+            // Accessibility page (hypr/scripts/accessibility.sh applies them to GTK and Qt apps)
+            property JsonObject accessibility: JsonObject {
+                // Text in the shell, GTK and Qt apps; 1 = as set on the Fonts page
+                property real textScale: 1
+                property bool reduceMotion: false
+            }
+
+            // Drives.qml: what happens when a USB drive or SD card is plugged in
+            property JsonObject drives: JsonObject {
+                property bool automount: true
+                property bool openFiles: false
+            }
+
             property JsonObject updates: JsonObject {
                 // Hours between checks, 0 = only when the Updates page opens
                 property int checkHours: 6

@@ -20,7 +20,7 @@ ColumnLayout {
         implicitHeight: 46
         radius: 12
         color: headerMouse.containsMouse ? Qt.alpha(Theme.overlay, 0.25) : Qt.alpha(Theme.base, 0.6)
-        Behavior on color { ColorAnimation { duration: 120 } }
+        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
         RowLayout {
             anchors.fill: parent
@@ -47,7 +47,7 @@ ColumnLayout {
             Icon {
                 name: "expand_more"
                 rotation: root.expanded ? 180 : 0
-                Behavior on rotation { NumberAnimation { duration: 200; easing.type: Easing.OutQuint } }
+                Behavior on rotation { NumberAnimation { duration: Theme.ms(200); easing.type: Easing.OutQuint } }
             }
         }
 
@@ -67,7 +67,7 @@ ColumnLayout {
         clip: true
         radius: 12
         color: Qt.alpha(Theme.base, 0.6)
-        Behavior on Layout.preferredHeight { NumberAnimation { duration: 220; easing.type: Easing.OutQuint } }
+        Behavior on Layout.preferredHeight { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
 
         ListView {
             id: list

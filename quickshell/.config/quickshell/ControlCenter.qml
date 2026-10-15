@@ -11,7 +11,7 @@ import QtQuick.Layouts
 
 // One window, centered under the bar's profile picture, holding everything that used to sit on the
 // right of the bar as tabs: account (with quick settings), music, notifications, network, Bluetooth, sound,
-// displays, battery, system, capture and GitHub. The sidebar also has the tray and background apps,
+// displays, drives (while one is plugged in), battery, system, capture and GitHub. The sidebar also has the tray and background apps,
 // the wallpaper picker and the power menu. Works from the keyboard alone (Super + S opens it): Esc
 // or a click outside closes it; Up/Down, Tab, Ctrl+Tab or J/K switch tabs, 1–9/0 jump. A
 // transparent full-screen overlay.
@@ -33,6 +33,7 @@ PanelWindow {
         { key: "bluetooth", title: "Bluetooth", page: bluetoothPage },
         { key: "audio", title: "Sound", page: audioPage },
         { key: "display", title: "Displays", page: displayPage },
+        { key: "drives", title: "Drives", page: drivesPage },
         { key: "battery", title: "Battery", page: batteryPage },
         { key: "system", title: "System", page: systemPage },
         { key: "capture", title: "Capture", page: capturePage },
@@ -49,6 +50,7 @@ PanelWindow {
         case "bluetooth": return btAdapter !== null;
         case "battery": return battery.isLaptopBattery;
         case "github": return GitHub.signedIn;
+        case "drives": return Drives.volumes.length > 0;
         default: return true;
         }
     }
@@ -190,7 +192,7 @@ PanelWindow {
                         height: target?.height ?? 0
                         radius: 12
                         color: Theme.accent
-                        Behavior on y { NumberAnimation { duration: 220; easing.type: Easing.OutQuint } }
+                        Behavior on y { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
                     }
 
                     ColumnLayout {
@@ -215,7 +217,7 @@ PanelWindow {
                                 implicitHeight: 38
                                 radius: 12
                                 color: !current && tabMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
-                                Behavior on color { ColorAnimation { duration: 120 } }
+                                Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
                                 RowLayout {
                                     anchors.fill: parent
@@ -230,14 +232,14 @@ PanelWindow {
                                         color: tabRow.current ? Theme.accentText
                                             : tabRow.key === "capture" && Recorder.active ? Theme.red
                                             : Theme.text
-                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                        Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
                                     }
                                     Label {
                                         Layout.fillWidth: true
                                         text: tabRow.modelData.title
                                         color: tabRow.current ? Theme.accentText : Theme.text
                                         font.bold: tabRow.current
-                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                        Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
                                         elide: Text.ElideRight
                                     }
                                     Label {
@@ -378,10 +380,10 @@ PanelWindow {
                             visible: opacity > 0
                             transform: Translate {
                                 y: flick.current ? 0 : 10
-                                Behavior on y { NumberAnimation { duration: 220; easing.type: Easing.OutQuint } }
+                                Behavior on y { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
                             }
                             // The old page goes quickly so the two barely overlap
-                            Behavior on opacity { NumberAnimation { duration: flick.current ? 220 : 70 } }
+                            Behavior on opacity { NumberAnimation { duration: Theme.ms(flick.current ? 220 : 70) } }
                             clip: true
                             contentWidth: width
                             contentHeight: loader.height
@@ -417,6 +419,7 @@ PanelWindow {
     Component { id: bluetoothPage; BluetoothPanel {} }
     Component { id: audioPage; AudioPanel {} }
     Component { id: displayPage; DisplayPanel {} }
+    Component { id: drivesPage; DrivesPanel {} }
     Component { id: batteryPage; BatteryPanel {} }
     Component { id: systemPage; SystemPanel {} }
     Component { id: capturePage; CapturePanel {} }
@@ -436,7 +439,7 @@ PanelWindow {
         color: active ? Qt.alpha(Theme.accent, 0.25)
             : mouse.containsMouse ? (danger ? Qt.alpha(Theme.red, 0.2) : Qt.alpha(Theme.surface, 0.8))
             : "transparent"
-        Behavior on color { ColorAnimation { duration: 120 } }
+        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
         Icon {
             anchors.centerIn: parent

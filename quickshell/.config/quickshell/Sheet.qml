@@ -39,7 +39,7 @@ Item {
     property real progress: open ? 1 : 0
     Behavior on progress {
         NumberAnimation {
-            duration: 300
+            duration: Theme.ms(300)
             easing.type: Easing.OutQuint
             onRunningChanged: if (!running && !root.open) root.closed()
         }

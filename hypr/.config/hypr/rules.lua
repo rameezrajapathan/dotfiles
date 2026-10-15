@@ -32,3 +32,6 @@ hl.window_rule({
 	move = "monitor_w*0.15 50",
 	workspace = "special:dropterm silent",
 })
+
+-- Rules made in the Settings app (Window rules page; quickshell/SettingsWindowRulesPage.qml)
+pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/window-rules.lua")

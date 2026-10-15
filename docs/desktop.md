@@ -12,6 +12,11 @@ notifications; upload a picture from the Account tab. While music plays, a small
 clock's place; clicking it opens the Music tab. The recording timer shows while recording (click to
 stop), and the [next meeting](developer.md#next-meeting) shows once a calendar is set.
 
+A yellow pill with a mic, camera or screen icon shows while an app uses one; hover for which apps,
+click for the Sound tab (`quickshell/Privacy.qml`). The mic counts PipeWire recording streams, but
+not ones that only listen to the speakers, like cava. The screen counts xdg-desktop-portal-hyprland's
+share. The camera counts PipeWire video capture and any process holding `/dev/video*` open.
+
 Settings > Bar has nine more styles and a custom setup: one pill, a pill per section (islands) or
 one bar across the screen; height, spacing, roundness and an outline; and which items go left, in
 the middle and right. Besides the ones above there are the weather (click for the forecast), the
@@ -46,21 +51,22 @@ The profile picture drops down one window, attached to the bar, with a tab for e
 Super + S opens it too, and it works from the keyboard alone: Esc or a click outside closes it,
 Up/Down, Tab, Ctrl + Tab or J/K switch tabs, and 1–9 and 0 jump to a tab in sidebar order. `qs ipc
 call controlcenter toggle <tab>` opens a tab from a keybind; the tabs are `account`, `music`,
-`notifications`, `network`, `bluetooth`, `audio`, `display`, `battery`, `system`, `capture` and
-`github`.
+`notifications`, `network`, `bluetooth`, `audio`, `display`, `drives`, `battery`, `system`,
+`capture` and `github`.
 
 | Tab | What's in it | Right click on the tab |
 |---|---|---|
-| Account | Profile picture (click it to upload one; saved square-cropped as `~/.face` and sent to AccountsService for the login screen), name, quick settings (Do Not Disturb, keep awake, night light, color picker), lock, log out, power menu | |
+| Account | Profile picture (click it to upload one; saved square-cropped as `~/.face` and sent to AccountsService for the login screen), name, quick settings (Do Not Disturb, keep awake, night light, [game mode](#game-mode), color picker), lock, log out, power menu | |
 | Music | Album art in a slowly turning scalloped frame with the live spectrum around it, title, artist and album, a wavy seek bar, round controls around a wide play button, the players (when there are several), open the app, volume | Play/pause |
 | Notifications | Notifications not yet dismissed | Do Not Disturb |
 | Network | Live download/upload speed with a one-minute graph, speed test (ping, download and upload against Cloudflare with curl; the gauge button next to settings), wired, Wi-Fi (asks for passwords), VPN switches, import or add a VPN | |
 | Bluetooth | Paired devices (connect, battery, forget), nearby devices to pair | Power on/off |
 | Sound | Output and input devices, per-app volume | Mute |
 | Displays | [Displays](#displays) | |
+| Drives | USB drives, SD cards and disk images (only while one is attached): click opens it in the file manager (mounting it, or asking for the passphrase of an encrypted drive), eject unmounts and powers it off, a bar shows how full it is | |
 | Battery | Time left, charge limit, power mode, GPU mode on ROG laptops | |
 | System | CPU, memory, GPU and disk with temperatures, busiest processes, last backup | |
-| Capture | Screenshot or record a region, window or screen | |
+| Capture | Screenshot or record a region, window or screen; annotate a region (satty) or copy the text in it (tesseract). Screenshot notifications have an Edit button that opens satty | |
 | GitHub | Notifications; only after `gh auth login` | |
 
 The bottom of the sidebar has the tray and hidden background apps (click opens the app, right
@@ -79,6 +85,28 @@ another (or the cheatsheet) closes it. When the keyboard moves focus to another 
 `cursor.no_warps` in `settings.lua`, done by `CursorGlide.qml`); it stays put when the mouse did the
 focusing (the pointer is in or right next to the window, or still moving), for new windows and on
 workspace switches.
+
+Settings > Accessibility > "Reduce motion" makes all of this instant and turns off Hyprland's, GTK's
+and KDE's animations; loading spinners and the recording dot keep moving. New shell animations take
+their duration through `Theme.ms()` so they follow it.
+
+## Game mode
+
+The Account tab's Game mode tile turns off animations, blur, shadows, rounding and gaps, switches
+to the performance power profile and turns on Do Not Disturb. Turning it off puts the power profile
+and Do Not Disturb back as they were. It lasts until turned off or a restart: `hypr/settings.lua`
+applies it whenever `$XDG_RUNTIME_DIR/pikadots-gamemode` exists, so a Hyprland reload keeps it.
+`qs ipc call quicksettings gameMode` toggles it.
+
+## Drives
+
+`quickshell/Drives.qml` lists removable disks from `lsblk` and refreshes whenever `udisksctl
+monitor` reports a change. Mounting, unlocking (a zenity passphrase prompt) and ejecting go through
+`hypr/scripts/drives.sh` and udisks, so no password is needed. A drive plugged in while the shell
+runs is mounted under `/run/media/$USER`, and a notification offers Open and Eject. With Settings >
+Drives "Open it right away" off, the notification asks first. Disk images (`udisksctl loop-setup -f
+file.iso`) are listed but never opened on their own. Phones (MTP) aren't block devices: install
+`gvfs-mtp` and they show in Thunar.
 
 ## Displays
 
@@ -101,9 +129,18 @@ Apps, most used first. A first character switches mode:
 | `~` | Projects (git repos you visit) | Default editor | Terminal there |
 | `+` | Clipboard history | Copy | |
 
+In clipboard mode Ctrl + P pins a clip (or unpins it), Shift + Delete removes one and Ctrl + Shift +
+Delete clears the history. Pins are files in `~/.local/share/pikadots/clipboard-pins`, listed first,
+and kept when the history is cleared. Settings > Launcher sets the history size and "Keep copied
+text when the app closes" (`wl-clip-persist`). `hypr/scripts/clipboard.sh watch` starts both at
+login.
+
 ## Overlays
 
 - **Power menu** (Super + Escape): lock, log out, suspend, restart, shut down (L / E / S / R / P).
+- **Password prompts** for system changes (pkexec, the Date & time page, updates) are the shell's own
+  polkit agent (`quickshell/PolkitDialog.qml`): Enter authenticates, Esc cancels. If another agent
+  already holds the session, it retries a few times, then starts hyprpolkitagent instead.
 - **Alt + Tab**: live window previews; release Alt to switch.
 - **Overview** (Super + Tab): every workspace in a row with live previews. Like Alt + Tab: hold
   Super, Tab or Shift + Tab moves, releasing Super switches, Esc cancels.

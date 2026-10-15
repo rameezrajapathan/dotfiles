@@ -13,7 +13,8 @@ import QtQuick.Layouts
 //   :  emoji (Enter copies it)
 //   ~  projects: zoxide's folders with a repo or project file (Enter opens the default editor,
 //      Shift+Enter a terminal there)
-//   +  clipboard history (cliphist; Enter copies, Shift+Delete removes; Super + V)
+//   +  clipboard history (cliphist; Enter copies, Ctrl+P pins or unpins, Shift+Delete removes,
+//      Ctrl+Shift+Delete clears all but the pins; Super + V; hypr/scripts/clipboard.sh)
 // Arrows move, Esc closes. Toggled with `qs ipc call launcher toggle`; `open <text>` starts with
 // text typed (Super + P opens projects). App launch counts live in
 // ~/.local/state/quickshell.
@@ -61,6 +62,9 @@ PanelWindow {
     property var projects: []
     // cliphist entries: { id, text, image (size and type, for binary entries) }
     property var clips: []
+    // Pinned clips (files that outlive the history): { file, text, image }
+    property var pins: []
+    readonly property string clipScript: Quickshell.env("HOME") + "/.config/hypr/scripts/clipboard.sh"
     // Bumped when thumbnails are written, so images reload
     property int thumbRevision: 0
     readonly property string thumbDir: Quickshell.env("XDG_RUNTIME_DIR") + "/quickshell-clipboard"
@@ -106,17 +110,27 @@ PanelWindow {
                         : Apps.editor(p)
                 }));
         case "clipboard":
-            return clips
+            return pins
+                .filter(p => p.text.toLowerCase().includes(q))
+                .map(p => ({
+                    title: p.image ? "Image" : p.text,
+                    subtitle: "Pinned  ·  ↵ copy  ·  ctrl+p unpin",
+                    symbol: "push_pin",
+                    thumb: p.image ? "file://" + p.file : "",
+                    pin: p,
+                    run: () => Quickshell.execDetached([clipScript, "copy-pin", p.file])
+                }))
+                .concat(clips
                 .filter(c => c.text.toLowerCase().includes(q))
                 .slice(0, 200)
                 .map(c => ({
                     title: c.image ? "Image" : c.text,
-                    subtitle: c.image ? c.image + "  ·  ↵ copy  ·  shift+del remove" : "↵ copy  ·  shift+del remove",
+                    subtitle: (c.image ? c.image + "  ·  " : "") + "↵ copy  ·  ctrl+p pin  ·  shift+del remove  ·  ctrl+shift+del clear",
                     symbol: c.image ? "image" : "content_paste",
                     thumb: c.image ? "file://" + thumbDir + "/" + c.id + ".png?" + thumbRevision : "",
                     clip: c,
                     run: () => Quickshell.execDetached(["sh", "-c", "cliphist list | grep -m1 \"^" + c.id + "\t\" | cliphist decode | wl-copy"])
-                }));
+                })));
         default:
             return appResults(q).map(e => ({ title: e.name, app: e, run: () => launch(e) }));
         }
@@ -248,7 +262,21 @@ PanelWindow {
     }
 
     // Clipboard history, read whenever clipboard mode opens; image entries get thumbnails
-    onModeChanged: if (mode === "clipboard") clipReader.running = true
+    onModeChanged: if (mode === "clipboard") refreshClips()
+    function refreshClips() {
+        clipReader.running = true;
+        pinReader.running = true;
+    }
+    Process {
+        id: pinReader
+        command: [root.clipScript, "pins"]
+        stdout: StdioCollector {
+            onStreamFinished: root.pins = text.split("\n").filter(l => l.includes("\t")).map(l => {
+                const [file, body] = [l.slice(0, l.indexOf("\t")), l.slice(l.indexOf("\t") + 1)];
+                return { file: file, text: body === "[[ image ]]" ? "image" : body, image: body === "[[ image ]]" };
+            })
+        }
+    }
     Process {
         id: clipReader
         command: ["cliphist", "list"]
@@ -281,12 +309,28 @@ PanelWindow {
     }
     Process {
         id: clipDeleter
-        onExited: clipReader.running = true
+        onExited: root.refreshClips()
     }
     function deleteClip(item) {
-        if (!item?.clip)
+        if (item?.pin)
+            clipDeleter.command = [clipScript, "unpin", item.pin.file];
+        else if (item?.clip)
+            clipDeleter.command = ["sh", "-c", "cliphist list | grep -m1 \"^" + item.clip.id + "\t\" | cliphist delete"];
+        else
             return;
-        clipDeleter.command = ["sh", "-c", "cliphist list | grep -m1 \"^" + item.clip.id + "\t\" | cliphist delete"];
+        clipDeleter.running = true;
+    }
+    function togglePin(item) {
+        if (item?.pin)
+            clipDeleter.command = [clipScript, "unpin", item.pin.file];
+        else if (item?.clip)
+            clipDeleter.command = [clipScript, "pin", item.clip.id];
+        else
+            return;
+        clipDeleter.running = true;
+    }
+    function clearClips() {
+        clipDeleter.command = [clipScript, "wipe"];
         clipDeleter.running = true;
     }
 
@@ -335,7 +379,7 @@ PanelWindow {
         anchors.fill: parent
         color: "black"
         opacity: root.open ? 0.3 : 0
-        Behavior on opacity { NumberAnimation { duration: 180 } }
+        Behavior on opacity { NumberAnimation { duration: Theme.ms(180) } }
     }
 
     MouseArea {
@@ -399,7 +443,15 @@ PanelWindow {
                         Keys.onBacktabPressed: grid.moveCurrentIndexLeft()
                         Keys.onPressed: event => {
                             if (root.mode === "clipboard" && event.key === Qt.Key_Delete && event.modifiers & Qt.ShiftModifier) {
-                                root.deleteClip(root.results[grid.currentIndex]);
+                                if (event.modifiers & Qt.ControlModifier)
+                                    root.clearClips();
+                                else
+                                    root.deleteClip(root.results[grid.currentIndex]);
+                                event.accepted = true;
+                                return;
+                            }
+                            if (root.mode === "clipboard" && event.key === Qt.Key_P && event.modifiers & Qt.ControlModifier) {
+                                root.togglePin(root.results[grid.currentIndex]);
                                 event.accepted = true;
                                 return;
                             }
@@ -529,7 +581,7 @@ PanelWindow {
                         anchors.margins: cell.list ? 2 : 4
                         radius: cell.list ? 14 : 18
                         color: !cell.selected && mouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
-                        Behavior on color { ColorAnimation { duration: 100 } }
+                        Behavior on color { ColorAnimation { duration: Theme.ms(100) } }
                     }
 
                     // App tile
@@ -545,7 +597,7 @@ PanelWindow {
                             source: cell.modelData.app ? root.iconFor(cell.modelData.app) : ""
                             asynchronous: true
                             scale: cell.selected ? 1.08 : 1
-                            Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                            Behavior on scale { NumberAnimation { duration: Theme.ms(120); easing.type: Easing.OutCubic } }
                         }
                         Label {
                             Layout.fillWidth: true
@@ -564,7 +616,7 @@ PanelWindow {
                         text: cell.modelData.emoji ?? ""
                         font.pixelSize: 36
                         scale: cell.selected ? 1.15 : 1
-                        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+                        Behavior on scale { NumberAnimation { duration: Theme.ms(120); easing.type: Easing.OutCubic } }
                     }
 
                     // List row (calculator, command, project)

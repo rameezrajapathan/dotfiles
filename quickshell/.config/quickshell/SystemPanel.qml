@@ -282,7 +282,7 @@ Item {
                 height: parent.height
                 radius: parent.radius
                 color: meter.dimmed ? Theme.overlay : meter.value > 0.85 ? Theme.red : meter.value > 0.6 ? Theme.yellow : Theme.accent
-                Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                Behavior on width { NumberAnimation { duration: Theme.ms(300); easing.type: Easing.OutCubic } }
             }
         }
     }

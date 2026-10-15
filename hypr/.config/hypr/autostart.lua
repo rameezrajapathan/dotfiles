@@ -3,8 +3,11 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("~/.config/hypr/scripts/hyprpaper.sh")
 	-- hypridle with the Settings app's timers (scripts/idle.sh; hypridle.conf has the defaults)
 	hl.exec_cmd("~/.config/hypr/scripts/idle.sh")
-	hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
-	hl.exec_cmd("wl-paste --watch cliphist store")
+	-- Password prompts come from the shell (quickshell/PolkitDialog.qml; hyprpolkitagent if it can't)
+	-- Clipboard history (and wl-clip-persist) with Settings > Launcher's options
+	hl.exec_cmd("~/.config/hypr/scripts/clipboard.sh watch")
+	-- Wallpaper colors back into kdeglobals for Qt apps (a Plasma session puts its own back)
+	hl.exec_cmd("python3 -I ~/.config/hypr/scripts/kde-theme.py")
 
 	-- Tray apps start once the bar's tray is up, so they hide to it instead of opening a window
 	hl.exec_cmd("~/.config/hypr/scripts/tray-apps.sh")

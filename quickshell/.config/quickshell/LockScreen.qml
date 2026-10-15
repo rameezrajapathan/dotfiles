@@ -91,17 +91,17 @@ Item {
         brightness: root.leaving || !root.shown ? 0 : root.awake ? -0.22 : -0.12
         saturation: root.leaving || !root.shown ? 0 : 0.15
         scale: root.leaving || !root.shown ? 1 : 1.06
-        Behavior on blur { NumberAnimation { duration: 900; easing.type: Easing.OutCubic } }
-        Behavior on brightness { NumberAnimation { duration: 900; easing.type: Easing.OutCubic } }
-        Behavior on saturation { NumberAnimation { duration: 900 } }
-        Behavior on scale { NumberAnimation { duration: 1400; easing.type: Easing.OutQuint } }
+        Behavior on blur { NumberAnimation { duration: Theme.ms(900); easing.type: Easing.OutCubic } }
+        Behavior on brightness { NumberAnimation { duration: Theme.ms(900); easing.type: Easing.OutCubic } }
+        Behavior on saturation { NumberAnimation { duration: Theme.ms(900) } }
+        Behavior on scale { NumberAnimation { duration: Theme.ms(1400); easing.type: Easing.OutQuint } }
     }
 
     // A soft shade at the bottom for the pill and cards, and the theme color when there's no image
     Rectangle {
         anchors.fill: parent
         opacity: root.leaving ? 0 : 1
-        Behavior on opacity { NumberAnimation { duration: 450 } }
+        Behavior on opacity { NumberAnimation { duration: Theme.ms(450) } }
         gradient: Gradient {
             GradientStop { position: 0; color: Qt.alpha(Theme.base, wallpaper.status === Image.Ready ? 0.15 : 1) }
             GradientStop { position: 0.55; color: Qt.alpha(Theme.base, wallpaper.status === Image.Ready ? 0 : 1) }
@@ -115,8 +115,8 @@ Item {
         anchors.fill: parent
         opacity: root.leaving || !root.shown ? 0 : 1
         scale: root.leaving ? 1.04 : 1
-        Behavior on opacity { NumberAnimation { duration: root.leaving ? 380 : 600; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: 450; easing.type: Easing.OutCubic } }
+        Behavior on opacity { NumberAnimation { duration: Theme.ms(root.leaving ? 380 : 600); easing.type: Easing.OutCubic } }
+        Behavior on scale { NumberAnimation { duration: Theme.ms(450); easing.type: Easing.OutCubic } }
 
         // Wakes on mouse movement and clicks; the field keeps the keyboard
         MouseArea {
@@ -137,7 +137,7 @@ Item {
             id: statusPill
             anchors.horizontalCenter: parent.horizontalCenter
             y: root.shown ? (Theme.barHeight - Theme.pillHeight) / 2 : -height
-            Behavior on y { NumberAnimation { duration: 700; easing.type: Easing.OutQuint } }
+            Behavior on y { NumberAnimation { duration: Theme.ms(700); easing.type: Easing.OutQuint } }
             width: statusRow.implicitWidth + 2 * Theme.pillInset + 8
             height: Theme.pillHeight
             radius: height / 2
@@ -219,8 +219,8 @@ Item {
             x: root.width * 0.28 - width / 2
             y: (root.height - height) / 2 + (root.shown ? 0 : 40)
             spacing: 28
-            Behavior on x { NumberAnimation { duration: 900; easing.type: Easing.OutQuint } }
-            Behavior on y { NumberAnimation { duration: 800; easing.type: Easing.OutQuint } }
+            Behavior on x { NumberAnimation { duration: Theme.ms(900); easing.type: Easing.OutQuint } }
+            Behavior on y { NumberAnimation { duration: Theme.ms(800); easing.type: Easing.OutQuint } }
 
             Column {
                 id: clockColumn
@@ -265,7 +265,7 @@ Item {
                         font.pixelSize: 190
                         anchors.baseline: parent.children[0].baseline
                         opacity: clock.date.getSeconds() % 2 === 0 ? 1 : 0.35
-                        Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.InOutSine } }
+                        Behavior on opacity { NumberAnimation { duration: Theme.ms(600); easing.type: Easing.InOutSine } }
                     }
                     Text {
                         text: time.parts[1]
@@ -301,7 +301,7 @@ Item {
                 border.color: Qt.alpha(Theme.text, 0.08)
                 opacity: root.player ? 1 : 0
                 visible: root.player !== null && Settings.lock.showMedia
-                Behavior on opacity { NumberAnimation { duration: 300 } }
+                Behavior on opacity { NumberAnimation { duration: Theme.ms(300) } }
 
                 ClippingRectangle {
                     id: cover
@@ -382,7 +382,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             color: main ? Theme.accent : controlMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                             scale: controlMouse.pressed ? 0.9 : 1
-                            Behavior on scale { NumberAnimation { duration: 100 } }
+                            Behavior on scale { NumberAnimation { duration: Theme.ms(100) } }
 
                             MediaGlyph {
                                 anchors.centerIn: parent
@@ -446,8 +446,8 @@ Item {
             // Grows out from the diamond; dims while resting
             height: root.shown ? root.height * 0.56 : 0
             opacity: root.awake ? 1 : 0.5
-            Behavior on height { NumberAnimation { duration: 1000; easing.type: Easing.OutQuint } }
-            Behavior on opacity { NumberAnimation { duration: 400 } }
+            Behavior on height { NumberAnimation { duration: Theme.ms(1000); easing.type: Easing.OutQuint } }
+            Behavior on opacity { NumberAnimation { duration: Theme.ms(400) } }
 
             readonly property real gap: 22
 
@@ -537,8 +537,8 @@ Item {
             y: (root.height - height) / 2
             spacing: 14
             opacity: root.awake ? 1 : 0.55
-            Behavior on x { NumberAnimation { duration: 800; easing.type: Easing.OutQuint } }
-            Behavior on opacity { NumberAnimation { duration: 400 } }
+            Behavior on x { NumberAnimation { duration: Theme.ms(800); easing.type: Easing.OutQuint } }
+            Behavior on opacity { NumberAnimation { duration: Theme.ms(400) } }
 
             // Picture with a ring: thin while waiting, a spinning arc while checking, red when wrong
             Item {
@@ -552,7 +552,7 @@ Item {
                     color: "transparent"
                     border.width: 2
                     border.color: root.lock.failed ? Theme.red : Qt.alpha(Theme.text, root.lock.checking ? 0.12 : 0.3)
-                    Behavior on border.color { ColorAnimation { duration: 250 } }
+                    Behavior on border.color { ColorAnimation { duration: Theme.ms(250) } }
                 }
 
                 Shape {
@@ -572,7 +572,7 @@ Item {
                             startAngle: -90
                             // Closes into a full ring once accepted
                             sweepAngle: root.leaving ? 360 : 100
-                            Behavior on sweepAngle { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                            Behavior on sweepAngle { NumberAnimation { duration: Theme.ms(300); easing.type: Easing.OutCubic } }
                         }
                     }
 
@@ -616,17 +616,17 @@ Item {
                 border.color: root.lock.failed ? Qt.alpha(Theme.red, 0.8)
                     : input.activeFocus && root.lock.password !== "" ? Qt.alpha(Theme.accent, 0.7)
                     : Qt.alpha(Theme.text, 0.14)
-                Behavior on border.color { ColorAnimation { duration: 200 } }
+                Behavior on border.color { ColorAnimation { duration: Theme.ms(200) } }
 
                 transform: Translate { id: shake }
 
                 SequentialAnimation {
                     id: shakeAnimation
-                    NumberAnimation { target: shake; property: "x"; to: -14; duration: 50; easing.type: Easing.OutQuad }
-                    NumberAnimation { target: shake; property: "x"; to: 12; duration: 70; easing.type: Easing.InOutQuad }
-                    NumberAnimation { target: shake; property: "x"; to: -8; duration: 70; easing.type: Easing.InOutQuad }
-                    NumberAnimation { target: shake; property: "x"; to: 5; duration: 70; easing.type: Easing.InOutQuad }
-                    NumberAnimation { target: shake; property: "x"; to: 0; duration: 80; easing.type: Easing.OutQuad }
+                    NumberAnimation { target: shake; property: "x"; to: -14; duration: Theme.ms(50); easing.type: Easing.OutQuad }
+                    NumberAnimation { target: shake; property: "x"; to: 12; duration: Theme.ms(70); easing.type: Easing.InOutQuad }
+                    NumberAnimation { target: shake; property: "x"; to: -8; duration: Theme.ms(70); easing.type: Easing.InOutQuad }
+                    NumberAnimation { target: shake; property: "x"; to: 5; duration: Theme.ms(70); easing.type: Easing.InOutQuad }
+                    NumberAnimation { target: shake; property: "x"; to: 0; duration: Theme.ms(80); easing.type: Easing.OutQuad }
                 }
 
                 Connections {
@@ -673,8 +673,8 @@ Item {
                             color: root.lock.checking ? Theme.subtext : Theme.text
                             scale: 0
                             Component.onCompleted: scale = 1
-                            Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutBack; easing.overshoot: 2.5 } }
-                            Behavior on color { ColorAnimation { duration: 200 } }
+                            Behavior on scale { NumberAnimation { duration: Theme.ms(160); easing.type: Easing.OutBack; easing.overshoot: 2.5 } }
+                            Behavior on color { ColorAnimation { duration: Theme.ms(200) } }
                         }
                     }
                 }
@@ -690,8 +690,8 @@ Item {
                     color: Theme.accent
                     opacity: root.lock.password !== "" && !root.lock.checking ? 1 : 0
                     scale: opacity > 0 ? 1 : 0.6
-                    Behavior on opacity { NumberAnimation { duration: 180 } }
-                    Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
+                    Behavior on opacity { NumberAnimation { duration: Theme.ms(180) } }
+                    Behavior on scale { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutBack } }
 
                     Icon {
                         anchors.centerIn: parent

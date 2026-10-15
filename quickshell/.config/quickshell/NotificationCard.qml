@@ -47,8 +47,8 @@ Rectangle {
     Component.onCompleted: if (popup) slideIn.start()
     ParallelAnimation {
         id: slideIn
-        NumberAnimation { target: slide; property: "x"; to: 0; duration: 260; easing.type: Easing.OutCubic }
-        NumberAnimation { target: slide; property: "y"; to: 0; duration: 260; easing.type: Easing.OutCubic }
+        NumberAnimation { target: slide; property: "x"; to: 0; duration: Theme.ms(260); easing.type: Easing.OutCubic }
+        NumberAnimation { target: slide; property: "y"; to: 0; duration: Theme.ms(260); easing.type: Easing.OutCubic }
     }
 
     // Accent wash from the top-left corner

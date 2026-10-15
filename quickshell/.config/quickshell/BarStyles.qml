@@ -18,7 +18,7 @@ Singleton {
         { id: "weather", label: "Weather", icon: "partly_cloudy_day", description: "Click for the forecast" },
         { id: "meeting", label: "Next meeting", icon: "event", description: "When a calendar is set up" },
         { id: "media", label: "Now playing", icon: "music_note", description: "Track and artist" },
-        { id: "recording", label: "Recording", icon: "radio_button_checked", description: "Only while recording" },
+        { id: "recording", label: "Recording & privacy", icon: "radio_button_checked", description: "While recording, or while an app uses the mic, camera or screen" },
         { id: "capture", label: "Capture", icon: "screenshot_frame", description: "Screenshots and recording" },
         { id: "tray", label: "Tray", icon: "widgets", description: "Background apps' icons" },
         { id: "system", label: "CPU & memory", icon: "memory", description: "Usage in percent" },
@@ -103,7 +103,7 @@ Singleton {
             description: "Edge to edge and square, like a traditional desktop.",
             layout: "full", height: 34, gap: 0, sideGap: 0, roundness: 0, border: false,
             left: ["launcher", "workspaces", "title"],
-            center: ["date", "clock"],
+            center: ["date", "clock", "recording"],
             right: ["tray", "system", "network", "sound", "battery", "power"]
         },
         {

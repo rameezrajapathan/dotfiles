@@ -78,11 +78,12 @@ SettingsPage {
             icon: "commit"
             title: root.repo ? root.repo.branch + " · " + root.repo.commit : "pikadots"
             description: root.repo ? (root.repo.subject + " · " + root.repo.date) : "Not checked yet"
+            // Up to date, `pikadots update` would do nothing: offer a repair instead
             Pill {
-                text: Updates.behind > 0 ? "Update" : "Update & repair"
+                text: Updates.behind > 0 ? "Update" : "Repair"
                 active: Updates.behind > 0
                 implicitHeight: 32
-                onClicked: Updates.updatePikadots()
+                onClicked: Updates.behind > 0 ? Updates.updatePikadots() : Updates.repairPikadots()
             }
         }
         SettingsRow {

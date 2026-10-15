@@ -21,10 +21,14 @@ Scope {
             keywords: "font typeface text size icons weight", component: fontsPage },
         { key: "bar", group: "Personalize", title: "Bar", icon: "toolbar",
             keywords: "bar pill height weather music spectrum clock 24 hour seconds", component: barPage },
+        { key: "accessibility", group: "Personalize", title: "Accessibility", icon: "accessibility_new",
+            keywords: "accessibility zoom magnifier magnify larger text size bigger font reduce motion animations", component: accessibilityPage },
         { key: "windows", group: "Desktop", title: "Windows", icon: "select_window",
             keywords: "hyprland layout dwindle master scrolling gaps borders rounding corners resize", component: windowsPage },
         { key: "effects", group: "Desktop", title: "Effects", icon: "auto_awesome",
             keywords: "blur opacity transparency dim shadows animations speed workspace", component: effectsPage },
+        { key: "rules", group: "Desktop", title: "Window rules", icon: "select_window",
+            keywords: "window rules float floating center size workspace opacity pin fullscreen blur app class", component: rulesPage },
         { key: "input", group: "Desktop", title: "Keyboard & mouse", icon: "keyboard",
             keywords: "keyboard layout language repeat mouse pointer sensitivity acceleration touchpad tap scroll cursor", component: inputPage },
         { key: "notifications", group: "Shell", title: "Notifications", icon: "notifications",
@@ -45,6 +49,8 @@ Scope {
             keywords: "sound audio volume speakers headphones microphone input output apps", component: soundPage },
         { key: "displays", group: "System", title: "Displays", icon: "monitor",
             keywords: "display monitor screen resolution refresh rate scale night light warmth", component: displaysPage },
+        { key: "drives", group: "System", title: "Drives", icon: "usb",
+            keywords: "drives usb stick flash sd card disk image iso mount eject automount removable", component: drivesPage },
         { key: "datetime", group: "System", title: "Date & time", icon: "schedule",
             keywords: "date time clock timezone time zone ntp sync 24 hour format week calendar world clocks", component: dateTimePage },
         { key: "power", group: "System", title: "Power", icon: "battery_android_frame_5",
@@ -408,7 +414,7 @@ Scope {
                                             radius: 13
                                             color: entry.current ? Theme.accent
                                                 : rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
-                                            Behavior on color { ColorAnimation { duration: 140 } }
+                                            Behavior on color { ColorAnimation { duration: Theme.ms(140) } }
 
                                             RowLayout {
                                                 anchors.fill: parent
@@ -501,9 +507,9 @@ Scope {
                             visible: opacity > 0
                             transform: Translate {
                                 y: flick.current ? 0 : 12
-                                Behavior on y { NumberAnimation { duration: 260; easing.type: Easing.OutQuint } }
+                                Behavior on y { NumberAnimation { duration: Theme.ms(260); easing.type: Easing.OutQuint } }
                             }
-                            Behavior on opacity { NumberAnimation { duration: flick.current ? 220 : 70 } }
+                            Behavior on opacity { NumberAnimation { duration: Theme.ms(flick.current ? 220 : 70) } }
                             clip: true
                             contentWidth: width
                             contentHeight: loader.height + 72
@@ -544,6 +550,9 @@ Scope {
     Component { id: keybindsPage; SettingsKeybindsPage {} }
     Component { id: networkPage; SettingsNetworkPage {} }
     Component { id: bluetoothPage; SettingsBluetoothPage {} }
+    Component { id: rulesPage; SettingsWindowRulesPage {} }
+    Component { id: accessibilityPage; SettingsAccessibilityPage {} }
+    Component { id: drivesPage; SettingsDrivesPage {} }
     Component { id: soundPage; SettingsSoundPage {} }
     Component { id: displaysPage; SettingsDisplaysPage {} }
     Component { id: powerPage; SettingsPowerPage {} }

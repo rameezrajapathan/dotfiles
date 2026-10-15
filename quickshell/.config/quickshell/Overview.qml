@@ -127,7 +127,7 @@ PanelWindow {
         anchors.fill: parent
         color: "black"
         opacity: root.open ? 0.3 : 0
-        Behavior on opacity { NumberAnimation { duration: 180 } }
+        Behavior on opacity { NumberAnimation { duration: Theme.ms(180) } }
     }
 
     MouseArea {
@@ -206,7 +206,7 @@ PanelWindow {
                         border.width: ws.selected ? 3 : 1
                         border.color: ws.selected ? Theme.accent : ws.active ? Qt.alpha(Theme.accent, 0.5) : Qt.alpha(Theme.text, 0.1)
                         scale: ws.selected ? 1.04 : 1
-                        Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutCubic } }
+                        Behavior on scale { NumberAnimation { duration: Theme.ms(160); easing.type: Easing.OutCubic } }
 
                         MouseArea {
                             anchors.fill: parent

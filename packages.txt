@@ -30,7 +30,11 @@ grim
 slurp
 wl-clipboard
 cliphist
+wl-clip-persist
 wf-recorder
+satty
+tesseract
+tesseract-data-eng
 jq
 pacman-contrib
 brightnessctl
@@ -55,6 +59,7 @@ bluez-utils
 pipewire-pulse
 wireplumber
 upower
+udisks2
 power-profiles-daemon
 
 # Shell

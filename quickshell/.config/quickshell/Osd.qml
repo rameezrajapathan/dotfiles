@@ -126,10 +126,10 @@ PanelWindow {
 
         opacity: root.open ? 1 : 0
         y: root.open ? 0 : 16
-        Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on y { NumberAnimation { duration: Theme.ms(200); easing.type: Easing.OutCubic } }
         Behavior on opacity {
             NumberAnimation {
-                duration: 180
+                duration: Theme.ms(180)
                 onRunningChanged: if (!running && !root.open) root.visible = false
             }
         }
@@ -146,7 +146,7 @@ PanelWindow {
                 implicitHeight: 44
                 radius: 22
                 color: root.muted ? Qt.alpha(Theme.red, 0.18) : Qt.alpha(Theme.accent, 0.2)
-                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
 
                 Icon {
                     anchors.centerIn: parent
@@ -178,8 +178,8 @@ PanelWindow {
                         radius: width / 2
                         color: lit ? Theme.accent : Qt.alpha(Theme.text, 0.15)
 
-                        Behavior on height { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-                        Behavior on color { ColorAnimation { duration: 140 } }
+                        Behavior on height { NumberAnimation { duration: Theme.ms(140); easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: Theme.ms(140) } }
                     }
                 }
             }

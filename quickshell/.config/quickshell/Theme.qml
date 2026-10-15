@@ -24,7 +24,15 @@ Singleton {
     // Fonts and sizes are chosen in the Settings app (Settings.qml)
     readonly property string font: Settings.appearance.font
     readonly property string displayFont: Settings.appearance.displayFont
-    readonly property int fontSize: Settings.appearance.fontSize
+    // Settings > Accessibility "Text size" scales it
+    readonly property int fontSize: Math.round(Settings.appearance.fontSize * Settings.accessibility.textScale)
+
+    // Settings > Accessibility "Reduce motion": the shell's transitions become instant (1 ms, so
+    // what waits for an animation to end still runs); spinners and pulses keep their pace
+    readonly property bool reduceMotion: Settings.accessibility.reduceMotion
+    function ms(duration) {
+        return reduceMotion ? 1 : duration;
+    }
     readonly property int barHeight: Settings.bar.height
     // Space above the bar's shapes (and below, inside barHeight)
     readonly property int barGap: Math.min(Settings.bar.gap, Math.floor((barHeight - 24) / 2))

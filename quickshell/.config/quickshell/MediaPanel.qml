@@ -223,8 +223,8 @@ Item {
                     implicitHeight: 32
                     radius: current ? 10 : height / 2
                     color: current ? Theme.accent : chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.accent, 0.1)
-                    Behavior on color { ColorAnimation { duration: 150 } }
-                    Behavior on radius { NumberAnimation { duration: 200 } }
+                    Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
+                    Behavior on radius { NumberAnimation { duration: Theme.ms(200) } }
 
                     RowLayout {
                         id: chipRow

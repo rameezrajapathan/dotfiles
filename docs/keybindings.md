@@ -60,6 +60,14 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Super + Shift + Ctrl + Arrows | Move the window to another monitor |
 | Three-finger swipe | Switch workspace |
 
+## Zoom
+
+| Keys | Action |
+|---|---|
+| Super + Alt + = | Zoom in around the pointer |
+| Super + Alt + − | Zoom out |
+| Super + Alt + 0 | Reset zoom |
+
 ## Screenshots and recording
 
 | Keys | Action |
@@ -68,6 +76,8 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Ctrl + Print | Screen → clipboard |
 | Alt + Print | Window → clipboard |
 | Super + Shift + F | Region → clipboard and `~/Pictures/Screenshots` |
+| Shift + Print | Region → draw on it in satty (Ctrl + C copies, Ctrl + S saves) |
+| Super + Shift + T | Text in a region → clipboard (tesseract) |
 | Super + Shift + R | Record a region (again to stop) |
 | Super + Alt + R | Record the screen (again to stop) |
 

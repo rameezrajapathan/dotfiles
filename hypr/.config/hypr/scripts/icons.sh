@@ -41,6 +41,8 @@ gsettings set org.gnome.desktop.interface icon-theme "$theme"
 mkdir -p "$state"
 # Quickshell uses the dark variant: its panels are dark or tinted either way
 variant dark >"$state/icon-theme"
+# Qt and KDE apps
+python3 -I ~/.config/hypr/scripts/kde-theme.py || true
 
 if [[ ${1:-} == --restart-shell ]]; then
 	qs kill >/dev/null 2>&1 || true

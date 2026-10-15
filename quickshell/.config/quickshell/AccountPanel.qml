@@ -49,7 +49,7 @@ Item {
                     radius: width / 2
                     color: Qt.alpha(Theme.base, 0.55)
                     opacity: pictureMouse.containsMouse ? 1 : 0
-                    Behavior on opacity { NumberAnimation { duration: 120 } }
+                    Behavior on opacity { NumberAnimation { duration: Theme.ms(120) } }
 
                     Icon {
                         anchors.centerIn: parent
@@ -137,6 +137,13 @@ Item {
                 onClicked: Toggles.nightLight = !Toggles.nightLight
             }
             ToggleTile {
+                icon: "sports_esports"
+                label: "Game mode"
+                detail: active ? "No effects" : "Off"
+                active: Toggles.gameMode
+                onClicked: Toggles.setGameMode(!Toggles.gameMode)
+            }
+            ToggleTile {
                 icon: "colorize"
                 label: "Color picker"
                 detail: "Copies hex"
@@ -164,7 +171,7 @@ Item {
                 implicitHeight: 42
                 radius: 12
                 color: actionMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
-                Behavior on color { ColorAnimation { duration: 120 } }
+                Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
                 RowLayout {
                     anchors.fill: parent

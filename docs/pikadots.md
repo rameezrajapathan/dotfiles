@@ -7,9 +7,11 @@ pikadots install      packages, links into $HOME, services, colors
 pikadots uninstall    undo install, then optionally remove packages
 pikadots health       check everything (alias: check, doctor)
 pikadots repair       fix what health finds (alias: fix)
-pikadots update       pull the repo, then repair
+pikadots update       pull the repo, then repair if anything changed
 pikadots backup       back up now
 pikadots backup-init  set up encrypted daily backups
+pikadots export       save your settings to one file
+pikadots import FILE  apply an exported file on this machine
 ```
 
 ## install
@@ -31,7 +33,9 @@ reinstalls, relinks, re-enables, regenerates colors and restarts the bar. Safe t
 
 ## update
 
-Pulls the repo (`git pull --rebase --autostash`), shows the new commits, then runs repair.
+Pulls the repo (`git pull --rebase --autostash`) and shows the new commits. Only when something
+new came in does it run repair (new packages, links and services); when it's already up to date it
+stops there, and `pikadots repair` checks everything anyway.
 Settings > Updates shows what's new before you update, checks in the background and runs this
 for you in a terminal ([settings.md](settings.md#updates)).
 
@@ -40,9 +44,25 @@ for you in a terminal ([settings.md](settings.md#updates)).
 Asks first. Removes the links and puts back the files that were there before install. Backups,
 the keyring and your git identity stay.
 
+It also puts Plasma's own colors, icons and fonts back into `~/.config/kdeglobals` (see
+[Qt and KDE apps](theming.md#qt-and-kde-apps)).
+
 Then it offers to remove the packages pikadots installed: **y** removes them, **e** opens the list
 in `$EDITOR` to choose, anything else keeps them. Essentials (networking, audio, Bluetooth, zsh,
 git, neovim, keyring, restic) are never offered, nor anything another installed package needs.
+
+## export and import
+
+`pikadots export [FILE]` saves what the Settings app changed into one file, by default
+`~/pikadots-settings-DATE.tar.gz`. That covers `~/.config/pikadots/settings.json` and the Hyprland
+files written from it (Windows, Effects and Input options, startup apps, window rules), plus the
+current wallpaper and `~/.face`. Keep it in cloud storage or on a USB drive.
+
+On a new machine, after `install.sh`: `pikadots import pikadots-settings-DATE.tar.gz`. It saves
+the files it replaces to `~/.local/state/pikadots/backups/import-DATE/`, stops the shell so it
+can't write its old settings back, and copies the files in. Then it recolors from the wallpaper
+and applies fonts, icons, accessibility, clipboard and idle timers, and restarts the shell. A plain
+`settings.json` works too. Monitor layouts, clipboard pins and backups stay per machine.
 
 ## Backups
 

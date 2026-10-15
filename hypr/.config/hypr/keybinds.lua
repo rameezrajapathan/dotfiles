@@ -33,6 +33,12 @@ hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("qs ipc call quicksettings pickCo
 hl.bind(mod .. " + C", app("editor"), { description = "Open text editor" })
 hl.bind(mod .. " + B", app("browser"), { description = "Open web browser" })
 hl.bind(mod .. " + SHIFT + F", shot("region save"), { description = "Capture and save a region screenshot" })
+hl.bind(mod .. " + SHIFT + T", shot("region text"), { description = "Copy the text in a region (OCR)" })
+
+-- Screen zoom around the pointer (scripts/zoom.sh; Settings > Accessibility)
+hl.bind(mod .. " + ALT + equal", script("zoom.sh in"), { repeating = true, description = "Zoom in" })
+hl.bind(mod .. " + ALT + minus", script("zoom.sh out"), { repeating = true, description = "Zoom out" })
+hl.bind(mod .. " + ALT + 0", script("zoom.sh reset"), { description = "Reset zoom" })
 hl.bind(mod .. " + E", app("files"), { description = "Open file manager" })
 hl.bind(mod .. " + A", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "Open app launcher" })
 hl.bind(mod .. " + P", hl.dsp.exec_cmd("qs ipc call launcher open '~'"), { description = "Open a project (VS Code / Neovim)" })
@@ -153,6 +159,7 @@ hl.bind("ALT + XF86Launch1", shot("active"), { description = "Copy active-window
 hl.bind("Print", shot("region"), { description = "Copy region screenshot" })
 hl.bind("CTRL + Print", shot("full"), { description = "Copy full-screen screenshot" })
 hl.bind("ALT + Print", shot("active"), { description = "Copy active-window screenshot" })
+hl.bind("SHIFT + Print", shot("region edit"), { description = "Annotate a region screenshot" })
 
 -- Screen recording (press again to stop)
 hl.bind(mod .. " + SHIFT + R", script("record.sh region"), { description = "Record a region" })

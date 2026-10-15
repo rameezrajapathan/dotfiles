@@ -27,7 +27,7 @@ Item {
                 radius: width / 2
                 color: Theme.accent
                 opacity: 0.45 + 0.55 * level
-                Behavior on height { NumberAnimation { duration: 60 } }
+                Behavior on height { NumberAnimation { duration: Theme.ms(60) } }
             }
         }
     }

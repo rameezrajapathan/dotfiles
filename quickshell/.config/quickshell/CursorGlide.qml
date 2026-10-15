@@ -12,7 +12,7 @@ import QtQuick
 Scope {
     id: root
 
-    readonly property int duration: 180
+    readonly property int duration: Theme.ms(180)
     // Each hyprctl call takes about 4 ms, taken off the sleep between steps
     readonly property int steps: 14
     // Border grab area (15) + border (2) + a little

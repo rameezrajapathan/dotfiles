@@ -26,8 +26,8 @@ Rectangle {
         height: parent.height - 8
         radius: height / 2
         color: Theme.accent
-        Behavior on x { NumberAnimation { duration: 220; easing.type: Easing.OutQuint } }
-        Behavior on width { NumberAnimation { duration: 220; easing.type: Easing.OutQuint } }
+        Behavior on x { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
+        Behavior on width { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
     }
 
     Row {

@@ -22,8 +22,8 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
 
 ## Features
 
-- **Colors from the wallpaper**: the bar, terminal, Neovim, GTK apps, lock screen and keyboard
-  lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
+- **Colors from the wallpaper**: the bar, terminal, Neovim, GTK and Qt/KDE apps, lock screen and
+  keyboard lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
 - **A bar your way**: by default one minimal pill with workspaces, the clock (a live spectrum while
   music plays) and your profile picture, which opens a control center with tabs for your account
   and quick settings, music, notifications, network (with a speed test), Bluetooth, sound,
@@ -31,10 +31,14 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
   Islands, Floating, Classic, Maximalist…) or your own: one pill, islands or a full-width bar, with
   20 items (weather, window title, tray, status icons, CPU, now playing…) placed where you want.
 - **A Settings app** (Super + ,): wallpaper, light/dark, palette, font themes, icon themes, bar
-  styles, gaps, borders, blur, animations, input, notifications, lock screen, idle timers, date &
-  time and world clocks, default and startup apps, and updates for pikadots and the system, all
-  applied live and searchable.
-- **Launcher** with a calculator, commands, emoji, projects and clipboard history.
+  styles, accessibility (zoom, text size, reduce motion), gaps, borders, blur, animations, window
+  rules, input, notifications, lock screen, idle timers, night light schedule, drives, date & time
+  and world clocks, default and startup apps, and updates for pikadots and the system, all applied
+  live and searchable.
+- **Launcher** with a calculator, commands, emoji, projects and clipboard history with pins.
+- **Screenshots** to draw on (satty) or read text from (OCR), USB drives that mount with a
+  notification, a privacy pill while the mic, camera or screen is in use, password prompts and game
+  mode in the shell's own style.
 - **Alt + Tab with live previews**, a workspace overview and a drop-down terminal.
 - **Developer setup**: keyring and SSH agent, git with delta, GitHub notifications, per-project
   tool versions, encrypted daily backups.
@@ -55,7 +59,8 @@ Log out, choose **Hyprland**, then:
 1. Pick a wallpaper with **Super + Shift + W**. Seven [come with it](wallpapers/CREDITS.md); add
    your own to `~/Pictures/Wallpapers`.
 2. Set resolution, refresh rate, scale and layout from the Displays tab of the control center.
-3. Optional: `pikadots backup-init` for backups, `gh auth login` for GitHub notifications.
+3. Optional: `pikadots backup-init` for backups, `gh auth login` for GitHub notifications, or
+   `pikadots import <file>` to bring your settings from another machine (`pikadots export` there).
 4. Run `pikadots health` to check everything.
 
 Existing configs are backed up first; `pikadots uninstall` restores them. Super + ? shows every

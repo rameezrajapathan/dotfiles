@@ -142,7 +142,7 @@ PanelWindow {
                             size: 16
                             color: placeMouse.containsMouse || root.searchOpen ? Theme.text : Theme.subtext
                             rotation: root.searchOpen ? 180 : 0
-                            Behavior on rotation { NumberAnimation { duration: 200 } }
+                            Behavior on rotation { NumberAnimation { duration: Theme.ms(200) } }
                         }
                     }
 
@@ -406,8 +406,8 @@ PanelWindow {
             scale: root.searchOpen ? 1 : 0.96
             transformOrigin: Item.TopLeft
             visible: opacity > 0
-            Behavior on opacity { NumberAnimation { duration: 160 } }
-            Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on opacity { NumberAnimation { duration: Theme.ms(160) } }
+            Behavior on scale { NumberAnimation { duration: Theme.ms(200); easing.type: Easing.OutCubic } }
             layer.enabled: true
             layer.effect: MultiEffect { shadowEnabled: true; shadowOpacity: 0.4; shadowBlur: 1; shadowVerticalOffset: 6 }
 

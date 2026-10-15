@@ -23,7 +23,7 @@ Loader {
         switch (moduleId) {
         case "weather": return Weather.ready;
         case "meeting": return Meetings.next !== null;
-        case "recording": return Recorder.active;
+        case "recording": return Recorder.active || Privacy.active;
         case "title": return ToplevelManager.activeToplevel !== null;
         case "media": return Media.active !== null;
         case "tray": return SystemTray.items.values.length > 0;
@@ -40,7 +40,7 @@ Loader {
         case "date": return date;
         case "weather": return weather;
         case "meeting": return meeting;
-        case "recording":
+        case "recording": return recording;
         case "capture": return capture;
         case "avatar": return avatar;
         case "launcher": return launcher;
@@ -63,6 +63,23 @@ Loader {
     Component { id: weather; WeatherChip { onClicked: root.action("weather") } }
     Component { id: meeting; NextMeeting {} }
     Component { id: capture; CaptureButton { onClicked: root.action("cc:capture") } }
+    // The recording timer, and the privacy dots while an app uses the mic, camera or screen
+    Component {
+        id: recording
+        Row {
+            spacing: 6
+            CaptureButton {
+                visible: Recorder.active
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: root.action("cc:capture")
+            }
+            PrivacyIndicator {
+                visible: Privacy.active
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: root.action("cc:audio")
+            }
+        }
+    }
     Component { id: title; BarTitle {} }
     Component { id: media; BarMedia { onClicked: root.action("cc:music") } }
     Component { id: system; BarSystem { onClicked: root.action("cc:system") } }
@@ -110,7 +127,7 @@ Loader {
                 id: clockLabel
                 anchors.centerIn: parent
                 opacity: clockItem.music ? 0 : 1
-                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on opacity { NumberAnimation { duration: Theme.ms(200) } }
             }
             MusicBars {
                 anchors.fill: parent
@@ -118,7 +135,7 @@ Loader {
                 anchors.bottomMargin: -2
                 opacity: clockItem.music ? 1 : 0
                 visible: opacity > 0
-                Behavior on opacity { NumberAnimation { duration: 200 } }
+                Behavior on opacity { NumberAnimation { duration: Theme.ms(200) } }
             }
             MouseArea {
                 anchors.fill: parent
@@ -165,7 +182,7 @@ Loader {
                 border.width: 2
                 border.color: Theme.accent
                 opacity: root.settingsActive ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 150 } }
+                Behavior on opacity { NumberAnimation { duration: Theme.ms(150) } }
             }
             Rectangle {
                 visible: NotificationService.list.length > 0 && !NotificationService.dnd

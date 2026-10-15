@@ -38,7 +38,12 @@ Singleton {
     }
 
     function updatePikadots() {
-        Apps.terminal(["sh", "-c", "pikadots update; echo; read -rp 'Done. Press Enter to close… ' _"]);
+        // Full path: the session's PATH may not include ~/.local/bin
+        Apps.terminal(["sh", "-c", "\"$HOME/.local/bin/pikadots\" update; echo; read -rp 'Done. Press Enter to close… ' _"]);
+    }
+
+    function repairPikadots() {
+        Apps.terminal(["sh", "-c", "\"$HOME/.local/bin/pikadots\" repair; echo; read -rp 'Done. Press Enter to close… ' _"]);
     }
 
     function updateSystem() {

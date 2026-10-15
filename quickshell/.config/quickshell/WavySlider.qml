@@ -14,7 +14,7 @@ Item {
     property real phase: 0
     // The wave flattens out while paused
     property real amplitude: playing ? 3 : 0
-    Behavior on amplitude { NumberAnimation { duration: 300 } }
+    Behavior on amplitude { NumberAnimation { duration: Theme.ms(300) } }
 
     implicitHeight: 20
     opacity: enabled ? 1 : 0.5
@@ -83,7 +83,7 @@ Item {
         height: drag.pressed ? 22 : 18
         radius: 2
         color: Theme.accent
-        Behavior on height { NumberAnimation { duration: 120 } }
+        Behavior on height { NumberAnimation { duration: Theme.ms(120) } }
     }
 
     MouseArea {

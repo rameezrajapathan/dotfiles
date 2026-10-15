@@ -36,6 +36,7 @@ The thresholds are at the top of `main()` in that script.
 | kitty (and fastfetch, delta, lazygit) | Live |
 | Neovim | Live |
 | GTK apps (translucent, like kitty) | GTK3 live, GTK4 on restart |
+| Qt and KDE apps ([kdeglobals](#qt-and-kde-apps)) | Live |
 | cava | Live |
 | Firefox and Zen ([Pywalfox](#firefox-and-zen)) | Live |
 | Keyboard lighting (ASUS) | Live |
@@ -45,6 +46,21 @@ The thresholds are at the top of `main()` in that script.
 
 Without generated files everything falls back to Catppuccin Mocha. To change which color goes
 where, edit the template for that app.
+
+## Qt and KDE apps
+
+Qt apps only take a theme from `~/.config/kdeglobals`, the file Plasma uses too.
+`hypr/scripts/kde-theme.py` writes the wallpaper's colors (from the matugen template `kde.json`),
+the icon theme and, with "Use in apps", the fonts into it. Plasma's own values are saved to
+`~/.local/state/pikadots/kdeglobals-plasma.json` first. `settings.lua` sets
+`QT_QPA_PLATFORMTHEME=kde`, so non-KDE Qt apps (Qt Designer, OneDrive GUI, CachyOS tools) read it
+as well.
+
+The `plasma` package adds `~/.config/plasma-workspace/env/pikadots.sh`, which puts Plasma's values
+back whenever a Plasma session starts. The next Hyprland login applies the wallpaper colors again,
+and saves Plasma's values again first, so a change made in Plasma's own settings is kept. Turning
+off Settings > Appearance > "Qt and KDE apps" puts Plasma's values back right away.
+`kde-theme.py restore` does the same by hand.
 
 ## Firefox and Zen
 

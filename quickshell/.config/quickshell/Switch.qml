@@ -19,7 +19,7 @@ Rectangle {
         x: root.checked ? parent.width - width - 3 : 3
         color: root.checked ? Theme.accentText : Theme.subtext
 
-        Behavior on x { NumberAnimation { duration: 120 } }
+        Behavior on x { NumberAnimation { duration: Theme.ms(120) } }
     }
 
     MouseArea {

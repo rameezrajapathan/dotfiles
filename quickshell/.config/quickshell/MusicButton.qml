@@ -21,8 +21,8 @@ Rectangle {
     color: filled || checked ? (mouse.containsMouse ? Qt.lighter(Theme.accent, 1.08) : Theme.accent)
         : mouse.containsMouse ? Qt.alpha(Theme.accent, 0.24) : Qt.alpha(Theme.accent, 0.13)
     opacity: enabled ? 1 : 0.4
-    Behavior on radius { NumberAnimation { duration: 260; easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
-    Behavior on color { ColorAnimation { duration: 150 } }
+    Behavior on radius { NumberAnimation { duration: Theme.ms(260); easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
+    Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
 
     Icon {
         visible: root.icon !== ""

@@ -84,7 +84,7 @@ SettingsPage {
                     radius: 14
                     color: Qt.alpha(Theme.base, 0.6)
                     scale: thumbMouse.containsMouse ? 1.03 : 1
-                    Behavior on scale { NumberAnimation { duration: 160; easing.type: Easing.OutQuint } }
+                    Behavior on scale { NumberAnimation { duration: Theme.ms(160); easing.type: Easing.OutQuint } }
 
                     Image {
                         id: image
@@ -94,7 +94,7 @@ SettingsPage {
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
                         opacity: status === Image.Ready ? 1 : 0
-                        Behavior on opacity { NumberAnimation { duration: 200 } }
+                        Behavior on opacity { NumberAnimation { duration: Theme.ms(200) } }
                     }
                     Icon {
                         visible: image.status !== Image.Ready
@@ -212,8 +212,21 @@ SettingsPage {
                         color: modelData
                         border.width: 2
                         border.color: Theme.base
-                        Behavior on color { ColorAnimation { duration: 400 } }
+                        Behavior on color { ColorAnimation { duration: Theme.ms(400) } }
                     }
+                }
+            }
+        }
+
+        SettingsRow {
+            icon: "widgets"
+            title: "Qt and KDE apps"
+            description: "Dolphin, Kate and other Qt apps use these colors and icons. Plasma keeps its own."
+            Switch {
+                checked: Settings.appearance.qtTheme
+                onToggled: {
+                    Settings.appearance.qtTheme = !checked;
+                    Settings.applyQtTheme();
                 }
             }
         }

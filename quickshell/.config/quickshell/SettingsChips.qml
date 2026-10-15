@@ -23,7 +23,7 @@ Flow {
             color: selected ? Theme.accent : mouse.containsMouse ? Qt.alpha(Theme.overlay, 0.35) : Qt.alpha(Theme.base, 0.6)
             border.width: selected ? 0 : 1
             border.color: Qt.alpha(Theme.overlay, 0.3)
-            Behavior on color { ColorAnimation { duration: 120 } }
+            Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
             Label {
                 id: label

@@ -60,7 +60,7 @@ PanelWindow {
         opacity: root.open ? 1 : 0
         Behavior on opacity {
             NumberAnimation {
-                duration: 160
+                duration: Theme.ms(160)
                 onRunningChanged: if (!running && !root.open) root.visible = false
             }
         }
@@ -77,7 +77,7 @@ PanelWindow {
             height: Math.min(parent.height - 80, implicitHeight)
             spacing: 18
             scale: root.open ? 1 : 0.96
-            Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+            Behavior on scale { NumberAnimation { duration: Theme.ms(180); easing.type: Easing.OutCubic } }
 
             // Header: title and search
             RowLayout {

@@ -35,8 +35,8 @@ Item {
     SequentialAnimation {
         id: flashAnimation
         loops: 2
-        NumberAnimation { target: glow; property: "opacity"; to: 0.22; duration: 260; easing.type: Easing.OutQuad }
-        NumberAnimation { target: glow; property: "opacity"; to: 0; duration: 420; easing.type: Easing.InQuad }
+        NumberAnimation { target: glow; property: "opacity"; to: 0.22; duration: Theme.ms(260); easing.type: Easing.OutQuad }
+        NumberAnimation { target: glow; property: "opacity"; to: 0; duration: Theme.ms(420); easing.type: Easing.InQuad }
     }
 
     Rectangle {

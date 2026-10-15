@@ -27,7 +27,7 @@ Item {
         boundsBehavior: Flickable.StopAtBounds
         clip: true
 
-        Behavior on contentX { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+        Behavior on contentX { NumberAnimation { duration: Theme.ms(250); easing.type: Easing.OutCubic } }
 
         Canvas {
             id: curve

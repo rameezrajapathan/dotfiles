@@ -16,7 +16,10 @@ config from your choices at login). Keep awake (Account tab or the Power page) h
 
 ## Power
 
-- **Power mode** in the Battery tab: power saver, balanced, performance.
+- **Power mode** in the Battery tab: power saver, balanced, performance. [Game mode](desktop.md#game-mode)
+  switches to performance while it's on.
+- **Night light** from the Account tab, or on a schedule in Settings > Displays: sunset to sunrise
+  where Weather says you are, or your own times.
 - **Lid**: with an external monitor, closing the lid turns the laptop screen off instead of
   suspending. Arrange the screens from the [Displays tab](desktop.md#displays).
 

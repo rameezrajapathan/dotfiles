@@ -57,7 +57,7 @@ Item {
         border.width: root.urgent ? 2 : 0
         border.color: Theme.red
         scale: mouse.pressed ? 0.9 : mouse.containsMouse ? 1.08 : 1
-        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+        Behavior on scale { NumberAnimation { duration: Theme.ms(120); easing.type: Easing.OutCubic } }
         clip: true
 
         Text {

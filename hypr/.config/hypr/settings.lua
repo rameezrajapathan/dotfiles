@@ -6,8 +6,18 @@ if ok then
 end
 
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
+-- Qt apps read colors, icons and fonts from kdeglobals like KDE apps (scripts/kde-theme.py)
+hl.env("QT_QPA_PLATFORMTHEME", "kde")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
 hl.env("TERMINAL", "kitty")
+-- pikadots and other user commands, for everything started from the session (shell, launcher)
+do
+	local bin, path = os.getenv("HOME") .. "/.local/bin", os.getenv("PATH") or "/usr/local/bin:/usr/bin"
+	-- Once: this file runs again on every reload
+	if not (":" .. path .. ":"):find(":" .. bin .. ":", 1, true) then
+		hl.env("PATH", bin .. ":" .. path)
+	end
+end
 -- SSH keys through gnome-keyring's agent (systemd user socket gcr-ssh-agent.socket)
 hl.env("SSH_AUTH_SOCK", os.getenv("XDG_RUNTIME_DIR") .. "/gcr/ssh")
 hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
@@ -70,3 +80,15 @@ hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 2, bezier = "d
 
 -- Changes made in the Settings app (Quickshell writes this file; quickshell/Hypr.qml)
 pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/hypr-settings.lua")
+
+-- Game mode (quick settings tile, quickshell/Toggles.qml): plain fast windows until it's turned
+-- off or the computer restarts. After the Settings app's changes so it wins over them.
+local gamemode = io.open((os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/pikadots-gamemode")
+if gamemode then
+	gamemode:close()
+	hl.config({
+		animations = { enabled = false },
+		decoration = { rounding = 0, blur = { enabled = false }, shadow = { enabled = false } },
+		general = { gaps_in = 0, gaps_out = 0, border_size = 1 },
+	})
+end

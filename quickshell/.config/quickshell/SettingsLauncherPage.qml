@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 
@@ -74,6 +75,63 @@ SettingsPage {
                     checked: root.l[modelData.key]
                     onToggled: root.l[modelData.key] = !checked
                 }
+            }
+        }
+    }
+
+    // clipboard.sh restarts the history watcher with the new settings
+    Timer {
+        id: watchTimer
+        interval: 800
+        onTriggered: Quickshell.execDetached([root.clipScript, "watch"])
+    }
+    readonly property string clipScript: Quickshell.env("HOME") + "/.config/hypr/scripts/clipboard.sh"
+    property bool hasPersist: false
+    Process {
+        running: true
+        command: ["sh", "-c", "command -v wl-clip-persist"]
+        onExited: code => root.hasPersist = code === 0
+    }
+
+    SettingsSection {
+        title: "Clipboard"
+        subtitle: "Super + V. Ctrl + P pins a clip; pins stay when the history is cleared."
+
+        SettingsRow {
+            icon: "history"
+            title: "History size"
+            description: "Older entries are dropped."
+            SettingsSlider {
+                from: 100; to: 2000; stepSize: 50
+                value: root.l.clipboardSize
+                onMoved: v => {
+                    root.l.clipboardSize = v;
+                    watchTimer.restart();
+                }
+            }
+        }
+        SettingsRow {
+            icon: "content_paste_go"
+            title: "Keep copied text when the app closes"
+            description: root.hasPersist ? "Otherwise what you copied is gone once its window closes."
+                : "Needs wl-clip-persist (sudo pacman -S wl-clip-persist)."
+            enabled: root.hasPersist
+            opacity: enabled ? 1 : 0.5
+            Switch {
+                checked: root.l.clipboardPersist
+                onToggled: {
+                    root.l.clipboardPersist = !checked;
+                    watchTimer.restart();
+                }
+            }
+        }
+        SettingsRow {
+            icon: "delete_sweep"
+            title: "Clear history"
+            description: "Pinned clips stay."
+            Pill {
+                icon: "delete"
+                onClicked: Quickshell.execDetached([root.clipScript, "wipe"])
             }
         }
     }
