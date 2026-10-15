@@ -12,7 +12,9 @@ Singleton {
 
     property alias keepAwake: state.keepAwake
     property alias nightLight: state.nightLight
-    readonly property int nightTemperature: 4500
+    // Settings app > Displays; a running hyprsunset follows changes through its IPC
+    readonly property int nightTemperature: Settings.display.nightTemperature
+    onNightTemperatureChanged: if (nightLight) Quickshell.execDetached(["hyprctl", "hyprsunset", "temperature", String(nightTemperature)])
 
     signal panelToggleRequested()
     // `qs ipc call controlcenter toggle <tab>` (account, music, notifications, network, bluetooth,

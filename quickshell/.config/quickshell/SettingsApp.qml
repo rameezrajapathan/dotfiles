@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Bluetooth
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
@@ -26,9 +27,28 @@ Scope {
             keywords: "blur opacity transparency dim shadows animations speed workspace", component: effectsPage },
         { key: "input", group: "Desktop", title: "Keyboard & mouse", icon: "keyboard",
             keywords: "keyboard layout language repeat mouse pointer sensitivity acceleration touchpad tap scroll cursor", component: inputPage },
+        { key: "network", group: "System", title: "Network", icon: "wifi",
+            keywords: "network wifi wi-fi ethernet wired vpn internet speed test", component: networkPage },
+        { key: "bluetooth", group: "System", title: "Bluetooth", icon: "bluetooth",
+            keywords: "bluetooth devices headphones pair", component: bluetoothPage },
+        { key: "sound", group: "System", title: "Sound", icon: "volume_up",
+            keywords: "sound audio volume speakers headphones microphone input output apps", component: soundPage },
+        { key: "displays", group: "System", title: "Displays", icon: "monitor",
+            keywords: "display monitor screen resolution refresh rate scale night light warmth", component: displaysPage },
+        { key: "power", group: "System", title: "Power", icon: "battery_android_frame_5",
+            keywords: "power battery charge limit profile performance idle dim lock sleep suspend screen off keep awake", component: powerPage },
+        { key: "apps", group: "System", title: "Default apps", icon: "apps",
+            keywords: "default apps browser terminal files editor mail pictures video music pdf open with", component: defaultAppsPage },
+        { key: "startup", group: "System", title: "Startup apps", icon: "rocket_launch",
+            keywords: "startup autostart login apps commands", component: startupPage },
         { key: "about", group: "System", title: "About", icon: "info",
             keywords: "about version system hyprland quickshell kernel memory cpu", component: aboutPage }
     ]
+
+    // Pages that need hardware this machine may not have
+    function available(key) {
+        return key !== "bluetooth" || Bluetooth.defaultAdapter !== null;
+    }
 
     function show(key) {
         if (key && pages.some(p => p.key === key))
@@ -60,7 +80,7 @@ Scope {
             // Pages matching the search (all of them while it's empty)
             readonly property var shownPages: {
                 const words = search.text.toLowerCase().split(/\s+/).filter(w => w);
-                return root.pages.filter(p => words.every(w => (p.title + " " + p.keywords).toLowerCase().includes(w)));
+                return root.pages.filter(p => root.available(p.key) && words.every(w => (p.title + " " + p.keywords).toLowerCase().includes(w)));
             }
 
             function step(delta) {
@@ -184,91 +204,132 @@ Scope {
                             }
                         }
 
-                        // Categories, under their group names
-                        Repeater {
-                            model: window.shownPages
+                        // Categories, under their group names; scrolls when the window is short
+                        Flickable {
+                            id: categoryFlick
+                            Component.onCompleted: revealTimer.restart()
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            contentHeight: categories.implicitHeight
+
+                            // Keeps the current page's row in view
+                            Timer {
+                                id: revealTimer
+                                interval: 30
+                                onTriggered: {
+                                    for (const item of categories.children)
+                                        if (item.current)
+                                            categoryFlick.reveal(item);
+                                }
+                            }
+                            Connections {
+                                target: root
+                                function onPageChanged() {
+                                    revealTimer.restart();
+                                }
+                            }
+
+                            function reveal(item) {
+                                const y = item.mapToItem(categories, 0, 0).y;
+                                if (y < contentY)
+                                    contentY = y;
+                                else if (y + item.height > contentY + height)
+                                    contentY = Math.min(contentHeight - height, y + item.height - height);
+                            }
+                            clip: true
+                            boundsBehavior: Flickable.StopAtBounds
 
                             ColumnLayout {
-                                id: entry
-                                required property var modelData
-                                required property int index
-                                readonly property bool current: root.page === modelData.key
-                                readonly property bool firstInGroup: index === 0 || window.shownPages[index - 1].group !== modelData.group
-
-                                Layout.fillWidth: true
+                                id: categories
+                                width: parent.width
                                 spacing: 4
 
-                                Label {
-                                    visible: entry.firstInGroup
-                                    Layout.leftMargin: 12
-                                    Layout.topMargin: entry.index === 0 ? 0 : 12
-                                    Layout.bottomMargin: 2
-                                    text: entry.modelData.group.toUpperCase()
-                                    color: Theme.overlay
-                                    font.pixelSize: Theme.fontSize - 3
-                                    font.bold: true
-                                    font.letterSpacing: 1.2
-                                }
+                                Repeater {
+                                    model: window.shownPages
 
-                                Rectangle {
-                                    Layout.fillWidth: true
-                                    implicitHeight: 42
-                                    radius: 13
-                                    color: entry.current ? Theme.accent
-                                        : rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
-                                    Behavior on color { ColorAnimation { duration: 140 } }
+                                    ColumnLayout {
+                                        id: entry
+                                        required property var modelData
+                                        required property int index
+                                        readonly property bool current: root.page === modelData.key
+                                        readonly property bool firstInGroup: index === 0 || window.shownPages[index - 1].group !== modelData.group
 
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 8
-                                        anchors.rightMargin: 12
-                                        spacing: 12
+                                        Layout.fillWidth: true
+                                        spacing: 4
+
+                                        Label {
+                                            visible: entry.firstInGroup
+                                            Layout.leftMargin: 12
+                                            Layout.topMargin: entry.index === 0 ? 0 : 12
+                                            Layout.bottomMargin: 2
+                                            text: entry.modelData.group.toUpperCase()
+                                            color: Theme.overlay
+                                            font.pixelSize: Theme.fontSize - 3
+                                            font.bold: true
+                                            font.letterSpacing: 1.2
+                                        }
 
                                         Rectangle {
-                                            implicitWidth: 28
-                                            implicitHeight: 28
-                                            radius: 9
-                                            color: entry.current ? Qt.alpha(Theme.accentText, 0.14) : Qt.alpha(Theme.accent, 0.16)
-                                            Icon {
-                                                anchors.centerIn: parent
-                                                name: entry.modelData.icon
-                                                size: 18
-                                                filled: entry.current
-                                                color: entry.current ? Theme.accentText : Theme.accent
+                                            Layout.fillWidth: true
+                                            implicitHeight: 38
+                                            radius: 13
+                                            color: entry.current ? Theme.accent
+                                                : rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
+                                            Behavior on color { ColorAnimation { duration: 140 } }
+
+                                            RowLayout {
+                                                anchors.fill: parent
+                                                anchors.leftMargin: 8
+                                                anchors.rightMargin: 12
+                                                spacing: 12
+
+                                                Rectangle {
+                                                    implicitWidth: 28
+                                                    implicitHeight: 28
+                                                    radius: 9
+                                                    color: entry.current ? Qt.alpha(Theme.accentText, 0.14) : Qt.alpha(Theme.accent, 0.16)
+                                                    Icon {
+                                                        anchors.centerIn: parent
+                                                        name: entry.modelData.icon
+                                                        size: 18
+                                                        filled: entry.current
+                                                        color: entry.current ? Theme.accentText : Theme.accent
+                                                    }
+                                                }
+                                                Label {
+                                                    Layout.fillWidth: true
+                                                    text: entry.modelData.title
+                                                    color: entry.current ? Theme.accentText : Theme.text
+                                                    font.weight: entry.current ? Font.DemiBold : Font.Normal
+                                                    elide: Text.ElideRight
+                                                }
+                                            }
+
+                                            MouseArea {
+                                                id: rowMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: root.page = entry.modelData.key
                                             }
                                         }
-                                        Label {
-                                            Layout.fillWidth: true
-                                            text: entry.modelData.title
-                                            color: entry.current ? Theme.accentText : Theme.text
-                                            font.weight: entry.current ? Font.DemiBold : Font.Normal
-                                            elide: Text.ElideRight
-                                        }
                                     }
+                                }
 
-                                    MouseArea {
-                                        id: rowMouse
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: root.page = entry.modelData.key
-                                    }
+                                Label {
+                                    visible: window.shownPages.length === 0
+                                    Layout.leftMargin: 12
+                                    text: "Nothing matches"
+                                    color: Theme.subtext
                                 }
                             }
                         }
 
-                        Label {
-                            visible: window.shownPages.length === 0
-                            Layout.leftMargin: 12
-                            text: "Nothing matches"
-                            color: Theme.subtext
-                        }
-
-                        Item { Layout.fillHeight: true }
 
                         Label {
                             Layout.fillWidth: true
                             Layout.leftMargin: 8
+                            Layout.topMargin: 8
                             wrapMode: Text.WordWrap
                             text: "ctrl+f search · esc close"
                             color: Theme.overlay
@@ -333,5 +394,12 @@ Scope {
     Component { id: windowsPage; SettingsWindowsPage {} }
     Component { id: effectsPage; SettingsEffectsPage {} }
     Component { id: inputPage; SettingsInputPage {} }
+    Component { id: networkPage; SettingsNetworkPage {} }
+    Component { id: bluetoothPage; SettingsBluetoothPage {} }
+    Component { id: soundPage; SettingsSoundPage {} }
+    Component { id: displaysPage; SettingsDisplaysPage {} }
+    Component { id: powerPage; SettingsPowerPage {} }
+    Component { id: defaultAppsPage; SettingsDefaultAppsPage {} }
+    Component { id: startupPage; SettingsStartupPage {} }
     Component { id: aboutPage; SettingsAboutPage {} }
 }

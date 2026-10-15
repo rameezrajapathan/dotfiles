@@ -6,6 +6,8 @@ import QtQuick.Layouts
 Item {
     id: root
     property string icon
+    // An app's icon (desktop entry Icon=) instead of a Material Symbol
+    property string appIcon
     property string title
     property string description
     property bool below: false
@@ -33,18 +35,25 @@ Item {
         rowSpacing: 12
 
         Rectangle {
-            visible: root.icon !== ""
+            visible: root.icon !== "" || root.appIcon !== ""
             Layout.alignment: Qt.AlignTop
             implicitWidth: 34
             implicitHeight: 34
             radius: 11
-            color: Qt.alpha(Theme.accent, 0.16)
+            color: root.appIcon ? "transparent" : Qt.alpha(Theme.accent, 0.16)
 
             Icon {
+                visible: root.icon !== ""
                 anchors.centerIn: parent
                 name: root.icon
                 size: 19
                 color: Theme.accent
+            }
+            AppIcon {
+                visible: root.appIcon !== ""
+                anchors.centerIn: parent
+                icon: root.appIcon
+                implicitSize: 30
             }
         }
 

@@ -8,6 +8,10 @@ Rectangle {
     property string placeholder
     signal accepted(string text)
 
+    function clear() {
+        input.text = "";
+    }
+
     implicitWidth: 240
     implicitHeight: 34
     radius: 10

@@ -1,7 +1,8 @@
 hl.on("hyprland.start", function()
 	hl.exec_cmd("QS_ICON_THEME=Papirus-Dark qs")
 	hl.exec_cmd("~/.config/hypr/scripts/hyprpaper.sh")
-	hl.exec_cmd("hypridle")
+	-- hypridle with the Settings app's timers (scripts/idle.sh; hypridle.conf has the defaults)
+	hl.exec_cmd("~/.config/hypr/scripts/idle.sh")
 	hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
 	hl.exec_cmd("wl-paste --watch cliphist store")
 
@@ -14,4 +15,7 @@ hl.on("hyprland.start", function()
 		"/opt/google/chrome/google-chrome --profile-directory=Default --app-id=ompifgpmddkgmclendfeacglnodjjndh", -- Teams
 		"/opt/google/chrome/google-chrome '--profile-directory=Profile 1' --app-id=hnpfjngllnobngcgfapefoaidbinmjnm", -- WhatsApp
 	})
+
+	-- Apps added in the Settings app (Startup apps page; Quickshell writes this file)
+	pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/autostart.lua")
 end)

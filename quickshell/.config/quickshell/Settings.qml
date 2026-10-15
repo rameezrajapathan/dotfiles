@@ -15,6 +15,10 @@ Singleton {
     readonly property JsonObject bar: adapter.bar
     // Hyprland options changed in the app, "general.gaps_in" → 5 (Hypr.qml); reassign to change
     property alias hypr: adapter.hypr
+    readonly property JsonObject idle: adapter.idle
+    readonly property JsonObject display: adapter.display
+    // Apps started at login: [{ name, icon, command, enabled }] (Startup apps page); reassign to change
+    property alias startup: adapter.startup
 
     signal openRequested(string page)
 
@@ -66,6 +70,20 @@ Singleton {
             }
 
             property var hypr: ({})
+            property var startup: []
+
+            // hypridle timers in minutes, 0 = never (hypr/scripts/idle.sh reads these)
+            property JsonObject idle: JsonObject {
+                property int dimMinutes: 5
+                property int lockMinutes: 10
+                property int screenOffMinutes: 11
+                property int suspendMinutes: 30
+                property bool lockBeforeSleep: true
+            }
+
+            property JsonObject display: JsonObject {
+                property int nightTemperature: 4500
+            }
 
             property JsonObject bar: JsonObject {
                 property int height: 44
