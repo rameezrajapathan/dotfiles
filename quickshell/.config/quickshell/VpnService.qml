@@ -25,6 +25,13 @@ Singleton {
         pendingTimeout.restart();
     }
 
+    // Deletes the connection from NetworkManager after a confirmation dialog.
+    function remove(name) {
+        Quickshell.execDetached(["sh", "-c",
+            'zenity --question --icon=network-vpn --title "Remove VPN" --ok-label Remove --cancel-label Cancel --no-markup '
+            + '--text "Remove the VPN connection \\"$1\\"?" && nmcli connection delete id "$1"', "sh", name]);
+    }
+
     Process {
         id: poll
         command: ["nmcli", "-t", "-f", "NAME,TYPE,ACTIVE", "connection", "show"]

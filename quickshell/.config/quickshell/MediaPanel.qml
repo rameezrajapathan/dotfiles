@@ -126,7 +126,7 @@ PanelWindow {
 
                 Pill {
                     visible: root.player?.canRaise ?? false
-                    text: "open app"
+                    icon: "open_in_new"
                     onClicked: {
                         root.visible = false;
                         root.player.raise();

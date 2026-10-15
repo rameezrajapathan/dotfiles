@@ -3,7 +3,7 @@
 # Usage: theme.sh [image]   (no image: regenerate from the current wallpaper)
 set -euo pipefail
 
-conf=~/.config/hypr/hyprpaper.conf
+conf=~/.config/hypr/wallpaper.conf
 state=~/.local/state/theme
 mkdir -p "$state"
 
@@ -19,8 +19,8 @@ if [[ $# -gt 0 ]]; then
 	for monitor in $(hyprctl -j monitors | jq -r '.[].name'); do
 		hyprctl hyprpaper wallpaper "$monitor,$img,cover" >/dev/null
 	done
-	# --follow-symlinks keeps the symlink into ~/dotfiles intact
-	sed -i --follow-symlinks "s|^\(\s*path\s*=\s*\).*|\1${img/#$HOME/\~}|" "$conf"
+	# This machine's wallpaper, kept out of git (scripts/hyprpaper.sh loads it at login)
+	printf 'wallpaper {\n    monitor =\n    path = %s\n    fit_mode = cover\n}\n' "${img/#$HOME/\~}" >"$conf"
 else
 	img=$current
 fi
@@ -42,6 +42,13 @@ mv "$state/starship.toml.tmp" "$state/starship.toml"
 pkill -USR1 -x kitty || true
 # cava reloads its config (and so themes/wallpaper) on USR1
 pkill -USR1 -x cava || true
+# Zen and Firefox through the Pywalfox extension: one socket per open browser (pywalfox-host),
+# plus the default one for a browser started through the package's own manifest
+if command -v pywalfox >/dev/null; then
+	for tmp in /tmp "${XDG_RUNTIME_DIR:-/tmp}"/pywalfox/*/; do
+		{ TMPDIR=$tmp pywalfox "$mode" && TMPDIR=$tmp pywalfox update; } >/dev/null 2>&1 || true
+	done
+fi
 # ROG keyboard lighting in the accent color (asusctl; skipped on other laptops)
 if command -v asusctl >/dev/null; then
 	accent=$(jq -r '.accent // empty' "$state/quickshell.json" | tr -d '#')

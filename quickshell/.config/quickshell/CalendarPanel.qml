@@ -98,7 +98,7 @@ PanelWindow {
                 Layout.fillWidth: true
 
                 Pill {
-                    text: "‹"
+                    icon: "chevron_left"
                     onClicked: root.shift(-1)
                 }
                 Label {
@@ -114,7 +114,7 @@ PanelWindow {
                     }
                 }
                 Pill {
-                    text: "›"
+                    icon: "chevron_right"
                     onClicked: root.shift(1)
                 }
             }

@@ -36,6 +36,11 @@ PanelWindow {
         }
     }
 
+    function addVpn(mode) {
+        visible = false;
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/vpn-add.sh", mode]);
+    }
+
     screen: bar.screen
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore
@@ -99,7 +104,7 @@ PanelWindow {
                     font.bold: true
                 }
                 Pill {
-                    text: "settings"
+                    icon: "settings"
                     onClicked: {
                         root.visible = false;
                         Quickshell.execDetached(["kitty", "-e", "nmtui"]);
@@ -174,7 +179,7 @@ PanelWindow {
                     }
                     Pill {
                         visible: modelData.known && !modelData.connected
-                        text: "forget"
+                        icon: "delete"
                         onClicked: modelData.forget()
                     }
 
@@ -189,8 +194,25 @@ PanelWindow {
             }
 
             // VPN
-            SectionLabel {
-                text: "VPN"
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 6
+                Layout.rightMargin: 8
+
+                SectionLabel {
+                    Layout.fillWidth: true
+                    Layout.topMargin: 0
+                    text: "VPN"
+                }
+                // vpn-add.sh: import an .ovpn/.conf file, or set one up in nm-connection-editor
+                Pill {
+                    icon: "file_open"
+                    onClicked: root.addVpn("import")
+                }
+                Pill {
+                    icon: "add"
+                    onClicked: root.addVpn("new")
+                }
             }
             Label {
                 visible: VpnService.connections.length === 0
@@ -213,6 +235,14 @@ PanelWindow {
                         : modelData.active ? "connected" : ""
                     onClicked: VpnService.toggle(modelData.name)
 
+                    Pill {
+                        visible: !vpnRow.modelData.active && !vpnRow.switching
+                        icon: "delete"
+                        onClicked: {
+                            root.visible = false;
+                            VpnService.remove(vpnRow.modelData.name);
+                        }
+                    }
                     Switch {
                         checked: vpnRow.switching ? VpnService.pending[vpnRow.modelData.name] : vpnRow.modelData.active
                         onToggled: VpnService.toggle(vpnRow.modelData.name)

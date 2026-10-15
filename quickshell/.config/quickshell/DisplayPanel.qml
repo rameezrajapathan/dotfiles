@@ -156,7 +156,7 @@ PanelWindow {
                             }
                             Pill {
                                 visible: Displays.saved[card.m.description] !== undefined
-                                text: "reset"
+                                icon: "restart_alt"
                                 onClicked: Displays.reset(card.m)
                             }
                             Switch {

@@ -74,7 +74,7 @@ PanelWindow {
                     font.bold: true
                 }
                 Pill {
-                    text: "settings"
+                    icon: "settings"
                     onClicked: {
                         root.visible = false;
                         Quickshell.execDetached(["pavucontrol"]);

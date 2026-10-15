@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Toggle a NetworkManager VPN connection. Usage: vpn.sh [connection name]
+# Toggle a NetworkManager VPN connection. Usage: vpn.sh <connection name>
 # For OpenVPN connections that store their password in NetworkManager
 # (password-flags=0), asks for it the first time and saves it.
-name=${1:-"Office VPN"}
+name=${1:?usage: vpn.sh <connection name>}
 
 if nmcli -t -f NAME connection show --active | grep -qxF "$name"; then
     nmcli connection down "$name"

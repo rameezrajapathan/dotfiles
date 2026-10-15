@@ -45,6 +45,8 @@ thunar
 # System services
 networkmanager
 networkmanager-openvpn
+nm-connection-editor
+zenity
 bluez
 bluez-utils
 pipewire-pulse

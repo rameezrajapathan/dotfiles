@@ -60,7 +60,7 @@ PanelWindow {
                 }
                 Pill {
                     visible: NotificationService.list.length > 0
-                    text: "clear all"
+                    icon: "clear_all"
                     onClicked: NotificationService.dismissAll()
                 }
             }

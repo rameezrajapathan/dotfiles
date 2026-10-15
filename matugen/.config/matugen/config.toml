@@ -48,3 +48,15 @@ output_path = "~/.config/cava/themes/wallpaper"
 [templates.peaclock]
 input_path = "~/.config/matugen/templates/peaclock"
 output_path = "~/.peaclock/config"
+
+# Zen through the Pywalfox extension, which only reads pywal's file. Pywalfox makes its own dark and
+# light themes from one palette (dark mode: background color0, accents 10/13, text 15; light mode:
+# accents 3/5, background from color7), so this is always the dark scheme plus light accents.
+[templates.pywalfox]
+input_path = "~/.config/matugen/templates/pywalfox.json"
+output_path = "~/.cache/wal/colors.json"
+
+# Zen's own interface, which Pywalfox can't reach (read at Zen's startup)
+[templates.zen]
+input_path = "~/.config/matugen/templates/zen-userChrome.css"
+output_path = "~/.local/state/theme/zen-userChrome.css"

@@ -144,7 +144,7 @@ PanelWindow {
                     font.bold: true
                 }
                 Pill {
-                    text: "btop"
+                    icon: "monitoring"
                     onClicked: {
                         root.visible = false;
                         Quickshell.execDetached(["kitty", "-e", "btop"]);
@@ -201,7 +201,7 @@ PanelWindow {
                     elide: Text.ElideRight
                 }
                 Pill {
-                    text: "back up now"
+                    icon: "backup"
                     onClicked: Quickshell.execDetached(["systemctl", "--user", "start", "--no-block", "pikadots-backup.service"])
                 }
             }

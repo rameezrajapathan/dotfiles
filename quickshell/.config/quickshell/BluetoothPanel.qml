@@ -110,7 +110,7 @@ PanelWindow {
                     font.bold: true
                 }
                 Pill {
-                    text: "settings"
+                    icon: "settings"
                     onClicked: {
                         root.visible = false;
                         Quickshell.execDetached(["kitty", "-e", "bluetoothctl"]);
@@ -157,7 +157,7 @@ PanelWindow {
 
                     Pill {
                         visible: !modelData.connected
-                        text: "forget"
+                        icon: "delete"
                         onClicked: modelData.forget()
                     }
                 }

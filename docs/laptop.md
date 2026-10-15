@@ -34,14 +34,3 @@ With `asusctl` (installed automatically on ASUS laptops):
 - **Thunderbird and Chrome apps** (Teams, WhatsApp) have no tray, so Super + Q hides them instead
   of closing them. They appear in the tray pill; right click quits. The list is in
   `hypr/background.lua`.
-
-## VPN
-
-VPNs are NetworkManager connections, toggled in the network panel. To import OpenVPN:
-
-```sh
-nmcli connection import type openvpn file client.ovpn
-nmcli connection modify <name> connection.id "Office VPN" +vpn.data username=<user>
-```
-
-The first connect asks for the password and saves it.

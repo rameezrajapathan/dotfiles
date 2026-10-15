@@ -62,7 +62,7 @@ PanelWindow {
                     font.bold: true
                 }
                 Pill {
-                    text: "folder"
+                    icon: "folder_open"
                     onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "xdg-open \"$(xdg-user-dir PICTURES)/Screenshots\""]))
                 }
             }
@@ -85,7 +85,7 @@ PanelWindow {
                     font.bold: true
                 }
                 Pill {
-                    text: "folder"
+                    icon: "folder_open"
                     onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "xdg-open \"$(xdg-user-dir VIDEOS)/Recordings\""]))
                 }
             }

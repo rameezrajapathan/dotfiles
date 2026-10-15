@@ -17,7 +17,7 @@ the status icons below, in order. Most of them open a panel; click outside it to
 | Capture | Screenshot or record a region, window or screen; shows a timer while recording | Region screenshot |
 | Palette | Wallpaper picker (Super + Shift + W); type to search by name | |
 | Monitor | [Displays](#displays); filled while an external monitor is on | |
-| Network | Wired, Wi-Fi (asks for passwords), VPN switches | |
+| Network | Wired, Wi-Fi (asks for passwords), VPN switches, import or add a VPN | |
 | Bluetooth | Paired devices (connect, battery, forget), nearby devices to pair | Power on/off |
 | Volume | Output and input devices, per-app volume | Mute; scroll changes volume |
 | System | CPU, memory, GPU and disk with temperatures, busiest processes, last backup | |
@@ -32,7 +32,7 @@ the status icons below, in order. Most of them open a panel; click outside it to
 
 The monitor icon opens a card per screen: on/off, resolution, refresh rate and scale, and with two
 screens, which side of the other it sits on, or mirroring. Changes apply at once and are remembered
-per monitor, so it comes back the same when plugged in again. **reset** returns it to the defaults.
+per monitor, so it comes back the same when plugged in again. The **reset** button (circular arrow) returns it to the defaults.
 
 The panel saves to `~/.local/state/pikadots/monitors.lua`, which `hypr/.config/hypr/monitors.lua`
 loads after its own rules. Edit `monitors.lua` only to change those defaults.

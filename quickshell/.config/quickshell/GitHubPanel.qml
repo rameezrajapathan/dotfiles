@@ -64,11 +64,11 @@ PanelWindow {
                 }
                 Pill {
                     visible: GitHub.unread > 0
-                    text: "mark all read"
+                    icon: "done_all"
                     onClicked: GitHub.markAllRead()
                 }
                 Pill {
-                    text: "open"
+                    icon: "open_in_new"
                     onClicked: {
                         root.visible = false;
                         Quickshell.execDetached(["xdg-open", "https://github.com/notifications"]);

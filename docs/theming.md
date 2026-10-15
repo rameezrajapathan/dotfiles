@@ -6,7 +6,8 @@ Picking a wallpaper (Super + Shift + W) runs `hypr/scripts/theme.sh <image>`. It
 wallpaper, generates colors with [matugen](https://github.com/InioX/matugen) from the templates in
 `matugen/.config/matugen/templates/`, and reloads what's running. Run it without an argument to
 regenerate from the current wallpaper. Generated files go to `~/.local/state/theme/`, outside the
-repo.
+repo. The chosen wallpaper is saved in `~/.config/hypr/wallpaper.conf`, which git ignores, so each
+machine keeps its own; `hypr/scripts/hyprpaper.sh` starts hyprpaper with it and `hyprpaper.conf`.
 
 ## Light, dark and how colorful
 
@@ -35,6 +36,7 @@ The thresholds are at the top of `main()` in that script.
 | Neovim | Live |
 | GTK apps (translucent, like kitty) | GTK3 live, GTK4 on restart |
 | cava | Live |
+| Firefox and Zen ([Pywalfox](#firefox-and-zen)) | Live |
 | Keyboard lighting (ASUS) | Live |
 | starship | Next prompt |
 | fuzzel, peaclock | Next launch |
@@ -42,3 +44,19 @@ The thresholds are at the top of `main()` in that script.
 
 Without generated files everything falls back to Catppuccin Mocha. To change which color goes
 where, edit the template for that app.
+
+## Firefox and Zen
+
+**Firefox** follows the wallpaper live through the
+[Pywalfox](https://addons.mozilla.org/firefox/addon/pywalfox/) extension. `pikadots install`
+installs its helper (`python-pywalfox` from the AUR); add the extension once and restart Firefox.
+matugen writes the colors to `~/.cache/wal/colors.json`, and `theme.sh` sends `pywalfox <mode>` and
+`pywalfox update` to every open browser. The helper normally serves one browser at a time, so
+pikadots starts it through `pywalfox-host`, which gives each browser its own socket in
+`$XDG_RUNTIME_DIR/pywalfox/`.
+
+**Zen** colors its sidebar, toolbar and workspace gradient itself and by default ignores Firefox
+themes. pikadots turns themes on in each Zen profile (`zen.theme.disable-lightweight` in
+`user.js`) and loads the generated `~/.local/state/theme/zen-userChrome.css` from
+`chrome/userChrome.css`. That file points Zen's colors at Pywalfox's theme, so Zen also follows
+the wallpaper live, light or dark, after a first restart. It replaces Zen's own space colors.

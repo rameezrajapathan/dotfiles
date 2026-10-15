@@ -229,6 +229,58 @@ enable_services() {
 	fi
 }
 
+# Browser helper for Pywalfox (wallpaper colors in Zen and Firefox): points both browsers at
+# pywalfox-host, which gives each its own socket so theme.sh can update them all. Firefox 157 still
+# reads ~/.mozilla/native-messaging-hosts; ~/.config/mozilla is the newer XDG place.
+pywalfox_manifests=("$HOME/.mozilla/native-messaging-hosts/pywalfox.json"
+	"$HOME/.config/mozilla/native-messaging-hosts/pywalfox.json")
+
+setup_pywalfox() {
+	command -v pywalfox >/dev/null || return 0
+	local m
+	for m in "${pywalfox_manifests[@]}"; do
+		mkdir -p "${m%/*}"
+		cat >"$m" <<-EOF
+			{
+			  "name": "pywalfox",
+			  "description": "Pywalfox helper, one socket per browser (pikadots)",
+			  "path": "$HOME/.local/bin/pywalfox-host",
+			  "type": "stdio",
+			  "allowed_extensions": ["pywalfox@frewacom.org"]
+			}
+		EOF
+	done
+	ok "Pywalfox helper for Zen and Firefox (add the Pywalfox extension in each)"
+}
+
+# Zen draws its own interface colors and ignores Firefox themes by default, so each Zen profile
+# loads the generated ~/.local/state/theme/zen-userChrome.css (matugen), which maps Zen's colors to
+# Pywalfox's live theme, through chrome/userChrome.css. user.js turns on userChrome.css and themes.
+# Takes effect when Zen restarts; after that colors change live.
+setup_zen() {
+	local ini dir profile css js line
+	for ini in "$HOME/.config/zen/profiles.ini" "$HOME/.zen/profiles.ini"; do
+		[[ -f $ini ]] || continue
+		dir=${ini%/*}
+		while IFS= read -r profile; do
+			[[ -f $dir/$profile/prefs.js ]] || continue # never opened
+			css=$dir/$profile/chrome/userChrome.css js=$dir/$profile/user.js
+			line="@import url(\"file://$HOME/.local/state/theme/zen-userChrome.css\");"
+			mkdir -p "${css%/*}"
+			if ! grep -qsF "$line" "$css"; then
+				# @import must come before any other rule
+				{ echo "$line"; cat "$css" 2>/dev/null || true; } >"$css.tmp" && mv "$css.tmp" "$css"
+			fi
+			grep -qs legacyUserProfileCustomizations "$js" ||
+				echo 'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);' >>"$js"
+			grep -qs zen.theme.disable-lightweight "$js" ||
+				echo 'user_pref("zen.theme.disable-lightweight", false);' >>"$js"
+			ok "Zen profile ${profile} uses the wallpaper colors (after Zen restarts)"
+		done < <(sed -n 's/^Path=//p' "$ini")
+	done
+	return 0
+}
+
 git_identity() {
 	[[ -f $HOME/.config/git/user ]] && return
 	local name email
@@ -242,7 +294,7 @@ git_identity() {
 
 wallpaper() { # current wallpaper, or any image in ~/Pictures/Wallpapers
 	local img
-	img=$(sed -n 's/^\s*path\s*=\s*//p' "$HOME/.config/hypr/hyprpaper.conf" 2>/dev/null)
+	img=$(sed -n 's/^\s*path\s*=\s*//p' "$HOME/.config/hypr/wallpaper.conf" 2>/dev/null)
 	img=${img/#\~/$HOME}
 	[[ -f $img ]] && { echo "$img"; return; }
 	find "$HOME/Pictures/Wallpapers" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.png' -o -iname '*.webp' \) 2>/dev/null | head -1
@@ -295,6 +347,8 @@ cmd_install() {
 	git_identity
 	step "Services"
 	enable_services
+	setup_pywalfox
+	setup_zen
 	step "Colors"
 	mkdir -p "$HOME/.local/state/quickshell" "$HOME/Pictures/Screenshots" "$HOME/Videos/Recordings"
 	copy_wallpapers
@@ -306,7 +360,7 @@ cmd_install() {
 	else
 		info "log out and pick the Hyprland session"
 	fi
-	info "set up displays from the monitor icon in the bar, VPNs in docs/laptop.md"
+	info "set up displays from the monitor icon in the bar, VPNs from the network panel"
 	info "optional: pikadots backup-init · gh auth login · pikadots health"
 }
 
@@ -391,6 +445,10 @@ cmd_health() {
 		info "not in a Hyprland session; skipped"
 	fi
 	[[ -f $HOME/.local/state/theme/quickshell.json ]] && ok "wallpaper colors generated" || bad "no wallpaper colors (run repair)"
+	if command -v pywalfox >/dev/null; then
+		grep -qs pywalfox-host "${pywalfox_manifests[0]}" && ok "browser colors (Pywalfox helper)" ||
+			bad "Pywalfox helper not set up for the browsers (run repair)"
+	fi
 
 	step "Developer"
 	[[ -f $HOME/.config/git/user ]] && ok "git identity: $(git config --get user.name) <$(git config --get user.email)>" || bad "no git identity (~/.config/git/user)"
@@ -440,6 +498,8 @@ cmd_repair() {
 	link_packages
 	step "Services"
 	enable_services
+	setup_pywalfox
+	setup_zen
 	step "Colors"
 	generate_colors
 	step "Reload"

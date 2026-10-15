@@ -14,7 +14,7 @@ PanelWindow {
     id: root
 
     readonly property string folder: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-    readonly property string config: Quickshell.env("HOME") + "/.config/hypr/hyprpaper.conf"
+    readonly property string config: Quickshell.env("HOME") + "/.config/hypr/wallpaper.conf"
     property string current: ""
     // Drives the slide; the window hides once the strip is back up
     property bool open: false
@@ -193,7 +193,7 @@ PanelWindow {
                         }
                     }
                     Pill {
-                        text: "open folder"
+                        icon: "folder_open"
                         onClicked: {
                             root.open = false;
                             Quickshell.execDetached(["thunar", root.folder]);
