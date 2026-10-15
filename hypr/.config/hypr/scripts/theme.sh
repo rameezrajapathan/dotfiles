@@ -64,10 +64,12 @@ fi
 hyprctl reload >/dev/null
 # Re-applying the GTK theme makes running GTK3 apps (Thunar) reload gtk.css
 # (light or dark variant to match); color-scheme is what libadwaita apps and websites follow
+# Icon theme from Settings > Fonts & icons, in the variant for this mode (icons.sh)
+icon_theme=$("$(dirname "$0")/icons.sh" --name "$mode")
 if [[ $mode == light ]]; then
-	gtk_theme=adw-gtk3 icon_theme=Papirus
+	gtk_theme=adw-gtk3
 else
-	gtk_theme=adw-gtk3-dark icon_theme=Papirus-Dark
+	gtk_theme=adw-gtk3-dark
 fi
 gsettings set org.gnome.desktop.interface gtk-theme "''"
 gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"

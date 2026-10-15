@@ -16,10 +16,11 @@ PanelWindow {
     property int year: today.getFullYear()
     property int month: today.getMonth()
 
-    // 42 cells (6 weeks), weeks start on Monday
+    // 42 cells (6 weeks), weeks starting on Settings.datetime.weekStart (1 Monday, 0 Sunday, 6 Saturday)
+    readonly property int weekStart: Settings.datetime.weekStart
     readonly property var days: {
         const first = new Date(year, month, 1);
-        const offset = (first.getDay() + 6) % 7;
+        const offset = (first.getDay() - weekStart + 7) % 7;
         const cells = [];
         for (let i = 0; i < 42; i++)
             cells.push(new Date(year, month, 1 - offset + i));
@@ -88,7 +89,7 @@ PanelWindow {
             }
 
             Label {
-                text: Qt.formatTime(clock.date, "h:mm:ss AP")
+                text: Qt.formatTime(clock.date, Settings.bar.clock24 ? "HH:mm:ss" : "h:mm:ss AP")
                 font.pixelSize: 32
                 font.bold: true
             }
@@ -125,12 +126,18 @@ PanelWindow {
 
             GridLayout {
                 Layout.fillWidth: true
-                columns: 7
+                columns: Settings.datetime.weekNumbers ? 8 : 7
                 rowSpacing: 2
                 columnSpacing: 2
 
+                Label {
+                    visible: Settings.datetime.weekNumbers
+                    text: "Wk"
+                    color: Theme.overlay
+                    font.pixelSize: Theme.fontSize - 3
+                }
                 Repeater {
-                    model: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+                    model: [0, 1, 2, 3, 4, 5, 6].map(i => ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"][(i + root.weekStart) % 7])
 
                     Label {
                         required property string modelData
@@ -142,12 +149,82 @@ PanelWindow {
                     }
                 }
 
+                // One week per row; with week numbers, an ISO week number cell first
                 Repeater {
-                    model: root.days
+                    model: root.days.length + (Settings.datetime.weekNumbers ? 6 : 0)
 
-                    Rectangle {
-                        required property var modelData
+                    Loader {
                         required property int index
+                        readonly property int cols: Settings.datetime.weekNumbers ? 8 : 7
+                        readonly property bool weekCell: Settings.datetime.weekNumbers && index % 8 === 0
+                        readonly property int day: Settings.datetime.weekNumbers ? index - Math.floor(index / 8) - 1 : index
+                        Layout.fillWidth: !weekCell
+                        sourceComponent: weekCell ? weekNumber : dayCell
+                        // Passed into the components below
+                        // A week number cell gets its row's Monday (ISO weeks start on Monday)
+                        property var dayDate: root.days[weekCell ? day + 1 + (8 - root.weekStart) % 7 : day]
+                        property int dayIndex: day
+                    }
+                }
+            }
+
+            // World clocks (Settings > Date & time)
+            Rectangle {
+                visible: Settings.datetime.worldClocks.length > 0
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                implicitHeight: 1
+                color: Qt.alpha(Theme.overlay, 0.3)
+            }
+            Repeater {
+                model: Settings.datetime.worldClocks
+
+                RowLayout {
+                    required property var modelData
+                    Layout.fillWidth: true
+                    spacing: 8
+
+                    Icon { name: "language"; size: 16; color: Theme.accent }
+                    Label {
+                        Layout.fillWidth: true
+                        text: modelData.label || TimeDate.city(modelData.zone)
+                        elide: Text.ElideRight
+                    }
+                    Label {
+                        text: TimeDate.difference(modelData.zone)
+                        color: Theme.subtext
+                        font.pixelSize: Theme.fontSize - 2
+                    }
+                    Label {
+                        text: TimeDate.timeIn(modelData.zone, clock.date)
+                        font.weight: Font.DemiBold
+                    }
+                }
+            }
+
+            Component {
+                id: weekNumber
+                Label {
+                    text: {
+                        // ISO 8601: the week holding this row's Thursday
+                        const d = new Date(parent.dayDate);
+                        const t = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 3 - (d.getDay() + 6) % 7);
+                        const jan4 = new Date(t.getFullYear(), 0, 4);
+                        return 1 + Math.round(((t - jan4) / 86400000 - 3 + (jan4.getDay() + 6) % 7) / 7);
+                    }
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    color: Theme.overlay
+                    font.pixelSize: Theme.fontSize - 3
+                    height: 30
+                }
+            }
+
+            Component {
+                id: dayCell
+                    Rectangle {
+                        readonly property var modelData: parent.dayDate
+                        readonly property int index: parent.dayIndex
                         readonly property bool isToday: modelData.toDateString() === root.today.toDateString()
                         readonly property bool inMonth: modelData.getMonth() === root.month
 
@@ -162,7 +239,7 @@ PanelWindow {
                             font.bold: parent.isToday
                             color: parent.isToday ? Theme.accentText
                                 : !parent.inMonth ? Theme.surface
-                                : index % 7 >= 5 ? Theme.subtext
+                                : modelData.getDay() % 6 === 0 ? Theme.subtext
                                 : Theme.text
                         }
                     }
@@ -170,4 +247,3 @@ PanelWindow {
             }
         }
     }
-}

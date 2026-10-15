@@ -32,6 +32,7 @@ wl-clipboard
 cliphist
 wf-recorder
 jq
+pacman-contrib
 brightnessctl
 libnotify
 libqalculate

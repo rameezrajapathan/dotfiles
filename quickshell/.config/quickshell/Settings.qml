@@ -20,6 +20,8 @@ Singleton {
     readonly property JsonObject notifications: adapter.notifications
     readonly property JsonObject launcher: adapter.launcher
     readonly property JsonObject lock: adapter.lock
+    readonly property JsonObject datetime: adapter.datetime
+    readonly property JsonObject updates: adapter.updates
     // Apps started at login: [{ name, icon, command, enabled }] (Startup apps page); reassign to change
     property alias startup: adapter.startup
 
@@ -30,6 +32,28 @@ Singleton {
         saveTimer.stop();
         file.writeAdapter();
         Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/theme.sh"]);
+    }
+
+    // Terminal and app fonts are applied by hypr/scripts/fonts.sh, which reads this file
+    function applyFonts() {
+        fontTimer.restart();
+    }
+    Timer {
+        id: fontTimer
+        interval: 400
+        onTriggered: {
+            saveTimer.stop();
+            file.writeAdapter();
+            Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/fonts.sh"]);
+        }
+    }
+
+    // Sets GTK's icon theme and restarts the shell, which only reads its icon theme at start
+    function applyIconTheme() {
+        saveTimer.stop();
+        fontTimer.stop();
+        file.writeAdapter();
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/icons.sh", "--restart-shell"]);
     }
 
     IpcHandler {
@@ -59,11 +83,20 @@ Singleton {
 
             property JsonObject appearance: JsonObject {
                 property string font: "FiraCode Nerd Font Propo"
+                // Terminal (kitty) font, applied by hypr/scripts/fonts.sh
+                property string monoFont: "FiraCode Nerd Font Mono"
+                // Also use the interface font for GTK apps
+                property bool appFonts: false
                 // Big numbers and headings (lock screen clock, page titles)
                 property string displayFont: "Fira Sans"
                 property int fontSize: 13
                 // Material Symbols weight: 300 light, 400 regular, 500 medium, 600 bold
                 property int iconWeight: 400
+                // Material Symbols style: Rounded, Outlined or Sharp
+                property string iconStyle: "Rounded"
+                // App icon theme family (Papirus, breeze, ...); hypr/scripts/icons.sh picks the
+                // dark or light variant
+                property string iconTheme: "Papirus"
                 // Bar pill and panel background opacity
                 property real panelOpacity: 0.8
                 // auto (from the wallpaper), dark, light
@@ -123,9 +156,43 @@ Singleton {
                 property bool showPower: true
             }
 
+            property JsonObject datetime: JsonObject {
+                // Bar date item and the calendar's long date (Qt date format)
+                property string dateFormat: "ddd d MMM"
+                // Calendar weeks start on: 1 Monday, 0 Sunday, 6 Saturday
+                property int weekStart: 1
+                property bool weekNumbers: false
+                // Extra clocks in the calendar: [{ zone: "Europe/London", label: "London" }]
+                property var worldClocks: []
+            }
+
+            // Checks for pikadots and system updates (Updates.qml)
+            property JsonObject updates: JsonObject {
+                // Hours between checks, 0 = only when the Updates page opens
+                property int checkHours: 6
+                property bool notify: true
+                property bool system: true
+            }
+
             property JsonObject bar: JsonObject {
-                property int height: 44
-                property bool weather: true
+                // pill: everything in one centered pill; islands: a pill per section;
+                // full: one bar across the screen with the sections at its left, middle and right
+                property string layout: "pill"
+                // Module ids per section (BarModule.qml lists them); a pill joins the three
+                property var left: []
+                // The "minimalist" style (BarStyles.qml)
+                property var center: ["workspaces", "divider", "clock", "meeting", "recording", "divider", "avatar"]
+                property var right: []
+                // Space the bar takes at the top of the screen; its shapes sit `gap` inside it
+                property int height: 46
+                property int gap: 4
+                // islands and full: space from the screen's sides
+                property int sideGap: 8
+                // 0 square .. 1 fully round ends
+                property real roundness: 1
+                property bool border: false
+                // The last custom setup, kept while a style is picked so "Custom" can bring it back
+                property var custom: null
                 property bool musicBars: true
                 property bool clock24: false
                 property bool seconds: false

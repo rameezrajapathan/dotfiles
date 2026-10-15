@@ -1,5 +1,5 @@
 hl.on("hyprland.start", function()
-	hl.exec_cmd("QS_ICON_THEME=Papirus-Dark qs")
+	hl.exec_cmd("~/.config/hypr/scripts/shell.sh")
 	hl.exec_cmd("~/.config/hypr/scripts/hyprpaper.sh")
 	-- hypridle with the Settings app's timers (scripts/idle.sh; hypridle.conf has the defaults)
 	hl.exec_cmd("~/.config/hypr/scripts/idle.sh")

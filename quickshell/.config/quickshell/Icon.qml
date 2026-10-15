@@ -1,6 +1,6 @@
 import QtQuick
 
-// Material Symbols Rounded icon by name, e.g. Icon { name: "wifi"; filled: true }.
+// Material Symbols icon (in the style picked in Settings) by name, e.g. Icon { name: "wifi"; filled: true }.
 // Names: https://fonts.google.com/icons (the font turns the name into the icon).
 Text {
     property string name

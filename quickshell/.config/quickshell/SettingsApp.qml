@@ -45,12 +45,16 @@ Scope {
             keywords: "sound audio volume speakers headphones microphone input output apps", component: soundPage },
         { key: "displays", group: "System", title: "Displays", icon: "monitor",
             keywords: "display monitor screen resolution refresh rate scale night light warmth", component: displaysPage },
+        { key: "datetime", group: "System", title: "Date & time", icon: "schedule",
+            keywords: "date time clock timezone time zone ntp sync 24 hour format week calendar world clocks", component: dateTimePage },
         { key: "power", group: "System", title: "Power", icon: "battery_android_frame_5",
             keywords: "power battery charge limit profile performance idle dim lock sleep suspend screen off keep awake", component: powerPage },
         { key: "apps", group: "System", title: "Default apps", icon: "apps",
             keywords: "default apps browser terminal files editor mail pictures video music pdf open with", component: defaultAppsPage },
         { key: "startup", group: "System", title: "Startup apps", icon: "rocket_launch",
             keywords: "startup autostart login apps commands", component: startupPage },
+        { key: "updates", group: "System", title: "Updates", icon: "system_update_alt",
+            keywords: "updates upgrade pikadots dotfiles git pull packages pacman aur flatpak", component: updatesPage },
         { key: "about", group: "System", title: "About", icon: "info",
             keywords: "about version system hyprland quickshell kernel memory cpu", component: aboutPage }
     ]
@@ -545,5 +549,7 @@ Scope {
     Component { id: powerPage; SettingsPowerPage {} }
     Component { id: defaultAppsPage; SettingsDefaultAppsPage {} }
     Component { id: startupPage; SettingsStartupPage {} }
+    Component { id: dateTimePage; SettingsDateTimePage {} }
+    Component { id: updatesPage; SettingsUpdatesPage {} }
     Component { id: aboutPage; SettingsAboutPage {} }
 }

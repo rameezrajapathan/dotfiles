@@ -4,19 +4,33 @@
 
 ## The bar
 
-One pill in the middle, always the same width: the current workspace number in a circle (click for
-the overview, scroll to go through workspaces; a red ring means another workspace wants attention),
-the clock (click for the calendar, scroll changes the month; `qs ipc call calendar toggle` opens it
-too), the weather (icon and temperature; click for the forecast) and your profile picture, which
-opens the control center. A dot on the picture means there are
+By default (the **Minimalist** style) one pill in the middle: the current workspace number in a
+circle (click for the overview, scroll to go through workspaces; a red ring means another workspace
+wants attention), the clock (click for the calendar; `qs ipc call calendar toggle` opens it too) and
+your profile picture, which opens the control center. A dot on the picture means there are
 notifications; upload a picture from the Account tab. While music plays, a small spectrum takes the
 clock's place; clicking it opens the Music tab. The recording timer shows while recording (click to
 stop), and the [next meeting](developer.md#next-meeting) shows once a calendar is set.
 
+Settings > Bar has nine more styles and a custom setup: one pill, a pill per section (islands) or
+one bar across the screen; height, spacing, roundness and an outline; and which items go left, in
+the middle and right. Besides the ones above there are the weather (click for the forecast), the
+date, the apps button (distro logo, opens the launcher), the focused window's title, now playing
+(right click plays or pauses, scroll skips), the tray, CPU and memory, network, Bluetooth (right
+click turns it on or off), sound (scroll for volume, right click mutes), battery, notifications
+(right click for Do Not Disturb), a capture button, power and dividers. Status icons open their
+control center tab. See [settings.md](settings.md#bar).
+
+## Calendar
+
+Click the clock (or the date). The time, the month (arrows or scroll change it, the month name
+returns to today) and, if you add them in Settings > Date & time, week numbers and world clocks
+with the time difference from yours. The week starts on Monday, Sunday or Saturday as you choose.
+
 ## Weather (Super + Ctrl + W)
 
-Comes out of the pill from the weather next to the clock, in the same plain style as the other
-panels: the temperature, conditions, feels like and today's high and low; the next 24 hours as a
+Comes out of the bar from the weather item (add it in Settings > Bar or Settings > Weather; Super +
+Ctrl + W opens it either way), in the same plain style as the other panels: the temperature, conditions, feels like and today's high and low; the next 24 hours as a
 thin line (scroll sideways) with the chance of rain; 7 days with each day's range against the
 week's; and humidity, wind, UV, air quality, the next sunrise or sunset, and pressure.
 
@@ -38,7 +52,7 @@ call controlcenter toggle <tab>` opens a tab from a keybind; the tabs are `accou
 | Tab | What's in it | Right click on the tab |
 |---|---|---|
 | Account | Profile picture (click it to upload one; saved square-cropped as `~/.face` and sent to AccountsService for the login screen), name, quick settings (Do Not Disturb, keep awake, night light, color picker), lock, log out, power menu | |
-| Music | Album art, live spectrum, seek bar, controls, shuffle, repeat, volume, player switcher | Play/pause |
+| Music | Album art in a slowly turning scalloped frame with the live spectrum around it, title, artist and album, a wavy seek bar, round controls around a wide play button, the players (when there are several), open the app, volume | Play/pause |
 | Notifications | Notifications not yet dismissed | Do Not Disturb |
 | Network | Live download/upload speed with a one-minute graph, speed test (ping, download and upload against Cloudflare with curl; the gauge button next to settings), wired, Wi-Fi (asks for passwords), VPN switches, import or add a VPN | |
 | Bluetooth | Paired devices (connect, battery, forget), nearby devices to pair | Power on/off |
@@ -57,8 +71,9 @@ on, and the power menu. The launcher is Super + A.
 
 Panels slide or fade both ways, and selection highlights (control center tabs, launcher, Alt + Tab,
 workspace pill) glide instead of jumping. The control center, calendar, weather, launcher, wallpaper picker,
-power menu, overview (one row of workspaces) and Alt + Tab switcher come out of the bar's pill: its
-bottom squares off and the panel slides out from under it. Only one is open at a time: opening
+power menu, overview (one row of workspaces) and Alt + Tab switcher come out of the bar: from the
+pill that holds the item they belong to (its bottom squares off and the panel slides out from under
+it), or from under that item on a full-width bar. Only one is open at a time: opening
 another (or the cheatsheet) closes it. When the keyboard moves focus to another window (arrows, Alt
 + Tab), the mouse pointer glides there instead of jumping (Hyprland's own warps are off:
 `cursor.no_warps` in `settings.lua`, done by `CursorGlide.qml`); it stays put when the mouse did the
@@ -98,7 +113,8 @@ Apps, most used first. A first character switches mode:
 
 ## Notifications
 
-Popups at the top right; hovering pauses the timeout. Critical ones stay until dismissed and get
+Popups at the top right by default (Settings > Notifications sets the corner, size and timeout);
+hovering pauses the timeout. Critical ones stay until dismissed and get
 through Do Not Disturb (Super + Shift + N).
 
 ## Lock screen
@@ -137,6 +153,7 @@ open a terminal also use; `pikadots install` writes it with kitty if it's missin
 
 ## Terminal
 
-kitty with starship, eza and zoxide. Super + T opens it with fastfetch. The cursor glides to
+kitty with starship, eza and zoxide. Super + T opens it with fastfetch. Its font is set in
+Settings > Fonts & icons (a font theme or the terminal font). The cursor glides to
 where it jumps, with a short trail (`cursor_trail` in `kitty/.config/kitty/kitty.conf`), and its
 blink fades.

@@ -32,6 +32,8 @@ reinstalls, relinks, re-enables, regenerates colors and restarts the bar. Safe t
 ## update
 
 Pulls the repo (`git pull --rebase --autostash`), shows the new commits, then runs repair.
+Settings > Updates shows what's new before you update, checks in the background and runs this
+for you in a terminal ([settings.md](settings.md#updates)).
 
 ## uninstall
 

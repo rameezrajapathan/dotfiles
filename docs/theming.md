@@ -14,7 +14,8 @@ machine keeps its own; `hypr/scripts/hyprpaper.sh` starts hyprpaper with it and 
 `hypr/scripts/theme-palette.py` looks at the wallpaper first:
 
 - **Bright wallpapers give a light theme**, others a dark one. GTK, icons, websites
-  (`color-scheme`) and Neovim switch with it.
+  (`color-scheme`) and Neovim switch with it. The icon theme is the one picked in Settings > Fonts
+  & icons (Papirus by default), in its light or dark variant.
 - **The scheme follows how colorful it is**: black and white wallpapers give pure greys, muted ones
   a neutral theme, colorful ones a theme built from the wallpaper's own colors.
 - **Terminal colors** keep their meaning (red is still red) but take the mode's lightness and the

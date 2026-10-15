@@ -26,13 +26,17 @@ Singleton {
     readonly property string displayFont: Settings.appearance.displayFont
     readonly property int fontSize: Settings.appearance.fontSize
     readonly property int barHeight: Settings.bar.height
-    // The bar's pill, and the circles at its ends (workspace, profile picture): the same gap on
-    // every side makes them sit concentric in the rounded ends
-    readonly property int pillHeight: barHeight - 8
-    readonly property int pillInset: 5
+    // Space above the bar's shapes (and below, inside barHeight)
+    readonly property int barGap: Math.min(Settings.bar.gap, Math.floor((barHeight - 24) / 2))
+    // The bar's pill(s), and the circles at their ends (workspace, profile picture): the same gap
+    // on every side makes them sit concentric in the rounded ends
+    readonly property int pillHeight: barHeight - 2 * barGap
+    readonly property int pillInset: Math.max(5, Math.round((pillHeight - 28) / 2))
     readonly property int pillCircle: pillHeight - 2 * pillInset
-    // Material Symbols Rounded (ttf-material-symbols-variable), used through Icon.qml
-    readonly property string iconFont: "Material Symbols Rounded"
+    readonly property real pillRadius: pillHeight / 2 * Settings.bar.roundness
+    // Material Symbols (ttf-material-symbols-variable), used through Icon.qml; Rounded, Outlined or
+    // Sharp (Settings app)
+    readonly property string iconFont: "Material Symbols " + Settings.appearance.iconStyle
     readonly property int iconSize: 20
     readonly property int iconWeight: Settings.appearance.iconWeight
 

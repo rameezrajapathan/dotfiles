@@ -121,6 +121,7 @@ PanelWindow {
     // Comes out of the bar's pill, like the launcher
     Sheet {
         open: root.open
+        anchorIds: ["workspaces"]
         sheetWidth: Math.min(root.width - 80, row.implicitWidth + 32)
         sheetHeight: row.implicitHeight + 32
         onClosed: root.visible = false

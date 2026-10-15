@@ -4,9 +4,9 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 
-// One centered pill: workspaces, the clock (click for the calendar), the weather (click for the
-// forecast) and a settings icon that opens ControlCenter, which holds everything else. While
-// recording, the timer shows too, and so does the next meeting when a calendar is set up.
+// The bar: by default one centered pill with workspaces, the clock (click for the calendar), the
+// weather (click for the forecast) and the profile picture that opens ControlCenter, which holds
+// everything else. Its style and items are set in Settings > Bar (BarLayout.qml).
 PanelWindow {
     id: bar
     required property var modelData
@@ -75,16 +75,20 @@ PanelWindow {
         enabled: Toggles.keepAwake
     }
 
-    BarIsland {
-        id: island
-        anchors.centerIn: parent
+    BarLayout {
+        width: parent.width
         // Hidden while a Sheet draws its copy over it
         opacity: (Panels.covered[bar.screen.name] ?? 0) > 0 ? 0 : 1
         settingsActive: controlCenter.open
-        onClockClicked: calendarPanel.toggle()
-        onWeatherClicked: weatherPanel.toggle()
-        onMusicClicked: controlCenter.toggle("music")
-        onCaptureClicked: controlCenter.toggle("capture")
-        onSettingsClicked: controlCenter.toggle()
+        onAction: name => {
+            if (name.startsWith("cc:"))
+                controlCenter.toggle(name.slice(3));
+            else if (name === "calendar")
+                calendarPanel.toggle();
+            else if (name === "weather")
+                weatherPanel.toggle();
+            else
+                Toggles.barAction(name);
+        }
     }
 }

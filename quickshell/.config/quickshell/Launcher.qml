@@ -347,6 +347,7 @@ PanelWindow {
     Sheet {
         id: card
         open: root.open
+        anchorIds: ["launcher"]
         sheetWidth: Math.min(root.width - 56, root.appColumns * root.cellSize + 40)
         sheetHeight: Math.min(600, root.height - Theme.barHeight - 40)
         onClosed: root.visible = false

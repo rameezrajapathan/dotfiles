@@ -85,6 +85,7 @@ PanelWindow {
     // Comes out of the bar's pill, like the launcher
     Sheet {
         open: root.open
+        anchorIds: ["power"]
         sheetWidth: tiles.implicitWidth + 56
         sheetHeight: content.implicitHeight + 52
         onClosed: root.visible = false

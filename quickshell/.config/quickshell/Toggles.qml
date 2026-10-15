@@ -23,6 +23,18 @@ Singleton {
     // `qs ipc call calendar toggle`
     signal calendarRequested()
 
+    // A click on a bar item (BarModule.qml) from outside a bar: a Sheet's copy of it
+    function barAction(name) {
+        if (name.startsWith("cc:"))
+            controlCenterRequested(name.slice(3));
+        else if (name === "calendar")
+            calendarRequested();
+        else if (name === "weather")
+            Weather.panelToggleRequested();
+        else
+            Quickshell.execDetached(["qs", "ipc", "call", name, "toggle"]);
+    }
+
     // Copies the picked color as hex and shows it in a notification
     function pickColor() {
         Quickshell.execDetached(["sh", "-c",

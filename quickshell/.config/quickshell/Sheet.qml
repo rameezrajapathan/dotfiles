@@ -2,12 +2,16 @@ import Quickshell
 import QtQuick
 import QtQuick.Shapes
 
-// A panel that comes out of the bar's pill: while it opens, a copy of the pill (BarIsland, same
-// place as the real one, which hides meanwhile) takes the sheet's color, its bottom corners
-// square off, concave curves grow from its sides and the sheet slides down out from under it.
-// The pill's icons keep working. Fill a full-screen overlay with it, put the content inside and
-// set sheetWidth/sheetHeight (the sheet below the pill). `closed()` fires once the close
-// animation has finished (hide the window then); `dismiss()` asks the owner to close.
+// A panel that comes out of the bar: while it opens, a copy of the bar (BarLayout, same place as
+// the real one, which hides meanwhile) takes the sheet's color where the sheet joins it, concave
+// curves grow at the join and the sheet slides down out from under it. The bar's items keep
+// working. With a pill or islands the sheet comes out of the pill holding the item it belongs to
+// (anchorIds), whose bottom corners square off; with a full-width bar it hangs from the bar's
+// bottom edge under that item. Where the pill is too close to the screen's side for a curve, the
+// sheet's edge lines up with the pill's instead.
+// Fill a full-screen overlay with it, put the content inside and set sheetWidth/sheetHeight (the
+// sheet below the bar). `closed()` fires once the close animation has finished (hide the window
+// then); `dismiss()` asks the owner to close.
 Item {
     id: root
     property bool open: false
@@ -16,8 +20,17 @@ Item {
     property real radius: 24
     property real ear: 14
     property color color: Theme.baseTranslucent
-    // "settings", "calendar" or "weather" for those panels: clicking their own pill item just closes them
+    // "settings", "calendar" or "weather" for those panels: clicking their own bar item just closes them
     property string kind: ""
+    // Bar items (BarModule ids) this sheet belongs to, in order of preference
+    property var anchorIds: {
+        switch (kind) {
+        case "settings": return ["avatar"];
+        case "calendar": return ["clock", "date"];
+        case "weather": return ["weather"];
+        }
+        return [];
+    }
     default property alias content: inner.data
     signal closed()
     signal dismiss()
@@ -32,17 +45,40 @@ Item {
         }
     }
 
-    readonly property real pillHeight: island.height
-    readonly property real pillTop: (Theme.barHeight - pillHeight) / 2
-    readonly property real pillBottom: pillTop + pillHeight
-    readonly property real pillX: Math.round((width - island.width) / 2)
-    // Wide enough for the curves and its own top corners on both sides of the pill
-    readonly property real bodyWidth: Math.max(sheetWidth, island.width + 2 * (ear + radius))
-    readonly property real bodyX: Math.round((width - bodyWidth) / 2)
+    // Where the sheet joins the bar; picked when it opens
+    property var anchor: ({ index: bar.strip ? 0 : 1, cx: width / 2 })
+    onOpenChanged: if (open) anchor = bar.anchorFor(anchorIds)
+
+    readonly property bool strip: bar.strip
+    readonly property Item shape: bar.shapes[anchor.index] ?? bar.shapes[1]
+    readonly property real shapeX: shape.x
+    readonly property real shapeWidth: shape.width
+    readonly property real shapeTop: Theme.barGap
+    readonly property real shapeHeight: Theme.pillHeight
+    readonly property real shapeBottom: shapeTop + shapeHeight
+    readonly property real shapeRadius: Theme.pillRadius
+    // Room for a curve and the sheet's own corner beside the pill
+    readonly property real reach: ear + radius + 4
+
+    readonly property bool pillFlushLeft: shapeX < reach
+    readonly property bool pillFlushRight: width - shapeX - shapeWidth < reach
+    readonly property real bodyWidth: strip ? Math.min(sheetWidth, shapeWidth)
+        : pillFlushLeft && pillFlushRight ? shapeWidth
+        : Math.max(sheetWidth, shapeWidth + 2 * reach - 8)
+    // A side where the sheet's edge continues the pill's (or the bar's) instead of curving out
+    readonly property bool flushLeft: strip ? centeredX - ear < shapeX + shapeRadius : pillFlushLeft
+    readonly property bool flushRight: strip ? centeredX + bodyWidth + ear > shapeX + shapeWidth - shapeRadius
+        : pillFlushRight
+    readonly property real centeredX: strip
+        ? Math.max(shapeX, Math.min(shapeX + shapeWidth - bodyWidth, Math.round(anchor.cx - bodyWidth / 2)))
+        : Math.max(4, Math.min(width - 4 - bodyWidth, Math.round(shapeX + (shapeWidth - bodyWidth) / 2)))
+    readonly property real bodyX: flushLeft ? shapeX
+        : flushRight ? shapeX + shapeWidth - bodyWidth
+        : centeredX
     // Sheet offset while sliding in
     readonly property real slide: (progress - 1) * sheetHeight
 
-    // The real pill hides while this one covers it
+    // The real bar hides while this copy covers it
     readonly property bool covering: progress > 0
     readonly property string screenName: QsWindow.window?.screen?.name ?? ""
     onCoveringChanged: Panels.cover(screenName, covering)
@@ -50,16 +86,14 @@ Item {
 
     anchors.fill: parent
 
-    // Background: pill, curves and sheet drawn opaque and overlapping, then made translucent
-    // together, so there are no seams where they meet (separate translucent shapes leave a faint
-    // line at the joins on fractional scales)
+    // Background: the pill (or bar), curves and sheet drawn opaque and overlapping, then made
+    // translucent together, so there are no seams where they meet (separate translucent shapes
+    // leave a faint line at the joins on fractional scales)
     Item {
         id: background
         visible: root.covering
-        x: root.bodyX
-        y: root.pillTop
-        width: root.bodyWidth
-        height: root.pillHeight + root.sheetHeight
+        width: root.width
+        height: root.shapeBottom + root.sheetHeight
         opacity: root.color.a
         layer.enabled: true
 
@@ -67,8 +101,9 @@ Item {
 
         // Sheet, sliding out from under the pill
         Item {
-            y: root.pillHeight
-            width: parent.width
+            x: root.bodyX
+            y: root.shapeBottom
+            width: root.bodyWidth
             height: root.sheetHeight
             clip: true
 
@@ -76,33 +111,48 @@ Item {
                 y: root.slide
                 width: parent.width
                 height: parent.height
-                radius: root.radius
                 color: background.solid
+                radius: root.radius
+                // Square where it continues the pill's side, or hangs from a full bar
+                topLeftRadius: root.strip || root.flushLeft ? 0 : root.radius
+                topRightRadius: root.strip || root.flushRight ? 0 : root.radius
             }
         }
 
-        // Pill, its bottom corners squaring off as the sheet comes out; reaches 2 px into the
-        // sheet so they overlap
+        // The pill or bar, its bottom corners squaring off as the sheet comes out where they
+        // meet it; reaches 2 px into the sheet so they overlap
         Rectangle {
-            x: root.pillX - root.bodyX
-            width: island.width
-            height: root.pillHeight + 2 * root.progress
+            readonly property real r: root.shapeRadius
+            readonly property real square: r * (1 - root.progress)
+            x: root.shapeX
+            y: root.shapeTop
+            width: root.shapeWidth
+            height: root.shapeHeight + (root.strip ? 0 : 2 * root.progress)
             color: background.solid
-            topLeftRadius: root.pillHeight / 2
-            topRightRadius: root.pillHeight / 2
-            bottomLeftRadius: root.pillHeight / 2 * (1 - root.progress)
-            bottomRightRadius: root.pillHeight / 2 * (1 - root.progress)
+            topLeftRadius: r
+            topRightRadius: r
+            bottomLeftRadius: root.strip && !root.flushLeft ? r : square
+            bottomRightRadius: root.strip && !root.flushRight ? r : square
         }
 
-        Ear { x: root.pillX - root.bodyX - size + 1; mirrored: false }
-        Ear { x: root.pillX - root.bodyX + island.width - 1; mirrored: true }
+        // Pill: curves at its bottom sides; full bar: at the sheet's top sides
+        Ear {
+            visible: !root.flushLeft
+            x: root.strip ? root.bodyX - size + 1 : root.shapeX - size + 1
+            mirrored: false
+        }
+        Ear {
+            visible: !root.flushRight
+            x: root.strip ? root.bodyX + root.bodyWidth - 1 : root.shapeX + root.shapeWidth - 1
+            mirrored: true
+        }
     }
 
     // Content, sliding with the sheet
     Item {
         visible: root.covering
         x: root.bodyX
-        y: root.pillBottom
+        y: root.shapeBottom
         width: root.bodyWidth
         height: root.sheetHeight
         clip: true
@@ -124,31 +174,40 @@ Item {
         }
     }
 
-    // The bar's pill, drawn over the background above
-    BarIsland {
-        id: island
-        x: root.pillX
-        y: root.pillTop
-        color: "transparent"
-        visible: root.covering
+    // The bar, drawn over the background above; laid out even while hidden so `anchorFor` can
+    // find its items
+    BarLayout {
+        id: bar
+        width: root.width
+        opacity: root.covering ? 1 : 0
+        bareShape: root.covering ? root.anchor.index : -1
         settingsActive: root.kind === "settings"
         // Opening another panel closes this one (Exclusive)
-        onClockClicked: root.kind === "calendar" ? root.dismiss() : Toggles.calendarRequested()
-        onWeatherClicked: root.kind === "weather" ? root.dismiss() : Weather.panelToggleRequested()
-        onMusicClicked: Toggles.controlCenterRequested("music")
-        onCaptureClicked: Toggles.controlCenterRequested("capture")
-        onSettingsClicked: root.kind === "settings" ? root.dismiss() : Toggles.controlCenterRequested("")
+        onAction: name => {
+            if (root.kind === "settings" && name === "cc:"
+                    || root.kind === "calendar" && name === "calendar"
+                    || root.kind === "weather" && name === "weather")
+                root.dismiss();
+            else
+                Toggles.barAction(name);
+        }
     }
 
-    // Concave curve joining a side of the pill to the top of the sheet
+    // Concave curve filling the corner between the pill's side and the sheet's top, or (full bar)
+    // between the bar's bottom and the sheet's side
     component Ear: Shape {
         property bool mirrored
         readonly property real size: root.ear * root.progress
-        y: root.pillHeight - size + 1
+        y: root.strip ? root.shapeBottom - 1 : root.shapeBottom - size + 1
         width: size
         height: size
         preferredRendererType: Shape.CurveRenderer
-        transform: Scale { xScale: mirrored ? -1 : 1; origin.x: size / 2 }
+        transform: Scale {
+            xScale: mirrored ? -1 : 1
+            yScale: root.strip ? -1 : 1
+            origin.x: size / 2
+            origin.y: size / 2
+        }
 
         ShapePath {
             fillColor: background.solid

@@ -24,12 +24,15 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
 
 - **Colors from the wallpaper**: the bar, terminal, Neovim, GTK apps, lock screen and keyboard
   lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
-- **A minimal bar**: workspaces, clock (a live spectrum while music plays), the weather (with a
-  forecast panel) and your profile picture, which opens a control center with tabs for your
-  account and quick settings, music, notifications, network (with a speed test), Bluetooth, sound,
-  displays, battery and more.
-- **A Settings app** (Super + ,): wallpaper, light/dark, palette, fonts, bar, gaps, borders,
-  blur, animations, input, notifications, lock screen, idle timers, default and startup apps, all
+- **A bar your way**: by default one minimal pill with workspaces, the clock (a live spectrum while
+  music plays) and your profile picture, which opens a control center with tabs for your account
+  and quick settings, music, notifications, network (with a speed test), Bluetooth, sound,
+  displays, battery and more. Ten ready-made styles (Minimalist, Focus, Everyday, Developer,
+  Islands, Floating, Classic, Maximalist…) or your own: one pill, islands or a full-width bar, with
+  20 items (weather, window title, tray, status icons, CPU, now playing…) placed where you want.
+- **A Settings app** (Super + ,): wallpaper, light/dark, palette, font themes, icon themes, bar
+  styles, gaps, borders, blur, animations, input, notifications, lock screen, idle timers, date &
+  time and world clocks, default and startup apps, and updates for pikadots and the system, all
   applied live and searchable.
 - **Launcher** with a calculator, commands, emoji, projects and clipboard history.
 - **Alt + Tab with live previews**, a workspace overview and a drop-down terminal.
@@ -60,7 +63,7 @@ shortcut.
 
 ## Docs
 
-- [The desktop](docs/desktop.md): bar, control center, launcher, overlays
+- [The desktop](docs/desktop.md): bar, control center, launcher, overlays, lock screen
 - [The Settings app](docs/settings.md)
 - [Keybindings](docs/keybindings.md)
 - [Colors from the wallpaper](docs/theming.md)

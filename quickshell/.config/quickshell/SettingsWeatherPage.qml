@@ -25,8 +25,9 @@ SettingsPage {
             icon: "partly_cloudy_day"
             title: "Show in the bar"
             Switch {
-                checked: Settings.bar.weather
-                onToggled: Settings.bar.weather = !checked
+                // The bar's Weather item (Settings > Bar > Items)
+                checked: BarStyles.has("weather")
+                onToggled: BarStyles.toggle("weather", !checked, "clock")
             }
         }
     }

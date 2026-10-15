@@ -348,7 +348,7 @@ reload_desktop() {
 	[[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || return 0
 	hyprctl reload >/dev/null && ok "Hyprland reloaded"
 	qs kill >/dev/null 2>&1
-	hyprctl dispatch 'hl.dsp.exec_cmd("QS_ICON_THEME=Papirus-Dark qs")' >/dev/null && ok "Quickshell restarted"
+	hyprctl dispatch 'hl.dsp.exec_cmd("~/.config/hypr/scripts/shell.sh")' >/dev/null && ok "Quickshell restarted"
 }
 
 # ── commands ────────────────────────────────────────────────────────────────────────────────
@@ -451,7 +451,8 @@ cmd_health() {
 		[[ $notifier == qs || $notifier == quickshell ]] && ok "Quickshell shows notifications" ||
 			bad "notifications are handled by ${notifier:-nothing}, not Quickshell (run repair)"
 		if pgrep -x qs >/dev/null || pgrep -x quickshell >/dev/null; then
-			errors=$(qs log 2>/dev/null | grep -E 'ERROR' | tail -1)
+			# Only since the last reload: errors from an earlier reload that was fixed don't count
+			errors=$(qs log 2>/dev/null | awk '/Reloading configuration/ { buf = "" } /ERROR/ { buf = $0 } END { print buf }')
 			[[ -z $errors ]] && ok "Quickshell running" || bad "Quickshell: $(sed 's/\x1b\[[0-9;]*m//g' <<<"$errors")"
 		else
 			bad "Quickshell isn't running"

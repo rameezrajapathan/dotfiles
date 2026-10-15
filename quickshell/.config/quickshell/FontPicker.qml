@@ -19,6 +19,9 @@ ColumnLayout {
                 return false;
             if (seen.has(f))
                 return false;
+            // Name-based: Qt can't tell fixed-pitch families apart here
+            if (root.monospace && !/mono|hack|iosevka|code|courier|consol|fixed|terminal/i.test(f))
+                return false;
             seen.add(f);
             return true;
         });
