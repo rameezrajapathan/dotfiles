@@ -13,6 +13,8 @@ Singleton {
     readonly property string path: Quickshell.env("HOME") + "/.config/pikadots/settings.json"
     readonly property JsonObject appearance: adapter.appearance
     readonly property JsonObject bar: adapter.bar
+    // Hyprland options changed in the app, "general.gaps_in" → 5 (Hypr.qml); reassign to change
+    property alias hypr: adapter.hypr
 
     signal openRequested(string page)
 
@@ -62,6 +64,8 @@ Singleton {
                 // auto, tonal-spot, content, neutral, monochrome, expressive, fidelity, rainbow
                 property string scheme: "auto"
             }
+
+            property var hypr: ({})
 
             property JsonObject bar: JsonObject {
                 property int height: 44

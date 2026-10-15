@@ -67,3 +67,6 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "default
 hl.animation({ leaf = "fade", enabled = true, speed = 3, bezier = "default" })
 hl.animation({ leaf = "borderangle", enabled = false })
 hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 2, bezier = "default", style = "slidefadevert" })
+
+-- Changes made in the Settings app (Quickshell writes this file; quickshell/Hypr.qml)
+pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/hypr-settings.lua")

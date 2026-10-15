@@ -7,18 +7,49 @@ ColumnLayout {
     id: root
     property string title
     property string subtitle
+    property bool canReset: false
     default property alias rows: card.data
+    signal reset()
 
     Layout.fillWidth: true
     spacing: 8
 
-    Label {
+    RowLayout {
         visible: root.title !== ""
+        Layout.fillWidth: true
         Layout.leftMargin: 4
-        text: root.title
-        color: Theme.accent
-        font.bold: true
-        font.pixelSize: Theme.fontSize - 1
+        Layout.rightMargin: 4
+
+        Label {
+            Layout.fillWidth: true
+            text: root.title
+            color: Theme.accent
+            font.bold: true
+            font.pixelSize: Theme.fontSize - 1
+        }
+        // Shown when something in the section differs from the defaults
+        Rectangle {
+            visible: root.canReset
+            implicitWidth: resetRow.implicitWidth + 16
+            implicitHeight: 24
+            radius: 12
+            color: resetMouse.containsMouse ? Qt.alpha(Theme.accent, 0.25) : Qt.alpha(Theme.accent, 0.12)
+
+            Row {
+                id: resetRow
+                anchors.centerIn: parent
+                spacing: 4
+                Icon { name: "restart_alt"; size: 15; color: Theme.accent; anchors.verticalCenter: parent.verticalCenter }
+                Label { text: "Reset"; color: Theme.accent; font.pixelSize: Theme.fontSize - 2; anchors.verticalCenter: parent.verticalCenter }
+            }
+            MouseArea {
+                id: resetMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.reset()
+            }
+        }
     }
     Label {
         visible: root.subtitle !== ""

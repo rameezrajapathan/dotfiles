@@ -20,6 +20,12 @@ Scope {
             keywords: "font typeface text size icons weight", component: fontsPage },
         { key: "bar", group: "Personalize", title: "Bar", icon: "toolbar",
             keywords: "bar pill height weather music spectrum clock 24 hour seconds", component: barPage },
+        { key: "windows", group: "Desktop", title: "Windows", icon: "select_window",
+            keywords: "hyprland layout dwindle master scrolling gaps borders rounding corners resize", component: windowsPage },
+        { key: "effects", group: "Desktop", title: "Effects", icon: "auto_awesome",
+            keywords: "blur opacity transparency dim shadows animations speed workspace", component: effectsPage },
+        { key: "input", group: "Desktop", title: "Keyboard & mouse", icon: "keyboard",
+            keywords: "keyboard layout language repeat mouse pointer sensitivity acceleration touchpad tap scroll cursor", component: inputPage },
         { key: "about", group: "System", title: "About", icon: "info",
             keywords: "about version system hyprland quickshell kernel memory cpu", component: aboutPage }
     ]
@@ -324,5 +330,8 @@ Scope {
     Component { id: appearancePage; SettingsAppearancePage {} }
     Component { id: fontsPage; SettingsFontsPage {} }
     Component { id: barPage; SettingsBarPage {} }
+    Component { id: windowsPage; SettingsWindowsPage {} }
+    Component { id: effectsPage; SettingsEffectsPage {} }
+    Component { id: inputPage; SettingsInputPage {} }
     Component { id: aboutPage; SettingsAboutPage {} }
 }
