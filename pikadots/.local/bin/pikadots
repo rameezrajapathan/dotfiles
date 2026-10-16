@@ -23,7 +23,7 @@ state=$HOME/.local/state/pikadots
 backups=$state/backups
 
 # Stow packages, in link order
-packages=(hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk cava git zsh plasma pikadots)
+packages=(hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk cava superfile git zsh plasma pikadots)
 services=(gcr-ssh-agent.socket)
 # System services the bar relies on (enabled with sudo when off)
 system_services=(NetworkManager.service bluetooth.service power-profiles-daemon.service)
@@ -263,8 +263,13 @@ setup_default_apps() {
 	local list="$HOME/.config/xdg-terminals.list" folders
 	[[ -s $list ]] || echo kitty.desktop >"$list"
 	folders=$(xdg-mime query default inode/directory 2>/dev/null)
-	if [[ -z $folders || $folders == kitty-open.desktop ]] && [[ -f /usr/share/applications/thunar.desktop ]]; then
-		xdg-mime default thunar.desktop inode/directory
+	# Folders open in superfile (spf, in the terminal); Thunar when it isn't installed
+	if [[ -z $folders || $folders == kitty-open.desktop ]]; then
+		if command -v spf >/dev/null; then
+			xdg-mime default superfile.desktop inode/directory
+		elif [[ -f /usr/share/applications/thunar.desktop ]]; then
+			xdg-mime default thunar.desktop inode/directory
+		fi
 	fi
 	[[ -n $(xdg-mime query default text/plain 2>/dev/null) ]] || xdg-mime default nvim.desktop text/plain
 	ok "default apps: terminal $(head -1 "$list"), browser $(xdg-settings get default-web-browser 2>/dev/null || echo none), files $(xdg-mime query default inode/directory), editor $(xdg-mime query default text/plain)"

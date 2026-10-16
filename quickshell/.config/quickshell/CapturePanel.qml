@@ -35,7 +35,7 @@ Item {
                 }
                 Pill {
                     icon: "folder_open"
-                    onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "xdg-open \"$(xdg-user-dir PICTURES)/Screenshots\""]))
+                    onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "exec \"$1\" files \"$(xdg-user-dir PICTURES)/Screenshots\"", "sh", Apps.script]))
                 }
             }
             RowLayout {
@@ -60,7 +60,7 @@ Item {
                 }
                 Pill {
                     icon: "folder_open"
-                    onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "xdg-open \"$(xdg-user-dir VIDEOS)/Recordings\""]))
+                    onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "exec \"$1\" files \"$(xdg-user-dir VIDEOS)/Recordings\"", "sh", Apps.script]))
                 }
             }
             RowLayout {

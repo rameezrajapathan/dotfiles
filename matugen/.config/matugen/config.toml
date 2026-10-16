@@ -72,3 +72,8 @@ output_path = "~/.local/state/theme/zen-userChrome.css"
 [templates.vscode]
 input_path = "~/.config/matugen/templates/vscode-theme.json"
 output_path = "~/.local/state/theme/vscode-theme.json"
+
+# superfile (spf), read when it starts; the theme is selected in superfile/config.toml
+[templates.superfile]
+input_path = "~/.config/matugen/templates/superfile.toml"
+output_path = "~/.config/superfile/theme/wallpaper.toml"

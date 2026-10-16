@@ -42,7 +42,7 @@ The thresholds are at the top of `main()` in that script.
 | VS Code and Code - OSS ([Pikadots theme](#vs-code-and-code---oss)) | Live |
 | Keyboard lighting (ASUS) | Live |
 | starship | Next prompt |
-| fuzzel, peaclock | Next launch |
+| fuzzel, peaclock, superfile (spf) | Next launch |
 | Lock screen | Live |
 
 Without generated files everything falls back to Catppuccin Mocha. To change which color goes

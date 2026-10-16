@@ -203,7 +203,7 @@ browser, file manager and editor through `hypr/scripts/app.sh`. Change them with
 |---|---|---|
 | Terminal (Super + Return, Super + T, Super + \`) | first line of `~/.config/xdg-terminals.list`, e.g. `foot.desktop` | kitty |
 | Browser (Super + B) | `xdg-settings set default-web-browser firefox.desktop` | — (your choice) |
-| File manager (Super + E) | `xdg-mime default thunar.desktop inode/directory` | Thunar |
+| File manager (Super + E) | `xdg-mime default superfile.desktop inode/directory` | superfile (spf, in the terminal; Thunar without it) |
 | Editor (Super + C, launcher projects) | `xdg-mime default code-oss.desktop text/plain` | Neovim |
 
 Terminal editors open in the default terminal. The terminal list is read by

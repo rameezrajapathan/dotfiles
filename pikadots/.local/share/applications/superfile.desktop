@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=superfile
+GenericName=File manager
+Comment=Browse files in the terminal (spf)
+Icon=system-file-manager
+Exec=spf %f
+Terminal=true
+MimeType=inode/directory;
+Keywords=files;folders;explorer;spf;superfile;
+Categories=System;FileTools;FileManager;ConsoleOnly;
