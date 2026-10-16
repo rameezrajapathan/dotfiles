@@ -214,7 +214,7 @@ runs a fading line with a glowing accent diamond and a light travelling down it.
 without input it rests: the blur softens and the right half dims to "Press any key". Any key or
 mouse movement wakes it; Esc clears the pill.
 
-Locks after 10 minutes idle (Settings > Power), before suspend, or with Super + Alt + L. Settings >
+Locks after 10 minutes idle (Settings > Power), before suspend, or with Super + L. Settings >
 Lock screen sets the blur, rest delay and what it shows. `hypr/scripts/lock.sh` falls
 back to hyprlock if the shell isn't running, and a restarted shell locks again if it crashed while
 locked.

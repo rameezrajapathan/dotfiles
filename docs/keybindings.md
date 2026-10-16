@@ -28,7 +28,7 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Super + Shift + W | Wallpaper picker |
 | Super + ? | Cheatsheet |
 | Super + Escape | Power menu |
-| Super + Alt + L | Lock |
+| Super + L | Lock |
 
 ## Windows
 
@@ -55,7 +55,7 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Super + Shift + 1…9 | Move the window there |
 | Super + Alt + 1…9 | Move it there without following |
 | Super + U / I or scroll | Next / previous workspace |
-| Super + F1 / F2 | Scratch workspaces (Shift: move the window there) |
+| Super + F1 / F2 | Scratch workspaces (Shift: move the window there). While one is open over a workspace, the bar shows its name in a pink chip (click to hide), a toast names it as it opens, and its windows get a border in that color |
 | Super + Ctrl + Arrows | Focus another monitor |
 | Super + Shift + Ctrl + Arrows | Move the window to another monitor |
 | Three-finger swipe | Switch workspace |

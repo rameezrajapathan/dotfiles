@@ -1,2 +1,3 @@
 *.bak
 hypr/.config/hypr/wallpaper.conf
+.vscode/settings.json

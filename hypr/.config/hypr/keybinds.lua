@@ -47,7 +47,7 @@ hl.bind(mod .. " + V", hl.dsp.exec_cmd("qs ipc call launcher open +"), { descrip
 hl.bind(mod .. " + Escape", hl.dsp.exec_cmd("qs ipc call power toggle"), { description = "Open power menu" })
 hl.bind(mod .. " + SHIFT + slash", hl.dsp.exec_cmd("qs ipc call cheatsheet toggle"), { description = "Show keybindings" })
 hl.bind(mod .. " + SHIFT + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"), { description = "Pick wallpaper" })
-hl.bind(mod .. " + ALT + L", hl.dsp.exec_cmd("loginctl lock-session"), { description = "Lock session" })
+hl.bind(mod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"), { description = "Lock session" })
 
 -- Keyboard backlight
 -- Uses the standard Linux keyboard-backlight LED device when available.

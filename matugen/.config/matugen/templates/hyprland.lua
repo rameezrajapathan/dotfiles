@@ -2,4 +2,6 @@
 return {
 	active_border = "rgb({{colors.primary.default.hex_stripped}})",
 	inactive_border = "rgb({{colors.surface_container_highest.default.hex_stripped}})",
+	-- Windows on a special workspace (scratchpads, drop-down terminal; rules.lua)
+	special_border = "rgb({{colors.tertiary.default.hex_stripped}})",
 }

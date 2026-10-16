@@ -9,16 +9,7 @@ hl.on("hyprland.start", function()
 	-- Wallpaper colors back into kdeglobals for Qt apps (a Plasma session puts its own back)
 	hl.exec_cmd("python3 -I ~/.config/hypr/scripts/kde-theme.py")
 
-	-- Tray apps start once the bar's tray is up, so they hide to it instead of opening a window
-	hl.exec_cmd("~/.config/hypr/scripts/tray-apps.sh")
-
-	-- Mail and Chrome apps start hidden (background.lua); they show in the tray pill
-	require("background").start({
-		"thunderbird",
-		"/opt/google/chrome/google-chrome --profile-directory=Default --app-id=ompifgpmddkgmclendfeacglnodjjndh", -- Teams
-		"/opt/google/chrome/google-chrome '--profile-directory=Profile 1' --app-id=hnpfjngllnobngcgfapefoaidbinmjnm", -- WhatsApp
-	})
-
-	-- Apps added in the Settings app (Startup apps page; Quickshell writes this file)
-	pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/autostart.lua")
+	-- Startup apps: only the ones on the Settings app's Startup apps page, once the bar's tray is
+	-- up (scripts/startup-apps.sh)
+	hl.exec_cmd("~/.config/hypr/scripts/startup-apps.sh")
 end)

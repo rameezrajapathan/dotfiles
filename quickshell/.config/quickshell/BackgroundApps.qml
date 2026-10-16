@@ -10,27 +10,16 @@ Repeater {
     id: root
     required property var bar
 
-    readonly property var pattern: /^(org\.mozilla\.Thunderbird|thunderbird|chrome-[a-p]+-.+)$/
-    readonly property string hiddenWorkspace: "special:background"
-
-    function appId(t) {
-        return t.wayland?.appId ?? t.lastIpcObject?.class ?? "";
-    }
-
-    function dispatch(dsp) {
-        Quickshell.execDetached(["hyprctl", "dispatch", dsp]);
-    }
-
-    model: Hyprland.toplevels.values.filter(t => pattern.test(appId(t)))
+    model: Background.windows
 
     Item {
         id: app
         required property HyprlandToplevel modelData
 
-        readonly property string selector: "address:0x" + modelData.address.replace(/^0x/, "")
-        readonly property bool hidden: modelData.workspace?.name === root.hiddenWorkspace
+        readonly property string selector: Background.selector(modelData)
+        readonly property bool hidden: Background.isHidden(modelData)
         readonly property string iconPath: {
-            const id = root.appId(modelData);
+            const id = Background.appId(modelData);
             const icon = DesktopEntries.heuristicLookup(id)?.icon ?? id;
             return Quickshell.hasThemeIcon(icon) ? Quickshell.iconPath(icon) : Quickshell.iconPath(icon, "application-x-executable");
         }
@@ -61,14 +50,16 @@ Repeater {
             onClicked: mouse => {
                 const sel = app.selector;
                 if (mouse.button === Qt.RightButton) {
-                    root.dispatch(`hl.dsp.window.close({ window = "${sel}" })`);
+                    Background.dispatch(`hl.dsp.window.close({ window = "${sel}" })`);
                 } else if (app.hidden) {
                     const ws = Hyprland.monitorFor(root.bar.screen)?.activeWorkspace?.id ?? "e+0";
-                    root.dispatch(`hl.dsp.window.move({ workspace = "${ws}", window = "${sel}" })`);
+                    Background.dispatch(`hl.dsp.window.move({ workspace = "${ws}", window = "${sel}" })`);
+                    Background.dispatch(`hl.dsp.focus({ window = "${sel}" })`);
                 } else if (app.modelData.activated) {
-                    root.dispatch(`hl.dsp.window.move({ workspace = "${root.hiddenWorkspace}", silent = true, window = "${sel}" })`);
+                    // Hides it the way Super + Q does (and gives the focus back)
+                    Quickshell.execDetached(["hyprctl", "eval", "require('background').hide_or_close()"]);
                 } else {
-                    root.dispatch(`hl.dsp.focus({ window = "${sel}" })`);
+                    Background.dispatch(`hl.dsp.focus({ window = "${sel}" })`);
                 }
             }
         }

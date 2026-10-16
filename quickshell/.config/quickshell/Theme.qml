@@ -17,6 +17,9 @@ Singleton {
     readonly property color accent: colors.accent
     // Text and icons drawn on top of accent
     readonly property color accentText: colors.accentText
+    // Special workspaces (scratchpads, drop-down terminal): the bar chip and their window borders
+    readonly property color special: colors.special
+    readonly property color specialText: colors.specialText
     readonly property color red: colors.red
     readonly property color green: colors.green
     readonly property color yellow: colors.yellow
@@ -72,6 +75,8 @@ Singleton {
             property string subtext: "#a6adc8"
             property string accent: "#89b4fa"
             property string accentText: "#1e1e2e"
+            property string special: "#f5c2e7"
+            property string specialText: "#1e1e2e"
             property string red: "#f38ba8"
             property string green: "#a6e3a1"
             property string yellow: "#f9e2af"

@@ -55,9 +55,10 @@ Singleton {
             n.dismiss();
     }
 
-    // Default action if the app offered one, otherwise nothing
+    // Default action if the app offered one; a background app hidden by Super + Q comes back
     function activate(n) {
         const action = n.actions.find(a => a.identifier === "default");
+        Background.notificationClicked(n);
         if (action)
             action.invoke();
         hidePopup(n);

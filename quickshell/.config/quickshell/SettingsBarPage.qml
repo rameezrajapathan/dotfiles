@@ -274,6 +274,7 @@ SettingsPage {
                                         anchors.centerIn: parent
                                         style: wsCard.modelData.id
                                         vertical: false
+                                        showSpecial: false
                                         // Previews only: clicks pick the style
                                         enabled: false
                                     }

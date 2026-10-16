@@ -23,7 +23,7 @@ Neovim, btop, cava and the GTK and Qt apps.
 |---|---|
 | ![Control center](docs/screenshots/controlcenter-v3.webp) Control center (Super + S) | ![Launcher](docs/screenshots/launcher-v3.webp) Launcher (Super + A) |
 | ![Wallpaper picker](docs/screenshots/wallpaper-v3.webp) Wallpapers (Super + Shift + W) | ![Power menu](docs/screenshots/power-v3.webp) Power menu (Super + Escape) |
-| ![Keyboard shortcuts](docs/screenshots/cheatsheet-v3.webp) Shortcuts (Super + ?) | ![Lock screen](docs/screenshots/lock-v3.webp) Lock screen (Super + Alt + L) |
+| ![Keyboard shortcuts](docs/screenshots/cheatsheet-v3.webp) Shortcuts (Super + ?) | ![Lock screen](docs/screenshots/lock-v3.webp) Lock screen (Super + L) |
 | ![Settings: Appearance](docs/screenshots/settings-appearance-v3.webp) Settings (Super + ,) | ![Settings: Window rules](docs/screenshots/settings-rules-v3.webp) Window rules |
 
 ## Bar styles

@@ -48,7 +48,7 @@ Nothing in the repo changes; your choices stay on this machine:
 | `~/.config/pikadots/settings.json` | the app (`quickshell/Settings.qml`) | the shell, and these scripts in `hypr/scripts`: `theme.sh` (mode, palette style), `idle.sh` (timers), `fonts.sh`, `icons.sh`, `kde-theme.py`, `accessibility.sh`, `clipboard.sh` |
 | `~/.local/state/pikadots/hypr-settings.lua` | Windows, Effects, Keyboard & mouse (`quickshell/Hypr.qml`) | end of `hypr/settings.lua` |
 | `~/.local/state/pikadots/window-rules.lua` | Window rules | end of `hypr/rules.lua` |
-| `~/.local/state/pikadots/autostart.lua` | Startup apps | end of the start handler in `hypr/autostart.lua` |
+| `~/.local/state/pikadots/autostart.lua` | Startup apps | `hypr/scripts/startup-apps.sh` (from `hypr/autostart.lua`), once the tray is up |
 | `$XDG_RUNTIME_DIR/hypridle.conf` | `hypr/scripts/idle.sh` at login and after a change | hypridle (`hypridle.conf` in the repo shows the defaults) |
 | `~/.config/xdg-terminals.list`, xdg-mime defaults | Default apps (`hypr/scripts/default-apps.py`) | `hypr/scripts/app.sh` |
 | `~/.local/state/pikadots/kitty-font.conf` | Fonts & icons (`hypr/scripts/fonts.sh`) | kitty (`include` in `kitty.conf`) |

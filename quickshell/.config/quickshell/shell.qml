@@ -18,6 +18,7 @@ ShellRoot {
     Launcher {}
     PowerMenu {}
     Osd {}
+    SpecialToast {}
     WindowSwitcher {}
     Overview {}
     CursorGlide {}

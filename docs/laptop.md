@@ -33,8 +33,11 @@ With `asusctl` (installed automatically on ASUS laptops):
 
 ## Background apps
 
-- **Tray apps** (OneDrive, Remmina) start after the tray is ready, so closing them hides them to
-  the tray. Started from `hypr/scripts/tray-apps.sh`.
+- **Startup apps** are only the ones on the Settings app's Startup apps page. They start once the
+  bar's tray is ready (`hypr/scripts/startup-apps.sh`), so tray apps like OneDrive hide to the
+  tray when closed. Nothing else is started at login.
 - **Thunderbird and Chrome apps** (Teams, WhatsApp) have no tray, so Super + Q hides them instead
   of closing them. They appear in the tray pill; right click quits. The list is in
-  `hypr/background.lua`.
+  `hypr/background.lua`. Hidden ones come back to the current workspace when you click their
+  tray icon, open them from the launcher or click one of their notifications. Ones added as
+  Startup apps start hidden.

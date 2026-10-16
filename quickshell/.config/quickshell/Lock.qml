@@ -6,7 +6,7 @@ import QtQuick
 
 // The lock screen: an ext-session-lock surface per monitor (LockScreen.qml) and the password check
 // through PAM. `qs ipc call lock lock` locks; hypridle's lock_cmd runs it, so loginctl lock-session,
-// Super+Alt+L, the Account tab and suspend all end up here (hyprlock is the fallback when qs isn't
+// Super+L, the Account tab and suspend all end up here (hyprlock is the fallback when qs isn't
 // running). While locked, $XDG_RUNTIME_DIR/quickshell-locked exists, and a restarted shell locks again
 // (Hyprland's misc.allow_session_lock_restore lets it take over after a crash).
 Scope {

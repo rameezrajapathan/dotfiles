@@ -23,10 +23,27 @@ function M.matches(class)
 	return false
 end
 
+-- Hyprland leaves the keyboard focus on a window moved away silently; give it to the window used
+-- last on the workspace it left
+local function focus_after(hidden, workspace)
+	local next
+	for _, w in ipairs(hl.get_windows()) do
+		if w.address ~= hidden and w.mapped and w.workspace and w.workspace.id == workspace
+			and (not next or w.focus_history_id < next.focus_history_id) then
+			next = w
+		end
+	end
+	if next then
+		hl.dispatch(hl.dsp.focus({ window = "address:" .. next.address }))
+	end
+end
+
 function M.hide_or_close()
 	local w = hl.get_active_window()
 	if w and M.matches(w.class) then
+		local address, workspace = w.address, w.workspace and w.workspace.id
 		dispatch.move_silently(M.workspace)
+		focus_after(address, workspace)
 	else
 		hl.dispatch(hl.dsp.window.close())
 	end

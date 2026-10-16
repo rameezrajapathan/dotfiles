@@ -69,7 +69,7 @@ SettingsPage {
         SettingsRow {
             icon: "lock"
             title: "Lock now"
-            description: "Super + Alt + L"
+            description: "Super + L"
             Pill {
                 icon: "lock"
                 implicitHeight: 30

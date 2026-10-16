@@ -33,5 +33,11 @@ hl.window_rule({
 	workspace = "special:dropterm silent",
 })
 
+-- Windows on a special workspace (scratchpads Super + F1/F2, drop-down terminal) get a border in
+-- the wallpaper's third color, so they don't look like part of the workspace under them
+local ok, theme = pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hyprland.lua")
+local special_border = ok and theme.special_border or "rgb(f5c2e7)"
+hl.window_rule({ match = { workspace = "s[true]" }, border_color = special_border })
+
 -- Rules made in the Settings app (Window rules page; quickshell/SettingsWindowRulesPage.qml)
 pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/window-rules.lua")
