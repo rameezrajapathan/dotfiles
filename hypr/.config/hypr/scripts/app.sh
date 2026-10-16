@@ -55,6 +55,7 @@ launch() {
     if [ -z "$id" ] || [ -z "$file" ]; then
         [ $# -gt 0 ] && exec xdg-open "$1"
         echo "app.sh: no default app set" >&2
+        notify-send -a Apps -i dialog-warning "No default app" "Pick one in Settings > Default apps." 2>/dev/null
         exit 1
     fi
     if [ "$(entry_key "$file" Terminal)" = true ]; then

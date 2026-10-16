@@ -21,6 +21,9 @@ Scope {
     property real workspaceChangedAt: 0
     property var openedAt: ({})
     property string pending: ""
+    // Hyprland sends activewindowv2 again when the focused window's title changes; only a new
+    // window counts
+    property string lastActive: ""
 
     Connections {
         target: Hyprland
@@ -38,6 +41,9 @@ Scope {
                 break;
             case "activewindowv2": {
                 const address = event.data.replace(/^0x/, "");
+                if (address === root.lastActive)
+                    return;
+                root.lastActive = address;
                 if (!address || now - root.workspaceChangedAt < 300 || now - (root.openedAt[address] ?? 0) < 1000)
                     return;
                 root.pending = address;

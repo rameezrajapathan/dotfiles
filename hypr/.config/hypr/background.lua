@@ -3,6 +3,7 @@
 -- same list); clicking one brings the window back.
 
 local M = {}
+local dispatch = require("dispatch")
 
 -- Lua patterns matched against the window class
 M.classes = {
@@ -25,7 +26,7 @@ end
 function M.hide_or_close()
 	local w = hl.get_active_window()
 	if w and M.matches(w.class) then
-		hl.dispatch(hl.dsp.window.move({ workspace = M.workspace, silent = true }))
+		dispatch.move_silently(M.workspace)
 	else
 		hl.dispatch(hl.dsp.window.close())
 	end

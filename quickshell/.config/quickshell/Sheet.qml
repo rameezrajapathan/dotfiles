@@ -117,8 +117,11 @@ Item {
     // The real bar hides while this copy covers it
     readonly property bool covering: progress > 0
     readonly property string screenName: QsWindow.window?.screen?.name ?? ""
-    onCoveringChanged: Panels.cover(screenName, covering)
-    Component.onDestruction: if (covering) Panels.cover(screenName, false)
+    property int coverKey: 0
+    Component.onCompleted: coverKey = Panels.newKey()
+    onCoveringChanged: Panels.cover(coverKey, screenName, covering)
+    onScreenNameChanged: if (covering) Panels.cover(coverKey, screenName, true)
+    Component.onDestruction: Panels.cover(coverKey, "", false)
 
     anchors.fill: parent
 

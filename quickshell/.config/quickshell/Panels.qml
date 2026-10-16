@@ -9,12 +9,27 @@ import QtQuick
 Singleton {
     signal opened(var panel)
 
-    // Screens whose bar pill is covered by a Sheet's copy of it (the real one hides meanwhile)
+    // Screens whose bar pill is covered by a Sheet's copy of it (the real one hides meanwhile):
+    // screen name → how many sheets cover it. Worked out from `covers` (sheet key → screen), so a
+    // sheet that reports twice, or uncovers after its screen name changed, can't leave it stuck.
     property var covered: ({})
+    property var covers: ({})
+    property int nextKey: 0
 
-    function cover(screen, on) {
-        const c = Object.assign({}, covered);
-        c[screen] = Math.max(0, (c[screen] ?? 0) + (on ? 1 : -1));
-        covered = c;
+    function newKey() {
+        return ++nextKey;
+    }
+
+    function cover(key, screen, on) {
+        const c = Object.assign({}, covers);
+        if (on && screen)
+            c[key] = screen;
+        else
+            delete c[key];
+        covers = c;
+        const n = {};
+        for (const k in c)
+            n[c[k]] = (n[c[k]] ?? 0) + 1;
+        covered = n;
     }
 }

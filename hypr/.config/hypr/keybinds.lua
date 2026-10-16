@@ -1,6 +1,7 @@
 -- Keybindings
 
 local mod = "SUPER"
+local dispatch = require("dispatch")
 local function script(cmd)
 	return hl.dsp.exec_cmd("~/.config/hypr/scripts/" .. cmd)
 end
@@ -77,22 +78,22 @@ hl.bind(mod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }), { desc
 hl.bind(mod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }), { description = "Move window right" })
 
 -- Monitor navigation
-hl.bind(mod .. " + CTRL + left", hl.dsp.focus({ monitor = "left" }), { description = "Focus monitor left" })
-hl.bind(mod .. " + CTRL + right", hl.dsp.focus({ monitor = "right" }), { description = "Focus monitor right" })
-hl.bind(mod .. " + CTRL + H", hl.dsp.focus({ monitor = "left" }), { description = "Focus monitor left" })
-hl.bind(mod .. " + CTRL + J", hl.dsp.focus({ monitor = "down" }), { description = "Focus monitor down" })
-hl.bind(mod .. " + CTRL + K", hl.dsp.focus({ monitor = "up" }), { description = "Focus monitor up" })
-hl.bind(mod .. " + CTRL + L", hl.dsp.focus({ monitor = "right" }), { description = "Focus monitor right" })
+hl.bind(mod .. " + CTRL + left", dispatch.focus_monitor("left"), { description = "Focus monitor left" })
+hl.bind(mod .. " + CTRL + right", dispatch.focus_monitor("right"), { description = "Focus monitor right" })
+hl.bind(mod .. " + CTRL + H", dispatch.focus_monitor("left"), { description = "Focus monitor left" })
+hl.bind(mod .. " + CTRL + J", dispatch.focus_monitor("down"), { description = "Focus monitor down" })
+hl.bind(mod .. " + CTRL + K", dispatch.focus_monitor("up"), { description = "Focus monitor up" })
+hl.bind(mod .. " + CTRL + L", dispatch.focus_monitor("right"), { description = "Focus monitor right" })
 
 -- Move window to monitor
-hl.bind(mod .. " + SHIFT + CTRL + left", hl.dsp.window.move({ monitor = "left" }), { description = "Move window to monitor left" })
-hl.bind(mod .. " + SHIFT + CTRL + down", hl.dsp.window.move({ monitor = "down" }), { description = "Move window to monitor down" })
-hl.bind(mod .. " + SHIFT + CTRL + up", hl.dsp.window.move({ monitor = "up" }), { description = "Move window to monitor up" })
-hl.bind(mod .. " + SHIFT + CTRL + right", hl.dsp.window.move({ monitor = "right" }), { description = "Move window to monitor right" })
-hl.bind(mod .. " + SHIFT + CTRL + H", hl.dsp.window.move({ monitor = "left" }), { description = "Move window to monitor left" })
-hl.bind(mod .. " + SHIFT + CTRL + J", hl.dsp.window.move({ monitor = "down" }), { description = "Move window to monitor down" })
-hl.bind(mod .. " + SHIFT + CTRL + K", hl.dsp.window.move({ monitor = "up" }), { description = "Move window to monitor up" })
-hl.bind(mod .. " + SHIFT + CTRL + L", hl.dsp.window.move({ monitor = "right" }), { description = "Move window to monitor right" })
+hl.bind(mod .. " + SHIFT + CTRL + left", dispatch.move_to_monitor("left"), { description = "Move window to monitor left" })
+hl.bind(mod .. " + SHIFT + CTRL + down", dispatch.move_to_monitor("down"), { description = "Move window to monitor down" })
+hl.bind(mod .. " + SHIFT + CTRL + up", dispatch.move_to_monitor("up"), { description = "Move window to monitor up" })
+hl.bind(mod .. " + SHIFT + CTRL + right", dispatch.move_to_monitor("right"), { description = "Move window to monitor right" })
+hl.bind(mod .. " + SHIFT + CTRL + H", dispatch.move_to_monitor("left"), { description = "Move window to monitor left" })
+hl.bind(mod .. " + SHIFT + CTRL + J", dispatch.move_to_monitor("down"), { description = "Move window to monitor down" })
+hl.bind(mod .. " + SHIFT + CTRL + K", dispatch.move_to_monitor("up"), { description = "Move window to monitor up" })
+hl.bind(mod .. " + SHIFT + CTRL + L", dispatch.move_to_monitor("right"), { description = "Move window to monitor right" })
 
 -- Workspace navigation
 hl.bind(mod .. " + Page_Down", hl.dsp.focus({ workspace = "e+1" }), { description = "Switch to next workspace" })
@@ -120,21 +121,21 @@ hl.bind(mod .. " + CTRL + mouse_up", hl.dsp.window.move({ workspace = "e-1" }), 
 for i = 1, 9 do
 	hl.bind(mod .. " + " .. i, hl.dsp.focus({ workspace = i }), { description = "Switch to workspace " .. i })
 	hl.bind(mod .. " + SHIFT + " .. i, hl.dsp.window.move({ workspace = i }), { description = "Move window to workspace " .. i })
-	hl.bind(mod .. " + ALT + " .. i, hl.dsp.window.move({ workspace = i, silent = true }), { description = "Move window silently to workspace " .. i })
+	hl.bind(mod .. " + ALT + " .. i, function() dispatch.move_silently(i) end, { description = "Move window silently to workspace " .. i })
 end
 
 -- Special workspaces
 hl.bind(mod .. " + F1", hl.dsp.workspace.toggle_special("magic"), { description = "Toggle special workspace magic" })
 hl.bind(mod .. " + SHIFT + F1", hl.dsp.window.move({ workspace = "special:magic" }), { description = "Move window to special workspace magic" })
-hl.bind(mod .. " + ALT + F1", hl.dsp.window.move({ workspace = "special:magic", silent = true }), { description = "Move window silently to special workspace magic" })
+hl.bind(mod .. " + ALT + F1", function() dispatch.move_silently("special:magic") end, { description = "Move window silently to special workspace magic" })
 hl.bind(mod .. " + F2", hl.dsp.workspace.toggle_special("magic1"), { description = "Toggle special workspace magic1" })
 hl.bind(mod .. " + SHIFT + F2", hl.dsp.window.move({ workspace = "special:magic1" }), { description = "Move window to special workspace magic1" })
-hl.bind(mod .. " + ALT + F2", hl.dsp.window.move({ workspace = "special:magic1", silent = true }), { description = "Move window silently to special workspace magic1" })
+hl.bind(mod .. " + ALT + F2", function() dispatch.move_silently("special:magic1") end, { description = "Move window silently to special workspace magic1" })
 
 -- Layout management
-hl.bind(mod .. " + bracketleft", hl.dsp.layout("preselect l"), { description = "Preselect left split" })
-hl.bind(mod .. " + bracketright", hl.dsp.layout("preselect r"), { description = "Preselect right split" })
-hl.bind(mod .. " + J", hl.dsp.layout("togglesplit"), { description = "Toggle split direction" })
+hl.bind(mod .. " + bracketleft", dispatch.try(hl.dsp.layout("preselect l")), { description = "Preselect left split" })
+hl.bind(mod .. " + bracketright", dispatch.try(hl.dsp.layout("preselect r")), { description = "Preselect right split" })
+hl.bind(mod .. " + J", dispatch.try(hl.dsp.layout("togglesplit")), { description = "Toggle split direction" })
 hl.bind(mod .. " + CTRL + F", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen window" })
 
 -- Mouse move / resize
@@ -143,15 +144,12 @@ hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, descripti
 hl.bind(mod .. " + Z", hl.dsp.window.drag(), { mouse = true, description = "Drag window" })
 hl.bind(mod .. " + X", hl.dsp.window.resize(), { mouse = true, description = "Resize window" })
 
--- Resize by keycode
-hl.bind(mod .. " + code:20", hl.dsp.window.resize({ x = -100, y = 0 }), { description = "Expand window left" })
-hl.bind(mod .. " + code:21", hl.dsp.window.resize({ x = 100, y = 0 }), { description = "Shrink window left" })
 
 -- Manual sizing
-hl.bind(mod .. " + minus", hl.dsp.window.resize({ x = -50, y = 0 }), { repeating = true, description = "Shrink window width" })
-hl.bind(mod .. " + equal", hl.dsp.window.resize({ x = 50, y = 0 }), { repeating = true, description = "Expand window width" })
-hl.bind(mod .. " + SHIFT + minus", hl.dsp.window.resize({ x = 0, y = -50 }), { repeating = true, description = "Shrink window height" })
-hl.bind(mod .. " + SHIFT + equal", hl.dsp.window.resize({ x = 0, y = 50 }), { repeating = true, description = "Expand window height" })
+hl.bind(mod .. " + minus", hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true, description = "Shrink window width" })
+hl.bind(mod .. " + equal", hl.dsp.window.resize({ x = 50, y = 0, relative = true }), { repeating = true, description = "Expand window width" })
+hl.bind(mod .. " + SHIFT + minus", hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true, description = "Shrink window height" })
+hl.bind(mod .. " + SHIFT + equal", hl.dsp.window.resize({ x = 0, y = 50, relative = true }), { repeating = true, description = "Expand window height" })
 
 -- Screenshots
 hl.bind("CTRL + XF86Launch1", shot("full"), { description = "Copy full-screen screenshot" })
