@@ -21,6 +21,8 @@ Scope {
             keywords: "font typeface text size icons weight", component: fontsPage },
         { key: "bar", group: "Personalize", title: "Bar", icon: "toolbar",
             keywords: "bar pill height weather music spectrum clock 24 hour seconds", component: barPage },
+        { key: "controlcenter", group: "Personalize", title: "Control center", icon: "dashboard_customize",
+            keywords: "control center quick settings tiles widgets layout bento columns custom panel", component: controlCenterPage },
         { key: "accessibility", group: "Personalize", title: "Accessibility", icon: "accessibility_new",
             keywords: "accessibility zoom magnifier magnify larger text size bigger font reduce motion animations", component: accessibilityPage },
         { key: "windows", group: "Desktop", title: "Windows", icon: "select_window",
@@ -540,6 +542,7 @@ Scope {
     Component { id: appearancePage; SettingsAppearancePage {} }
     Component { id: fontsPage; SettingsFontsPage {} }
     Component { id: barPage; SettingsBarPage {} }
+    Component { id: controlCenterPage; SettingsControlCenterPage {} }
     Component { id: windowsPage; SettingsWindowsPage {} }
     Component { id: effectsPage; SettingsEffectsPage {} }
     Component { id: inputPage; SettingsInputPage {} }

@@ -43,7 +43,7 @@ PanelWindow {
         target: Toggles
         function onPanelToggleRequested() {
             if (Hyprland.focusedMonitor?.name === bar.screen.name)
-                controlCenter.toggle("account");
+                controlCenter.toggle("");
         }
         function onControlCenterRequested(tab) {
             if (Hyprland.focusedMonitor?.name === bar.screen.name)

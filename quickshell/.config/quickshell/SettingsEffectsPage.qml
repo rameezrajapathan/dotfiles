@@ -1,3 +1,4 @@
+import Quickshell
 import QtQuick
 import QtQuick.Layouts
 
@@ -133,6 +134,126 @@ SettingsPage {
                 value: Hypr.value("decoration.shadow.range") ?? 4
                 suffix: " px"
                 onMoved: v => Hypr.set("decoration.shadow.range", v)
+            }
+        }
+    }
+
+    SettingsSection {
+        title: "Panels"
+        subtitle: "How the control center, calendar, weather, launcher and the other panels come out of the bar."
+        canReset: Settings.appearance.panelAnimation !== "slide" || Settings.appearance.panelSpeed !== 1
+        onReset: {
+            Settings.appearance.panelAnimation = "slide";
+            Settings.appearance.panelSpeed = 1;
+        }
+
+        // Reduce motion makes every shell transition instant, these included
+        SettingsRow {
+            visible: Theme.reduceMotion
+            icon: "motion_photos_off"
+            title: "Reduce motion is on"
+            description: "Panels open instantly, whichever style is picked (Settings > Accessibility)."
+            Pill {
+                text: "Turn off"
+                onClicked: {
+                    Settings.accessibility.reduceMotion = false;
+                    Hypr.set("animations.enabled", true);
+                    // GTK and Qt apps, once settings.json is saved
+                    Quickshell.execDetached(["sh", "-c", "sleep 0.6; exec \"$HOME/.config/hypr/scripts/accessibility.sh\""]);
+                }
+            }
+        }
+        SettingsRow {
+            icon: "animation"
+            title: "Open and close"
+            description: PanelMotion.info(PanelMotion.style).description
+            below: true
+
+            GridLayout {
+                columns: 3
+                columnSpacing: 10
+                rowSpacing: 10
+
+                Repeater {
+                    model: PanelMotion.styles
+
+                    Rectangle {
+                        id: card
+                        required property var modelData
+                        readonly property bool selected: PanelMotion.style === modelData.id
+
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        implicitHeight: cardColumn.implicitHeight + 16
+                        radius: 14
+                        color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
+                        border.width: selected ? 2 : 1
+                        border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
+                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+
+                        ColumnLayout {
+                            id: cardColumn
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
+                            spacing: 8
+
+                            PanelMotionPreview {
+                                Layout.fillWidth: true
+                                style: card.modelData.id
+                                running: root.shown && !Theme.reduceMotion
+                            }
+                            RowLayout {
+                                Layout.leftMargin: 4
+                                Layout.rightMargin: 4
+                                spacing: 6
+                                Icon {
+                                    name: card.modelData.icon
+                                    size: 17
+                                    filled: card.selected
+                                    color: Theme.accent
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    text: card.modelData.label
+                                    font.weight: Font.DemiBold
+                                    elide: Text.ElideRight
+                                }
+                                CheckBadge {
+                                    visible: card.selected
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: cardMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Settings.appearance.panelAnimation = card.modelData.id
+                        }
+                    }
+                }
+            }
+        }
+        SettingsRow {
+            icon: "speed"
+            title: "Speed"
+            description: "Faster to the right."
+            SettingsSlider {
+                from: 50
+                to: 200
+                stepSize: 10
+                value: Math.round(Settings.appearance.panelSpeed * 100)
+                suffix: "%"
+                onMoved: v => Settings.appearance.panelSpeed = Math.round(v) / 100
+            }
+        }
+        SettingsRow {
+            icon: "play_circle"
+            title: "Try it"
+            description: "Opens the control center with this animation."
+            Pill {
+                text: "Open"
+                onClicked: Quickshell.execDetached(["qs", "ipc", "call", "controlcenter", "toggle", ""])
             }
         }
     }

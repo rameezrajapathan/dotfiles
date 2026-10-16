@@ -25,9 +25,10 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
 - **Colors from the wallpaper**: the bar, terminal, Neovim, GTK and Qt/KDE apps, lock screen and
   keyboard lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
 - **A bar your way**: by default one minimal pill with workspaces, the clock (a live spectrum while
-  music plays) and your profile picture, which opens a control center with tabs for your account
-  and quick settings, music, notifications, network (with a speed test), Bluetooth, sound,
-  displays, battery and more. Ten ready-made styles (Minimalist, Focus, Everyday, Developer,
+  music plays) and your profile picture, which opens a control center: quick tiles,
+  sliders, music, notifications and more at a glance, in one column, a three-column Bento or
+  your own layout, with details for network (with a speed test), Bluetooth, sound, displays,
+  battery and more a click away. Ten ready-made styles (Minimalist, Focus, Everyday, Developer,
   Islands, Floating, Classic, Maximalist…) or your own: one pill, islands or a full-width bar, with
   20 items (weather, window title, tray, status icons, CPU, now playing…) placed where you want.
 - **A Settings app** (Super + ,): wallpaper, light/dark, palette, font themes, icon themes, bar
@@ -58,7 +59,7 @@ Log out, choose **Hyprland**, then:
 
 1. Pick a wallpaper with **Super + Shift + W**. Seven [come with it](wallpapers/CREDITS.md); add
    your own to `~/Pictures/Wallpapers`.
-2. Set resolution, refresh rate, scale and layout from the Displays tab of the control center.
+2. Set resolution, refresh rate, scale and layout from the control center (the monitor button next to brightness).
 3. Optional: `pikadots backup-init` for backups, `gh auth login` for GitHub notifications, or
    `pikadots import <file>` to bring your settings from another machine (`pikadots export` there).
 4. Run `pikadots health` to check everything.

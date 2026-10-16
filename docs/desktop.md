@@ -24,7 +24,7 @@ date, the apps button (distro logo, opens the launcher), the focused window's ti
 (right click plays or pauses, scroll skips), the tray, CPU and memory, network, Bluetooth (right
 click turns it on or off), sound (scroll for volume, right click mutes), battery, notifications
 (right click for Do Not Disturb), a capture button, power and dividers. Status icons open their
-control center tab. See [settings.md](settings.md#bar).
+control center page. See [settings.md](settings.md#bar).
 
 ## Calendar
 
@@ -47,38 +47,58 @@ are saved in `~/.local/state/quickshell/weather.json`. `qs ipc call weather togg
 
 ## Control center
 
-The profile picture drops down one window, attached to the bar, with a tab for everything else.
-Super + S opens it too, and it works from the keyboard alone: Esc or a click outside closes it,
-Up/Down, Tab, Ctrl + Tab or J/K switch tabs, and 1–9 and 0 jump to a tab in sidebar order. `qs ipc
-call controlcenter toggle <tab>` opens a tab from a keybind; the tabs are `account`, `music`,
-`notifications`, `network`, `bluetooth`, `audio`, `display`, `drives`, `battery`, `system`,
-`capture` and `github`.
+The profile picture drops down one window, attached to the bar, holding everything else as
+widgets. Pick its layout on [Settings > Control center](settings.md#control-center):
 
-| Tab | What's in it | Right click on the tab |
-|---|---|---|
-| Account | Profile picture (click it to upload one; saved square-cropped as `~/.face` and sent to AccountsService for the login screen), name, quick settings (Do Not Disturb, keep awake, night light, [game mode](#game-mode), color picker), lock, log out, power menu | |
-| Music | Album art in a slowly turning scalloped frame with the live spectrum around it, title, artist and album, a wavy seek bar, round controls around a wide play button, the players (when there are several), open the app, volume | Play/pause |
-| Notifications | Notifications not yet dismissed | Do Not Disturb |
-| Network | Live download/upload speed with a one-minute graph, speed test (ping, download and upload against Cloudflare with curl; the gauge button next to settings), wired, Wi-Fi (asks for passwords), VPN switches, import or add a VPN | |
-| Bluetooth | Paired devices (connect, battery, forget), nearby devices to pair | Power on/off |
-| Sound | Output and input devices, per-app volume | Mute |
-| Displays | [Displays](#displays) | |
-| Drives | USB drives, SD cards and disk images (only while one is attached): click opens it in the file manager (mounting it, or asking for the passphrase of an encrypted drive), eject unmounts and powers it off, a bar shows how full it is | |
-| Battery | Time left, charge limit, power mode, GPU mode on ROG laptops | |
-| System | CPU, memory, GPU and disk with temperatures, busiest processes, last backup | |
-| Capture | Screenshot or record a region, window or screen; annotate a region (satty) or copy the text in it (tesseract). Screenshot notifications have an Edit button that opens satty | |
-| GitHub | Notifications; only after `gh auth login` | |
+- **One glance** (the default): one column with your profile, lock/settings/power, quick tiles,
+  volume and brightness, what's playing, the latest notifications, status chips (CPU, memory,
+  drives, updates, GitHub, recording) and the tray.
+- **Bento**: three columns: controls; music, calendar, weather and system usage; updates,
+  notifications and shortcuts (capture, wallpaper, settings).
+- **Custom**: any of the widgets in one to three columns, in your order.
 
-The bottom of the sidebar has the tray and hidden background apps (click opens the app, right
-click shows its menu), the wallpaper picker (Super + Shift + W), a coffee cup while keep awake is
-on, and the power menu. The launcher is Super + A.
+The quick tiles (the same set for every layout, picked on the settings page) toggle on click; the
+arrow on a tile (or a right click) opens its details in place, and so do the chips, cards and
+the buttons next to the sliders. A back arrow, Esc, Backspace or Alt + Left returns to the
+widgets; Esc again or a click outside closes. Super + S opens it; `qs ipc call controlcenter
+toggle <page>` opens a details page directly: `account`, `music`, `notifications`, `network`,
+`bluetooth`, `audio`, `display`, `drives`, `battery`, `system`, `capture` or `github` (`""` for
+the widgets).
+
+The details pages:
+
+| Page | What's in it |
+|---|---|
+| Account | Profile picture (click it to upload one; saved square-cropped as `~/.face` and sent to AccountsService for the login screen), name, quick settings (Do Not Disturb, keep awake, night light, [game mode](#game-mode), color picker), lock, log out, power menu |
+| Music | Album art in a slowly turning scalloped frame with the live spectrum around it, title, artist and album, a wavy seek bar, round controls around a wide play button, the players (when there are several), open the app, volume |
+| Notifications | Notifications not yet dismissed |
+| Network | Live download/upload speed with a one-minute graph, speed test (ping, download and upload against Cloudflare with curl; the gauge button next to settings), wired, Wi-Fi (asks for passwords), VPN switches, import or add a VPN |
+| Bluetooth | Paired devices (connect, battery, forget), nearby devices to pair |
+| Sound | Output and input devices, per-app volume |
+| Displays | [Displays](#displays) |
+| Drives | USB drives, SD cards and disk images (only while one is attached): click opens it in the file manager (mounting it, or asking for the passphrase of an encrypted drive), eject unmounts and powers it off, a bar shows how full it is |
+| Battery | Time left, charge limit, power mode, GPU mode on ROG laptops |
+| System | CPU, memory, GPU and disk with temperatures, busiest processes, last backup |
+| Capture | Screenshot or record a region, window or screen; annotate a region (satty) or copy the text in it (tesseract). Screenshot notifications have an Edit button that opens satty |
+| GitHub | Notifications; only after `gh auth login` |
+
+The Tray widget has the tray and hidden background apps (click opens the app, right click shows
+its menu). The wallpaper picker is Super + Shift + W (or the Shortcuts widget) and the launcher
+Super + A.
 
 ## Motion
 
-Panels slide or fade both ways, and selection highlights (control center tabs, launcher, Alt + Tab,
+Panels that come out of the bar (control center, calendar, weather, launcher, wallpaper picker,
+power menu, overview, Alt + Tab) share one animation, picked on Settings › Effects: **Slide**
+(down from under the pill, the default), **Morph** (the pill stretches into the panel), **Spring**
+(Morph with a soft overshoot), **Liquid** (widens, then pours down), **Reveal** (uncovered from the
+top) or **Fade**, at 50–200% speed. Closing is a quick ease-out in every style. `PanelMotion.qml`
+holds the curves and shapes; `Sheet.qml` applies them.
+
+Selection highlights (launcher, Alt + Tab,
 workspace pill) glide instead of jumping. The control center, calendar, weather, launcher, wallpaper picker,
 power menu, overview (one row of workspaces) and Alt + Tab switcher come out of the bar: from the
-pill that holds the item they belong to (its bottom squares off and the panel slides out from under
+pill that holds the item they belong to (its bottom squares off and the panel comes out from under
 it), or from under that item on a full-width bar. Only one is open at a time: opening
 another (or the cheatsheet) closes it. When the keyboard moves focus to another window (arrows, Alt
 + Tab), the mouse pointer glides there instead of jumping (Hyprland's own warps are off:

@@ -13,6 +13,7 @@ Singleton {
     readonly property string path: Quickshell.env("HOME") + "/.config/pikadots/settings.json"
     readonly property JsonObject appearance: adapter.appearance
     readonly property JsonObject bar: adapter.bar
+    readonly property JsonObject controlCenter: adapter.controlCenter
     // Hyprland options changed in the app, "general.gaps_in" → 5 (Hypr.qml); reassign to change
     property alias hypr: adapter.hypr
     readonly property JsonObject idle: adapter.idle
@@ -109,6 +110,9 @@ Singleton {
                 property string iconTheme: "Papirus"
                 // Wallpaper colors, icons and fonts for Qt/KDE apps (hypr/scripts/kde-theme.py)
                 property bool qtTheme: true
+                // How panels open and close (PanelMotion.qml) and how fast (0.5 .. 2)
+                property string panelAnimation: "slide"
+                property real panelSpeed: 1
                 // Bar pill and panel background opacity
                 property real panelOpacity: 0.8
                 // auto (from the wallpaper), dark, light
@@ -208,6 +212,16 @@ Singleton {
                 property int checkHours: 6
                 property bool notify: true
                 property bool system: true
+            }
+
+            // Control center layout (CCStyles.qml): "glance" (one column), "bento" (three columns)
+            // or "custom" (the widget columns in `custom`, made on Settings > Control center)
+            property JsonObject controlCenter: JsonObject {
+                property string style: "glance"
+                // [[widget ids of column 1], [column 2], ...]; null until first customized
+                property var custom: null
+                // Quick tiles, in order (CCStyles.tiles lists them)
+                property var tiles: ["network", "bluetooth", "vpn", "dnd", "night", "profile"]
             }
 
             property JsonObject bar: JsonObject {

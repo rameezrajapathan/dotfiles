@@ -12,6 +12,8 @@ Item {
     // Cookie size; the bars use the room around it
     property real coverSize: 190
     property string icon: "music_note"
+    // Room around the cookie for the spectrum bars; 0 = no bars
+    property real barRoom: 90
 
     readonly property int bumps: 9
     readonly property real depth: 0.07
@@ -23,7 +25,7 @@ Item {
         return coverRadius * (1 - depth + depth * Math.cos(bumps * angle));
     }
 
-    implicitWidth: coverSize + 90
+    implicitWidth: coverSize + barRoom
     implicitHeight: implicitWidth
 
     // One turn every 40 s while playing; stays where it is when paused
@@ -39,6 +41,7 @@ Item {
     // Spectrum bars around the cookie
     Canvas {
         id: bars
+        visible: root.barRoom > 0
         anchors.fill: parent
         readonly property var levels: Cava.levels
         onLevelsChanged: requestPaint()
