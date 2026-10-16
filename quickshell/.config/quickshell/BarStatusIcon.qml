@@ -15,22 +15,28 @@ Item {
     implicitWidth: row.implicitWidth
     implicitHeight: row.implicitHeight
 
-    RowLayout {
+    // Icon over its percentage or count on a side bar
+    GridLayout {
         id: row
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: 3
+        anchors.centerIn: parent
+        flow: Theme.barVertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
+        rowSpacing: 2
+        columnSpacing: 3
 
         Icon {
             name: StatusInfo.icon(root.key)
             color: root.key === "battery" && StatusInfo.batteryPercent <= 15 && !StatusInfo.charging ? Theme.red : Theme.text
             opacity: mouse.containsMouse ? 0.7 : 1
+            Layout.alignment: Qt.AlignHCenter
         }
         Label {
             visible: root.key === "battery"
-            text: StatusInfo.batteryPercent + "%"
+            Layout.alignment: Qt.AlignHCenter
+            text: StatusInfo.batteryPercent + (Theme.barVertical ? "" : "%")
         }
         Rectangle {
             visible: root.count > 0
+            Layout.alignment: Qt.AlignHCenter
             implicitWidth: Math.max(16, badge.implicitWidth + 8)
             implicitHeight: 16
             radius: 8

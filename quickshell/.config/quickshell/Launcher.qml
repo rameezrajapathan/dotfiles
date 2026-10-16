@@ -392,8 +392,8 @@ PanelWindow {
         id: card
         open: root.open
         anchorIds: ["launcher"]
-        sheetWidth: Math.min(root.width - 56, root.appColumns * root.cellSize + 40)
-        sheetHeight: Math.min(600, root.height - Theme.barHeight - 40)
+        sheetWidth: Math.min(root.width - Theme.barSpaceX - 56, root.appColumns * root.cellSize + 40)
+        sheetHeight: Math.min(600, root.height - Theme.barSpaceY - 40)
         onClosed: root.visible = false
         onDismiss: root.open = false
 

@@ -16,7 +16,7 @@ Loader {
     property bool dividerShown: true
     signal action(string name)
 
-    Layout.alignment: Qt.AlignVCenter
+    Layout.alignment: Qt.AlignCenter
     visible: wanted && (moduleId !== "divider" || dividerShown)
     // Hidden while there's nothing to show; a hidden item takes no room in the row
     readonly property bool wanted: {
@@ -24,7 +24,8 @@ Loader {
         case "weather": return Weather.ready;
         case "meeting": return Meetings.next !== null;
         case "recording": return Recorder.active || Privacy.active;
-        case "title": return ToplevelManager.activeToplevel !== null;
+        // No room for a title across a side bar
+        case "title": return ToplevelManager.activeToplevel !== null && !Theme.barVertical;
         case "media": return Media.active !== null;
         case "tray": return SystemTray.items.values.length > 0;
         case "bluetooth": return StatusInfo.btAdapter !== null;
@@ -66,16 +67,17 @@ Loader {
     // The recording timer, and the privacy dots while an app uses the mic, camera or screen
     Component {
         id: recording
-        Row {
+        Grid {
+            columns: Theme.barVertical ? 1 : 2
             spacing: 6
+            horizontalItemAlignment: Grid.AlignHCenter
+            verticalItemAlignment: Grid.AlignVCenter
             CaptureButton {
                 visible: Recorder.active
-                anchors.verticalCenter: parent.verticalCenter
                 onClicked: root.action("cc:capture")
             }
             PrivacyIndicator {
                 visible: Privacy.active
-                anchors.verticalCenter: parent.verticalCenter
                 onClicked: root.action("cc:audio")
             }
         }
@@ -107,7 +109,10 @@ Loader {
     }
     Component {
         id: tray
-        Row {
+        Grid {
+            // One row, or one column on a side bar
+            columns: Theme.barVertical ? 1 : -1
+            rows: Theme.barVertical ? -1 : 1
             spacing: 8
             Tray { bar: QsWindow.window }
         }
@@ -129,10 +134,11 @@ Loader {
                 opacity: clockItem.music ? 0 : 1
                 Behavior on opacity { NumberAnimation { duration: Theme.ms(200) } }
             }
+            // Across the pill's inside on a side bar, where the clock is narrow
             MusicBars {
-                anchors.fill: parent
-                anchors.topMargin: -2
-                anchors.bottomMargin: -2
+                anchors.centerIn: parent
+                width: Theme.barVertical ? Theme.pillCircle : parent.width
+                height: parent.height + (Theme.barVertical ? 0 : 4)
                 opacity: clockItem.music ? 1 : 0
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: Theme.ms(200) } }
@@ -153,7 +159,9 @@ Loader {
                 id: dateClock
                 precision: SystemClock.Hours
             }
-            text: Qt.formatDate(dateClock.date, Settings.datetime.dateFormat)
+            // Day over month on a side bar
+            text: Qt.formatDate(dateClock.date, Theme.barVertical ? "d\nMMM" : Settings.datetime.dateFormat)
+            horizontalAlignment: Text.AlignHCenter
             MouseArea {
                 anchors.fill: parent
                 anchors.margins: -4

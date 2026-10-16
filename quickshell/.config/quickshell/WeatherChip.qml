@@ -10,20 +10,22 @@ Item {
     implicitWidth: row.implicitWidth
     implicitHeight: row.implicitHeight
 
-    Row {
+    // Icon over temperature on a side bar
+    Grid {
         id: row
         anchors.centerIn: parent
-        spacing: 4
+        columns: Theme.barVertical ? 1 : 2
+        spacing: Theme.barVertical ? 0 : 4
+        horizontalItemAlignment: Grid.AlignHCenter
+        verticalItemAlignment: Grid.AlignVCenter
 
         Icon {
-            anchors.verticalCenter: parent.verticalCenter
             name: Weather.ready ? Weather.icon(Weather.current.code, Weather.current.isDay) : ""
             filled: true
             size: 18
             color: Theme.accent
         }
         Label {
-            anchors.verticalCenter: parent.verticalCenter
             text: Weather.ready ? Weather.temp(Weather.current.temp) : ""
         }
     }

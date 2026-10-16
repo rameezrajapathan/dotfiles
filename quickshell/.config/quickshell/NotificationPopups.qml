@@ -16,7 +16,13 @@ PanelWindow {
         right: position.endsWith("right")
         left: position.endsWith("left")
     }
-    margins { top: Theme.barHeight + 6; bottom: 8; right: 8; left: 8 }
+    // Clear of the bar, whichever edge it's on
+    margins {
+        top: (Theme.barPosition === "top" ? Theme.barHeight : 0) + 6
+        bottom: (Theme.barPosition === "bottom" ? Theme.barHeight : 0) + 8
+        right: (Theme.barPosition === "right" ? Theme.barHeight : 0) + 8
+        left: (Theme.barPosition === "left" ? Theme.barHeight : 0) + 8
+    }
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "quickshell-notifications"

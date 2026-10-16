@@ -59,7 +59,10 @@ Repeater {
                     item.secondaryActivate();
                 } else if (mouse.button === Qt.RightButton || item.onlyMenu || root.menuOnly.includes(item.id)) {
                     if (item.hasMenu) {
-                        const p = icon.mapToItem(null, 0, icon.height + 10);
+                        // Beside the icon, away from the bar's edge
+                        const edge = Theme.barPosition;
+                        const p = icon.mapToItem(null, edge === "left" ? icon.width + 10 : edge === "right" ? -10 : 0,
+                            edge === "bottom" ? -10 : edge === "top" ? icon.height + 10 : 0);
                         item.display(root.bar, p.x, p.y);
                     }
                 } else {

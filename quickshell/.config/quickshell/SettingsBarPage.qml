@@ -9,6 +9,26 @@ SettingsPage {
     subtitle: "Pick a style, or change anything below to make your own."
 
     SettingsSection {
+        title: "Position"
+
+        SettingsRow {
+            icon: "dock_to_bottom"
+            title: "Screen edge"
+            description: "Where the bar sits. Panels open out of it on that side."
+            SettingsSegmented {
+                options: [
+                    { value: "top", label: "Top", icon: "vertical_align_top" },
+                    { value: "bottom", label: "Bottom", icon: "vertical_align_bottom" },
+                    { value: "left", label: "Left", icon: "align_horizontal_left" },
+                    { value: "right", label: "Right", icon: "align_horizontal_right" }
+                ]
+                current: Theme.barPosition
+                onPicked: v => Settings.bar.position = v
+            }
+        }
+    }
+
+    SettingsSection {
         title: "Style"
 
         SettingsRow {
@@ -103,7 +123,7 @@ SettingsPage {
         SettingsRow {
             icon: "view_day"
             title: "Layout"
-            description: "One pill, a pill per section, or one bar across the screen."
+            description: "One pill, a pill per section, or one bar along the whole edge."
             SettingsSegmented {
                 options: [
                     { value: "pill", label: "Pill", icon: "radio_button_unchecked" },
@@ -117,7 +137,7 @@ SettingsPage {
         SettingsRow {
             icon: "height"
             title: "Height"
-            description: "Room the bar takes at the top of the screen."
+            description: "Room the bar takes at its edge of the screen (its width on a side)."
             SettingsSlider {
                 from: 28
                 to: 60
@@ -129,7 +149,7 @@ SettingsPage {
         }
         SettingsRow {
             icon: "vertical_align_top"
-            title: "Space above"
+            title: "Space at the edge"
             description: "0 sticks the bar to the screen's edge."
             SettingsSlider {
                 from: 0

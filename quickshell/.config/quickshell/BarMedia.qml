@@ -13,7 +13,7 @@ Item {
 
     RowLayout {
         id: row
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.centerIn: parent
         spacing: 6
 
         Icon {
@@ -22,7 +22,9 @@ Item {
             size: 18
             color: Theme.accent
         }
+        // Just play/pause on a side bar
         Label {
+            visible: !Theme.barVertical
             Layout.maximumWidth: 200
             text: [root.player?.trackTitle, root.player?.trackArtist].filter(s => s).join(" · ")
             elide: Text.ElideRight

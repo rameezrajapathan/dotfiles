@@ -88,7 +88,7 @@ PanelWindow {
     readonly property int detailWidth: 640
     // Details pages are at least this tall; notifications get room for a long list
     readonly property int detailMinHeight: root.detail === "notifications" ? Math.round(root.maxHeight * 0.8) : 420
-    readonly property int maxHeight: Math.min(root.height - Theme.barHeight - 20, 900)
+    readonly property int maxHeight: Math.min(root.height - Theme.barSpaceY - 20, 900)
 
     screen: bar.screen
     anchors { top: true; bottom: true; left: true; right: true }
@@ -113,7 +113,7 @@ PanelWindow {
         kind: "settings"
         // Comes out of the details' own bar icon when it's on the bar, else the profile picture
         anchorIds: (root.detail ? (({ audio: ["sound"], music: ["media"], capture: ["capture", "recording"] })[root.detail] ?? [root.detail]) : []).concat(["avatar"])
-        sheetWidth: Math.min(root.detail ? root.detailWidth : root.overviewWidth, root.width - 56)
+        sheetWidth: Math.min(root.detail ? root.detailWidth : root.overviewWidth, root.width - Theme.barSpaceX - 56)
         sheetHeight: Math.min(root.maxHeight, root.detail
             ? Math.max(root.detailMinHeight, (detailLoader.item?.implicitHeight ?? 0) + 52)
             : overview.implicitHeight + 2 * root.padding)

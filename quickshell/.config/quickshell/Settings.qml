@@ -230,12 +230,14 @@ Singleton {
                 // pill: everything in one centered pill; islands: a pill per section;
                 // full: one bar across the screen with the sections at its left, middle and right
                 property string layout: "pill"
+                // Screen edge it sits on: top, bottom, left or right
+                property string position: "top"
                 // Module ids per section (BarModule.qml lists them); a pill joins the three
                 property var left: []
                 // The "minimalist" style (BarStyles.qml)
                 property var center: ["workspaces", "divider", "clock", "meeting", "recording", "divider", "avatar"]
                 property var right: []
-                // Space the bar takes at the top of the screen; its shapes sit `gap` inside it
+                // Space the bar takes at its screen edge; its shapes sit `gap` inside it
                 property int height: 46
                 property int gap: 4
                 // islands and full: space from the screen's sides

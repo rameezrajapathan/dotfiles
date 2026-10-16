@@ -12,7 +12,7 @@ Item {
 
     RowLayout {
         id: row
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.centerIn: parent
         spacing: 6
 
         Icon {
@@ -21,7 +21,9 @@ Item {
             size: 18
             color: Meetings.ongoing ? Theme.red : Theme.accent
         }
+        // Just the icon on a side bar
         Label {
+            visible: !Theme.barVertical
             Layout.maximumWidth: 240
             text: Meetings.label(Meetings.next)
             color: Meetings.ongoing ? Theme.red : Theme.text

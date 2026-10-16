@@ -34,6 +34,12 @@ Singleton {
         return reduceMotion ? 1 : duration;
     }
     readonly property int barHeight: Settings.bar.height
+    // Screen edge the bar is on; on the left or right its "height" is its width
+    readonly property string barPosition: ["top", "bottom", "left", "right"].includes(Settings.bar.position) ? Settings.bar.position : "top"
+    readonly property bool barVertical: barPosition === "left" || barPosition === "right"
+    // Room the bar takes across and down the screen
+    readonly property int barSpaceX: barVertical ? barHeight : 0
+    readonly property int barSpaceY: barVertical ? 0 : barHeight
     // Space above the bar's shapes (and below, inside barHeight)
     readonly property int barGap: Math.min(Settings.bar.gap, Math.floor((barHeight - 24) / 2))
     // The bar's pill(s), and the circles at their ends (workspace, profile picture): the same gap

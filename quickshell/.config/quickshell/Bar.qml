@@ -12,8 +12,16 @@ PanelWindow {
     required property var modelData
     screen: modelData
 
-    anchors { top: true; left: true; right: true }
+    // Along the screen edge picked in Settings > Bar (Theme.barPosition)
+    readonly property string edge: Theme.barPosition
+    anchors {
+        top: edge !== "bottom"
+        bottom: edge !== "top"
+        left: edge !== "right"
+        right: edge !== "left"
+    }
     implicitHeight: Theme.barHeight
+    implicitWidth: Theme.barHeight
     color: "transparent"
 
     CalendarPanel {
@@ -76,7 +84,7 @@ PanelWindow {
     }
 
     BarLayout {
-        width: parent.width
+        anchors.fill: parent
         // Hidden while a Sheet draws its copy over it
         opacity: (Panels.covered[bar.screen.name] ?? 0) > 0 ? 0 : 1
         settingsActive: controlCenter.open

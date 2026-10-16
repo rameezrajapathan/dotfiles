@@ -9,8 +9,11 @@ import QtQuick.Shapes
 // (anchorIds), whose bottom corners square off; with a full-width bar it hangs from the bar's
 // bottom edge under that item. Where the pill is too close to the screen's side for a curve, the
 // sheet's edge lines up with the pill's instead.
+// On a bottom or side bar (Settings > Bar > Position) it comes out the same way towards the
+// middle of the screen: the shapes are worked out as for a top bar, with "along" the bar and
+// "depth" away from it, and mapped onto that edge (edgeMatrix, place()).
 // Fill a full-screen overlay with it, put the content inside and set sheetWidth/sheetHeight (the
-// sheet below the bar). `closed()` fires once the close animation has finished (hide the window
+// sheet's size on screen, whichever edge it comes from). `closed()` fires once the close animation has finished (hide the window
 // then); `dismiss()` asks the owner to close.
 Item {
     id: root
@@ -50,8 +53,15 @@ Item {
         onRunningChanged: if (!running && !root.open) root.closed()
     }
 
+    // The bar's edge, and the sheet's size along the bar and away from it
+    readonly property string edge: Theme.barPosition
+    readonly property bool vertical: Theme.barVertical
+    readonly property real length: vertical ? height : width
+    readonly property real sheetAlong: vertical ? sheetHeight : sheetWidth
+    readonly property real sheetDepth: vertical ? sheetWidth : sheetHeight
+
     // Where the sheet joins the bar; picked when it opens
-    property var anchor: ({ index: bar.strip ? 0 : 1, cx: width / 2 })
+    property var anchor: ({ index: bar.strip ? 0 : 1, cx: length / 2 })
     onOpenChanged: {
         if (open)
             anchor = bar.anchorFor(anchorIds);
@@ -66,8 +76,9 @@ Item {
 
     readonly property bool strip: bar.strip
     readonly property Item shape: bar.shapes[anchor.index] ?? bar.shapes[1]
-    readonly property real shapeX: shape.x
-    readonly property real shapeWidth: shape.width
+    // Positions along the bar (x on a top bar) and away from its edge (y on a top bar)
+    readonly property real shapeX: shape.along
+    readonly property real shapeWidth: shape.size
     readonly property real shapeTop: Theme.barGap
     readonly property real shapeHeight: Theme.pillHeight
     readonly property real shapeBottom: shapeTop + shapeHeight
@@ -76,17 +87,17 @@ Item {
     readonly property real reach: ear + radius + 4
 
     readonly property bool pillFlushLeft: shapeX < reach
-    readonly property bool pillFlushRight: width - shapeX - shapeWidth < reach
-    readonly property real bodyWidth: strip ? Math.min(sheetWidth, shapeWidth)
+    readonly property bool pillFlushRight: length - shapeX - shapeWidth < reach
+    readonly property real bodyWidth: strip ? Math.min(sheetAlong, shapeWidth)
         : pillFlushLeft && pillFlushRight ? shapeWidth
-        : Math.max(sheetWidth, shapeWidth + 2 * reach - 8)
+        : Math.max(sheetAlong, shapeWidth + 2 * reach - 8)
     // A side where the sheet's edge continues the pill's (or the bar's) instead of curving out
     readonly property bool flushLeft: strip ? centeredX - ear < shapeX + shapeRadius : pillFlushLeft
     readonly property bool flushRight: strip ? centeredX + bodyWidth + ear > shapeX + shapeWidth - shapeRadius
         : pillFlushRight
     readonly property real centeredX: strip
         ? Math.max(shapeX, Math.min(shapeX + shapeWidth - bodyWidth, Math.round(anchor.cx - bodyWidth / 2)))
-        : Math.max(4, Math.min(width - 4 - bodyWidth, Math.round(shapeX + (shapeWidth - bodyWidth) / 2)))
+        : Math.max(4, Math.min(length - 4 - bodyWidth, Math.round(shapeX + (shapeWidth - bodyWidth) / 2)))
     readonly property real bodyX: flushLeft ? shapeX
         : flushRight ? shapeX + shapeWidth - bodyWidth
         : centeredX
@@ -98,8 +109,8 @@ Item {
         : shapeX + (shapeWidth - startWidth) / 2
     readonly property real curWidth: startWidth + (bodyWidth - startWidth) * shapeNow.w
     readonly property real curX: startX + (bodyX - startX) * shapeNow.w
-    readonly property real curHeight: Math.max(0, sheetHeight * shapeNow.h)
-    readonly property real slide: shapeNow.y * sheetHeight
+    readonly property real curHeight: Math.max(0, sheetDepth * shapeNow.h)
+    readonly property real slide: shapeNow.y * sheetDepth
     // Top corners round off as the body widens past the pill
     readonly property real topRound: PanelMotion.clamp((curWidth - startWidth) / (2 * reach))
 
@@ -111,16 +122,36 @@ Item {
 
     anchors.fill: parent
 
+    // From along/depth (x/y as for a top bar) to the screen
+    readonly property matrix4x4 edgeMatrix: {
+        switch (edge) {
+        case "bottom": return Qt.matrix4x4(1, 0, 0, 0, 0, -1, 0, height, 0, 0, 1, 0, 0, 0, 0, 1);
+        case "left": return Qt.matrix4x4(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        case "right": return Qt.matrix4x4(0, -1, 0, width, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        return Qt.matrix4x4();
+    }
+    // A box at `a` along and `d` deep, `la` long and `ld` deep, inside one `extent` deep, on screen
+    function place(a, d, la, ld, extent) {
+        switch (edge) {
+        case "bottom": return Qt.rect(a, extent - d - ld, la, ld);
+        case "left": return Qt.rect(d, a, ld, la);
+        case "right": return Qt.rect(extent - d - ld, a, ld, la);
+        }
+        return Qt.rect(a, d, la, ld);
+    }
+
     // Background: the pill (or bar), curves and sheet drawn opaque and overlapping, then made
     // translucent together, so there are no seams where they meet (separate translucent shapes
     // leave a faint line at the joins on fractional scales)
     Item {
         id: background
         visible: root.covering
-        width: root.width
-        height: root.shapeBottom + Math.max(root.sheetHeight, root.curHeight)
+        width: root.length
+        height: root.shapeBottom + Math.max(root.sheetDepth, root.curHeight)
         opacity: root.color.a
         layer.enabled: true
+        transform: Matrix4x4 { matrix: root.edgeMatrix }
 
         readonly property color solid: Qt.rgba(root.color.r, root.color.g, root.color.b, 1)
 
@@ -135,7 +166,7 @@ Item {
             Rectangle {
                 y: root.slide
                 width: parent.width
-                height: root.shapeNow.reveal || root.shapeNow.h >= 1 ? root.sheetHeight : root.curHeight
+                height: root.shapeNow.reveal || root.shapeNow.h >= 1 ? root.sheetDepth : root.curHeight
                 color: background.solid
                 opacity: root.shapeNow.body
                 radius: root.radius
@@ -181,21 +212,26 @@ Item {
 
     // Content, laid out at full size where it ends up, shown through the body as it opens
     Item {
+        readonly property rect box: root.place(root.curX, root.shapeBottom, root.curWidth, root.curHeight,
+            root.vertical ? root.width : root.height)
         visible: root.covering
-        x: root.curX
-        y: root.shapeBottom
-        width: root.curWidth
-        height: root.curHeight
+        x: box.x
+        y: box.y
+        width: box.width
+        height: box.height
         clip: true
 
         Item {
-            x: root.bodyX - root.curX
-            y: root.slide + root.shapeNow.cy
-            width: root.bodyWidth
-            height: root.sheetHeight
+            readonly property rect box: root.place(root.bodyX - root.curX, root.slide + root.shapeNow.cy,
+                root.bodyWidth, root.sheetDepth, root.curHeight)
+            x: box.x
+            y: box.y
+            width: box.width
+            height: box.height
             opacity: root.shapeNow.content * root.shapeNow.body
             scale: root.shapeNow.scale
-            transformOrigin: Item.Top
+            // The side next to the bar
+            transformOrigin: ({ bottom: Item.Bottom, left: Item.Left, right: Item.Right })[root.edge] ?? Item.Top
 
             // Clicks on the sheet stay on it
             MouseArea {
@@ -213,7 +249,10 @@ Item {
     // find its items
     BarLayout {
         id: bar
-        width: root.width
+        x: root.edge === "right" ? root.width - width : 0
+        y: root.edge === "bottom" ? root.height - height : 0
+        width: root.vertical ? Theme.barHeight : root.width
+        height: root.vertical ? root.height : Theme.barHeight
         opacity: root.covering ? 1 : 0
         bareShape: root.covering ? root.anchor.index : -1
         settingsActive: root.kind === "settings"

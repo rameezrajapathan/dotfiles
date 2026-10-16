@@ -48,16 +48,20 @@ Item {
         }
     }
 
-    RowLayout {
+    // In a column, smaller, on a side bar
+    GridLayout {
         id: row
-        anchors.verticalCenter: parent.verticalCenter
-        spacing: 4
+        readonly property bool vertical: Theme.barVertical
+        anchors.centerIn: parent
+        flow: vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
+        rowSpacing: 0
+        columnSpacing: 4
 
-        Icon { name: "memory"; size: 18; color: Theme.accent }
-        Label { text: root.cpu + "%" }
-        Item { implicitWidth: 4 }
-        Icon { name: "memory_alt"; size: 18; color: Theme.accent }
-        Label { text: root.memory + "%" }
+        Icon { name: "memory"; size: 18; color: Theme.accent; Layout.alignment: Qt.AlignHCenter }
+        Label { text: root.cpu + "%"; font.pixelSize: Theme.fontSize - (row.vertical ? 3 : 0); Layout.alignment: Qt.AlignHCenter }
+        Item { implicitWidth: 4; implicitHeight: 4 }
+        Icon { name: "memory_alt"; size: 18; color: Theme.accent; Layout.alignment: Qt.AlignHCenter }
+        Label { text: root.memory + "%"; font.pixelSize: Theme.fontSize - (row.vertical ? 3 : 0); Layout.alignment: Qt.AlignHCenter }
     }
 
     MouseArea {

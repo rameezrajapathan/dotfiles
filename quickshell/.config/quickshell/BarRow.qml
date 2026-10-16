@@ -1,11 +1,16 @@
 import QtQuick
 import QtQuick.Layouts
 
-// One section of the bar: its modules in a row. A divider only shows between two shown items,
+// One section of the bar: its modules in a row (a column on a side bar), centered across the
+// bar's pill and placed along it by `along`. A divider only shows between two shown items,
 // so hidden ones (no meeting, not recording) don't leave doubled or dangling lines.
-RowLayout {
+GridLayout {
     id: root
     property var modules: []
+    // Where it starts along the bar, and its length along it
+    property real along: 0
+    readonly property bool vertical: Theme.barVertical
+    readonly property real length: vertical ? implicitHeight : implicitWidth
     property bool settingsActive: false
     signal action(string name)
 
@@ -20,7 +25,11 @@ RowLayout {
         return false;
     }
 
-    spacing: 12
+    flow: vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
+    rowSpacing: vertical ? 10 : 0
+    columnSpacing: vertical ? 0 : 12
+    x: vertical ? Theme.barGap + (Theme.pillHeight - width) / 2 : along
+    y: vertical ? along : Theme.barGap + (Theme.pillHeight - height) / 2
 
     // A divider shows when content comes before and after it, and it's the first one since the
     // content before

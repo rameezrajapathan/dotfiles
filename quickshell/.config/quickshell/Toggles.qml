@@ -136,6 +136,19 @@ Singleton {
         }
     }
 
+    // qs ipc call bar position <top|bottom|left|right>; bar cycle goes round the edges
+    IpcHandler {
+        target: "bar"
+        function position(edge: string): void {
+            if (["top", "bottom", "left", "right"].includes(edge))
+                Settings.bar.position = edge;
+        }
+        function cycle(): void {
+            const edges = ["top", "right", "bottom", "left"];
+            Settings.bar.position = edges[(edges.indexOf(Theme.barPosition) + 1) % 4];
+        }
+    }
+
     IpcHandler {
         target: "calendar"
         function toggle(): void {

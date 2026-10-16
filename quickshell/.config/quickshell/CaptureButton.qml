@@ -22,7 +22,7 @@ Item {
         id: pill
         anchors.centerIn: parent
         visible: Recorder.active
-        implicitWidth: row.implicitWidth + 16
+        implicitWidth: Theme.barVertical ? implicitHeight : row.implicitWidth + 16
         implicitHeight: 22
         radius: height / 2
         color: Qt.alpha(Theme.red, mouse.containsMouse ? 0.35 : 0.2)
@@ -45,7 +45,9 @@ Item {
                     NumberAnimation { to: 1; duration: 600 }
                 }
             }
+            // Just the dot on a side bar
             Label {
+                visible: !Theme.barVertical
                 text: mouse.containsMouse ? "Stop" : Recorder.elapsedText
                 color: Theme.red
                 font.bold: true

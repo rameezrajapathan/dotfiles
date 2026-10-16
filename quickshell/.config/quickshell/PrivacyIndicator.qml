@@ -7,16 +7,19 @@ Rectangle {
     id: root
     signal clicked()
 
-    implicitWidth: row.implicitWidth + 14
-    implicitHeight: 22
+    // A column of icons on a side bar
+    implicitWidth: Theme.barVertical ? 22 : row.implicitWidth + 14
+    implicitHeight: Theme.barVertical ? row.implicitHeight + 14 : 22
     radius: height / 2
     color: Qt.alpha(Theme.yellow, mouse.containsMouse ? 0.3 : 0.18)
     Behavior on implicitWidth { NumberAnimation { duration: Theme.ms(180); easing.type: Easing.OutCubic } }
 
-    RowLayout {
+    GridLayout {
         id: row
         anchors.centerIn: parent
-        spacing: 4
+        flow: Theme.barVertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
+        rowSpacing: 4
+        columnSpacing: 4
 
         Repeater {
             model: [
@@ -33,7 +36,7 @@ Rectangle {
             }
         }
         Label {
-            visible: mouse.containsMouse
+            visible: mouse.containsMouse && !Theme.barVertical
             text: Privacy.summary
             color: Theme.yellow
             font.pixelSize: Theme.fontSize - 2

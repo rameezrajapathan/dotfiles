@@ -75,7 +75,7 @@ Item {
 
             ListView {
                 Layout.fillWidth: true
-                Layout.preferredHeight: Math.min(contentHeight, root.height - Theme.barHeight - 120)
+                Layout.preferredHeight: Math.min(contentHeight, root.height - Theme.barSpaceY - 120)
                 visible: count > 0
                 clip: true
                 spacing: 8
