@@ -82,5 +82,7 @@ for ini in ~/.config/gtk-{3,4}.0/settings.ini; do
 		sed -i --follow-symlinks "s/^\(gtk-application-prefer-dark-theme=\).*/\1$prefer_dark/" "$ini"
 	fi
 done
+# VS Code and Code - OSS watch their theme file in the Pikadots extension
+python3 -I ~/.config/hypr/scripts/vscode-theme.py || true
 # Qt and KDE apps (kdeglobals; also picks up the icon theme for this mode)
 python3 -I ~/.config/hypr/scripts/kde-theme.py || true

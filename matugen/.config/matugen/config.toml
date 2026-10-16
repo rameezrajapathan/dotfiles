@@ -66,3 +66,9 @@ output_path = "~/.cache/wal/colors.json"
 [templates.zen]
 input_path = "~/.config/matugen/templates/zen-userChrome.css"
 output_path = "~/.local/state/theme/zen-userChrome.css"
+
+# VS Code, Code - OSS and VSCodium: hypr/scripts/vscode-theme.py copies it into the Pikadots theme
+# extension, which the editors watch (live)
+[templates.vscode]
+input_path = "~/.config/matugen/templates/vscode-theme.json"
+output_path = "~/.local/state/theme/vscode-theme.json"

@@ -39,6 +39,7 @@ The thresholds are at the top of `main()` in that script.
 | Qt and KDE apps ([kdeglobals](#qt-and-kde-apps)) | Live |
 | cava | Live |
 | Firefox and Zen ([Pywalfox](#firefox-and-zen)) | Live |
+| VS Code and Code - OSS ([Pikadots theme](#vs-code-and-code---oss)) | Live |
 | Keyboard lighting (ASUS) | Live |
 | starship | Next prompt |
 | fuzzel, peaclock | Next launch |
@@ -77,3 +78,28 @@ themes. pikadots turns themes on in each Zen profile (`zen.theme.disable-lightwe
 `user.js`) and loads the generated `~/.local/state/theme/zen-userChrome.css` from
 `chrome/userChrome.css`. That file points Zen's colors at Pywalfox's theme, so Zen also follows
 the wallpaper live, light or dark, after a first restart. It replaces Zen's own space colors.
+
+## VS Code and Code - OSS
+
+`pikadots install` (or `repair`, after installing an editor) builds a small local theme extension,
+"Pikadots", and installs it in each of Code - OSS, VS Code and VSCodium it finds
+(`hypr/scripts/vscode-theme.py install`). The theme is the matugen template `vscode-theme.json`,
+styled like kitty: one surface for every part with thin lines between them, the active tab
+filled, and the same syntax and terminal colors as Neovim and kitty. Its themes use VS Code's
+`_watch` flag, so `theme.sh` only copies the new file into the extension and open windows recolor
+live. Light and dark follow the desktop (`window.autoDetectColorScheme`). The editor also gets
+kitty's feel: the terminal font from Settings > Fonts, a block cursor that blinks softly and
+glides, and 12px of padding.
+
+**Transparency** (Code - OSS only): Arch's Code - OSS runs on the system Electron from a small
+launcher, `/usr/lib/code/code.mjs`. `vscode-theme.py` writes a copy to
+`~/.local/share/pikadots/code-oss/code.mjs` that opens windows transparent, clears the parts'
+backgrounds and paints one tint under them (the theme's `pikadots.glass`, kitty's 0.85), so text
+stays solid and Hyprland blurs the wallpaper behind. `~/.local/bin/code-oss` (and `code`) and
+`~/.local/share/applications/code-oss.desktop` start it; they're rewritten on every theme change,
+so a Code - OSS update is picked up. Microsoft's VS Code bundles its own Electron and stays opaque.
+Restart Code - OSS once after installing.
+
+The settings it replaced are kept in `~/.local/state/pikadots/vscode-<editor>.json`;
+`vscode-theme.py restore` (also run by `pikadots uninstall`) puts them back, removes the extension
+and the transparent launcher.

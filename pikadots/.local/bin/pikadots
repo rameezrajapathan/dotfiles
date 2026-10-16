@@ -298,6 +298,20 @@ setup_zen() {
 	return 0
 }
 
+setup_vscode() {
+	# The Pikadots color theme in each installed editor (hypr/scripts/vscode-theme.py)
+	command -v code-oss >/dev/null || command -v code >/dev/null || command -v codium >/dev/null || return 0
+	local out line
+	if out=$(python3 -I "$repo/hypr/.config/hypr/scripts/vscode-theme.py" install 2>&1); then
+		while IFS= read -r line; do
+			[[ -n $line ]] && ok "$line (live)"
+		done <<<"$out"
+	else
+		warn "VS Code theme: ${out//$'\n'/; }"
+	fi
+	return 0
+}
+
 git_identity() {
 	[[ -f $HOME/.config/git/user ]] && return
 	local name email
@@ -366,6 +380,7 @@ cmd_install() {
 	enable_services
 	setup_pywalfox
 	setup_zen
+	setup_vscode
 	setup_default_apps
 	step "Colors"
 	mkdir -p "$HOME/.local/state/quickshell" "$HOME/Pictures/Screenshots" "$HOME/Videos/Recordings"
@@ -391,6 +406,8 @@ cmd_uninstall() {
 	# Plasma's own colors back into kdeglobals while the script is still linked
 	python3 -I "$repo/hypr/.config/hypr/scripts/kde-theme.py" restore >/dev/null 2>&1 &&
 		ok "Qt/KDE theme restored"
+	python3 -I "$repo/hypr/.config/hypr/scripts/vscode-theme.py" restore >/dev/null 2>&1 &&
+		ok "VS Code theme restored"
 	step "Links"
 	local pkg
 	for ((i = ${#packages[@]} - 1; i >= 0; i--)); do
@@ -532,6 +549,7 @@ cmd_repair() {
 	enable_services
 	setup_pywalfox
 	setup_zen
+	setup_vscode
 	setup_default_apps
 	step "Colors"
 	generate_colors

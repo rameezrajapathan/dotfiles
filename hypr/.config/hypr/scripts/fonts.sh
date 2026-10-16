@@ -31,3 +31,5 @@ elif [ -e "$state/app-fonts" ]; then
 fi
 # Qt and KDE apps get the same interface fonts (kdeglobals)
 python3 -I ~/.config/hypr/scripts/kde-theme.py || true
+# VS Code / Code - OSS editor and terminal font
+python3 -I ~/.config/hypr/scripts/vscode-theme.py || true

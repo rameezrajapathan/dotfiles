@@ -22,8 +22,8 @@ Quickshell bar and a `pikadots` command to install, check, repair and update it.
 
 ## Features
 
-- **Colors from the wallpaper**: the bar, terminal, Neovim, GTK and Qt/KDE apps, lock screen and
-  keyboard lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
+- **Colors from the wallpaper**: the bar, terminal, Neovim, VS Code, GTK and Qt/KDE apps, lock
+  screen and keyboard lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
 - **A bar your way**: by default one minimal pill with workspaces, the clock (a live spectrum while
   music plays) and your profile picture, which opens a control center: quick tiles,
   sliders, music, notifications and more at a glance, in one column, a three-column Bento or
