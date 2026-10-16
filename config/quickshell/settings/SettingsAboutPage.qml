@@ -39,7 +39,7 @@ SettingsPage {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: 120
-        radius: 20
+        radius: Theme.round(20, width, height)
         gradient: Gradient {
             orientation: Gradient.Horizontal
             GradientStop { position: 0; color: Qt.alpha(Theme.accent, 0.35) }
@@ -48,7 +48,7 @@ SettingsPage {
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 24
+            anchors.margins: Theme.pad(24, 20, parent.width, parent.height)
             spacing: 20
 
             Avatar {

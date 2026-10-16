@@ -17,18 +17,18 @@ SettingsPage {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: summary.implicitHeight + 36
-        radius: 18
+        radius: Theme.round(18, width, height)
         color: Qt.alpha(Updates.count > 0 ? Theme.accent : Theme.green, 0.12)
 
         RowLayout {
             id: summary
-            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 20 }
+            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: Theme.pad(20, 18, parent.width, parent.height) }
             spacing: 16
 
             Rectangle {
                 implicitWidth: 52
                 implicitHeight: 52
-                radius: 16
+                radius: Theme.round(16, width, height)
                 color: Updates.count > 0 ? Theme.accent : Qt.alpha(Theme.green, 0.25)
                 Icon {
                     anchors.centerIn: parent
@@ -162,7 +162,7 @@ SettingsPage {
                         required property string modelData
                         implicitWidth: pkg.implicitWidth + 18
                         implicitHeight: 26
-                        radius: 13
+                        radius: Theme.round(13, width, height)
                         color: Qt.alpha(Theme.base, 0.6)
                         Label {
                             id: pkg

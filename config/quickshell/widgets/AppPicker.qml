@@ -37,14 +37,14 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: 46
-        radius: 12
+        radius: Theme.round(12, width, height)
         color: headerMouse.containsMouse ? Qt.alpha(Theme.overlay, 0.25) : Qt.alpha(Theme.base, 0.6)
         Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
         RowLayout {
             anchors.fill: parent
-            anchors.leftMargin: 10
-            anchors.rightMargin: 12
+            anchors.leftMargin: Theme.pad(10, 12, parent.width, parent.height)
+            anchors.rightMargin: Theme.pad(12, 12, parent.width, parent.height)
             spacing: 10
 
             AppIcon {
@@ -84,14 +84,14 @@ ColumnLayout {
         Layout.preferredHeight: root.expanded ? (search.visible ? search.height + 6 : 0) + Math.min(Math.max(list.contentHeight, empty.visible ? 40 : 0) + 12, 300) : 0
         visible: Layout.preferredHeight > 0
         clip: true
-        radius: 12
+        radius: Theme.round(12, width, height)
         color: Qt.alpha(Theme.base, 0.6)
         Behavior on Layout.preferredHeight { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
 
         SettingsTextField {
             id: search
             visible: root.searchable
-            anchors { top: parent.top; left: parent.left; right: parent.right; margins: 6 }
+            anchors { top: parent.top; left: parent.left; right: parent.right; margins: Theme.pad(6, 12, parent.width, parent.height) }
             placeholder: "Search " + root.options.length + " apps…"
             onEdited: t => root.query = t
             onEntered: t => {
@@ -112,7 +112,7 @@ ColumnLayout {
 
         ListView {
             id: list
-            anchors { top: search.visible ? search.bottom : parent.top; left: parent.left; right: parent.right; bottom: parent.bottom; margins: 6 }
+            anchors { top: search.visible ? search.bottom : parent.top; left: parent.left; right: parent.right; bottom: parent.bottom; margins: Theme.pad(6, 12, parent.width, parent.height) }
             model: root.shown
             spacing: 2
             clip: true
@@ -125,13 +125,13 @@ ColumnLayout {
 
                 width: ListView.view.width
                 height: 40
-                radius: 9
+                radius: Theme.round(9, width, height)
                 color: selected ? Qt.alpha(Theme.accent, 0.2) : rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : "transparent"
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: 8
-                    anchors.rightMargin: 10
+                    anchors.leftMargin: Theme.pad(8, 9, parent.width, parent.height)
+                    anchors.rightMargin: Theme.pad(10, 9, parent.width, parent.height)
                     spacing: 10
                     AppIcon { icon: row.modelData.icon; implicitSize: 24 }
                     Label {

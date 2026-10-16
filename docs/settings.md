@@ -14,12 +14,12 @@ then closes the window.
 
 | Page | `open` name | What's in it |
 |---|---|---|
-| Appearance | `appearance` | Wallpaper strip (click to apply and recolor), light/dark/auto mode, palette style (tonal, vivid, expressive, neutral, monochrome, …), current palette, Qt and KDE apps on/off, bar and panel opacity |
-| Fonts & icons | `fonts` | Font themes (interface + heading + terminal font pairings), or each font on its own: interface, display (headings, lock clock), terminal (kitty); optionally used by GTK apps too; text size; shell symbol style (Rounded, Outlined, Sharp) and weight; app icon theme |
-| Bar | `bar` | Styles (Minimalist, Focus, Everyday, On the go, Music lover, Developer, Islands, Floating, Classic, Maximalist, Custom); layout (one pill, islands, full width), height, space above and at the sides, roundness, outline; the items in each section; 24-hour clock, seconds, music spectrum |
+| Appearance | `appearance` | Wallpaper strip (click to apply and recolor), light/dark/auto mode, palette style (tonal, vivid, expressive, neutral, monochrome, …), current palette, Qt and KDE apps on/off, bar and panel opacity, corner roundness for the whole shell and Hyprland windows (0% square, 100% default, 200% circles and pills) |
+| Fonts & icons | `fonts` | Font themes (interface + heading + terminal font pairings), or each font on its own: interface, display (headings, lock clock), terminal (kitty); optionally used by GTK apps too; text size; shell symbol style (Rounded, Outlined, Sharp), and weight; app icon theme |
+| Bar | `bar` | Styles (Minimalist, Focus, Everyday, On the go, Music lover, Developer, Islands, Floating, Classic, Maximalist, Custom); layout (one pill, islands, full width), height, space above and at the sides, outline; the items in each section; 24-hour clock, seconds, music spectrum |
 | Control center | `controlcenter` | Layout (One glance, Bento or Custom, with a drawing of each), the widgets in each of one to three columns, and the quick tiles in order (Wi-Fi, Bluetooth, VPN, Do Not Disturb, night light, power profile, keep awake, game mode, microphone, record, color picker). Saved as `controlCenter` in `settings.json` |
 | Accessibility | `accessibility` | Screen zoom around the pointer (Hyprland `cursor:zoom_factor`, not saved; Super + Alt + = / − / 0), text size for the shell, GTK and Qt apps (`hypr/scripts/accessibility.sh`), reduce motion (the shell's transitions become instant through `Theme.ms()`, Hyprland, GTK and KDE animations off; spinners keep turning) |
-| Windows | `windows` | Tiling layout (dwindle, master, scrolling), gaps, border width, resize on borders, corner roundness and shape |
+| Windows | `windows` | Tiling layout (dwindle, master, scrolling), gaps, border width, resize on borders, corner shape (roundness follows Appearance) |
 | Effects | `effects` | Blur (strength, passes, vibrancy), window opacity, dimming, shadows, how panels open and close (Slide, Morph, Spring, Liquid, Reveal or Fade, each with a live preview, and their speed), animation speed and workspace switch style (the bar's workspace number animates the same way) |
 | Window rules | `rules` | Per app (window class; searchable picker, open windows listed first): floating, position (auto, one of nine spots on a 3×3 grid kept clear of the bar and screen edges, or exact x/y; *Use the open window* copies an open window's place and size), size, on every workspace, fullscreen, no blur, workspace (and whether to switch to it), opacity; ▶ opens the app. **Terminal apps** (a command such as `cava` or `peaclock`, or an installed terminal entry such as btop) get a launcher entry from `hypr/scripts/terminal-app.sh` in `~/.local/share/applications` that opens them in the default terminal with their own class (`pikadots-<name>`), so the rule matches them and not every terminal; deleting the rule removes the entry. Written to `~/.local/state/pikadots/window-rules.lua`, loaded at the end of `hypr/rules.lua`; Hyprland reloads after a change |
 | Keyboard & mouse | `input` | Keyboard layouts and options, key repeat, pointer speed and acceleration, focus follows mouse, touchpad, cursor theme and size |
@@ -94,7 +94,7 @@ them for your user, for example
 
 ![Bar page](screenshots/settings-bar-v3.webp)
 
-A style sets the layout, size, spacing, roundness, outline and items all at once
+A style sets the layout, size, spacing, outline and items all at once
 (`quickshell/services/BarStyles.qml`); changing any of them makes it "Custom", and the last custom setup
 comes back when you click the Custom card. Items (`BarModule.qml`): workspaces, apps (distro
 logo), window title, clock, date, weather, next meeting, now playing, recording & privacy (only while

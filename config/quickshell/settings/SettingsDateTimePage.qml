@@ -24,12 +24,12 @@ SettingsPage {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: nowRow.implicitHeight + 40
-        radius: 18
+        radius: Theme.round(18, width, height)
         color: Qt.alpha(Theme.accent, 0.12)
 
         RowLayout {
             id: nowRow
-            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 22 }
+            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: Theme.pad(22, 18, parent.width, parent.height) }
             spacing: 16
 
             ColumnLayout {
@@ -87,12 +87,12 @@ SettingsPage {
         visible: TimeDate.shellStale || TimeDate.error !== ""
         Layout.fillWidth: true
         implicitHeight: noticeRow.implicitHeight + 20
-        radius: 14
+        radius: Theme.round(14, width, height)
         color: Qt.alpha(TimeDate.error ? Theme.red : Theme.yellow, 0.14)
 
         RowLayout {
             id: noticeRow
-            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 14 }
+            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: Theme.pad(14, 14, parent.width, parent.height) }
             spacing: 10
             Icon {
                 name: TimeDate.error ? "error" : "restart_alt"

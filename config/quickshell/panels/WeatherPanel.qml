@@ -95,7 +95,7 @@ PanelWindow {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
             spacing: 4
 
             RowLayout {
@@ -281,14 +281,14 @@ PanelWindow {
 
                         Rectangle {
                             anchors.fill: parent
-                            radius: 2
+                            radius: Theme.round(2, width, height)
                             color: Qt.alpha(Theme.text, 0.08)
                         }
                         Rectangle {
                             x: (day.modelData.min - root.weekMin) / track.span * track.width
                             width: Math.max(4, (day.modelData.max - day.modelData.min) / track.span * track.width)
                             height: parent.height
-                            radius: 2
+                            radius: Theme.round(2, width, height)
                             color: Theme.accent
                             opacity: day.index === 0 ? 1 : 0.55
                         }
@@ -298,7 +298,7 @@ PanelWindow {
                             anchors.verticalCenter: parent.verticalCenter
                             width: 8
                             height: 8
-                            radius: 4
+                            radius: Theme.round(4, width, height)
                             color: Theme.text
                             border.width: 2
                             border.color: Theme.base
@@ -339,7 +339,7 @@ PanelWindow {
                         required property var modelData
                         Layout.fillWidth: true
                         Layout.preferredHeight: 56
-                        radius: 12
+                        radius: Theme.round(12, width, height)
                         color: Qt.alpha(Theme.surface, 0.5)
 
                         Icon {
@@ -384,7 +384,7 @@ PanelWindow {
             y: content.y + placeButton.height + 10
             width: 340
             height: searchColumn.implicitHeight + 16
-            radius: 16
+            radius: Theme.round(16, width, height)
             color: Theme.base
             border.width: 1
             border.color: Qt.alpha(Theme.text, 0.1)
@@ -409,7 +409,7 @@ PanelWindow {
                 Rectangle {
                     width: parent.width
                     height: 38
-                    radius: 10
+                    radius: Theme.round(10, width, height)
                     color: Qt.alpha(Theme.surface, 0.7)
 
                     Icon {

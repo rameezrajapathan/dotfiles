@@ -18,8 +18,8 @@ SettingsPage {
 
             GridLayout {
                 id: themeGrid
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
-                columns: 3
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 16) }
+                columns: Math.max(1, Math.min(3, Math.floor((width + 10) / 170)))
                 columnSpacing: 10
                 rowSpacing: 10
 
@@ -34,7 +34,7 @@ SettingsPage {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: cardColumn.implicitHeight + 24
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
                         border.width: selected ? 2 : 1
                         border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
@@ -42,7 +42,7 @@ SettingsPage {
 
                         ColumnLayout {
                             id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(12, 14, parent.width, parent.height) }
                             spacing: 4
 
                             RowLayout {
@@ -215,25 +215,35 @@ SettingsPage {
             }
         }
 
-        RowLayout {
+        GridLayout {
             Layout.fillWidth: true
-            Layout.margins: 16
+            Layout.margins: Theme.pad(16, 16)
             Layout.topMargin: 4
-            spacing: 0
+            columns: 10
+            columnSpacing: 0
+            rowSpacing: 8
 
             Repeater {
-                model: ["wifi", "bluetooth", "volume_up", "battery_android_frame_5", "notifications", "dark_mode", "music_note", "photo_camera", "folder", "settings"]
+                model: {
+                    const names = ["wifi", "bluetooth", "volume_up", "battery_android_frame_5", "notifications", "dark_mode", "music_note", "photo_camera", "folder", "settings"];
+                    return names.map(name => ({ name, filled: false })).concat(names.map(name => ({ name, filled: true })));
+                }
                 Item {
-                    required property string modelData
+                    required property var modelData
                     Layout.fillWidth: true
-                    implicitHeight: 44
+                    implicitHeight: 52
                     Rectangle {
                         anchors.centerIn: parent
-                        width: 42
-                        height: 42
-                        radius: 13
+                        width: 50
+                        height: 50
+                        radius: Theme.round(16, width, height)
                         color: Qt.alpha(Theme.base, 0.6)
-                        Icon { anchors.centerIn: parent; name: parent.parent.modelData; size: 22 }
+                        Icon {
+                            anchors.centerIn: parent
+                            name: parent.parent.modelData.name
+                            filled: parent.parent.modelData.filled
+                            size: 28
+                        }
                     }
                 }
             }
@@ -250,7 +260,7 @@ SettingsPage {
 
             IconThemePicker {
                 id: picker
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 16) }
             }
         }
     }

@@ -13,6 +13,8 @@ Item {
     property bool below: false
     property bool separator: true
     default property alias control: slot.data
+    readonly property real controlWidth: slot.children.length ? slot.children[0].implicitWidth : 0
+    readonly property bool stacked: below || (controlWidth > 0 && controlWidth > layout.width * 0.45)
 
     Layout.fillWidth: true
     implicitHeight: layout.implicitHeight + 24
@@ -25,7 +27,7 @@ Item {
         id: glow
         anchors.fill: parent
         anchors.margins: 4
-        radius: 12
+        radius: Theme.round(12, width, height)
         color: Theme.accent
         opacity: 0
     }
@@ -38,7 +40,7 @@ Item {
 
     Rectangle {
         visible: root.separator && root.parent && root.parent.children[0] !== root
-        anchors { top: parent.top; left: parent.left; right: parent.right; leftMargin: 62; rightMargin: 16 }
+        anchors { top: parent.top; left: parent.left; right: parent.right; leftMargin: Theme.pad(62, 16); rightMargin: Theme.pad(16, 16) }
         height: 1
         color: Qt.alpha(Theme.overlay, 0.25)
     }
@@ -46,9 +48,9 @@ Item {
     GridLayout {
         id: layout
         anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
-        anchors.leftMargin: 14
-        anchors.rightMargin: 16
-        columns: root.below ? 2 : 3
+        anchors.leftMargin: Theme.pad(14, 16)
+        anchors.rightMargin: Theme.pad(16, 16)
+        columns: root.stacked ? 2 : 3
         columnSpacing: 14
         rowSpacing: 12
 
@@ -57,7 +59,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             implicitWidth: 34
             implicitHeight: 34
-            radius: 11
+            radius: Theme.round(11, width, height)
             color: root.appIcon ? "transparent" : Qt.alpha(Theme.accent, 0.16)
 
             Icon {
@@ -98,10 +100,10 @@ Item {
 
         Item {
             id: slot
-            Layout.column: root.below ? 1 : 2
-            Layout.row: root.below ? 1 : 0
-            Layout.fillWidth: root.below
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+            Layout.column: root.stacked ? 1 : 2
+            Layout.row: root.stacked ? 1 : 0
+            Layout.fillWidth: root.stacked
+            Layout.alignment: Qt.AlignVCenter | (root.stacked ? Qt.AlignLeft : Qt.AlignRight)
             implicitWidth: children.length ? children[0].implicitWidth : 0
             implicitHeight: children.length ? children[0].implicitHeight : 0
 

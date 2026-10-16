@@ -56,14 +56,14 @@ SettingsPage {
                     implicitHeight: 44
 
                     Label {
-                        anchors { left: parent.left; leftMargin: 18; right: keys.left; rightMargin: 12; verticalCenter: parent.verticalCenter }
+                        anchors { left: parent.left; leftMargin: Theme.pad(18, 16); right: keys.left; rightMargin: 12; verticalCenter: parent.verticalCenter }
                         text: bind.modelData.desc
                         elide: Text.ElideRight
                     }
 
                     Row {
                         id: keys
-                        anchors { right: parent.right; rightMargin: 16; verticalCenter: parent.verticalCenter }
+                        anchors { right: parent.right; rightMargin: Theme.pad(16, 16); verticalCenter: parent.verticalCenter }
                         spacing: 4
 
                         Repeater {
@@ -73,7 +73,7 @@ SettingsPage {
                                 required property string modelData
                                 implicitWidth: Math.max(26, keyLabel.implicitWidth + 14)
                                 implicitHeight: 24
-                                radius: 7
+                                radius: Theme.round(7, width, height)
                                 color: Qt.alpha(Theme.base, 0.7)
                                 border.width: 1
                                 border.color: Qt.alpha(Theme.text, 0.12)

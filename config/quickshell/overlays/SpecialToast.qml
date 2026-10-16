@@ -60,7 +60,7 @@ PanelWindow {
         implicitWidth: row.implicitWidth + 14 + 22
         width: parent.width
         height: parent.height
-        radius: height / 2
+        radius: Theme.round(height / 2, width, height)
         color: Qt.alpha(Theme.base, 0.92)
         border.width: 1
         border.color: Qt.alpha(Theme.special, 0.5)
@@ -84,7 +84,7 @@ PanelWindow {
             Rectangle {
                 implicitWidth: 40
                 implicitHeight: 40
-                radius: 20
+                radius: Theme.round(20, width, height)
                 color: Theme.special
 
                 Icon {

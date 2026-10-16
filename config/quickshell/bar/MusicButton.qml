@@ -17,7 +17,7 @@ Rectangle {
 
     implicitWidth: size
     implicitHeight: size
-    radius: mouse.pressed ? size * 0.22 : checked ? size * 0.3 : size / 2
+    radius: Theme.round(mouse.pressed ? size * 0.22 : checked ? size * 0.3 : size / 2, width, height)
     color: filled || checked ? (mouse.containsMouse ? Qt.lighter(Theme.accent, 1.08) : Theme.accent)
         : mouse.containsMouse ? Qt.alpha(Theme.accent, 0.24) : Qt.alpha(Theme.accent, 0.13)
     opacity: enabled ? 1 : 0.4

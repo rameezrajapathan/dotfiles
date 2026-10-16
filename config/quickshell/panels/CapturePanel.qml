@@ -22,7 +22,7 @@ Item {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
             spacing: 8
 
             RowLayout {
@@ -90,7 +90,7 @@ Item {
 
         Layout.fillWidth: true
         implicitHeight: 64
-        radius: 12
+        radius: Theme.round(12, width, height)
         color: tileMouse.containsMouse ? Qt.alpha(Theme.accent, 0.25) : Qt.alpha(Theme.surface, 0.7)
         Behavior on color { ColorAnimation { duration: Theme.ms(100) } }
 

@@ -366,7 +366,7 @@ SettingsPage {
                     Rectangle {
                         implicitWidth: spotGrid.implicitWidth + 12
                         implicitHeight: spotGrid.implicitHeight + 12
-                        radius: 10
+                        radius: Theme.round(10, width, height)
                         color: Qt.alpha(Theme.base, 0.6)
                         border.width: 1
                         border.color: Qt.alpha(Theme.overlay, 0.3)
@@ -384,7 +384,7 @@ SettingsPage {
                                     readonly property bool selected: rule.position === modelData
                                     width: 34
                                     height: 22
-                                    radius: 6
+                                    radius: Theme.round(6, width, height)
                                     color: selected ? Theme.accent : spotMouse.containsMouse ? Qt.alpha(Theme.overlay, 0.45) : Qt.alpha(Theme.overlay, 0.18)
                                     Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
                                     MouseArea {
@@ -553,7 +553,7 @@ SettingsPage {
 
         implicitWidth: label.implicitWidth + 26
         implicitHeight: 30
-        radius: height / 2
+        radius: Theme.round(height / 2, width, height)
         color: checked ? Theme.accent : mouse.containsMouse ? Qt.alpha(Theme.overlay, 0.35) : Qt.alpha(Theme.base, 0.6)
         border.width: checked ? 0 : 1
         border.color: Qt.alpha(Theme.overlay, 0.3)

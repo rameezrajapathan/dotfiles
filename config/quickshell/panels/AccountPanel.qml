@@ -24,7 +24,7 @@ Item {
 
     ColumnLayout {
         id: content
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
         spacing: 4
 
         Label {
@@ -47,7 +47,7 @@ Item {
                 }
                 Rectangle {
                     anchors.fill: parent
-                    radius: width / 2
+                    radius: Theme.round(width / 2, width, height)
                     color: Qt.alpha(Theme.base, 0.55)
                     opacity: pictureMouse.containsMouse ? 1 : 0
                     Behavior on opacity { NumberAnimation { duration: Theme.ms(120) } }
@@ -169,14 +169,14 @@ Item {
                 required property var modelData
                 Layout.fillWidth: true
                 implicitHeight: 42
-                radius: 12
+                radius: Theme.round(12, width, height)
                 color: actionMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                 Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
+                    anchors.leftMargin: Theme.pad(12, 12, parent.width, parent.height)
+                    anchors.rightMargin: Theme.pad(12, 12, parent.width, parent.height)
                     spacing: 12
 
                     Icon { name: action.modelData.icon }

@@ -55,7 +55,7 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 24
+        anchors.margins: Theme.pad(24, 24)
         visible: root.player !== null
         spacing: 12
 
@@ -209,7 +209,7 @@ Item {
 
                     implicitWidth: chipRow.implicitWidth + 20
                     implicitHeight: 32
-                    radius: current ? 10 : height / 2
+                    radius: Theme.round(current ? 10 : height / 2, width, height)
                     color: current ? Theme.accent : chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.accent, 0.1)
                     Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
                     Behavior on radius { NumberAnimation { duration: Theme.ms(200) } }

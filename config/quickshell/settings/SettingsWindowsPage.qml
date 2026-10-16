@@ -93,20 +93,10 @@ SettingsPage {
 
     SettingsSection {
         title: "Corners"
-        readonly property var keys: ["decoration.rounding", "decoration.rounding_power"]
+        readonly property var keys: ["decoration.rounding_power"]
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)
 
-        SettingsRow {
-            icon: "rounded_corner"
-            title: "Roundness"
-            SettingsSlider {
-                from: 0; to: 24
-                value: Hypr.value("decoration.rounding") ?? 0
-                suffix: " px"
-                onMoved: v => Hypr.set("decoration.rounding", v)
-            }
-        }
         SettingsRow {
             icon: "crop_square"
             title: "Corner shape"

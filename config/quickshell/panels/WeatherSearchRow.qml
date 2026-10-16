@@ -12,7 +12,7 @@ Rectangle {
 
     width: parent?.width ?? 0
     height: 42
-    radius: 10
+    radius: Theme.round(10, width, height)
     color: rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
 
     Icon {

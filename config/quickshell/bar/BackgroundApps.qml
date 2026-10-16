@@ -37,7 +37,7 @@ Repeater {
             anchors.topMargin: 2
             width: 4
             height: 4
-            radius: 2
+            radius: Theme.round(2, width, height)
             color: Theme.accent
         }
 

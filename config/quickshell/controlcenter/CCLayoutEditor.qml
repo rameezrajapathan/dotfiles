@@ -80,7 +80,7 @@ ColumnLayout {
                 Layout.preferredWidth: 1
                 Layout.alignment: Qt.AlignTop
                 implicitHeight: content.implicitHeight + 16
-                radius: 14
+                radius: Theme.round(14, width, height)
                 color: Qt.alpha(Theme.base, 0.45)
                 border.width: root.safeTarget === index ? 1.5 : 0
                 border.color: Qt.alpha(Theme.accent, 0.7)
@@ -92,7 +92,7 @@ ColumnLayout {
 
                 ColumnLayout {
                     id: content
-                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
                     spacing: 4
 
                     Label {
@@ -123,15 +123,15 @@ ColumnLayout {
 
                             Layout.fillWidth: true
                             implicitHeight: 34
-                            radius: 10
+                            radius: Theme.round(10, width, height)
                             color: hover.hovered ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.surface, 0.5)
 
                             HoverHandler { id: hover }
 
                             RowLayout {
                                 anchors.fill: parent
-                                anchors.leftMargin: 8
-                                anchors.rightMargin: 6
+                                anchors.leftMargin: Theme.pad(8, 10, parent.width, parent.height)
+                                anchors.rightMargin: Theme.pad(6, 10, parent.width, parent.height)
                                 spacing: 6
 
                                 Icon { name: item.info.icon; size: 16; color: Theme.accent }

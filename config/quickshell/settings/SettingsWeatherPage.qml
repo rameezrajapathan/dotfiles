@@ -94,11 +94,11 @@ SettingsPage {
                         required property var modelData
                         Layout.fillWidth: true
                         implicitHeight: 40
-                        radius: 10
+                        radius: Theme.round(10, width, height)
                         color: resultMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : "transparent"
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 10
+                            anchors.leftMargin: Theme.pad(10, 10, parent.width, parent.height)
                             spacing: 10
                             Icon { name: "pin_drop"; size: 18; color: Theme.accent }
                             Label { text: result.modelData.name }

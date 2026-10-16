@@ -67,3 +67,7 @@ output_path = "~/.config/superfile/theme/wallpaper.toml"
 [templates.btop]
 input_path = "~/.config/matugen/templates/btop.theme"
 output_path = "~/.config/btop/themes/wallpaper.theme"
+
+[templates.cmatrix]
+input_path = "~/.config/matugen/templates/cmatrix"
+output_path = "~/.local/state/theme/cmatrix"

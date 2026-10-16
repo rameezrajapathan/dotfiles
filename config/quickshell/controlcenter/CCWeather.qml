@@ -22,7 +22,7 @@ CCCard {
 
     ColumnLayout {
         id: column
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 16 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(16, 22) }
         spacing: 2
 
         Label {

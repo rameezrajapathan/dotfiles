@@ -10,7 +10,7 @@ Rectangle {
 
     implicitHeight: Theme.pillCircle
     implicitWidth: vertical ? Theme.pillCircle : row.implicitWidth + 2 * 10
-    radius: height / 2
+    radius: Theme.round(height / 2, width, height)
     color: Theme.special
     scale: mouse.pressed ? 0.94 : mouse.containsMouse ? 1.04 : 1
     Behavior on scale { NumberAnimation { duration: Theme.ms(120); easing.type: Easing.OutCubic } }

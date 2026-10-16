@@ -28,7 +28,7 @@ Item {
 
                 width: root.vertical ? size : root.barThickness
                 height: root.vertical ? root.barThickness : size
-                radius: root.barThickness / 2
+                radius: Theme.round(root.barThickness / 2, width, height)
                 color: Theme.accent
                 opacity: 0.45 + 0.55 * level
                 Behavior on width { enabled: root.vertical; NumberAnimation { duration: Theme.ms(60) } }

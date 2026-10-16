@@ -11,7 +11,7 @@ Rectangle {
 
     Layout.fillWidth: true
     implicitHeight: 42
-    radius: 14
+    radius: Theme.round(14, width, height)
     color: Qt.alpha(Theme.surface, mouse.containsMouse ? 0.85 : 0.55)
     Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 

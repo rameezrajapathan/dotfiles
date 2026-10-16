@@ -75,7 +75,7 @@ PanelWindow {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 24) }
             spacing: 10
 
             SystemClock {
@@ -221,7 +221,7 @@ PanelWindow {
 
                         Layout.fillWidth: true
                         implicitHeight: 30
-                        radius: 6
+                        radius: Theme.round(6, width, height)
                         color: isToday ? Theme.accent : "transparent"
 
                         Label {

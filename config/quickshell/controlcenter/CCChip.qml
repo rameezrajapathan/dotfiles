@@ -12,7 +12,7 @@ Rectangle {
 
     implicitWidth: row.implicitWidth + 24
     implicitHeight: 30
-    radius: height / 2
+    radius: Theme.round(height / 2, width, height)
     color: highlight ? Qt.alpha(tint, mouse.containsMouse ? 0.32 : 0.2)
         : Qt.alpha(Theme.surface, mouse.containsMouse ? 0.85 : 0.55)
     Behavior on color { ColorAnimation { duration: Theme.ms(120) } }

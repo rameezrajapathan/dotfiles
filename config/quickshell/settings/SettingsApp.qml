@@ -17,7 +17,7 @@ Scope {
 
     readonly property var pages: [
         { key: "appearance", group: "Personalize", title: "Appearance", icon: "palette",
-            keywords: "wallpaper colors theme dark light mode palette scheme transparency opacity", component: appearancePage },
+            keywords: "wallpaper colors theme dark light mode palette scheme transparency opacity roundness rounded corners radius square circle", component: appearancePage },
         { key: "fonts", group: "Personalize", title: "Fonts & icons", icon: "font_download",
             keywords: "font typeface text size icons weight", component: fontsPage },
         { key: "bar", group: "Personalize", title: "Bar", icon: "toolbar",
@@ -27,7 +27,7 @@ Scope {
         { key: "accessibility", group: "Personalize", title: "Accessibility", icon: "accessibility_new",
             keywords: "accessibility zoom magnifier magnify larger text size bigger font reduce motion animations", component: accessibilityPage },
         { key: "windows", group: "Desktop", title: "Windows", icon: "select_window",
-            keywords: "hyprland layout dwindle master scrolling gaps borders rounding corners resize", component: windowsPage },
+            keywords: "hyprland layout dwindle master scrolling gaps borders corner shape squircle resize", component: windowsPage },
         { key: "effects", group: "Desktop", title: "Effects", icon: "auto_awesome",
             keywords: "blur opacity transparency dim shadows animations speed workspace", component: effectsPage },
         { key: "rules", group: "Desktop", title: "Window rules", icon: "select_window",
@@ -95,7 +95,7 @@ Scope {
             title: "Settings"
             implicitWidth: 1040
             implicitHeight: 720
-            minimumSize: Qt.size(780, 520)
+            minimumSize: Qt.size(420, 420)
             color: Qt.alpha(Theme.base, 0.94)
             onClosed: root.open = false
 
@@ -105,6 +105,9 @@ Scope {
             }
 
             property var hits: []
+            readonly property bool compact: width < 760
+            property bool drawerOpen: false
+            onCompactChanged: drawerOpen = false
             readonly property bool searching: search.text.trim() !== ""
 
             function collectRows(item, out) {
@@ -136,6 +139,7 @@ Scope {
             }
 
             function jump(hit) {
+                drawerOpen = false;
                 root.page = hit.key;
                 pendingHit = hit;
                 jumpTimer.restart();
@@ -171,11 +175,15 @@ Scope {
                 focus: true
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Escape) {
-                        if (search.text !== "")
+                        if (window.drawerOpen)
+                            window.drawerOpen = false;
+                        else if (search.text !== "")
                             search.text = "";
                         else
                             root.open = false;
                     } else if (event.key === Qt.Key_F && event.modifiers & Qt.ControlModifier) {
+                        if (window.compact)
+                            window.drawerOpen = true;
                         search.forceActiveFocus();
                     } else if (event.key === Qt.Key_Tab && event.modifiers & Qt.ControlModifier) {
                         window.step(1);
@@ -189,14 +197,18 @@ Scope {
 
                 Rectangle {
                     id: sidebar
-                    anchors { top: parent.top; bottom: parent.bottom; left: parent.left }
-                    width: 264
-                    color: Qt.alpha(Theme.surface, 0.3)
+                    anchors { top: parent.top; bottom: parent.bottom }
+                    z: 2
+                    width: window.compact ? Math.min(300, window.width - 56) : window.width < 1000 ? 232 : 264
+                    x: window.compact && !window.drawerOpen ? -width - 1 : 0
+                    visible: !window.compact || window.drawerOpen || x > -width
+                    color: window.compact ? Qt.alpha(Theme.base, 0.98) : Qt.alpha(Theme.surface, 0.3)
+                    Behavior on x { NumberAnimation { duration: Theme.ms(240); easing.type: Easing.OutQuint } }
 
                     ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: 16
-                        anchors.topMargin: 22
+                        anchors.margins: Theme.pad(16, 10)
+                        anchors.topMargin: Theme.pad(22, 10)
                         spacing: 4
 
                         RowLayout {
@@ -208,7 +220,7 @@ Scope {
                             Rectangle {
                                 implicitWidth: 42
                                 implicitHeight: 42
-                                radius: 14
+                                radius: Theme.round(14, width, height)
                                 gradient: Gradient {
                                     GradientStop { position: 0; color: Qt.lighter(Theme.accent, 1.15) }
                                     GradientStop { position: 1; color: Qt.darker(Theme.accent, 1.2) }
@@ -242,15 +254,15 @@ Scope {
                             Layout.fillWidth: true
                             Layout.bottomMargin: 10
                             implicitHeight: 38
-                            radius: 12
+                            radius: Theme.round(12, width, height)
                             color: Qt.alpha(Theme.base, 0.7)
                             border.width: search.activeFocus ? 1 : 0
                             border.color: Theme.accent
 
                             RowLayout {
                                 anchors.fill: parent
-                                anchors.leftMargin: 12
-                                anchors.rightMargin: 12
+                                anchors.leftMargin: Theme.pad(12, 12, parent.width, parent.height)
+                                anchors.rightMargin: Theme.pad(12, 12, parent.width, parent.height)
                                 spacing: 8
 
                                 Icon { name: "search"; size: 18; color: Theme.subtext }
@@ -338,13 +350,13 @@ Scope {
                                         required property int index
                                         Layout.fillWidth: true
                                         implicitHeight: hitColumn.implicitHeight + 14
-                                        radius: 12
+                                        radius: Theme.round(12, width, height)
                                         color: hitMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8)
                                             : index === 0 ? Qt.alpha(Theme.accent, 0.12) : "transparent"
 
                                         ColumnLayout {
                                             id: hitColumn
-                                            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: 12; rightMargin: 12 }
+                                            anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: Theme.pad(12, 12, parent.width, parent.height); rightMargin: Theme.pad(12, 12, parent.width, parent.height) }
                                             spacing: 0
                                             Label {
                                                 Layout.fillWidth: true
@@ -401,21 +413,21 @@ Scope {
                                         Rectangle {
                                             Layout.fillWidth: true
                                             implicitHeight: 38
-                                            radius: 13
+                                            radius: Theme.round(13, width, height)
                                             color: entry.current ? Theme.accent
                                                 : rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                                             Behavior on color { ColorAnimation { duration: Theme.ms(140) } }
 
                                             RowLayout {
                                                 anchors.fill: parent
-                                                anchors.leftMargin: 8
-                                                anchors.rightMargin: 12
+                                                anchors.leftMargin: Theme.pad(8, 13, parent.width, parent.height)
+                                                anchors.rightMargin: Theme.pad(12, 13, parent.width, parent.height)
                                                 spacing: 12
 
                                                 Rectangle {
                                                     implicitWidth: 28
                                                     implicitHeight: 28
-                                                    radius: 9
+                                                    radius: Theme.round(9, width, height)
                                                     color: entry.current ? Qt.alpha(Theme.accentText, 0.14) : Qt.alpha(Theme.accent, 0.16)
                                                     Icon {
                                                         anchors.centerIn: parent
@@ -439,7 +451,10 @@ Scope {
                                                 anchors.fill: parent
                                                 hoverEnabled: true
                                                 cursorShape: Qt.PointingHandCursor
-                                                onClicked: root.page = entry.modelData.key
+                                                onClicked: {
+                                                    root.page = entry.modelData.key;
+                                                    window.drawerOpen = false;
+                                                }
                                             }
                                         }
                                     }
@@ -466,8 +481,85 @@ Scope {
                     }
                 }
 
+                Rectangle {
+                    z: 1
+                    anchors.fill: parent
+                    color: "black"
+                    opacity: window.compact && window.drawerOpen ? 0.35 : 0
+                    visible: opacity > 0
+                    Behavior on opacity { NumberAnimation { duration: Theme.ms(200) } }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: window.drawerOpen = false
+                    }
+                }
+
+                Rectangle {
+                    id: topBar
+                    visible: window.compact
+                    anchors { top: parent.top; left: parent.left; right: parent.right }
+                    height: visible ? 52 : 0
+                    color: Qt.alpha(Theme.surface, 0.3)
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 16
+                        spacing: 8
+
+                        Rectangle {
+                            implicitWidth: 36
+                            implicitHeight: 36
+                            radius: Theme.round(12, width, height)
+                            color: menuMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
+                            Icon {
+                                anchors.centerIn: parent
+                                name: "menu"
+                                size: 22
+                                color: Theme.text
+                            }
+                            MouseArea {
+                                id: menuMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: window.drawerOpen = !window.drawerOpen
+                            }
+                        }
+                        Label {
+                            Layout.fillWidth: true
+                            text: root.pages.find(p => p.key === root.page)?.title ?? "Settings"
+                            font.weight: Font.DemiBold
+                            elide: Text.ElideRight
+                        }
+                        Rectangle {
+                            implicitWidth: 36
+                            implicitHeight: 36
+                            radius: Theme.round(12, width, height)
+                            color: searchMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
+                            Icon {
+                                anchors.centerIn: parent
+                                name: "search"
+                                size: 20
+                                color: Theme.subtext
+                            }
+                            MouseArea {
+                                id: searchMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    window.drawerOpen = true;
+                                    search.forceActiveFocus();
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Item {
-                    anchors { top: parent.top; bottom: parent.bottom; left: sidebar.right; right: parent.right }
+                    anchors { top: topBar.bottom; bottom: parent.bottom; left: parent.left; right: parent.right }
+                    anchors.leftMargin: window.compact ? 0 : sidebar.width
 
                     Repeater {
                         id: pageRepeater
@@ -499,15 +591,17 @@ Scope {
                             Behavior on opacity { NumberAnimation { duration: Theme.ms(flick.current ? 220 : 70) } }
                             clip: true
                             contentWidth: width
-                            contentHeight: loader.height + 72
+                            contentHeight: loader.height + loader.y * 2
                             boundsBehavior: Flickable.StopAtBounds
+
+                            readonly property int gutter: width < 520 ? 16 : width < 760 ? 24 : 40
 
                             Loader {
                                 id: loader
                                 active: flick.visited
-                                x: 40
-                                y: 36
-                                width: Math.min(flick.width - 80, 820)
+                                width: Math.min(flick.width - flick.gutter * 2, 880)
+                                x: Math.max(flick.gutter, (flick.width - width) / 2)
+                                y: window.compact ? 20 : 36
                                 height: item?.implicitHeight ?? 0
                                 sourceComponent: flick.modelData.component
                             }

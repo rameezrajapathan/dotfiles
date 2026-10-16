@@ -18,7 +18,7 @@ not ones that only listen to the speakers, like cava. The screen counts xdg-desk
 share. The camera counts PipeWire video capture and any process holding `/dev/video*` open.
 
 Settings > Bar has nine more styles and a custom setup: one pill, a pill per section (islands) or
-one bar across the screen; height, spacing, roundness and an outline; and which items go left, in
+one bar across the screen; height, spacing and an outline; and which items go left, in
 the middle and right. Besides the ones above there are the weather (click for the forecast), the
 date, the apps button (distro logo, opens the launcher), the focused window's title, now playing
 (right click plays or pauses, scroll skips), the tray, CPU and memory, network, Bluetooth (right

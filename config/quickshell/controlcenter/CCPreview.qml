@@ -19,7 +19,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         width: root.panelWidth
         height: parent.height
-        radius: 8
+        radius: Theme.round(8, width, height)
         color: Qt.alpha(Theme.base, 0.85)
         border.width: 1
         border.color: Qt.alpha(Theme.overlay, 0.25)
@@ -45,7 +45,7 @@ Item {
                             required property string modelData
                             width: column.width
                             height: Math.max(2, (root.heights[modelData] ?? 8) * root.scale)
-                            radius: Math.min(4, height / 2)
+                            radius: Theme.round(Math.min(4, height / 2), width, height)
                             color: modelData.startsWith("tiles") ? Qt.alpha(Theme.accent, 0.75)
                                 : modelData === "header" ? Qt.alpha(Theme.text, 0.35)
                                 : Qt.alpha(Theme.surface, 0.95)

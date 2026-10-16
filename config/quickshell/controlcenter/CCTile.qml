@@ -18,7 +18,7 @@ Rectangle {
     readonly property color fg: active ? Theme.accentText : Theme.text
 
     implicitHeight: small ? 76 : 64
-    radius: 20
+    radius: Theme.round(20, width, height)
     color: active ? (mainMouse.containsMouse ? Qt.lighter(Theme.accent, 1.06) : Theme.accent)
         : mainMouse.containsMouse ? Qt.alpha(Theme.surface, 0.85) : Qt.alpha(Theme.surface, 0.55)
     Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
@@ -35,7 +35,7 @@ Rectangle {
     RowLayout {
         visible: !root.small
         anchors.fill: parent
-        anchors.leftMargin: 16
+        anchors.leftMargin: Theme.pad(16, 20, parent.width, parent.height)
         spacing: 12
 
         Icon {
@@ -78,7 +78,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 4
-                radius: 14
+                radius: Theme.round(14, width, height)
                 color: moreMouse.containsMouse ? Qt.alpha(root.active ? Theme.accentText : Theme.text, 0.1) : "transparent"
             }
             Icon {
@@ -103,7 +103,7 @@ Rectangle {
     Item {
         visible: root.small
         anchors.fill: parent
-        anchors.margins: 12
+        anchors.margins: Theme.pad(12, 20, parent.width, parent.height)
 
         Icon {
             anchors { left: parent.left; top: parent.top }

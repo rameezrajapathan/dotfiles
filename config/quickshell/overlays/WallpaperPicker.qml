@@ -104,7 +104,7 @@ PanelWindow {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 24) }
             spacing: 10
 
             RowLayout {
@@ -118,7 +118,7 @@ PanelWindow {
                 Rectangle {
                     implicitWidth: 260
                     implicitHeight: 30
-                    radius: height / 2
+                    radius: Theme.round(height / 2, width, height)
                     color: Theme.surface
                     border.width: 2
                     border.color: search.text !== "" ? Qt.alpha(Theme.accent, 0.6) : "transparent"
@@ -218,14 +218,14 @@ PanelWindow {
                         id: thumb
                         width: height * 16 / 10
                         height: parent.height - 26
-                        radius: 8
+                        radius: Theme.round(8, width, height)
                         color: Theme.surface
                         border.width: 3
                         border.color: cell.active ? Theme.accent : cell.selected ? Theme.overlay : "transparent"
 
                         Image {
                             anchors.fill: parent
-                            anchors.margins: 3
+                            anchors.margins: Theme.pad(3, 8, parent.width, parent.height)
                             source: "file://" + cell.modelData.path
                             sourceSize.width: 400
                             fillMode: Image.PreserveAspectCrop

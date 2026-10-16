@@ -22,7 +22,7 @@ Rectangle {
 
     implicitWidth: 240
     implicitHeight: 34
-    radius: 10
+    radius: Theme.round(10, width, height)
     color: Qt.alpha(Theme.base, 0.6)
     border.width: input.activeFocus ? 1 : 0
     border.color: Theme.accent
@@ -39,8 +39,8 @@ Rectangle {
     TextInput {
         id: input
         anchors.fill: parent
-        anchors.leftMargin: 12
-        anchors.rightMargin: 12
+        anchors.leftMargin: Theme.pad(12, 10, parent.width, parent.height)
+        anchors.rightMargin: Theme.pad(12, 10, parent.width, parent.height)
         verticalAlignment: TextInput.AlignVCenter
         text: root.text
         color: Theme.text

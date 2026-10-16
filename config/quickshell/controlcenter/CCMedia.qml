@@ -30,7 +30,7 @@ CCCard {
     RowLayout {
         id: compactLayout
         visible: !root.large
-        anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 14 }
+        anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: Theme.pad(14, 22) }
         spacing: 14
 
         MediaCover {
@@ -120,7 +120,7 @@ CCCard {
     ColumnLayout {
         id: largeLayout
         visible: root.large
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 18 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(18, 22) }
         spacing: 2
 
         Item { Layout.fillWidth: true }

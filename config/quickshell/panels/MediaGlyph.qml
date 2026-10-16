@@ -21,7 +21,7 @@ Item {
             Rectangle {
                 width: root.size * 0.28
                 height: root.size * 0.9
-                radius: width * 0.35
+                radius: Theme.round(width * 0.35, width, height)
                 color: root.color
             }
         }

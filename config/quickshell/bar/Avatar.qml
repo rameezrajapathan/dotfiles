@@ -9,7 +9,7 @@ ClippingRectangle {
 
     implicitWidth: size
     implicitHeight: size
-    radius: size / 2
+    radius: Theme.round(size / 2, width, height)
     color: picture.status === Image.Ready ? "transparent" : Theme.surface
 
     Image {

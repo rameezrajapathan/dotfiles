@@ -75,7 +75,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: 4
         height: drag.pressed ? 22 : 18
-        radius: 2
+        radius: Theme.round(2, width, height)
         color: Theme.accent
         Behavior on height { NumberAnimation { duration: Theme.ms(120) } }
     }

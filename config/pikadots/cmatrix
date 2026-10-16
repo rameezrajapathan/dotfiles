@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+theme=$HOME/.local/state/theme/cmatrix
+[[ -r $theme && -t 1 ]] || exec /usr/bin/cmatrix "$@"
+mapfile -t seq <"$theme"
+printf "${seq[0]}"
+trap 'printf "${seq[1]}"' EXIT
+/usr/bin/cmatrix "$@"

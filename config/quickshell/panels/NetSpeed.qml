@@ -16,7 +16,7 @@ Rectangle {
     property var last: null
 
     implicitHeight: column.implicitHeight + 24
-    radius: 12
+    radius: Theme.round(12, width, height)
     color: Qt.alpha(Theme.surface, 0.5)
 
     onActiveChanged: {
@@ -72,7 +72,7 @@ Rectangle {
 
     ColumnLayout {
         id: column
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(12, 12, parent.width, parent.height) }
         spacing: 8
 
         RowLayout {
@@ -214,7 +214,7 @@ Rectangle {
         Rectangle {
             implicitWidth: 30
             implicitHeight: 30
-            radius: 15
+            radius: Theme.round(15, width, height)
             color: Qt.alpha(speed.color, 0.18)
 
             Icon {

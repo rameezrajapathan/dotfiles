@@ -14,7 +14,7 @@ Rectangle {
     signal clicked()
 
     implicitHeight: 32
-    radius: 6
+    radius: Theme.round(6, width, height)
     color: clickable && mouse.containsMouse ? Theme.surface : "transparent"
 
     MouseArea {
@@ -28,8 +28,8 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
+        anchors.leftMargin: Theme.pad(8, 6, parent.width, parent.height)
+        anchors.rightMargin: Theme.pad(8, 6, parent.width, parent.height)
         spacing: 10
 
         Icon {

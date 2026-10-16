@@ -25,7 +25,7 @@ CCCard {
 
     GridLayout {
         id: grid
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 22) }
         columns: root.stats.length
         columnSpacing: 14
 
@@ -53,12 +53,12 @@ CCCard {
                 Rectangle {
                     Layout.fillWidth: true
                     implicitHeight: 6
-                    radius: 3
+                    radius: Theme.round(3, width, height)
                     color: Qt.alpha(Theme.surface, 0.9)
                     Rectangle {
                         width: parent.width * Math.min(1, modelData.value)
                         height: parent.height
-                        radius: 3
+                        radius: Theme.round(3, width, height)
                         color: modelData.good ? Theme.green : modelData.value > 0.85 ? Theme.red : Theme.accent
                         Behavior on width { NumberAnimation { duration: Theme.ms(300) } }
                     }

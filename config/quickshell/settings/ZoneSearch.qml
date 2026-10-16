@@ -40,13 +40,13 @@ ColumnLayout {
 
             Layout.fillWidth: true
             implicitHeight: 38
-            radius: 10
+            radius: Theme.round(10, width, height)
             color: selected ? Qt.alpha(Theme.accent, 0.18) : mouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.4)
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 12
-                anchors.rightMargin: 12
+                anchors.leftMargin: Theme.pad(12, 10, parent.width, parent.height)
+                anchors.rightMargin: Theme.pad(12, 10, parent.width, parent.height)
                 spacing: 8
 
                 Icon { name: "public"; size: 17; color: Theme.accent }

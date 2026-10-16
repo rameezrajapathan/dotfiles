@@ -145,7 +145,7 @@ PanelWindow {
 
                     implicitWidth: 120
                     implicitHeight: 132
-                    radius: 22
+                    radius: Theme.round(22, width, height)
                     color: selected ? tint : Qt.alpha(Theme.surface, 0.5)
                     border.width: 1
                     border.color: selected ? tint : Qt.alpha(Theme.text, 0.08)
@@ -174,10 +174,10 @@ PanelWindow {
                     }
 
                     Rectangle {
-                        anchors { top: parent.top; right: parent.right; margins: 10 }
+                        anchors { top: parent.top; right: parent.right; margins: Theme.pad(10, 22, parent.width, parent.height) }
                         width: 24
                         height: 24
-                        radius: 8
+                        radius: Theme.round(8, width, height)
                         color: tile.selected ? Qt.alpha(Theme.accentText, 0.15) : Qt.alpha(Theme.surface, 0.8)
 
                         Label {

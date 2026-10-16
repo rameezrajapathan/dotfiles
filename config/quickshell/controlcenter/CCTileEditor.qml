@@ -50,15 +50,15 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 implicitHeight: 40
-                radius: 12
+                radius: Theme.round(12, width, height)
                 color: hover.hovered ? Qt.alpha(Theme.accent, 0.3) : Qt.alpha(Theme.accent, 0.18)
 
                 HoverHandler { id: hover }
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: 10
-                    anchors.rightMargin: 6
+                    anchors.leftMargin: Theme.pad(10, 12, parent.width, parent.height)
+                    anchors.rightMargin: Theme.pad(6, 12, parent.width, parent.height)
                     spacing: 8
 
                     Label {

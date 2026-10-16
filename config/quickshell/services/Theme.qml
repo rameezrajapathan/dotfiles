@@ -37,10 +37,20 @@ Singleton {
     readonly property int pillHeight: barHeight - 2 * barGap
     readonly property int pillInset: Math.max(5, Math.round((pillHeight - 28) / 2))
     readonly property int pillCircle: pillHeight - 2 * pillInset
-    readonly property real pillRadius: pillHeight / 2 * Settings.bar.roundness
+    readonly property real pillRadius: round(pillHeight / 2, pillHeight, pillHeight)
     readonly property string iconFont: "Material Symbols " + Settings.appearance.iconStyle
     readonly property int iconSize: 20
     readonly property int iconWeight: Settings.appearance.iconWeight
+    readonly property real roundness: Math.max(0, Math.min(2, Settings.appearance.roundness))
+
+    function round(base, width, height) {
+        const r = base * roundness;
+        return width === undefined ? r : Math.max(0, Math.min(r, Math.min(width, height) / 2));
+    }
+
+    function pad(base, radius, width, height) {
+        return base + Math.round(Math.max(0, round(radius, width, height) - radius) / 2);
+    }
 
     function wifiIcon(strength) {
         return ["signal_wifi_0_bar", "wifi_1_bar", "wifi_2_bar", "wifi", "wifi"][Math.min(4, Math.floor(strength * 5))];

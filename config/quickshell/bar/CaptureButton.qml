@@ -24,7 +24,7 @@ Item {
         visible: Recorder.active
         implicitWidth: Theme.barVertical ? implicitHeight : row.implicitWidth + 16
         implicitHeight: 22
-        radius: height / 2
+        radius: Theme.round(height / 2, width, height)
         color: Qt.alpha(Theme.red, mouse.containsMouse ? 0.35 : 0.2)
 
         RowLayout {
@@ -35,7 +35,7 @@ Item {
             Rectangle {
                 implicitWidth: 8
                 implicitHeight: 8
-                radius: 4
+                radius: Theme.round(4, width, height)
                 color: Theme.red
 
                 SequentialAnimation on opacity {

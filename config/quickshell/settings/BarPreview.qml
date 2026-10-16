@@ -10,7 +10,7 @@ Item {
     readonly property real barH: Math.max(8, (config.height - 2 * Math.min(config.gap, (config.height - 24) / 2)) * k)
     readonly property real gap: Math.min(config.gap, (config.height - 24) / 2) * k
     readonly property real side: config.layout === "pill" ? 0 : config.sideGap * k + 3
-    readonly property real r: barH / 2 * config.roundness
+    readonly property real r: Theme.round(barH / 2, barH, barH)
     readonly property var sections: {
         if (config.layout !== "pill")
             return [config.left, config.center, config.right];
@@ -36,7 +36,7 @@ Item {
         y: root.gap + root.barH + 6
         width: parent.width - 20
         height: parent.height
-        radius: 4
+        radius: Theme.round(4, width, height)
         color: Qt.alpha(Theme.base, 0.5)
     }
 

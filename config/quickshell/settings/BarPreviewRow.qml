@@ -25,7 +25,7 @@ Row {
                 anchors.centerIn: parent
                 width: parent.width
                 height: parent.modelData === "divider" ? root.barH * 0.4 : parent.circle ? width : parent.wide ? 3 : 4
-                radius: height / 2
+                radius: Theme.round(height / 2, width, height)
                 color: parent.circle ? Theme.accent : Qt.alpha(Theme.text, parent.modelData === "divider" ? 0.3 : 0.75)
             }
         }

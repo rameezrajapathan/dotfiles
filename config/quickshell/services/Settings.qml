@@ -92,6 +92,7 @@ Singleton {
                 property int fontSize: 13
                 property int iconWeight: 400
                 property string iconStyle: "Rounded"
+                property real roundness: 1
                 property string iconTheme: "Papirus"
                 property bool qtTheme: true
                 property string panelAnimation: "slide"
@@ -200,7 +201,6 @@ Singleton {
                 property int height: 46
                 property int gap: 4
                 property int sideGap: 8
-                property real roundness: 1
                 property bool border: false
                 property var custom: null
                 property bool musicBars: true

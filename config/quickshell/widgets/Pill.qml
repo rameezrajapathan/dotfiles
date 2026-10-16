@@ -10,7 +10,7 @@ Rectangle {
 
     implicitWidth: icon ? implicitHeight : label.implicitWidth + 16
     implicitHeight: 22
-    radius: height / 2
+    radius: Theme.round(height / 2, width, height)
     color: active ? Theme.accent : mouse.containsMouse ? Theme.overlay : Theme.surface
 
     Label {

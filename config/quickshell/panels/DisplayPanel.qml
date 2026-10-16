@@ -66,7 +66,7 @@ Item {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
             spacing: 10
 
             Label {
@@ -88,12 +88,12 @@ Item {
 
                     Layout.fillWidth: true
                     implicitHeight: cardContent.implicitHeight + 20
-                    radius: 8
+                    radius: Theme.round(8, width, height)
                     color: Qt.alpha(Theme.surface, 0.5)
 
                     ColumnLayout {
                         id: cardContent
-                        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 10 }
+                        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(10, 8, parent.width, parent.height) }
                         spacing: 8
 
                         RowLayout {

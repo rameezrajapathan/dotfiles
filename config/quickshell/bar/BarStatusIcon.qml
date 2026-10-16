@@ -36,7 +36,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             implicitWidth: Math.max(16, badge.implicitWidth + 8)
             implicitHeight: 16
-            radius: 8
+            radius: Theme.round(8, width, height)
             color: Theme.accent
             Label {
                 id: badge

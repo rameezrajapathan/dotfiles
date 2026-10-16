@@ -64,7 +64,7 @@ Item {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
             spacing: 4
 
             RowLayout {

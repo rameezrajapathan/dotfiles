@@ -8,13 +8,13 @@ Rectangle {
 
     implicitWidth: 36
     implicitHeight: 20
-    radius: height / 2
+    radius: Theme.round(height / 2, width, height)
     color: checked ? Theme.accent : Theme.surface
 
     Rectangle {
         width: 14
         height: 14
-        radius: 7
+        radius: Theme.round(7, width, height)
         anchors.verticalCenter: parent.verticalCenter
         x: root.checked ? parent.width - width - 3 : 3
         color: root.checked ? Theme.accentText : Theme.subtext

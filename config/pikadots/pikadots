@@ -30,6 +30,7 @@ links=(
 	"pikadots/pikadots-backup .local/bin/pikadots-backup"
 	"pikadots/pikadots-meetings .local/bin/pikadots-meetings"
 	"pikadots/pywalfox-host .local/bin/pywalfox-host"
+	"pikadots/cmatrix .local/bin/cmatrix"
 	"pikadots/pikadots-backup.service .config/systemd/user/pikadots-backup.service"
 	"pikadots/pikadots-backup.timer .config/systemd/user/pikadots-backup.timer"
 	"pikadots/pikadots-settings.desktop .local/share/applications/pikadots-settings.desktop"

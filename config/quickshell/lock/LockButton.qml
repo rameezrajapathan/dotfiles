@@ -22,7 +22,7 @@ Item {
     Rectangle {
         id: circle
         anchors.fill: parent
-        radius: width / 2
+        radius: Theme.round(width / 2, width, height)
         color: root.armed ? Qt.alpha(Theme.red, 0.9)
             : mouse.containsMouse ? Qt.alpha(Theme.surface, 0.85) : Qt.alpha(Theme.base, 0.45)
         border.width: 1
@@ -45,7 +45,7 @@ Item {
         anchors.bottomMargin: 10
         width: tip.implicitWidth + 20
         height: 28
-        radius: 14
+        radius: Theme.round(14, width, height)
         color: Qt.alpha(Theme.base, 0.8)
         opacity: mouse.containsMouse || root.armed ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.ms(150) } }

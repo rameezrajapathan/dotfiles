@@ -41,7 +41,7 @@ SettingsPage {
             below: true
 
             GridLayout {
-                columns: 3
+                columns: Math.max(1, Math.min(3, Math.floor((width + 10) / 170)))
                 columnSpacing: 10
                 rowSpacing: 10
 
@@ -62,7 +62,7 @@ SettingsPage {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: cardColumn.implicitHeight + 16
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
                         border.width: selected ? 2 : 1
                         border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
@@ -70,13 +70,13 @@ SettingsPage {
 
                         ColumnLayout {
                             id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
                             spacing: 8
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 implicitHeight: 58
-                                radius: 9
+                                radius: Theme.round(9, width, height)
                                 color: "transparent"
                                 clip: true
                                 BarPreview {
@@ -175,19 +175,6 @@ SettingsPage {
             }
         }
         SettingsRow {
-            icon: "rounded_corner"
-            title: "Roundness"
-            description: "Square corners to fully round ends."
-            SettingsSlider {
-                from: 0
-                to: 100
-                stepSize: 5
-                value: Math.round(Settings.bar.roundness * 100)
-                suffix: "%"
-                onMoved: v => Settings.bar.roundness = Math.round(v) / 100
-            }
-        }
-        SettingsRow {
             icon: "border_style"
             title: "Outline"
             description: "A thin line around the bar's shapes."
@@ -208,7 +195,7 @@ SettingsPage {
 
             BarModuleEditor {
                 id: editor
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 16) }
             }
         }
     }
@@ -225,7 +212,7 @@ SettingsPage {
             below: true
 
             GridLayout {
-                columns: 4
+                columns: Math.max(2, Math.min(4, Math.floor((width + 10) / 130)))
                 columnSpacing: 10
                 rowSpacing: 10
 
@@ -240,7 +227,7 @@ SettingsPage {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: wsCardColumn.implicitHeight + 16
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         color: selected ? Qt.alpha(Theme.accent, 0.16) : wsCardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
                         border.width: selected ? 2 : 1
                         border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
@@ -248,13 +235,13 @@ SettingsPage {
 
                         ColumnLayout {
                             id: wsCardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
                             spacing: 8
 
                             Rectangle {
                                 Layout.fillWidth: true
                                 implicitHeight: 50
-                                radius: 9
+                                radius: Theme.round(9, width, height)
                                 color: Qt.alpha(Theme.base, 0.5)
                                 clip: true
 

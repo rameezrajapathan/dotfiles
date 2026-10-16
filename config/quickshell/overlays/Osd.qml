@@ -114,7 +114,7 @@ PanelWindow {
         id: pill
         width: parent.width
         height: parent.height
-        radius: height / 2
+        radius: Theme.round(height / 2, width, height)
         color: Qt.alpha(Theme.base, 0.92)
         border.width: 1
         border.color: Qt.alpha(Theme.accent, 0.3)
@@ -138,7 +138,7 @@ PanelWindow {
             Rectangle {
                 implicitWidth: 44
                 implicitHeight: 44
-                radius: 22
+                radius: Theme.round(22, width, height)
                 color: root.muted ? Qt.alpha(Theme.red, 0.18) : Qt.alpha(Theme.accent, 0.2)
                 Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
 
@@ -167,7 +167,7 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                         width: (parent.width - parent.spacing * (root.segments - 1)) / root.segments
                         height: lit ? full : 6
-                        radius: width / 2
+                        radius: Theme.round(width / 2, width, height)
                         color: lit ? Theme.accent : Qt.alpha(Theme.text, 0.15)
 
                         Behavior on height { NumberAnimation { duration: Theme.ms(140); easing.type: Easing.OutCubic } }

@@ -14,7 +14,7 @@ Rectangle {
 
     implicitWidth: 36
     implicitHeight: 36
-    radius: Math.min(12, height / 3)
+    radius: Theme.round(Math.min(12, height / 3), width, height)
     color: tone === "accent" ? (mouse.containsMouse ? Qt.lighter(Theme.accent, 1.08) : Theme.accent)
         : tone === "danger" ? Qt.alpha(Theme.red, mouse.containsMouse ? 0.3 : 0.16)
         : tone === "flat" ? (mouse.containsMouse ? Qt.alpha(Theme.surface, 0.7) : "transparent")
@@ -43,7 +43,7 @@ Rectangle {
         anchors { top: parent.top; right: parent.right; topMargin: 1; rightMargin: 1 }
         height: 15
         width: Math.max(height, badgeText.implicitWidth + 8)
-        radius: height / 2
+        radius: Theme.round(height / 2, width, height)
         color: Theme.accent
 
         Label {

@@ -74,7 +74,7 @@ PanelWindow {
 
     readonly property var columns: CCStyles.current
     readonly property int columnWidth: CCStyles.columnWidth(columns.length)
-    readonly property int padding: 16
+    readonly property int padding: Theme.pad(16, 24)
     readonly property int overviewWidth: columns.length * columnWidth + (columns.length - 1) * 12 + 2 * padding
     readonly property int detailWidth: 640
     readonly property int detailMinHeight: root.detail === "notifications" ? Math.round(root.maxHeight * 0.8) : 420

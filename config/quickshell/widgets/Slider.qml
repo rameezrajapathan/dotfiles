@@ -19,7 +19,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
         height: 6
-        radius: 3
+        radius: Theme.round(3, width, height)
         color: Theme.surface
 
         Rectangle {
@@ -33,7 +33,7 @@ Item {
     Rectangle {
         width: 14
         height: 14
-        radius: 7
+        radius: Theme.round(7, width, height)
         anchors.verticalCenter: parent.verticalCenter
         x: Math.min(1, root.value) * (parent.width - width)
         color: root.dimmed ? Theme.subtext : Theme.text

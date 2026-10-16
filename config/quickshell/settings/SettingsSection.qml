@@ -31,7 +31,7 @@ ColumnLayout {
             visible: root.canReset
             implicitWidth: resetRow.implicitWidth + 16
             implicitHeight: 24
-            radius: 12
+            radius: Theme.round(12, width, height)
             color: resetMouse.containsMouse ? Qt.alpha(Theme.accent, 0.25) : Qt.alpha(Theme.accent, 0.12)
 
             Row {
@@ -64,7 +64,7 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: card.implicitHeight
-        radius: 16
+        radius: Theme.round(16, width, height)
         color: Qt.alpha(Theme.surface, 0.45)
 
         ColumnLayout {

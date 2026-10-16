@@ -4,7 +4,7 @@ import qs.services
 Rectangle {
     implicitWidth: 18
     implicitHeight: 18
-    radius: width / 2
+    radius: Theme.round(width / 2, width, height)
     color: Theme.accent
     Icon {
         anchors.centerIn: parent

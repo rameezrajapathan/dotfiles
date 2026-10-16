@@ -9,7 +9,7 @@ Rectangle {
 
     width: parent.width
     implicitHeight: cardContent.implicitHeight + 32
-    radius: 18
+    radius: Theme.round(18, width, height)
     color: Theme.baseTranslucent
     border.width: 1
     border.color: Qt.alpha(Theme.text, 0.08)
@@ -20,7 +20,7 @@ Rectangle {
 
     ColumnLayout {
         id: cardContent
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 16 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(16, 18, parent.width, parent.height) }
         spacing: 8
 
         RowLayout {
@@ -30,7 +30,7 @@ Rectangle {
             Rectangle {
                 implicitWidth: 32
                 implicitHeight: 32
-                radius: 10
+                radius: Theme.round(10, width, height)
                 color: Qt.alpha(Theme.accent, 0.18)
 
                 Icon {
@@ -73,7 +73,7 @@ Rectangle {
                             required property string modelData
                             implicitWidth: Math.max(26, keyLabel.implicitWidth + 14)
                             implicitHeight: 24
-                            radius: 7
+                            radius: Theme.round(7, width, height)
                             color: Qt.alpha(Theme.surface, 0.9)
                             border.width: 1
                             border.color: Qt.alpha(Theme.text, 0.12)
@@ -81,7 +81,7 @@ Rectangle {
                             Rectangle {
                                 anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: 1 }
                                 height: 3
-                                radius: 6
+                                radius: Theme.round(6, width, height)
                                 color: Qt.alpha(Theme.base, 0.5)
                             }
 

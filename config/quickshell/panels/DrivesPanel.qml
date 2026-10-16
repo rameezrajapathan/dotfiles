@@ -15,7 +15,7 @@ Item {
 
     ColumnLayout {
         id: content
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
         spacing: 4
 
         Label {
@@ -71,13 +71,13 @@ Item {
                     Layout.bottomMargin: 4
                     visible: drive.mounted && drive.modelData.size > 0
                     implicitHeight: 4
-                    radius: 2
+                    radius: Theme.round(2, width, height)
                     color: Theme.surface
 
                     Rectangle {
                         width: parent.width * Math.min(1, drive.modelData.used / Math.max(1, drive.modelData.size))
                         height: parent.height
-                        radius: 2
+                        radius: Theme.round(2, width, height)
                         color: drive.modelData.used / Math.max(1, drive.modelData.size) > 0.9 ? Theme.red : Theme.accent
                     }
                 }

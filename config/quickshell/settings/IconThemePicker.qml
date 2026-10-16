@@ -37,7 +37,7 @@ ColumnLayout {
 
     GridLayout {
         Layout.fillWidth: true
-        columns: 2
+        columns: width < 380 ? 1 : 2
         columnSpacing: 10
         rowSpacing: 10
 
@@ -52,7 +52,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 implicitHeight: cardColumn.implicitHeight + 24
-                radius: 14
+                radius: Theme.round(14, width, height)
                 color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
                 border.width: selected ? 2 : 1
                 border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
@@ -60,7 +60,7 @@ ColumnLayout {
 
                 ColumnLayout {
                     id: cardColumn
-                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
+                    anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(12, 14, parent.width, parent.height) }
                     spacing: 10
 
                     RowLayout {

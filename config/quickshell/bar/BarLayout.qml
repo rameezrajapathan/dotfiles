@@ -13,7 +13,7 @@ Item {
     readonly property bool vertical: Theme.barVertical
     readonly property real length: vertical ? height : width
     readonly property real sideGap: layout === "pill" ? 0 : Settings.bar.sideGap
-    readonly property real padding: Theme.pillInset + Math.round((1 - Settings.bar.roundness) * 6)
+    readonly property real padding: Theme.pillInset + Math.round((1 - Math.min(1, Theme.roundness)) * 6)
     readonly property var shapes: [shape0, shape1, shape2]
     readonly property var rows: [row0, row1, row2]
 

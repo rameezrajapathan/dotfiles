@@ -9,7 +9,7 @@ Rectangle {
 
     Layout.fillWidth: true
     implicitHeight: holder.children.length ? holder.children[0].implicitHeight : 0
-    radius: 16
+    radius: Theme.round(16, width, height)
     color: Qt.alpha(Theme.surface, 0.45)
 
     Item {

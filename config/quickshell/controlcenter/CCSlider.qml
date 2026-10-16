@@ -11,7 +11,7 @@ Rectangle {
     signal iconClicked()
 
     implicitHeight: 44
-    radius: 16
+    radius: Theme.round(16, width, height)
     color: Qt.alpha(Theme.surface, 0.55)
     clip: true
 
@@ -58,7 +58,7 @@ Rectangle {
     }
 
     Label {
-        anchors { right: parent.right; rightMargin: 14; verticalCenter: parent.verticalCenter }
+        anchors { right: parent.right; rightMargin: Theme.pad(14, 16, parent.width, parent.height); verticalCenter: parent.verticalCenter }
         text: Math.round(root.value * 100) + "%"
         color: root.value > 0.9 ? Theme.accentText : Theme.subtext
         font.pixelSize: Theme.fontSize - 1

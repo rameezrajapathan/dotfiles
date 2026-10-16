@@ -9,7 +9,7 @@ Rectangle {
 
     implicitWidth: Theme.barVertical ? 22 : row.implicitWidth + 14
     implicitHeight: Theme.barVertical ? row.implicitHeight + 14 : 22
-    radius: height / 2
+    radius: Theme.round(height / 2, width, height)
     color: Qt.alpha(Theme.yellow, mouse.containsMouse ? 0.3 : 0.18)
     Behavior on implicitWidth { NumberAnimation { duration: Theme.ms(180); easing.type: Easing.OutCubic } }
 

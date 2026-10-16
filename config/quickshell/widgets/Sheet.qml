@@ -9,7 +9,7 @@ Item {
     property bool open: false
     property real sheetWidth: 600
     property real sheetHeight: 400
-    property real radius: 24
+    property real radius: Theme.round(24)
     property real ear: 14
     property color color: Theme.baseTranslucent
     property string kind: ""

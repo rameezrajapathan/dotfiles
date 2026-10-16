@@ -183,7 +183,7 @@ PanelWindow {
                     ClippingRectangle {
                         implicitWidth: root.cardWidth
                         implicitHeight: root.monitorHeight * root.cardScale
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         color: Qt.alpha(Theme.surface, 0.6)
                         border.width: ws.selected ? 3 : 1
                         border.color: ws.selected ? Theme.accent : ws.active ? Qt.alpha(Theme.accent, 0.5) : Qt.alpha(Theme.text, 0.1)
@@ -216,7 +216,7 @@ PanelWindow {
 
                                 ClippingRectangle {
                                     anchors.fill: parent
-                                    radius: 6
+                                    radius: Theme.round(6, width, height)
                                     color: Theme.base
                                     border.width: winMouse.containsMouse ? 2 : 0
                                     border.color: Theme.accent

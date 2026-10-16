@@ -97,7 +97,7 @@ PanelWindow {
                 Rectangle {
                     Layout.preferredWidth: 360
                     implicitHeight: 42
-                    radius: 21
+                    radius: Theme.round(21, width, height)
                     color: Theme.baseTranslucent
                     border.width: 1
                     border.color: search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : Qt.alpha(Theme.text, 0.1)
@@ -108,8 +108,8 @@ PanelWindow {
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 14
-                        anchors.rightMargin: 14
+                        anchors.leftMargin: Theme.pad(14, 21, parent.width, parent.height)
+                        anchors.rightMargin: Theme.pad(14, 21, parent.width, parent.height)
                         spacing: 10
 
                         Icon {

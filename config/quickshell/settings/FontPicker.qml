@@ -34,14 +34,14 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         implicitHeight: 56
-        radius: 12
+        radius: Theme.round(12, width, height)
         color: headerMouse.containsMouse ? Qt.alpha(Theme.overlay, 0.25) : Qt.alpha(Theme.base, 0.6)
         Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
         RowLayout {
             anchors.fill: parent
-            anchors.leftMargin: 14
-            anchors.rightMargin: 12
+            anchors.leftMargin: Theme.pad(14, 12, parent.width, parent.height)
+            anchors.rightMargin: Theme.pad(12, 12, parent.width, parent.height)
             spacing: 10
 
             ColumnLayout {
@@ -91,25 +91,25 @@ ColumnLayout {
         Layout.preferredHeight: root.expanded ? 330 : 0
         visible: Layout.preferredHeight > 0
         clip: true
-        radius: 12
+        radius: Theme.round(12, width, height)
         color: Qt.alpha(Theme.base, 0.6)
         Behavior on Layout.preferredHeight { NumberAnimation { duration: Theme.ms(240); easing.type: Easing.OutQuint } }
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 8
+            anchors.margins: Theme.pad(8, 12, parent.width, parent.height)
             spacing: 6
 
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 36
-                radius: 10
+                radius: Theme.round(10, width, height)
                 color: Qt.alpha(Theme.surface, 0.8)
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: 10
-                    anchors.rightMargin: 10
+                    anchors.leftMargin: Theme.pad(10, 10, parent.width, parent.height)
+                    anchors.rightMargin: Theme.pad(10, 10, parent.width, parent.height)
                     spacing: 8
                     Icon { name: "search"; size: 18; color: Theme.subtext }
                     TextInput {
@@ -154,14 +154,14 @@ ColumnLayout {
 
                     width: ListView.view.width
                     height: 50
-                    radius: 10
+                    radius: Theme.round(10, width, height)
                     color: selected ? Qt.alpha(Theme.accent, 0.2)
                         : rowMouse.containsMouse || ListView.isCurrentItem ? Qt.alpha(Theme.surface, 0.9) : "transparent"
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
+                        anchors.leftMargin: Theme.pad(12, 10, parent.width, parent.height)
+                        anchors.rightMargin: Theme.pad(12, 10, parent.width, parent.height)
                         spacing: 10
 
                         ColumnLayout {

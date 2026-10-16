@@ -1,0 +1,2 @@
+\e]4;0;{{colors.surface.default.hex}}\a\e]21;transparent_background_color1={{colors.surface.default.hex}}\a\e]4;2;{{colors.primary.default.hex}}\a\e]4;10;{{colors.primary_fixed.default.hex}}\a
+\e]4;0;{{colors.surface_container_highest.default.hex}}\a\e]21;transparent_background_color1=\a\e]4;2;{{ansi.green}}\a\e]4;10;{{ansi.green}}\a

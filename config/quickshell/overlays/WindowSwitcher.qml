@@ -119,7 +119,7 @@ PanelWindow {
         ListView {
             id: row
             anchors.fill: parent
-            anchors.margins: 16
+            anchors.margins: Theme.pad(16, 24)
             implicitWidth: contentWidth
             implicitHeight: 200
             orientation: ListView.Horizontal
@@ -132,7 +132,7 @@ PanelWindow {
             highlight: Rectangle {
                 width: 260
                 height: 200
-                radius: 16
+                radius: Theme.round(16, width, height)
                 color: Qt.alpha(Theme.accent, 0.22)
                 border.width: 2
                 border.color: Theme.accent
@@ -149,18 +149,18 @@ PanelWindow {
 
                 width: 260
                 height: 200
-                radius: 16
+                radius: Theme.round(16, width, height)
                 color: !selected && cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 10
+                    anchors.margins: Theme.pad(10, 16, parent.width, parent.height)
                     spacing: 8
 
                     ClippingRectangle {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        radius: 10
+                        radius: Theme.round(10, width, height)
                         color: Theme.surface
 
                         ScreencopyView {

@@ -371,21 +371,21 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 20
+            anchors.margins: Theme.pad(20, 24)
             spacing: 14
 
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 52
-                radius: 16
+                radius: Theme.round(16, width, height)
                 color: Qt.alpha(Theme.surface, 0.7)
                 border.width: 2
                 border.color: search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : "transparent"
 
                 RowLayout {
                     anchors.fill: parent
-                    anchors.leftMargin: 18
-                    anchors.rightMargin: 18
+                    anchors.leftMargin: Theme.pad(18, 16, parent.width, parent.height)
+                    anchors.rightMargin: Theme.pad(18, 16, parent.width, parent.height)
                     spacing: 14
 
                     Icon {
@@ -468,7 +468,7 @@ PanelWindow {
 
                         implicitWidth: chipRow.implicitWidth + 20
                         implicitHeight: 30
-                        radius: 15
+                        radius: Theme.round(15, width, height)
                         color: chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.surface, 0.6)
 
                         RowLayout {
@@ -524,7 +524,7 @@ PanelWindow {
                     Rectangle {
                         anchors.fill: parent
                         anchors.margins: root.columns === 1 ? 2 : 4
-                        radius: root.columns === 1 ? 14 : 18
+                        radius: Theme.round(root.columns === 1 ? 14 : 18, width, height)
                         color: Qt.alpha(Theme.accent, 0.22)
                         border.width: 1
                         border.color: Qt.alpha(Theme.accent, 0.5)
@@ -546,7 +546,7 @@ PanelWindow {
                     Rectangle {
                         anchors.fill: parent
                         anchors.margins: cell.list ? 2 : 4
-                        radius: cell.list ? 14 : 18
+                        radius: Theme.round(cell.list ? 14 : 18, width, height)
                         color: !cell.selected && mouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                         Behavior on color { ColorAnimation { duration: Theme.ms(100) } }
                     }
@@ -586,8 +586,8 @@ PanelWindow {
 
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 16
-                        anchors.rightMargin: 16
+                        anchors.leftMargin: Theme.pad(16, 14)
+                        anchors.rightMargin: Theme.pad(16, 14)
                         spacing: 14
                         visible: cell.list
 

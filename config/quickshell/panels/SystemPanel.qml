@@ -103,7 +103,7 @@ Item {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
             spacing: 12
 
             RowLayout {
@@ -269,7 +269,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             implicitHeight: 6
-            radius: 3
+            radius: Theme.round(3, width, height)
             color: Theme.surface
 
             Rectangle {

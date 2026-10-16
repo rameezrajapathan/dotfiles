@@ -131,7 +131,7 @@ Item {
             Behavior on y { NumberAnimation { duration: Theme.ms(700); easing.type: Easing.OutQuint } }
             width: statusRow.implicitWidth + 2 * Theme.pillInset + 8
             height: Theme.pillHeight
-            radius: height / 2
+            radius: Theme.round(height / 2, width, height)
             color: Qt.alpha(Theme.base, 0.55)
             border.width: 1
             border.color: Qt.alpha(Theme.text, 0.08)
@@ -145,7 +145,7 @@ Item {
                 Rectangle {
                     width: Theme.pillCircle
                     height: Theme.pillCircle
-                    radius: width / 2
+                    radius: Theme.round(width / 2, width, height)
                     color: Theme.accent
 
                     Icon {
@@ -281,7 +281,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 380
                 height: 96
-                radius: 24
+                radius: Theme.round(24, width, height)
                 color: Qt.alpha(Theme.base, 0.5)
                 border.width: 1
                 border.color: Qt.alpha(Theme.text, 0.08)
@@ -292,11 +292,11 @@ Item {
                 ClippingRectangle {
                     id: cover
                     anchors.left: parent.left
-                    anchors.leftMargin: 14
+                    anchors.leftMargin: Theme.pad(14, 24, parent.width, parent.height)
                     anchors.verticalCenter: parent.verticalCenter
                     width: 68
                     height: 68
-                    radius: 16
+                    radius: Theme.round(16, width, height)
                     color: Theme.surface
 
                     Image {
@@ -318,9 +318,9 @@ Item {
 
                 Column {
                     anchors.left: cover.right
-                    anchors.leftMargin: 14
+                    anchors.leftMargin: Theme.pad(14, 24, parent.width, parent.height)
                     anchors.right: controls.left
-                    anchors.rightMargin: 8
+                    anchors.rightMargin: Theme.pad(8, 24, parent.width, parent.height)
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 3
 
@@ -352,7 +352,7 @@ Item {
                 Row {
                     id: controls
                     anchors.right: parent.right
-                    anchors.rightMargin: 12
+                    anchors.rightMargin: Theme.pad(12, 24, parent.width, parent.height)
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 2
 
@@ -364,7 +364,7 @@ Item {
                             readonly property bool main: modelData === "toggle"
                             width: main ? 44 : 34
                             height: width
-                            radius: width / 2
+                            radius: Theme.round(width / 2, width, height)
                             anchors.verticalCenter: parent.verticalCenter
                             color: main ? Theme.accent : controlMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                             scale: controlMouse.pressed ? 0.9 : 1
@@ -464,7 +464,7 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: 140
-                    radius: width / 2
+                    radius: Theme.round(width / 2, width, height)
                     gradient: Gradient {
                         GradientStop { position: 0; color: Qt.alpha(Theme.accent, 0) }
                         GradientStop { position: 0.5; color: Theme.accent }
@@ -485,7 +485,7 @@ Item {
                 anchors.centerIn: parent
                 width: 22
                 height: 22
-                radius: 3
+                radius: Theme.round(3, width, height)
                 rotation: 45
                 color: "transparent"
                 border.width: 1
@@ -495,7 +495,7 @@ Item {
                 anchors.centerIn: parent
                 width: 10
                 height: 10
-                radius: 2
+                radius: Theme.round(2, width, height)
                 rotation: 45
                 color: Theme.accent
                 layer.enabled: true
@@ -526,7 +526,7 @@ Item {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: width / 2
+                    radius: Theme.round(width / 2, width, height)
                     color: "transparent"
                     border.width: 2
                     border.color: root.lock.failed ? Theme.red : Qt.alpha(Theme.text, root.lock.checking ? 0.12 : 0.3)
@@ -586,7 +586,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 320
                 height: 52
-                radius: height / 2
+                radius: Theme.round(height / 2, width, height)
                 color: Qt.alpha(Theme.base, 0.5)
                 border.width: 1.5
                 border.color: root.lock.failed ? Qt.alpha(Theme.red, 0.8)
@@ -644,7 +644,7 @@ Item {
                         Rectangle {
                             width: 10
                             height: 10
-                            radius: 5
+                            radius: Theme.round(5, width, height)
                             color: root.lock.checking ? Theme.subtext : Theme.text
                             scale: 0
                             Component.onCompleted: scale = 1
@@ -660,7 +660,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     width: 40
                     height: 40
-                    radius: 20
+                    radius: Theme.round(20, width, height)
                     color: Theme.accent
                     opacity: root.lock.password !== "" && !root.lock.checking ? 1 : 0
                     scale: opacity > 0 ? 1 : 0.6

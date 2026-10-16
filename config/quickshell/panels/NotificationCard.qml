@@ -25,9 +25,10 @@ Rectangle {
     }
     readonly property bool expires: popup && !critical && notification.expireTimeout !== 0
     property real remaining: 1
+    readonly property int inset: Theme.pad(14, 18)
 
-    implicitHeight: layout.implicitHeight + 28
-    radius: 18
+    implicitHeight: layout.implicitHeight + inset * 2 + (expires ? 8 : 0)
+    radius: Theme.round(18, width, height)
     color: Qt.alpha(Theme.base, 0.92)
     border.width: 1
     border.color: Qt.alpha(root.tint, critical ? 0.7 : 0.35)
@@ -78,14 +79,14 @@ Rectangle {
 
     RowLayout {
         id: layout
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: root.inset }
         spacing: 14
 
         Rectangle {
             Layout.alignment: Qt.AlignTop
             implicitWidth: 44
             implicitHeight: 44
-            radius: 14
+            radius: Theme.round(14, width, height)
             color: Qt.alpha(root.tint, 0.16)
 
             Image {
@@ -138,7 +139,7 @@ Rectangle {
                 Rectangle {
                     implicitWidth: 24
                     implicitHeight: 24
-                    radius: 12
+                    radius: Theme.round(12, width, height)
                     color: close.containsMouse ? Qt.alpha(Theme.red, 0.2) : "transparent"
 
                     Icon {
@@ -193,7 +194,7 @@ Rectangle {
 
                         implicitWidth: actionLabel.implicitWidth + 24
                         implicitHeight: 28
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         color: actionMouse.containsMouse ? root.tint : Qt.alpha(root.tint, 0.18)
 
                         Label {
@@ -226,11 +227,11 @@ Rectangle {
         visible: root.expires
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.leftMargin: 14
-        anchors.bottomMargin: 6
-        width: (parent.width - 28) * root.remaining
+        anchors.leftMargin: root.inset
+        anchors.bottomMargin: root.inset - 6
+        width: (parent.width - root.inset * 2) * root.remaining
         height: 3
-        radius: 1.5
+        radius: Theme.round(1.5, width, height)
         color: Qt.alpha(root.tint, 0.7)
     }
 }

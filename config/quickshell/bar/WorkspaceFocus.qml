@@ -43,7 +43,7 @@ Item {
     Rectangle {
         id: circle
         anchors.fill: parent
-        radius: width / 2
+        radius: Theme.round(width / 2, width, height)
         color: Theme.accent
         border.width: root.urgent ? 2 : 0
         border.color: Theme.red

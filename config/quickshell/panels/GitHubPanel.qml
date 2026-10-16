@@ -23,7 +23,7 @@ Item {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(20, 24) }
             spacing: 6
 
             RowLayout {
@@ -66,12 +66,12 @@ Item {
 
                     Layout.fillWidth: true
                     implicitHeight: rowLayout.implicitHeight + 16
-                    radius: 8
+                    radius: Theme.round(8, width, height)
                     color: rowMouse.containsMouse ? Theme.surface : "transparent"
 
                     RowLayout {
                         id: rowLayout
-                        anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: 8; rightMargin: 8 }
+                        anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: Theme.pad(8, 8, parent.width, parent.height); rightMargin: Theme.pad(8, 8, parent.width, parent.height) }
                         spacing: 10
 
                         Icon {

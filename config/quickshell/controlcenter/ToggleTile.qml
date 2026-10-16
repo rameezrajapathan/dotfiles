@@ -13,14 +13,14 @@ Rectangle {
 
     Layout.fillWidth: true
     implicitHeight: 58
-    radius: 14
+    radius: Theme.round(14, width, height)
     color: active ? Theme.accent : tileMouse.containsMouse ? Theme.surface : Qt.alpha(Theme.surface, 0.6)
     Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 12
-        anchors.rightMargin: 10
+        anchors.leftMargin: Theme.pad(12, 14, parent.width, parent.height)
+        anchors.rightMargin: Theme.pad(10, 14, parent.width, parent.height)
         spacing: 10
 
         Icon {

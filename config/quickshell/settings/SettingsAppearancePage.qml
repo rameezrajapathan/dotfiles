@@ -42,8 +42,8 @@ SettingsPage {
             Layout.topMargin: 14
             Layout.bottomMargin: 4
             orientation: ListView.Horizontal
-            leftMargin: 14
-            rightMargin: 14
+            leftMargin: Theme.pad(14, 16)
+            rightMargin: Theme.pad(14, 16)
             spacing: 12
             clip: true
             model: files
@@ -80,7 +80,7 @@ SettingsPage {
                     y: 3
                     width: parent.width
                     height: 116
-                    radius: 14
+                    radius: Theme.round(14, width, height)
                     color: Qt.alpha(Theme.base, 0.6)
                     scale: thumbMouse.containsMouse ? 1.03 : 1
                     Behavior on scale { NumberAnimation { duration: Theme.ms(160); easing.type: Easing.OutQuint } }
@@ -113,10 +113,10 @@ SettingsPage {
                 }
                 Rectangle {
                     visible: thumb.selected
-                    anchors { right: picture.right; top: picture.top; margins: 8 }
+                    anchors { right: picture.right; top: picture.top; margins: Theme.pad(8, 14) }
                     width: 24
                     height: 24
-                    radius: 12
+                    radius: Theme.round(12, width, height)
                     color: Theme.accent
                     Icon { anchors.centerIn: parent; name: "check"; size: 16; weight: 600; color: Theme.accentText }
                 }
@@ -207,7 +207,7 @@ SettingsPage {
                         required property color modelData
                         width: 28
                         height: 28
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         color: modelData
                         border.width: 2
                         border.color: Theme.base
@@ -245,6 +245,27 @@ SettingsPage {
                 to: 100
                 stepSize: 5
                 onMoved: v => Settings.appearance.panelOpacity = v / 100
+            }
+        }
+    }
+
+    SettingsSection {
+        title: "Shape"
+
+        SettingsRow {
+            icon: "rounded_corner"
+            title: "Corner roundness"
+            description: "Every corner in the shell and Hyprland windows. 0% is square, 100% is the default, 200% turns small shapes into circles and pills."
+            SettingsSlider {
+                from: 0
+                to: 200
+                stepSize: 5
+                value: Math.round(Settings.appearance.roundness * 100)
+                suffix: "%"
+                onMoved: v => {
+                    Settings.appearance.roundness = Math.round(v) / 100;
+                    Hypr.set("decoration.rounding", Math.round(10 * Settings.appearance.roundness));
+                }
             }
         }
     }

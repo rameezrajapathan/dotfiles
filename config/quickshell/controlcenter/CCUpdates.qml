@@ -12,7 +12,7 @@ CCCard {
     implicitHeight: 64
 
     RowLayout {
-        anchors { fill: parent; leftMargin: 16; rightMargin: 12 }
+        anchors { fill: parent; leftMargin: Theme.pad(16, 22); rightMargin: Theme.pad(12, 22) }
         spacing: 12
 
         Icon {
@@ -43,7 +43,7 @@ CCCard {
         Rectangle {
             implicitWidth: buttonLabel.implicitWidth + 28
             implicitHeight: 34
-            radius: 17
+            radius: Theme.round(17, width, height)
             color: root.any ? (buttonMouse.containsMouse ? Qt.lighter(Theme.accent, 1.08) : Theme.accent)
                 : Qt.alpha(Theme.surface, buttonMouse.containsMouse ? 0.85 : 0.55)
 

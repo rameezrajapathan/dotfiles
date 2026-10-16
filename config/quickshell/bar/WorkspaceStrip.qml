@@ -69,7 +69,7 @@ Item {
         y: grid.y + (target?.y ?? 0) - grow + (line ? (root.vertical ? ((target?.height ?? 0) - height) / 2 : (target?.height ?? 0) - height) : 0)
         width: line ? (root.vertical ? thickness : (target?.width ?? 0) * 0.55) : (target?.width ?? 0) + 2 * grow
         height: line ? (root.vertical ? (target?.height ?? 0) * 0.55 : thickness) : (target?.height ?? 0) + 2 * grow
-        radius: Math.min(width, height) / 2
+        radius: Theme.round(Math.min(width, height) / 2, width, height)
         color: root.style === "icons" ? Qt.alpha(Theme.accent, 0.28) : Theme.accent
         Behavior on x { NumberAnimation { duration: root.ms; easing.type: Easing.OutCubic } }
         Behavior on y { NumberAnimation { duration: root.ms; easing.type: Easing.OutCubic } }
@@ -129,7 +129,7 @@ Item {
                     height: root.style === "dots" ? root.dot * dotScale : parent.height
                     Behavior on width { NumberAnimation { duration: root.ms; easing.type: Easing.OutCubic } }
                     Behavior on height { NumberAnimation { duration: root.ms; easing.type: Easing.OutCubic } }
-                    radius: root.style === "boxes" ? Math.round(7 * Settings.bar.roundness) : Math.min(width, height) / 2
+                    radius: Theme.round(root.style === "boxes" ? 7 : Math.min(width, height) / 2, width, height)
                     color: {
                         if (root.style === "boxes")
                             return ws.active ? Theme.accent : ws.used || !root.opts.markOccupied ? Qt.alpha(Theme.surface, 0.9) : "transparent";
@@ -176,7 +176,7 @@ Item {
                     anchors { right: parent.right; top: parent.top }
                     width: 6
                     height: 6
-                    radius: 3
+                    radius: Theme.round(3, width, height)
                     color: Theme.red
                 }
 

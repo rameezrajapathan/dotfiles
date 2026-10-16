@@ -12,7 +12,7 @@ Rectangle {
 
     implicitWidth: row.implicitWidth + 8
     implicitHeight: 34
-    radius: height / 2
+    radius: Theme.round(height / 2, width, height)
     color: Qt.alpha(Theme.base, 0.6)
 
     Rectangle {
@@ -25,7 +25,7 @@ Rectangle {
         y: 4
         width: target?.width ?? 0
         height: parent.height - 8
-        radius: height / 2
+        radius: Theme.round(height / 2, width, height)
         color: Theme.accent
         Behavior on x { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
         Behavior on width { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }

@@ -24,7 +24,7 @@ CCCard {
 
     ColumnLayout {
         id: column
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(12, 22) }
         spacing: 8
 
         RowLayout {
@@ -89,7 +89,7 @@ CCCard {
 
                 Layout.fillWidth: true
                 implicitHeight: rowLayout.implicitHeight + 20
-                radius: 16
+                radius: Theme.round(16, width, height)
                 color: rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.85) : Qt.alpha(Theme.surface, 0.55)
 
                 MouseArea {
@@ -105,7 +105,7 @@ CCCard {
 
                 RowLayout {
                     id: rowLayout
-                    anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: 12; rightMargin: 8 }
+                    anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; leftMargin: Theme.pad(12, 16, parent.width, parent.height); rightMargin: Theme.pad(8, 16, parent.width, parent.height) }
                     spacing: 10
 
                     Item {

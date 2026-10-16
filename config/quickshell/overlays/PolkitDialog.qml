@@ -98,7 +98,7 @@ PanelWindow {
         anchors.centerIn: parent
         width: 420
         implicitHeight: content.implicitHeight + 48
-        radius: 24
+        radius: Theme.round(24, width, height)
         color: Theme.baseTranslucent
         border.width: 1
         border.color: Qt.alpha(Theme.overlay, 0.4)
@@ -114,14 +114,14 @@ PanelWindow {
 
         ColumnLayout {
             id: content
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 24 }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(24, 24, parent.width, parent.height) }
             spacing: 14
 
             Rectangle {
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: 56
                 implicitHeight: 56
-                radius: 18
+                radius: Theme.round(18, width, height)
                 color: Qt.alpha(Theme.accent, 0.18)
 
                 Icon {
@@ -164,7 +164,7 @@ PanelWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 42
-                radius: 14
+                radius: Theme.round(14, width, height)
                 color: Qt.alpha(Theme.base, 0.6)
                 border.width: 1
                 border.color: root.flow?.supplementaryIsError ? Theme.red : input.activeFocus ? Theme.accent : "transparent"
@@ -172,8 +172,8 @@ PanelWindow {
                 TextInput {
                     id: input
                     anchors.fill: parent
-                    anchors.leftMargin: 14
-                    anchors.rightMargin: 14
+                    anchors.leftMargin: Theme.pad(14, 14, parent.width, parent.height)
+                    anchors.rightMargin: Theme.pad(14, 14, parent.width, parent.height)
                     verticalAlignment: TextInput.AlignVCenter
                     echoMode: root.flow?.responseVisible ? TextInput.Normal : TextInput.Password
                     color: Theme.text
@@ -238,7 +238,7 @@ PanelWindow {
 
         implicitWidth: label.implicitWidth + 28
         implicitHeight: 34
-        radius: height / 2
+        radius: Theme.round(height / 2, width, height)
         color: primary ? (mouse.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)
             : mouse.containsMouse ? Theme.overlay : Theme.surface
 

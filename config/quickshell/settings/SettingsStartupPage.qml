@@ -85,7 +85,7 @@ SettingsPage {
         Label {
             visible: Settings.startup.length === 0
             Layout.fillWidth: true
-            Layout.margins: 18
+            Layout.margins: Theme.pad(18, 16)
             text: "Nothing yet. Add an app or a command below."
             color: Theme.subtext
         }

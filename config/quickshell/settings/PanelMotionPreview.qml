@@ -21,7 +21,7 @@ Rectangle {
     readonly property real curHeight: Math.max(0, bodyHeight * g.h)
 
     implicitHeight: 104
-    radius: 10
+    radius: Theme.round(10, width, height)
     color: Qt.alpha(Theme.base, 0.7)
     clip: true
 
@@ -51,8 +51,8 @@ Rectangle {
             y: root.g.y * root.bodyHeight
             width: parent.width
             height: root.g.reveal || root.g.h >= 1 ? root.bodyHeight : root.curHeight
-            radius: 9
-            topLeftRadius: 9 * PanelMotion.clamp((root.curWidth - root.pillWidth) / 20)
+            radius: Theme.round(9, width, height)
+            topLeftRadius: Theme.round(9 * PanelMotion.clamp((root.curWidth - root.pillWidth) / 20), width, height)
             topRightRadius: topLeftRadius
             color: Theme.surface
             opacity: root.g.body
@@ -72,8 +72,8 @@ Rectangle {
             scale: root.g.scale
             transformOrigin: Item.Top
 
-            Rectangle { x: 8; y: 8; width: 10; height: 10; radius: 5; color: Theme.overlay }
-            Rectangle { x: 22; y: 10; width: 36; height: 5; radius: 2.5; color: Theme.overlay }
+            Rectangle { x: 8; y: 8; width: 10; height: 10; radius: Theme.round(5, width, height); color: Theme.overlay }
+            Rectangle { x: 22; y: 10; width: 36; height: 5; radius: Theme.round(2.5, width, height); color: Theme.overlay }
             Grid {
                 x: 8
                 y: 24
@@ -85,7 +85,7 @@ Rectangle {
                         required property int index
                         width: (root.bodyWidth - 20) / 2
                         height: 14
-                        radius: 5
+                        radius: Theme.round(5, width, height)
                         color: index === 0 || index === 3 ? Theme.accent : Qt.alpha(Theme.base, 0.6)
                     }
                 }
@@ -93,7 +93,7 @@ Rectangle {
             Rectangle {
                 x: 8; y: 62; width: root.bodyWidth - 16; height: 8; radius: 4
                 color: Qt.alpha(Theme.base, 0.6)
-                Rectangle { width: parent.width * 0.62; height: parent.height; radius: 4; color: Theme.accent }
+                Rectangle { width: parent.width * 0.62; height: parent.height; radius: Theme.round(4, width, height); color: Theme.accent }
             }
         }
     }
@@ -104,13 +104,13 @@ Rectangle {
         width: root.pillWidth
         height: root.pillHeight + root.shown
         color: Theme.surface
-        topLeftRadius: root.pillHeight / 2
-        topRightRadius: root.pillHeight / 2
-        bottomLeftRadius: root.pillHeight / 2 * (1 - root.shown)
-        bottomRightRadius: root.pillHeight / 2 * (1 - root.shown)
+        topLeftRadius: Theme.round(root.pillHeight / 2, width, height)
+        topRightRadius: Theme.round(root.pillHeight / 2, width, height)
+        bottomLeftRadius: Theme.round(root.pillHeight / 2 * (1 - root.shown), width, height)
+        bottomRightRadius: Theme.round(root.pillHeight / 2 * (1 - root.shown), width, height)
 
-        Rectangle { x: 4; anchors.verticalCenter: parent.verticalCenter; width: 7; height: 7; radius: 3.5; color: Theme.accent }
-        Rectangle { anchors.centerIn: parent; width: 18; height: 3; radius: 1.5; color: Theme.overlay }
-        Rectangle { anchors.right: parent.right; anchors.rightMargin: 4; anchors.verticalCenter: parent.verticalCenter; width: 7; height: 7; radius: 3.5; color: Theme.overlay }
+        Rectangle { x: 4; anchors.verticalCenter: parent.verticalCenter; width: 7; height: 7; radius: Theme.round(3.5, width, height); color: Theme.accent }
+        Rectangle { anchors.centerIn: parent; width: 18; height: 3; radius: Theme.round(1.5, width, height); color: Theme.overlay }
+        Rectangle { anchors.right: parent.right; anchors.rightMargin: 4; anchors.verticalCenter: parent.verticalCenter; width: 7; height: 7; radius: Theme.round(3.5, width, height); color: Theme.overlay }
     }
 }

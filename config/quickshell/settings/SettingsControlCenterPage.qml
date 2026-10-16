@@ -20,7 +20,7 @@ SettingsPage {
             below: true
 
             GridLayout {
-                columns: 3
+                columns: Math.max(1, Math.min(3, Math.floor((width + 10) / 170)))
                 columnSpacing: 10
                 rowSpacing: 10
 
@@ -38,7 +38,7 @@ SettingsPage {
                         Layout.fillWidth: true
                         Layout.preferredWidth: 1
                         implicitHeight: cardColumn.implicitHeight + 16
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
                         border.width: selected ? 2 : 1
                         border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
@@ -46,7 +46,7 @@ SettingsPage {
 
                         ColumnLayout {
                             id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
                             spacing: 8
 
                             CCPreview {
@@ -100,7 +100,7 @@ SettingsPage {
 
             CCLayoutEditor {
                 id: layoutEditor
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 16) }
             }
         }
     }
@@ -115,7 +115,7 @@ SettingsPage {
 
             CCTileEditor {
                 id: tileEditor
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 16) }
             }
         }
     }

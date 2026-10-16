@@ -41,7 +41,7 @@ CCCard {
 
     ColumnLayout {
         id: column
-        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+        anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 22) }
         spacing: 8
 
         RowLayout {
@@ -94,7 +94,7 @@ CCCard {
                         anchors.centerIn: parent
                         width: 28
                         height: 28
-                        radius: 14
+                        radius: Theme.round(14, width, height)
                         visible: modelData.today
                         color: Theme.accent
                     }

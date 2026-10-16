@@ -172,7 +172,7 @@ Loader {
             }
             Rectangle {
                 anchors.fill: parent
-                radius: width / 2
+                radius: Theme.round(width / 2, width, height)
                 color: "transparent"
                 border.width: 2
                 border.color: Theme.accent
@@ -187,7 +187,7 @@ Loader {
                 anchors.topMargin: -2
                 width: 8
                 height: 8
-                radius: 4
+                radius: Theme.round(4, width, height)
                 color: Theme.accent
                 border.width: 1.5
                 border.color: Theme.base
