@@ -43,7 +43,6 @@ libqalculate
 unicode-emoji
 zoxide
 eza
-stow
 xdg-utils
 pavucontrol
 thunar

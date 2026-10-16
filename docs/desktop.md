@@ -13,7 +13,7 @@ clock's place; clicking it opens the Music tab. The recording timer shows while 
 stop), and the [next meeting](developer.md#next-meeting) shows once a calendar is set.
 
 A yellow pill with a mic, camera or screen icon shows while an app uses one; hover for which apps,
-click for the Sound tab (`quickshell/Privacy.qml`). The mic counts PipeWire recording streams, but
+click for the Sound tab (`quickshell/services/Privacy.qml`). The mic counts PipeWire recording streams, but
 not ones that only listen to the speakers, like cava. The screen counts xdg-desktop-portal-hyprland's
 share. The camera counts PipeWire video capture and any process holding `/dev/video*` open.
 
@@ -138,7 +138,7 @@ applies it whenever `$XDG_RUNTIME_DIR/pikadots-gamemode` exists, so a Hyprland r
 
 ## Drives
 
-`quickshell/Drives.qml` lists removable disks from `lsblk` and refreshes whenever `udisksctl
+`quickshell/services/Drives.qml` lists removable disks from `lsblk` and refreshes whenever `udisksctl
 monitor` reports a change. Mounting, unlocking (a zenity passphrase prompt) and ejecting go through
 `hypr/scripts/drives.sh` and udisks, so no password is needed. A drive plugged in while the shell
 runs is mounted under `/run/media/$USER`, and a notification offers Open and Eject. With Settings >
@@ -152,7 +152,7 @@ The Displays tab has a card per screen: on/off, resolution, refresh rate and sca
 screens, which side of the other it sits on, or mirroring. Changes apply at once and are remembered
 per monitor, so it comes back the same when plugged in again. The **reset** button (circular arrow) returns it to the defaults.
 
-The tab saves to `~/.local/state/pikadots/monitors.lua`, which `hypr/.config/hypr/monitors.lua`
+The tab saves to `~/.local/state/pikadots/monitors.lua`, which `config/hypr/monitors.lua`
 loads after its own rules. Edit `monitors.lua` only to change those defaults.
 
 ## Launcher (Super + A)
@@ -183,7 +183,7 @@ login.
 
 - **Power menu** (Super + Escape): lock, log out, suspend, restart, shut down (L / E / S / R / P).
 - **Password prompts** for system changes (pkexec, the Date & time page, updates) are the shell's own
-  polkit agent (`quickshell/PolkitDialog.qml`): Enter authenticates, Esc cancels. If another agent
+  polkit agent (`quickshell/overlays/PolkitDialog.qml`): Enter authenticates, Esc cancels. If another agent
   already holds the session, it retries a few times, then starts hyprpolkitagent instead.
 - **Alt + Tab**: live window previews; release Alt to switch.
 - **Overview** (Super + Tab): every workspace in a row with live previews. Like Alt + Tab: hold
@@ -206,7 +206,7 @@ through Do Not Disturb (Super + Shift + N).
 
 ![Lock screen](screenshots/lock-v3.webp)
 
-Part of the shell (`quickshell/Lock.qml`), split in two over the blurred wallpaper. The left half
+Part of the shell (`quickshell/lock/Lock.qml`), split in two over the blurred wallpaper. The left half
 has the date and a big clock, now playing (controls and a live spectrum) and suspend, restart and
 power off (restart and power off ask for a second click). The right half has your profile picture
 and the password pill: dots pop in, it shakes on a wrong password, and Caps Lock warns. Between them
@@ -242,10 +242,10 @@ open a terminal also use; `pikadots install` writes it with kitty if it's missin
 
 kitty with starship, eza and zoxide. Super + T opens it with fastfetch. Its font is set in
 Settings > Fonts & icons (a font theme or the terminal font). The cursor glides to
-where it jumps, with a short trail (`cursor_trail` in `kitty/.config/kitty/kitty.conf`), and its
+where it jumps, with a short trail (`cursor_trail` in `config/kitty/kitty.conf`), and its
 blink fades.
 
-Terminal apps follow the wallpaper too: btop (`btop/.config/btop/btop.conf` picks the generated
+Terminal apps follow the wallpaper too: btop (`config/btop/btop.conf` picks the generated
 `wallpaper` theme with a transparent background), cava, peaclock, superfile and Neovim. To open one
 floating in a fixed spot, add it as a terminal app in
 [Settings > Window rules](settings.md#window-rules).

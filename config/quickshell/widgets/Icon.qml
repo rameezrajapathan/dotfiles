@@ -1,0 +1,17 @@
+import QtQuick
+import qs.services
+
+Text {
+    property string name
+    property bool filled: false
+    property int size: Theme.iconSize
+    property int weight: Theme.iconWeight
+
+    text: name
+    color: Theme.text
+    verticalAlignment: Text.AlignVCenter
+    horizontalAlignment: Text.AlignHCenter
+    font.family: Theme.iconFont
+    font.pixelSize: size
+    font.variableAxes: ({ "FILL": filled ? 1 : 0, "wght": weight, "opsz": Math.min(48, Math.max(20, size)) })
+}

@@ -1,0 +1,10 @@
+[color]
+gradient = 1
+gradient_color_1 = '{{ansi.blue}}'
+gradient_color_2 = '{{ansi.sapphire}}'
+gradient_color_3 = '{{colors.primary.default.hex}}'
+gradient_color_4 = '{{ansi.mauve}}'
+gradient_color_5 = '{{ansi.magenta}}'
+gradient_color_6 = '{{ansi.red}}'
+gradient_color_7 = '{{ansi.peach}}'
+gradient_color_8 = '{{ansi.yellow}}'

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+repo=$(sed "s|^~|$HOME|" "$HOME/.config/pikadots/backup-repo" 2>/dev/null)
+repo=${repo:-$HOME/Backups/restic}
+password_file=$HOME/.config/restic/password
+state=$HOME/.local/state/pikadots
+mkdir -p "$state"
+export RESTIC_REPOSITORY=$repo RESTIC_PASSWORD_FILE=$password_file
+
+paths=(
+	"$HOME/Projects" "$HOME/Documents" "$HOME/Pictures" "$HOME/dotfiles"
+	"$HOME/.ssh" "$HOME/.local/share/keyrings" "$HOME/.config/restic"
+)
+excludes=(
+	--exclude "$HOME/Projects/**/bin" --exclude "$HOME/Projects/**/obj" --exclude "$HOME/Projects/**/target"
+	--exclude node_modules --exclude .venv
+	--exclude __pycache__ --exclude .cache --exclude '*.tmp'
+	--exclude "$repo"
+)
+
+status() {
+	printf '{"time": %s, "ok": %s, "message": "%s", "snapshots": %s}\n' \
+		"$(date +%s)" "$1" "${2//\"/\'}" "$(restic snapshots --json 2>/dev/null | jq length 2>/dev/null || echo 0)" \
+		>"$state/backup.json"
+}
+
+fail() {
+	status false "$1"
+	notify-send -u critical -a Backup "Backup failed" "$1"
+	exit 1
+}
+
+[[ -f $password_file ]] || fail "No password file at ${password_file/#$HOME/\~} (run: pikadots backup-init)"
+mkdir -p "$(dirname "$repo")" || fail "Can't create ${repo/#$HOME/\~}"
+[[ -f $repo/config ]] || fail "No repository at ${repo/#$HOME/\~} (run: pikadots backup-init)"
+
+existing=()
+for p in "${paths[@]}"; do [[ -e $p ]] && existing+=("$p"); done
+
+out=$(restic backup --quiet --tag auto "${excludes[@]}" "${existing[@]}" 2>&1) || fail "${out:-restic backup failed}"
+prune=(); [[ $(date +%u) == 7 ]] && prune=(--prune)
+restic forget --quiet --tag auto --keep-daily 7 --keep-weekly 4 --keep-monthly 6 "${prune[@]}" >/dev/null 2>&1 || true
+status true "Backed up $(date +%H:%M)"

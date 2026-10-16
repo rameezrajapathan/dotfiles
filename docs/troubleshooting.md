@@ -27,4 +27,4 @@ Start with `pikadots health`, then `pikadots repair`.
 | Screen stuck zoomed in | Super + Alt + 0 |
 | Annotate or Edit does nothing | `sudo pacman -S satty` (also in `packages.txt`) |
 
-Programs start from `hypr/.config/hypr/autostart.lua`, not systemd.
+Programs start from `config/hypr/autostart.lua`, not systemd.

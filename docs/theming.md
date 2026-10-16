@@ -4,7 +4,7 @@
 
 Picking a wallpaper (Super + Shift + W) runs `hypr/scripts/theme.sh <image>`. It sets the
 wallpaper, generates colors with [matugen](https://github.com/InioX/matugen) from the templates in
-`matugen/.config/matugen/templates/`, and reloads what's running. Run it without an argument to
+`config/matugen/templates/`, and reloads what's running. Run it without an argument to
 regenerate from the current wallpaper. Generated files go to `~/.local/state/theme/`, outside the
 repo. The chosen wallpaper is saved in `~/.config/hypr/wallpaper.conf`, which git ignores, so each
 machine keeps its own; `hypr/scripts/hyprpaper.sh` starts hyprpaper with it and `hyprpaper.conf`.

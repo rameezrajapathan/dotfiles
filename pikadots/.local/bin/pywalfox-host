@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# Pywalfox's helper, started by the browser through the pywalfox.json manifest that pikadots writes
-# to ~/.config/mozilla/native-messaging-hosts. Pywalfox listens on one socket per user, so with Zen
-# and Firefox both open only the first got live updates; this gives each browser its own socket
-# under $XDG_RUNTIME_DIR/pywalfox/<browser>/, and theme.sh updates them all.
-browser=$(basename "$(readlink "/proc/$PPID/exe")")
-export TMPDIR=${XDG_RUNTIME_DIR:-/tmp}/pywalfox/${browser:-browser}
-mkdir -p "$TMPDIR"
-exec pywalfox start

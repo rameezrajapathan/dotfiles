@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+browser=$(basename "$(readlink "/proc/$PPID/exe")")
+export TMPDIR=${XDG_RUNTIME_DIR:-/tmp}/pywalfox/${browser:-browser}
+mkdir -p "$TMPDIR"
+exec pywalfox start

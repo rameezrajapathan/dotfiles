@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily restic backup (pikadots)
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15m
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,69 @@
+[config]
+
+[templates.quickshell]
+input_path = "~/.config/matugen/templates/quickshell.json"
+output_path = "~/.local/state/theme/quickshell.json"
+
+[templates.kitty]
+input_path = "~/.config/matugen/templates/kitty.conf"
+output_path = "~/.local/state/theme/kitty.conf"
+
+[templates.alacritty]
+input_path = "~/.config/matugen/templates/alacritty.toml"
+output_path = "~/.local/state/theme/alacritty.toml"
+
+[templates.hyprland]
+input_path = "~/.config/matugen/templates/hyprland.lua"
+output_path = "~/.local/state/theme/hyprland.lua"
+
+[templates.hyprlock]
+input_path = "~/.config/matugen/templates/hyprlock.conf"
+output_path = "~/.local/state/theme/hyprlock.conf"
+
+[templates.fuzzel]
+input_path = "~/.config/matugen/templates/fuzzel.ini"
+output_path = "~/.local/state/theme/fuzzel.ini"
+
+[templates.gtk]
+input_path = "~/.config/matugen/templates/gtk.css"
+output_path = "~/.local/state/theme/gtk.css"
+
+[templates.starship]
+input_path = "~/.config/matugen/templates/starship-palette.toml"
+output_path = "~/.local/state/theme/starship-palette.toml"
+
+[templates.nvim]
+input_path = "~/.config/matugen/templates/nvim.lua"
+output_path = "~/.local/state/theme/nvim.lua"
+
+[templates.cava]
+input_path = "~/.config/matugen/templates/cava-theme"
+output_path = "~/.config/cava/themes/wallpaper"
+
+[templates.peaclock]
+input_path = "~/.config/matugen/templates/peaclock"
+output_path = "~/.peaclock/config"
+
+[templates.kde]
+input_path = "~/.config/matugen/templates/kde.json"
+output_path = "~/.local/state/theme/kde.json"
+
+[templates.pywalfox]
+input_path = "~/.config/matugen/templates/pywalfox.json"
+output_path = "~/.cache/wal/colors.json"
+
+[templates.zen]
+input_path = "~/.config/matugen/templates/zen-userChrome.css"
+output_path = "~/.local/state/theme/zen-userChrome.css"
+
+[templates.vscode]
+input_path = "~/.config/matugen/templates/vscode-theme.json"
+output_path = "~/.local/state/theme/vscode-theme.json"
+
+[templates.superfile]
+input_path = "~/.config/matugen/templates/superfile.toml"
+output_path = "~/.config/superfile/theme/wallpaper.toml"
+
+[templates.btop]
+input_path = "~/.config/matugen/templates/btop.theme"
+output_path = "~/.config/btop/themes/wallpaper.theme"

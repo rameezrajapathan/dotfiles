@@ -45,8 +45,8 @@ Nothing in the repo changes; your choices stay on this machine:
 
 | File | Written by | Read by |
 |---|---|---|
-| `~/.config/pikadots/settings.json` | the app (`quickshell/Settings.qml`) | the shell, and these scripts in `hypr/scripts`: `theme.sh` (mode, palette style), `idle.sh` (timers), `fonts.sh`, `icons.sh`, `kde-theme.py`, `accessibility.sh`, `clipboard.sh` |
-| `~/.local/state/pikadots/hypr-settings.lua` | Windows, Effects, Keyboard & mouse (`quickshell/Hypr.qml`) | end of `hypr/settings.lua` |
+| `~/.config/pikadots/settings.json` | the app (`quickshell/services/Settings.qml`) | the shell, and these scripts in `hypr/scripts`: `theme.sh` (mode, palette style), `idle.sh` (timers), `fonts.sh`, `icons.sh`, `kde-theme.py`, `accessibility.sh`, `clipboard.sh` |
+| `~/.local/state/pikadots/hypr-settings.lua` | Windows, Effects, Keyboard & mouse (`quickshell/services/Hypr.qml`) | end of `hypr/settings.lua` |
 | `~/.local/state/pikadots/window-rules.lua` | Window rules | end of `hypr/rules.lua` |
 | `~/.local/state/pikadots/autostart.lua` | Startup apps | `hypr/scripts/startup-apps.sh` (from `hypr/autostart.lua`), once the tray is up |
 | `$XDG_RUNTIME_DIR/hypridle.conf` | `hypr/scripts/idle.sh` at login and after a change | hypridle (`hypridle.conf` in the repo shows the defaults) |
@@ -57,7 +57,7 @@ Nothing in the repo changes; your choices stay on this machine:
 | GTK `text-scaling-factor`, `enable-animations` | Accessibility (`hypr/scripts/accessibility.sh`) | GTK apps |
 | `~/.config/kdeglobals` (colors, icons, fonts, animation speed) | Appearance, Fonts & icons, Accessibility (`hypr/scripts/kde-theme.py`; Plasma's values saved in `~/.local/state/pikadots/kdeglobals-plasma.json`) | Qt and KDE apps |
 | `~/.local/share/pikadots/clipboard-pins/` | Ctrl + P in the launcher's clipboard mode (`hypr/scripts/clipboard.sh`) | the launcher |
-| System time zone and clock | Date & time (`timedatectl`, through `quickshell/TimeDate.qml`) | the whole system |
+| System time zone and clock | Date & time (`timedatectl`, through `quickshell/services/TimeDate.qml`) | the whole system |
 | `~/.cache/pikadots/icon-themes.json` | `hypr/scripts/icon-themes.py` (a cache) | Fonts & icons |
 
 Hyprland options only store what you changed: sections with changes show a **Reset** button, which
@@ -72,7 +72,7 @@ pikadots): Inter, Google Sans Flex, Rubik, Outfit, Manrope, Plus Jakarta Sans, F
 `.ttf` files in `~/.local/share/fonts`, run `fc-cache -f`, then restart the shell
 (`qs kill; setsid -f ~/.config/hypr/scripts/shell.sh`) so it sees them.
 
-Font themes are listed in `quickshell/FontThemes.qml`; a theme only shows when all three of its
+Font themes are listed in `quickshell/services/FontThemes.qml`; a theme only shows when all three of its
 fonts are installed. The terminal font goes to kitty through
 `~/.local/state/pikadots/kitty-font.conf` (included by `kitty.conf`, written by
 `hypr/scripts/fonts.sh`). "Use in apps" sets the interface and monospace fonts for GTK, Qt and KDE apps, and
@@ -95,7 +95,7 @@ them for your user, for example
 ![Bar page](screenshots/settings-bar-v3.webp)
 
 A style sets the layout, size, spacing, roundness, outline and items all at once
-(`quickshell/BarStyles.qml`); changing any of them makes it "Custom", and the last custom setup
+(`quickshell/services/BarStyles.qml`); changing any of them makes it "Custom", and the last custom setup
 comes back when you click the Custom card. Items (`BarModule.qml`): workspaces, apps (distro
 logo), window title, clock, date, weather, next meeting, now playing, recording & privacy (only while
 recording, or while the mic, camera or screen is in use), capture, tray, CPU & memory, network, Bluetooth, sound, battery, notifications,
@@ -162,7 +162,7 @@ offers a button for that. World clocks, the week start and week numbers show in 
 
 The page checks when it opens and in the background (every 6 hours by default, the first check a
 minute after login), with a notification when something new turns up
-(`hypr/scripts/updates.sh`, `quickshell/Updates.qml`; `qs ipc call updates check`). pikadots: it
+(`hypr/scripts/updates.sh`, `quickshell/services/Updates.qml`; `qs ipc call updates check`). pikadots: it
 fetches the repo and lists the new commits, local changes and unpushed commits; **Update** runs
 `pikadots update` in a terminal (**Repair**, when there's nothing new, runs `pikadots repair`). System: pacman (`checkupdates`, no root needed), AUR (yay or paru)
 and Flatpak; **Update system** runs the upgrade in a terminal, since it asks for your password.

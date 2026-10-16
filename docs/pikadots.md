@@ -18,8 +18,9 @@ pikadots import FILE  apply an exported file on this machine
 
 1. Installs [`packages.txt`](../packages.txt) with pacman, [`aur.txt`](../aur.txt) with yay or paru
    when present, and `asusctl` on ASUS laptops.
-2. Links each top-level folder into `$HOME` with GNU Stow (`hypr/.config/hypr` →
-   `~/.config/hypr`). Files in the way are moved to `~/.local/state/pikadots/backups/<date>/`.
+2. Links the files in `config/` into `$HOME` (`config/hypr` → `~/.config/hypr`; the full list is the
+   `links` table at the top of `config/pikadots/pikadots`). Files in the way are moved to
+   `~/.local/state/pikadots/backups/<date>/`. `pikadots link` does only this step.
 3. Asks for your git name and email (saved to `~/.config/git/user`, outside the repo).
 4. Enables NetworkManager, Bluetooth, power-profiles-daemon and the SSH agent.
 5. Copies the [wallpapers](../wallpapers/CREDITS.md) into `~/Pictures/Wallpapers` (existing files are
@@ -82,3 +83,18 @@ export RESTIC_REPOSITORY=$(sed "s|^~|$HOME|" ~/.config/pikadots/backup-repo) RES
 restic snapshots
 restic restore latest --target ~/restored --include ~/Projects/myapp
 ```
+
+## Repo layout
+
+```
+config/       one folder per app with its files (config/kitty → ~/.config/kitty)
+docs/         these pages and their screenshots
+wallpapers/   copied to ~/Pictures/Wallpapers on install
+install.sh    first-time setup (runs pikadots install)
+packages.txt  pacman packages; aur.txt: AUR packages
+```
+
+The shell (`config/quickshell/`) is split by role: `bar/`, `controlcenter/`,
+`panels/` (control center pages), `overlays/` (launcher, overview, switcher, OSD, popups),
+`lock/`, `settings/` (the Settings app), `services/` (singletons: state and system access) and
+`widgets/` (shared controls). Files import other folders as `import qs.<folder>`.

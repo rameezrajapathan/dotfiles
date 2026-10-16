@@ -1,0 +1,52 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+
+  "logo": {
+    "type": "kitty-direct",
+    "source": "~/.config/fastfetch/pika.png",
+    "width": 24,
+    "height": 12,
+    "padding": { "top": 2, "left": 3, "right": 4 }
+  },
+
+  "display": {
+    "separator": "  ",
+    "key": { "width": 15 },
+    "color": { "output": "white" },
+    "percent": { "type": 3 },
+    "bar": { "width": 12, "char": { "elapsed": "■", "total": "·" } }
+  },
+
+  "modules": [
+    "break",
+    { "type": "title", "format": "{#bold_blue}{user-name}{#}{#bright_black} at {#}{#bold_magenta}{host-name}{#}" },
+    "break",
+
+    { "type": "custom", "format": "{#blue}╭─ 󰌢  {#bold_blue}Software{#}" },
+    { "type": "os", "key": "│ 󰣇  OS", "keyColor": "blue", "format": "{pretty-name} {arch}" },
+    { "type": "kernel", "key": "│ 󰒋  Kernel", "keyColor": "blue" },
+    { "type": "wm", "key": "│ 󱂬  WM", "keyColor": "blue" },
+    { "type": "shell", "key": "│ 󰆍  Shell", "keyColor": "blue" },
+    { "type": "terminal", "key": "│ 󰞷  Terminal", "keyColor": "blue" },
+    { "type": "packages", "key": "│ 󰏖  Packages", "keyColor": "blue" },
+    { "type": "custom", "format": "{#blue}╰─" },
+
+    { "type": "custom", "format": "{#magenta}╭─ 󰍹  {#bold_magenta}Hardware{#}" },
+    { "type": "host", "key": "│ 󰌢  Model", "keyColor": "magenta", "format": "{family}" },
+    { "type": "cpu", "key": "│ 󰻠  CPU", "keyColor": "magenta", "format": "{name} · {cores-logical} threads" },
+    { "type": "gpu", "key": "│ 󰢮  GPU", "keyColor": "magenta", "hideType": "integrated", "format": "{name}" },
+    { "type": "display", "key": "│ 󰍹  Display", "keyColor": "magenta", "compactType": "original-with-refresh-rate" },
+    { "type": "memory", "key": "│ 󰍛  Memory", "keyColor": "magenta" },
+    { "type": "disk", "key": "│ 󰋊  Disk", "keyColor": "magenta", "folders": "/" },
+    { "type": "battery", "key": "│ 󰁹  Battery", "keyColor": "magenta" },
+    { "type": "custom", "format": "{#magenta}╰─" },
+
+    { "type": "custom", "format": "{#green}╭─ 󰔟  {#bold_green}Session{#}" },
+    { "type": "uptime", "key": "│ 󰅐  Uptime", "keyColor": "green" },
+    { "type": "localip", "key": "│ 󰩟  Local IP", "keyColor": "green", "showIpv6": false, "compact": true },
+    { "type": "custom", "format": "{#green}╰─" },
+
+    "break",
+    { "type": "colors", "symbol": "circle", "paddingLeft": 2 }
+  ]
+}

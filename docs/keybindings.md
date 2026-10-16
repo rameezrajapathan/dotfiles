@@ -2,7 +2,7 @@
 
 [← README](../README.md)
 
-Super + ? shows these on screen. Change them in `hypr/.config/hypr/keybinds.lua`. Terminal, browser,
+Super + ? shows these on screen. Change them in `config/hypr/keybinds.lua`. Terminal, browser,
 file manager and editor open your [default apps](desktop.md#default-apps).
 
 ## Apps and system
