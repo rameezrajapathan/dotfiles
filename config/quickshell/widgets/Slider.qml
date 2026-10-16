@@ -27,6 +27,7 @@ Item {
             height: parent.height
             radius: parent.radius
             color: root.dimmed ? Theme.overlay : Theme.accent
+            gradient: Theme.accentFill(!root.dimmed)
         }
     }
 

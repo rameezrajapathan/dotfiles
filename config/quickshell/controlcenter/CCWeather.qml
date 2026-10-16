@@ -40,6 +40,7 @@ CCCard {
                 filled: Weather.autoLocation
                 size: 14
                 color: Theme.accent
+                gradientFill: true
             }
             Label {
                 anchors.verticalCenter: parent.verticalCenter
@@ -80,6 +81,7 @@ CCCard {
                 size: 48
                 weight: 200
                 color: Theme.accent
+                gradientFill: true
             }
         }
 

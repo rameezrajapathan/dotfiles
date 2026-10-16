@@ -187,7 +187,10 @@ SettingsPage {
                         radius: Theme.round(14, width, height)
                         color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
                         border.width: selected ? 2 : 1
-                        border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
+                        border.color: Theme.gradientAccent && (selected) ? "transparent" : selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
+                        GradientBorder {
+                            active: selected
+                        }
                         Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
                         ColumnLayout {

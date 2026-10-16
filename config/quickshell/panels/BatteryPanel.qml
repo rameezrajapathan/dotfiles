@@ -59,21 +59,29 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
                 Layout.bottomMargin: 4
+                spacing: 16
 
-                Label {
+                RingGauge {
+                    size: 72
+                    value: root.percent / 100
+                    tint: root.percent <= 20 ? Theme.red : Theme.green
+                }
+                ColumnLayout {
                     Layout.fillWidth: true
-                    text: "Battery"
-                    font.bold: true
-                }
-                Label {
-                    text: root.percent + "%"
-                    font.bold: true
-                }
-            }
+                    spacing: 2
 
-            Label {
-                text: root.status
-                color: Theme.subtext
+                    Label {
+                        Layout.fillWidth: true
+                        text: "Battery"
+                        font.bold: true
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        text: root.status
+                        color: Theme.subtext
+                        wrapMode: Text.WordWrap
+                    }
+                }
             }
 
             SectionLabel {

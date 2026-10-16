@@ -121,7 +121,11 @@ PanelWindow {
                     radius: Theme.round(height / 2, width, height)
                     color: Theme.surface
                     border.width: 2
-                    border.color: search.text !== "" ? Qt.alpha(Theme.accent, 0.6) : "transparent"
+                    border.color: Theme.gradientAccent && (search.text !== "") ? "transparent" : search.text !== "" ? Qt.alpha(Theme.accent, 0.6) : "transparent"
+                    GradientBorder {
+                        active: search.text !== ""
+                        strength: 0.6
+                    }
 
                     RowLayout {
                         anchors.fill: parent
@@ -221,7 +225,10 @@ PanelWindow {
                         radius: Theme.round(8, width, height)
                         color: Theme.surface
                         border.width: 3
-                        border.color: cell.active ? Theme.accent : cell.selected ? Theme.overlay : "transparent"
+                        border.color: Theme.gradientAccent && (cell.active) ? "transparent" : cell.active ? Theme.accent : cell.selected ? Theme.overlay : "transparent"
+                        GradientBorder {
+                            active: cell.active
+                        }
 
                         Image {
                             anchors.fill: parent

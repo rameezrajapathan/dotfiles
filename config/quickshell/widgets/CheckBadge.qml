@@ -6,6 +6,7 @@ Rectangle {
     implicitHeight: 18
     radius: Theme.round(width / 2, width, height)
     color: Theme.accent
+    gradient: Theme.accentFill(true)
     Icon {
         anchors.centerIn: parent
         name: "check"

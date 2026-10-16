@@ -50,7 +50,14 @@ Item {
                 ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
                 ctx.lineWidth = 2;
                 ctx.lineCap = "round";
-                ctx.strokeStyle = Theme.accent;
+                if (Theme.gradientAccent) {
+                    const g = ctx.createLinearGradient(0, 0, width, 0);
+                    g.addColorStop(0, Theme.accent);
+                    g.addColorStop(1, Theme.accentEnd);
+                    ctx.strokeStyle = g;
+                } else {
+                    ctx.strokeStyle = Theme.accent;
+                }
                 ctx.stroke();
 
                 ctx.beginPath();
@@ -66,6 +73,8 @@ Item {
             Connections {
                 target: Theme
                 function onAccentChanged() { curve.requestPaint(); }
+                function onAccentEndChanged() { curve.requestPaint(); }
+                function onGradientAccentChanged() { curve.requestPaint(); }
             }
         }
 

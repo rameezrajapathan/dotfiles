@@ -186,7 +186,11 @@ PanelWindow {
                         radius: Theme.round(14, width, height)
                         color: Qt.alpha(Theme.surface, 0.6)
                         border.width: ws.selected ? 3 : 1
-                        border.color: ws.selected ? Theme.accent : ws.active ? Qt.alpha(Theme.accent, 0.5) : Qt.alpha(Theme.text, 0.1)
+                        border.color: Theme.gradientAccent && (ws.selected || ws.active) ? "transparent" : ws.selected ? Theme.accent : ws.active ? Qt.alpha(Theme.accent, 0.5) : Qt.alpha(Theme.text, 0.1)
+                        GradientBorder {
+                            active: ws.selected || ws.active
+                            strength: ws.selected ? 1 : 0.5
+                        }
                         scale: ws.selected ? 1.04 : 1
                         Behavior on scale { NumberAnimation { duration: Theme.ms(160); easing.type: Easing.OutCubic } }
 
@@ -219,7 +223,10 @@ PanelWindow {
                                     radius: Theme.round(6, width, height)
                                     color: Theme.base
                                     border.width: winMouse.containsMouse ? 2 : 0
-                                    border.color: Theme.accent
+                                    border.color: Theme.gradientAccent && (winMouse.containsMouse) ? "transparent" : Theme.accent
+                                    GradientBorder {
+                                        active: winMouse.containsMouse
+                                    }
 
                                     ScreencopyView {
                                         anchors.fill: parent

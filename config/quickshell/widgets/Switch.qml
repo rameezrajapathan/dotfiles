@@ -10,6 +10,7 @@ Rectangle {
     implicitHeight: 20
     radius: Theme.round(height / 2, width, height)
     color: checked ? Theme.accent : Theme.surface
+    gradient: Theme.accentFill(checked)
 
     Rectangle {
         width: 14

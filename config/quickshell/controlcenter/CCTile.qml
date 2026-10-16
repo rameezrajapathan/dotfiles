@@ -21,6 +21,7 @@ Rectangle {
     radius: Theme.round(20, width, height)
     color: active ? (mainMouse.containsMouse ? Qt.lighter(Theme.accent, 1.06) : Theme.accent)
         : mainMouse.containsMouse ? Qt.alpha(Theme.surface, 0.85) : Qt.alpha(Theme.surface, 0.55)
+    gradient: Theme.accentFill(active)
     Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
 
     MouseArea {

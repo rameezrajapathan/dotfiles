@@ -123,33 +123,39 @@ Item {
                 }
             }
 
-            Meter {
-                icon: "memory"
-                label: "CPU"
-                value: root.cpu
-                detail: Math.round(root.cpu * 100) + "%" + (root.info.cpuTemp ? "  ·  " + root.info.cpuTemp + "°C" : "")
-            }
-            Meter {
-                icon: "memory_alt"
-                label: "Memory"
-                value: root.info.mem ? root.info.mem.used / root.info.mem.total : 0
-                detail: root.info.mem ? root.gib(root.info.mem.used) + " / " + root.gib(root.info.mem.total) + " GiB" : ""
-            }
-            Meter {
-                icon: "developer_board"
-                label: "GPU"
-                visible: root.info.gpuState !== undefined
-                value: root.info.gpu?.util ?? 0
-                dimmed: !root.info.gpu
-                detail: root.info.gpu
-                    ? Math.round(root.info.gpu.util * 100) + "%  ·  " + root.info.gpu.temp + "°C  ·  " + Math.round(root.info.gpu.watts) + " W"
-                    : "sleeping"
-            }
-            Meter {
-                icon: "hard_drive"
-                label: "Disk /"
-                value: root.info.disk ? root.info.disk.used / root.info.disk.total : 0
-                detail: root.info.disk ? root.gib(root.info.disk.used) + " / " + root.gib(root.info.disk.total) + " GiB" : ""
+            GridLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                Layout.bottomMargin: 4
+                columns: root.info.gpuState !== undefined ? 4 : 3
+                columnSpacing: 8
+
+                Meter {
+                    label: "CPU"
+                    slot: 0
+                    value: root.cpu
+                    detail: root.info.cpuTemp ? root.info.cpuTemp + "°C" : ""
+                }
+                Meter {
+                    label: "Memory"
+                    slot: 1
+                    value: root.info.mem ? root.info.mem.used / root.info.mem.total : 0
+                    detail: root.info.mem ? root.gib(root.info.mem.used) + " / " + root.gib(root.info.mem.total) + " GiB" : ""
+                }
+                Meter {
+                    label: "GPU"
+                    slot: 0
+                    visible: root.info.gpuState !== undefined
+                    value: root.info.gpu?.util ?? 0
+                    dimmed: !root.info.gpu
+                    detail: root.info.gpu ? root.info.gpu.temp + "°C · " + Math.round(root.info.gpu.watts) + " W" : "sleeping"
+                }
+                Meter {
+                    label: "Disk /"
+                    slot: 2
+                    value: root.info.disk ? root.info.disk.used / root.info.disk.total : 0
+                    detail: root.info.disk ? root.gib(root.info.disk.used) + " / " + root.gib(root.info.disk.total) + " GiB" : ""
+                }
             }
 
             RowLayout {
@@ -237,48 +243,45 @@ Item {
 
     component Meter: ColumnLayout {
         id: meter
-        property string icon
         property string label
         property string detail
         property real value: 0
         property bool dimmed: false
+        property int slot: 0
+        readonly property bool hot: value > 0.85
 
         Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        Layout.alignment: Qt.AlignTop
         spacing: 6
 
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Icon {
-                name: meter.icon
-                size: 18
-                color: meter.dimmed ? Theme.overlay : Theme.accent
-            }
-            Label {
-                Layout.fillWidth: true
-                text: meter.label
-                font.bold: true
-            }
-            Label {
-                text: meter.detail
-                color: Theme.subtext
-                font.pixelSize: Theme.fontSize - 1
-            }
+        RingGauge {
+            Layout.alignment: Qt.AlignHCenter
+            size: Math.max(48, Math.min(72, meter.width))
+            value: meter.value
+            dimmed: meter.dimmed
+            tint: meter.hot ? Theme.red : Theme.accents[meter.slot]
+            tintEnd: Theme.multiColor && !meter.hot ? Theme.accents[(meter.slot + 1) % 3] : Theme.shade(tint)
         }
-        Rectangle {
+        Label {
             Layout.fillWidth: true
-            implicitHeight: 6
-            radius: Theme.round(3, width, height)
-            color: Theme.surface
-
-            Rectangle {
-                width: Math.min(1, meter.value) * parent.width
-                height: parent.height
-                radius: parent.radius
-                color: meter.dimmed ? Theme.overlay : meter.value > 0.85 ? Theme.red : meter.value > 0.6 ? Theme.yellow : Theme.accent
-                Behavior on width { NumberAnimation { duration: Theme.ms(300); easing.type: Easing.OutCubic } }
-            }
+            horizontalAlignment: Text.AlignHCenter
+            text: meter.label.toUpperCase()
+            color: Theme.overlay
+            font.pixelSize: Theme.fontSize - 3
+            font.weight: Font.DemiBold
+            font.letterSpacing: 0.6
+            elide: Text.ElideRight
+        }
+        Label {
+            Layout.fillWidth: true
+            Layout.topMargin: -4
+            visible: meter.detail !== ""
+            horizontalAlignment: Text.AlignHCenter
+            text: meter.detail
+            color: Theme.subtext
+            font.pixelSize: Theme.fontSize - 3
+            wrapMode: Text.WordWrap
         }
     }
 }

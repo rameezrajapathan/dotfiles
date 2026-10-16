@@ -34,7 +34,14 @@ Item {
             const x = root.shown * width;
             const gap = 6;
             ctx.lineCap = "round";
-            ctx.strokeStyle = Theme.accent;
+            if (Theme.gradientAccent) {
+                const g = ctx.createLinearGradient(0, 0, width, 0);
+                g.addColorStop(0, Theme.accent);
+                g.addColorStop(1, Theme.accentEnd);
+                ctx.strokeStyle = g;
+            } else {
+                ctx.strokeStyle = Theme.accent;
+            }
             ctx.lineWidth = 4;
             ctx.beginPath();
             const end = Math.max(2, x - gap);
@@ -67,6 +74,8 @@ Item {
         Connections {
             target: Theme
             function onAccentChanged() { canvas.requestPaint(); }
+            function onAccentEndChanged() { canvas.requestPaint(); }
+            function onGradientAccentChanged() { canvas.requestPaint(); }
         }
     }
 
@@ -76,7 +85,7 @@ Item {
         width: 4
         height: drag.pressed ? 22 : 18
         radius: Theme.round(2, width, height)
-        color: Theme.accent
+        color: Theme.gradientAccent ? Theme.mix(Theme.accent, Theme.accentEnd, root.shown) : Theme.accent
         Behavior on height { NumberAnimation { duration: Theme.ms(120) } }
     }
 

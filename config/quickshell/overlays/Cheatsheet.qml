@@ -100,7 +100,11 @@ PanelWindow {
                     radius: Theme.round(21, width, height)
                     color: Theme.baseTranslucent
                     border.width: 1
-                    border.color: search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : Qt.alpha(Theme.text, 0.1)
+                    border.color: Theme.gradientAccent && (search.activeFocus) ? "transparent" : search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : Qt.alpha(Theme.text, 0.1)
+                    GradientBorder {
+                        active: search.activeFocus
+                        strength: 0.6
+                    }
 
                     MouseArea {
                         anchors.fill: parent

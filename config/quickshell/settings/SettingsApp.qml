@@ -257,7 +257,10 @@ Scope {
                             radius: Theme.round(12, width, height)
                             color: Qt.alpha(Theme.base, 0.7)
                             border.width: search.activeFocus ? 1 : 0
-                            border.color: Theme.accent
+                            border.color: Theme.gradientAccent && (search.activeFocus) ? "transparent" : Theme.accent
+                            GradientBorder {
+                                active: search.activeFocus
+                            }
 
                             RowLayout {
                                 anchors.fill: parent
@@ -416,6 +419,7 @@ Scope {
                                             radius: Theme.round(13, width, height)
                                             color: entry.current ? Theme.accent
                                                 : rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
+                                            gradient: Theme.accentFill(entry.current)
                                             Behavior on color { ColorAnimation { duration: Theme.ms(140) } }
 
                                             RowLayout {

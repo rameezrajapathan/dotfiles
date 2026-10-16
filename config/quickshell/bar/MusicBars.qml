@@ -29,7 +29,7 @@ Item {
                 width: root.vertical ? size : root.barThickness
                 height: root.vertical ? root.barThickness : size
                 radius: Theme.round(root.barThickness / 2, width, height)
-                color: Theme.accent
+                color: Theme.gradientAccent ? Theme.mix(Theme.accent, Theme.accentEnd, root.count > 1 ? index / (root.count - 1) : 0) : Theme.accent
                 opacity: 0.45 + 0.55 * level
                 Behavior on width { enabled: root.vertical; NumberAnimation { duration: Theme.ms(60) } }
                 Behavior on height { enabled: !root.vertical; NumberAnimation { duration: Theme.ms(60) } }

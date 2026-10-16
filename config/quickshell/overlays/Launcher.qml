@@ -380,7 +380,11 @@ PanelWindow {
                 radius: Theme.round(16, width, height)
                 color: Qt.alpha(Theme.surface, 0.7)
                 border.width: 2
-                border.color: search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : "transparent"
+                border.color: Theme.gradientAccent && (search.activeFocus) ? "transparent" : search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : "transparent"
+                GradientBorder {
+                    active: search.activeFocus
+                    strength: 0.6
+                }
 
                 RowLayout {
                     anchors.fill: parent
@@ -527,7 +531,10 @@ PanelWindow {
                         radius: Theme.round(root.columns === 1 ? 14 : 18, width, height)
                         color: Qt.alpha(Theme.accent, 0.22)
                         border.width: 1
-                        border.color: Qt.alpha(Theme.accent, 0.5)
+                        border.color: Theme.gradientAccent ? "transparent" : Qt.alpha(Theme.accent, 0.5)
+                        GradientBorder {
+                            strength: 0.5
+                        }
                     }
                 }
                 keyNavigationWraps: false

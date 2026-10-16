@@ -6,6 +6,7 @@ import QtQuick
 import qs.widgets
 
 Singleton {
+    id: root
     readonly property color base: colors.base
     readonly property color baseTranslucent: Qt.alpha(colors.base, Settings.appearance.panelOpacity)
     readonly property color surface: colors.surface
@@ -14,6 +15,26 @@ Singleton {
     readonly property color subtext: colors.subtext
     readonly property color accent: colors.accent
     readonly property color accentText: colors.accentText
+    readonly property bool multiColor: colors.accent2 !== ""
+    readonly property color accent2: multiColor ? colors.accent2 : accent
+    readonly property color accent3: multiColor && colors.accent3 !== "" ? colors.accent3 : accent2
+    readonly property var accents: [accent, accent2, accent3]
+    readonly property bool gradientAccent: Settings.appearance.gradient
+    readonly property color accentEnd: multiColor ? accent2 : shade(accent)
+    function mix(a, b, t) {
+        return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t);
+    }
+    function shade(c) {
+        return Qt.hsla(c.hslHue, Math.min(1, c.hslSaturation * 1.1), Math.max(0, c.hslLightness - (c.hslLightness > 0.5 ? 0.15 : 0.1)), 1);
+    }
+    readonly property Gradient accentGradient: Gradient {
+        orientation: Gradient.Horizontal
+        GradientStop { position: 0; color: root.accent }
+        GradientStop { position: 1; color: root.accentEnd }
+    }
+    function accentFill(on) {
+        return on && gradientAccent ? accentGradient : null;
+    }
     readonly property color special: colors.special
     readonly property color specialText: colors.specialText
     readonly property color red: colors.red
@@ -70,6 +91,8 @@ Singleton {
             property string subtext: "#a6adc8"
             property string accent: "#89b4fa"
             property string accentText: "#1e1e2e"
+            property string accent2: ""
+            property string accent3: ""
             property string special: "#f5c2e7"
             property string specialText: "#1e1e2e"
             property string red: "#f38ba8"

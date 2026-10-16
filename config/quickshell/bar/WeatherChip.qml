@@ -24,6 +24,7 @@ Item {
             filled: true
             size: 18
             color: Theme.accent
+            gradientFill: true
         }
         Label {
             text: Weather.ready ? Weather.temp(Weather.current.temp) : ""

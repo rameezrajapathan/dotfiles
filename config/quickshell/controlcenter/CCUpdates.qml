@@ -46,6 +46,7 @@ CCCard {
             radius: Theme.round(17, width, height)
             color: root.any ? (buttonMouse.containsMouse ? Qt.lighter(Theme.accent, 1.08) : Theme.accent)
                 : Qt.alpha(Theme.surface, buttonMouse.containsMouse ? 0.85 : 0.55)
+            gradient: Theme.accentFill(root.any)
 
             Label {
                 id: buttonLabel

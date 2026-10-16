@@ -117,7 +117,10 @@ PanelWindow {
         radius: Theme.round(height / 2, width, height)
         color: Qt.alpha(Theme.base, 0.92)
         border.width: 1
-        border.color: Qt.alpha(Theme.accent, 0.3)
+        border.color: Theme.gradientAccent ? "transparent" : Qt.alpha(Theme.accent, 0.3)
+        GradientBorder {
+            strength: 0.3
+        }
 
         opacity: root.open ? 1 : 0
         y: root.open ? 0 : 16

@@ -22,6 +22,7 @@ Rectangle {
         : mouse.containsMouse ? Qt.alpha(Theme.accent, 0.24) : Qt.alpha(Theme.accent, 0.13)
     opacity: enabled ? 1 : 0.4
     Behavior on radius { NumberAnimation { duration: Theme.ms(260); easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
+    gradient: Theme.accentFill(filled || checked)
     Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
 
     Icon {

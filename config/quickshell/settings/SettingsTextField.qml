@@ -25,7 +25,10 @@ Rectangle {
     radius: Theme.round(10, width, height)
     color: Qt.alpha(Theme.base, 0.6)
     border.width: input.activeFocus ? 1 : 0
-    border.color: Theme.accent
+    border.color: Theme.gradientAccent && (input.activeFocus) ? "transparent" : Theme.accent
+    GradientBorder {
+        active: input.activeFocus
+    }
 
     MouseArea {
         anchors.fill: parent

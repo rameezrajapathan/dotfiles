@@ -108,7 +108,9 @@ SettingsPage {
                     radius: picture.radius + 3
                     color: "transparent"
                     border.width: 3
-                    border.color: Theme.accent
+                    border.color: Theme.gradientAccent ? "transparent" : Theme.accent
+                    GradientBorder {
+                    }
                     visible: thumb.selected
                 }
                 Rectangle {
@@ -181,6 +183,7 @@ SettingsPage {
                     { value: "auto", label: "Auto" },
                     { value: "tonal-spot", label: "Tonal" },
                     { value: "content", label: "Vivid" },
+                    { value: "multi", label: "Multi-color" },
                     { value: "expressive", label: "Expressive" },
                     { value: "fidelity", label: "Fidelity" },
                     { value: "rainbow", label: "Rainbow" },
@@ -196,22 +199,82 @@ SettingsPage {
         }
 
         SettingsRow {
+            icon: "gradient"
+            title: "Gradient accents"
+            description: Theme.multiColor ? "Accent fills blend from one wallpaper color into the next."
+                : "Accent fills blend into a deeper shade of the same color."
+            Switch {
+                checked: Settings.appearance.gradient
+                onToggled: {
+                    Settings.appearance.gradient = !Settings.appearance.gradient;
+                    Settings.retheme();
+                }
+            }
+        }
+
+        SettingsRow {
             icon: "format_color_fill"
             title: "Current palette"
             description: "Changes live with the wallpaper."
-            Row {
-                spacing: -6
-                Repeater {
-                    model: [Theme.base, Theme.surface, Theme.overlay, Theme.accent, Theme.red, Theme.yellow, Theme.green, Theme.text]
-                    Rectangle {
-                        required property color modelData
-                        width: 28
-                        height: 28
-                        radius: Theme.round(14, width, height)
-                        color: modelData
-                        border.width: 2
-                        border.color: Theme.base
-                        Behavior on color { ColorAnimation { duration: Theme.ms(400) } }
+            below: true
+
+            ColumnLayout {
+                spacing: 8
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: 34
+                    radius: Theme.round(12, width, height)
+                    border.width: 1
+                    border.color: Qt.alpha(Theme.overlay, 0.3)
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0; color: Theme.base }
+                        GradientStop { position: 0.16; color: Theme.surface }
+                        GradientStop { position: 0.36; color: Theme.accent }
+                        GradientStop { position: 0.56; color: Theme.multiColor ? Theme.accent2 : Theme.accentEnd }
+                        GradientStop { position: 0.76; color: Theme.multiColor ? Theme.accent3 : Theme.special }
+                        GradientStop { position: 1; color: Theme.text }
+                    }
+                }
+                Flow {
+                    Layout.fillWidth: true
+                    spacing: 6
+                    Repeater {
+                        model: [
+                            { name: "Accent", color: Theme.accent },
+                            { name: Theme.multiColor ? "Second" : "Shade", color: Theme.multiColor ? Theme.accent2 : Theme.accentEnd },
+                            { name: Theme.multiColor ? "Third" : "Special", color: Theme.multiColor ? Theme.accent3 : Theme.special },
+                            { name: "Red", color: Theme.red },
+                            { name: "Yellow", color: Theme.yellow },
+                            { name: "Green", color: Theme.green }
+                        ]
+                        Rectangle {
+                            required property var modelData
+                            implicitWidth: swatchRow.implicitWidth + 16
+                            implicitHeight: 24
+                            radius: Theme.round(12, width, height)
+                            color: Qt.alpha(Theme.base, 0.6)
+                            Row {
+                                id: swatchRow
+                                anchors.centerIn: parent
+                                spacing: 6
+                                Rectangle {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 12
+                                    height: 12
+                                    radius: Theme.round(6, width, height)
+                                    color: modelData.color
+                                    Behavior on color { ColorAnimation { duration: Theme.ms(400) } }
+                                }
+                                Label {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: modelData.name
+                                    color: Theme.subtext
+                                    font.pixelSize: Theme.fontSize - 3
+                                }
+                            }
+                        }
                     }
                 }
             }

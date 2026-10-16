@@ -117,6 +117,7 @@ PanelWindow {
                             filled: Weather.autoLocation
                             size: 16
                             color: Theme.accent
+                            gradientFill: true
                         }
                         Label {
                             anchors.verticalCenter: parent.verticalCenter
@@ -221,6 +222,7 @@ PanelWindow {
                     size: 64
                     weight: 200
                     color: Theme.accent
+                    gradientFill: true
                 }
             }
 
@@ -290,6 +292,7 @@ PanelWindow {
                             height: parent.height
                             radius: Theme.round(2, width, height)
                             color: Theme.accent
+                            gradient: Theme.accentFill(true)
                             opacity: day.index === 0 ? 1 : 0.55
                         }
                         Rectangle {

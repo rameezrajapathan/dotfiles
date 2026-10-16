@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import colorsys
 import json
 import math
 import os
@@ -87,6 +88,61 @@ def analyze(path):
         "hue_strength": math.hypot(sum_a, sum_b) / n,
     }
 
+def hue_gap(a, b):
+    return abs(math.atan2(math.sin(a - b), math.cos(a - b)))
+
+def wallpaper_colors(path, mode):
+    found = []
+    for index in range(6):
+        result = subprocess.run(
+            ["matugen", "image", path, "--type", "scheme-content", "--mode", mode,
+             "--source-color-index", str(index), "--dry-run", "--json", "hex"],
+            capture_output=True,
+        )
+        if result.returncode != 0:
+            break
+        try:
+            color = json.loads(result.stdout)["colors"]["primary"]["default"]["color"]
+        except (ValueError, KeyError):
+            break
+        if color not in found and (not found or hex_to_lch(color)[1] > 0.04):
+            found.append(color)
+    return found
+
+def multi_colors(path, mode):
+    found = wallpaper_colors(path, mode)
+    if not found:
+        return []
+    L, C, h = hex_to_lch(found[0])
+    picked = []
+    for _ in range(2):
+        taken = [hex_to_lch(found[0])[2]] + [hex_to_lch(c)[2] for c in picked]
+        best = max(found[1:], key=lambda c: min(hue_gap(hex_to_lch(c)[2], t) for t in taken), default=None)
+        if best and best not in picked and min(hue_gap(hex_to_lch(best)[2], t) for t in taken) > math.radians(28):
+            picked.append(best)
+    rotations = [math.radians(-65), math.radians(70)]
+    while len(picked) < 2:
+        picked.append(lch_to_hex(L, max(C, 0.08), h + rotations[len(picked)]))
+    return picked
+
+def shade(color):
+    r, g, b = (int(color[i : i + 2], 16) / 255 for i in (1, 3, 5))
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    l = max(0, l - (0.15 if l > 0.5 else 0.1))
+    s = min(1, s * 1.1)
+    return "#" + "".join(f"{round(c * 255):02x}" for c in colorsys.hls_to_rgb(h, l, s))
+
+def primary(path, scheme, mode):
+    result = subprocess.run(
+        ["matugen", "image", path, "--type", scheme, "--mode", mode,
+         "--source-color-index", "0", "--dry-run", "--json", "hex"],
+        capture_output=True,
+    )
+    try:
+        return json.loads(result.stdout)["colors"]["primary"]["default"]["color"]
+    except (ValueError, KeyError):
+        return ""
+
 def main():
     stats = analyze(sys.argv[1])
     colorful = stats["colorfulness"]
@@ -104,6 +160,16 @@ def main():
         mode = os.environ["THEME_MODE"]
     if os.environ.get("THEME_SCHEME", "auto") != "auto":
         scheme = "scheme-" + os.environ["THEME_SCHEME"]
+    multi = []
+    if scheme == "scheme-multi":
+        scheme = "scheme-content"
+        multi = multi_colors(sys.argv[1], mode)
+
+    if multi:
+        end = multi[0]
+    else:
+        base = primary(sys.argv[1], scheme, mode)
+        end = shade(base) if base else ""
 
     strength = min(1.15, max(0.15, (colorful - 0.01) / 0.13))
     target_l = {"light": 0.52, "dark": 0.8}[mode]
@@ -119,6 +185,7 @@ def main():
         {
             "theme": {"mode": mode, "scheme": scheme, **{k: round(v, 4) for k, v in stats.items()}},
             "ansi": ansi,
+            "multi": {"accent2": multi[0] if multi else "", "accent3": multi[1] if multi else "", "end": end.lstrip("#")},
         },
         sys.stdout,
     )

@@ -27,6 +27,7 @@ Rectangle {
         height: parent.height - 8
         radius: Theme.round(height / 2, width, height)
         color: Theme.accent
+        gradient: Theme.accentFill(true)
         Behavior on x { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
         Behavior on width { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
     }

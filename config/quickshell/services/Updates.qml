@@ -11,6 +11,8 @@ Singleton {
     property var system: null
     property real checked: 0
     property bool checking: false
+    property bool recheck: false
+    readonly property string afterRun: "; qs ipc call updates check >/dev/null 2>&1; echo; read -rp 'Done. Press Enter to close… ' _"
 
     readonly property int behind: pikadots?.behind ?? 0
     readonly property int systemCount: system ? system.pacman.length + system.aur.length + system.flatpak.length : 0
@@ -20,8 +22,10 @@ Singleton {
     property int notifiedSystem: 0
 
     function check() {
-        if (checking)
+        if (checking) {
+            recheck = true;
             return;
+        }
         checking = true;
         proc.command = [Quickshell.env("HOME") + "/.config/hypr/scripts/updates.sh"].concat(Settings.updates.system ? [] : ["repo"]);
         proc.running = true;
@@ -33,11 +37,11 @@ Singleton {
     }
 
     function updatePikadots() {
-        Apps.terminal(["sh", "-c", "\"$HOME/.local/bin/pikadots\" update; echo; read -rp 'Done. Press Enter to close… ' _"]);
+        Apps.terminal(["sh", "-c", "\"$HOME/.local/bin/pikadots\" update" + afterRun]);
     }
 
     function repairPikadots() {
-        Apps.terminal(["sh", "-c", "\"$HOME/.local/bin/pikadots\" repair; echo; read -rp 'Done. Press Enter to close… ' _"]);
+        Apps.terminal(["sh", "-c", "\"$HOME/.local/bin/pikadots\" repair" + afterRun]);
     }
 
     function updateSystem() {
@@ -45,7 +49,7 @@ Singleton {
         const steps = [helper ? helper + " -Syu" : "sudo pacman -Syu"];
         if ((system?.flatpak.length ?? 0) > 0)
             steps.push("flatpak update");
-        Apps.terminal(["sh", "-c", steps.join(" && ") + "; echo; read -rp 'Done. Press Enter to close… ' _"]);
+        Apps.terminal(["sh", "-c", steps.join(" && ") + afterRun]);
     }
 
     function ago(seconds) {
@@ -73,6 +77,18 @@ Singleton {
         onTriggered: root.check()
     }
 
+    FileView {
+        path: "/var/log/pacman.log"
+        preload: false
+        watchChanges: true
+        onFileChanged: settleTimer.restart()
+    }
+    Timer {
+        id: settleTimer
+        interval: 8000
+        onTriggered: root.check()
+    }
+
     Process {
         id: proc
         stdout: StdioCollector {
@@ -90,7 +106,13 @@ Singleton {
                 root.announce();
             }
         }
-        onExited: root.checking = false
+        onExited: {
+            root.checking = false;
+            if (root.recheck) {
+                root.recheck = false;
+                root.check();
+            }
+        }
     }
 
     function announce() {

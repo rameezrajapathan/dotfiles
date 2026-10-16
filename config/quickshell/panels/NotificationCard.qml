@@ -31,7 +31,11 @@ Rectangle {
     radius: Theme.round(18, width, height)
     color: Qt.alpha(Theme.base, 0.92)
     border.width: 1
-    border.color: Qt.alpha(root.tint, critical ? 0.7 : 0.35)
+    border.color: Theme.gradientAccent && (!root.critical) ? "transparent" : Qt.alpha(root.tint, critical ? 0.7 : 0.35)
+    GradientBorder {
+        active: !root.critical
+        strength: 0.35
+    }
     clip: true
 
     readonly property string edge: Settings.notifications.position
@@ -233,5 +237,7 @@ Rectangle {
         height: 3
         radius: Theme.round(1.5, width, height)
         color: Qt.alpha(root.tint, 0.7)
+        gradient: Theme.accentFill(!root.critical)
+        opacity: Theme.gradientAccent && !root.critical ? 0.8 : 1
     }
 }

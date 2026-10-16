@@ -15,6 +15,7 @@ Rectangle {
     implicitHeight: 58
     radius: Theme.round(14, width, height)
     color: active ? Theme.accent : tileMouse.containsMouse ? Theme.surface : Qt.alpha(Theme.surface, 0.6)
+    gradient: Theme.accentFill(active)
     Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
 
     RowLayout {

@@ -489,7 +489,10 @@ Item {
                 rotation: 45
                 color: "transparent"
                 border.width: 1
-                border.color: Qt.alpha(Theme.accent, 0.55)
+                border.color: Theme.gradientAccent ? "transparent" : Qt.alpha(Theme.accent, 0.55)
+                GradientBorder {
+                    strength: 0.55
+                }
             }
             Rectangle {
                 anchors.centerIn: parent

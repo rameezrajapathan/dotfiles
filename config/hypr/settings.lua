@@ -3,6 +3,16 @@ local ok, generated = pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hy
 if ok then
 	colors = generated
 end
+do
+	local f = io.open(os.getenv("HOME") .. "/.config/pikadots/settings.json")
+	local text = f and f:read("a") or ""
+	if f then
+		f:close()
+	end
+	if colors.accent_end and colors.accent_end ~= "rgb()" and text:match('"gradient"%s*:%s*true') then
+		colors.active_border = { colors = { colors.active_border, colors.accent_end }, angle = 45 }
+	end
+end
 
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_QPA_PLATFORMTHEME", "kde")

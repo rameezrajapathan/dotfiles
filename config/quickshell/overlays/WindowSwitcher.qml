@@ -135,7 +135,9 @@ PanelWindow {
                 radius: Theme.round(16, width, height)
                 color: Qt.alpha(Theme.accent, 0.22)
                 border.width: 2
-                border.color: Theme.accent
+                border.color: Theme.gradientAccent ? "transparent" : Theme.accent
+                GradientBorder {
+                }
             }
             preferredHighlightBegin: width / 2 - 130
             preferredHighlightEnd: width / 2 + 130

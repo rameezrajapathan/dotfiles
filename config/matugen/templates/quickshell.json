@@ -6,6 +6,8 @@
     "subtext": "{{colors.on_surface_variant.default.hex}}",
     "accent": "{{colors.primary.default.hex}}",
     "accentText": "{{colors.on_primary.default.hex}}",
+    "accent2": "{{multi.accent2}}",
+    "accent3": "{{multi.accent3}}",
     "special": "{{colors.tertiary.default.hex}}",
     "specialText": "{{colors.on_tertiary.default.hex}}",
     "red": "{{colors.error.default.hex}}",

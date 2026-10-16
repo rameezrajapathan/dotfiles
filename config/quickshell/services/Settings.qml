@@ -100,6 +100,7 @@ Singleton {
                 property real panelOpacity: 0.8
                 property string themeMode: "auto"
                 property string scheme: "auto"
+                property bool gradient: false
             }
 
             property var hypr: ({})

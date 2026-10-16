@@ -175,7 +175,9 @@ Loader {
                 radius: Theme.round(width / 2, width, height)
                 color: "transparent"
                 border.width: 2
-                border.color: Theme.accent
+                border.color: Theme.gradientAccent ? "transparent" : Theme.accent
+                GradientBorder {
+                }
                 opacity: root.settingsActive ? 1 : 0
                 Behavior on opacity { NumberAnimation { duration: Theme.ms(150) } }
             }

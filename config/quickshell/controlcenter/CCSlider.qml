@@ -26,6 +26,7 @@ Rectangle {
         height: parent.height
         radius: root.radius
         color: root.dimmed ? Theme.overlay : Theme.accent
+        gradient: Theme.accentFill(!root.dimmed)
         Behavior on width {
             enabled: !drag.pressed
             NumberAnimation { duration: Theme.ms(120) }

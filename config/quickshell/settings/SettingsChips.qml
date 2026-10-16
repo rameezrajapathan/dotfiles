@@ -22,6 +22,7 @@ Flow {
             implicitHeight: 30
             radius: Theme.round(height / 2, width, height)
             color: selected ? Theme.accent : mouse.containsMouse ? Qt.alpha(Theme.overlay, 0.35) : Qt.alpha(Theme.base, 0.6)
+            gradient: Theme.accentFill(selected)
             border.width: selected ? 0 : 1
             border.color: Qt.alpha(Theme.overlay, 0.3)
             Behavior on color { ColorAnimation { duration: Theme.ms(120) } }

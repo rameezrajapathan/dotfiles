@@ -45,6 +45,7 @@ Item {
         anchors.fill: parent
         radius: Theme.round(width / 2, width, height)
         color: Theme.accent
+        gradient: Theme.accentFill(true)
         border.width: root.urgent ? 2 : 0
         border.color: Theme.red
         scale: mouse.pressed ? 0.9 : mouse.containsMouse ? 1.08 : 1

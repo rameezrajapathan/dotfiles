@@ -21,6 +21,7 @@ Item {
             filled: true
             size: 18
             color: Theme.accent
+            gradientFill: true
         }
         Label {
             visible: !Theme.barVertical

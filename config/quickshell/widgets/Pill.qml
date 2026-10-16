@@ -12,6 +12,7 @@ Rectangle {
     implicitHeight: 22
     radius: Theme.round(height / 2, width, height)
     color: active ? Theme.accent : mouse.containsMouse ? Theme.overlay : Theme.surface
+    gradient: Theme.accentFill(active)
 
     Label {
         id: label
