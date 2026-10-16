@@ -10,7 +10,7 @@ Singleton {
 
     // multi: can be added more than once
     readonly property var modules: [
-        { id: "workspaces", label: "Workspaces", icon: "space_dashboard", description: "Current workspace; click for the overview" },
+        { id: "workspaces", label: "Workspaces", icon: "space_dashboard", description: "Workspaces, in the style picked below" },
         { id: "launcher", label: "Apps", icon: "apps", description: "Distro logo that opens the launcher" },
         { id: "title", label: "Window title", icon: "web_asset", description: "The focused window" },
         { id: "clock", label: "Clock", icon: "schedule", description: "Click for the calendar" },

@@ -147,6 +147,14 @@ Singleton {
             const edges = ["top", "right", "bottom", "left"];
             Settings.bar.position = edges[(edges.indexOf(Theme.barPosition) + 1) % 4];
         }
+        // qs ipc call bar workspaces <focus|numbers|boxes|underline|dots|pills|vpills|icons|next>
+        function workspaces(style: string): void {
+            const ids = WorkspaceStyles.styles.map(s => s.id);
+            if (style === "next")
+                Settings.workspaces.style = ids[(ids.indexOf(Settings.workspaces.style) + 1) % ids.length];
+            else if (ids.includes(style))
+                Settings.workspaces.style = style;
+        }
     }
 
     IpcHandler {

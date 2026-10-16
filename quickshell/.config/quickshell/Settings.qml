@@ -13,6 +13,7 @@ Singleton {
     readonly property string path: Quickshell.env("HOME") + "/.config/pikadots/settings.json"
     readonly property JsonObject appearance: adapter.appearance
     readonly property JsonObject bar: adapter.bar
+    readonly property JsonObject workspaces: adapter.workspaces
     readonly property JsonObject controlCenter: adapter.controlCenter
     // Hyprland options changed in the app, "general.gaps_in" → 5 (Hypr.qml); reassign to change
     property alias hypr: adapter.hypr
@@ -224,6 +225,25 @@ Singleton {
                 property var custom: null
                 // Quick tiles, in order (CCStyles.tiles lists them)
                 property var tiles: ["network", "bluetooth", "vpn", "dnd", "night", "profile"]
+            }
+
+            // The bar's workspace indicator (WorkspaceStyles.qml; Settings > Bar > Workspaces)
+            property JsonObject workspaces: JsonObject {
+                // focus, numbers, boxes, underline, dots, pills, vpills or icons
+                property string style: "focus"
+                // arabic (1 2 3), roman (I II III) or kanji (一 二 三)
+                property string labels: "arabic"
+                // fixed: 1..count, plus any others in use; occupied: only those in use and the current one
+                property string show: "fixed"
+                property int count: 5
+                // Workspaces with windows look brighter than empty ones
+                property bool markOccupied: true
+                // The current one's highlight glides between workspaces
+                property bool glide: true
+                // pills: the current one's number inside its pill
+                property bool pillLabel: false
+                // 0.7 .. 1.3
+                property real size: 1
             }
 
             property JsonObject bar: JsonObject {

@@ -8,6 +8,9 @@ SettingsPage {
     title: "Bar"
     subtitle: "Pick a style, or change anything below to make your own."
 
+    // The picked workspace indicator (Workspaces section)
+    readonly property var wsInfo: WorkspaceStyles.info(Settings.workspaces.style)
+
     SettingsSection {
         title: "Position"
 
@@ -207,6 +210,189 @@ SettingsPage {
             BarModuleEditor {
                 id: editor
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: 14 }
+            }
+        }
+    }
+
+    SettingsSection {
+        title: "Workspaces"
+        subtitle: "How the Workspaces item shows them. Click one to switch to it, the current one for the overview."
+
+        SettingsRow {
+            id: wsStyleRow
+            icon: "space_dashboard"
+            title: "Indicator"
+            description: WorkspaceStyles.info(Settings.workspaces.style).description
+            below: true
+
+            GridLayout {
+                columns: 4
+                columnSpacing: 10
+                rowSpacing: 10
+
+                Repeater {
+                    model: WorkspaceStyles.styles
+
+                    Rectangle {
+                        id: wsCard
+                        required property var modelData
+                        readonly property bool selected: Settings.workspaces.style === modelData.id
+
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        implicitHeight: wsCardColumn.implicitHeight + 16
+                        radius: 14
+                        color: selected ? Qt.alpha(Theme.accent, 0.16) : wsCardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
+                        border.width: selected ? 2 : 1
+                        border.color: selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
+                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+
+                        ColumnLayout {
+                            id: wsCardColumn
+                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
+                            spacing: 8
+
+                            // The real indicator in this style, on a pill like the bar's
+                            Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: 50
+                                radius: 9
+                                color: Qt.alpha(Theme.base, 0.5)
+                                clip: true
+
+                                // Shrunk to fit a narrow card
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    width: preview.width + 2 * Theme.pillInset + 4
+                                    height: Theme.pillHeight
+                                    scale: Math.min(1, (parent.width - 12) / width, (parent.height - 6) / height)
+                                    radius: Theme.pillRadius
+                                    color: Theme.baseTranslucent
+
+                                    Workspaces {
+                                        id: preview
+                                        anchors.centerIn: parent
+                                        style: wsCard.modelData.id
+                                        vertical: false
+                                        // Previews only: clicks pick the style
+                                        enabled: false
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.leftMargin: 4
+                                Layout.rightMargin: 4
+                                spacing: 6
+                                Icon {
+                                    name: wsCard.modelData.icon
+                                    size: 17
+                                    filled: wsCard.selected
+                                    color: Theme.accent
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    text: wsCard.modelData.label
+                                    font.weight: Font.DemiBold
+                                    elide: Text.ElideRight
+                                }
+                                CheckBadge {
+                                    visible: wsCard.selected
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: wsCardMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Settings.workspaces.style = wsCard.modelData.id
+                        }
+                    }
+                }
+            }
+        }
+
+        SettingsRow {
+            visible: root.wsInfo.labels === true || Settings.workspaces.style === "pills" && Settings.workspaces.pillLabel
+                || Settings.workspaces.style === "icons"
+            icon: "translate"
+            title: "Numbers"
+            description: "How workspace numbers are written."
+            SettingsSegmented {
+                options: WorkspaceStyles.labelStyles
+                current: Settings.workspaces.labels
+                onPicked: v => Settings.workspaces.labels = v
+            }
+        }
+        SettingsRow {
+            visible: Settings.workspaces.style !== "focus"
+            icon: "view_week"
+            title: "Show"
+            description: Settings.workspaces.show === "occupied" ? "Only workspaces with windows, and the current one."
+                : "A fixed number of workspaces, plus any others with windows."
+            SettingsSegmented {
+                options: [
+                    { value: "fixed", label: "Fixed", icon: "filter_5" },
+                    { value: "occupied", label: "In use", icon: "select_window" }
+                ]
+                current: Settings.workspaces.show
+                onPicked: v => Settings.workspaces.show = v
+            }
+        }
+        SettingsRow {
+            visible: Settings.workspaces.style !== "focus" && Settings.workspaces.show !== "occupied"
+            icon: "tag"
+            title: "How many"
+            SettingsSlider {
+                from: 1
+                to: 10
+                stepSize: 1
+                value: Settings.workspaces.count
+                onMoved: v => Settings.workspaces.count = v
+            }
+        }
+        SettingsRow {
+            visible: Settings.workspaces.style !== "focus"
+            icon: "brightness_6"
+            title: "Mark workspaces in use"
+            description: "Empty ones look dimmer, or as rings."
+            Switch {
+                checked: Settings.workspaces.markOccupied
+                onToggled: Settings.workspaces.markOccupied = !checked
+            }
+        }
+        SettingsRow {
+            visible: root.wsInfo.glide === true
+            icon: "animation"
+            title: "Gliding highlight"
+            description: "The current workspace's highlight slides over when you switch."
+            Switch {
+                checked: Settings.workspaces.glide
+                onToggled: Settings.workspaces.glide = !checked
+            }
+        }
+        SettingsRow {
+            visible: Settings.workspaces.style === "pills"
+            icon: "pin"
+            title: "Number in the pill"
+            description: "Writes the current workspace's number inside its pill."
+            Switch {
+                checked: Settings.workspaces.pillLabel
+                onToggled: Settings.workspaces.pillLabel = !checked
+            }
+        }
+        SettingsRow {
+            visible: Settings.workspaces.style !== "focus"
+            icon: "format_size"
+            title: "Size"
+            SettingsSlider {
+                from: 70
+                to: 130
+                stepSize: 5
+                value: Math.round(Settings.workspaces.size * 100)
+                suffix: "%"
+                onMoved: v => Settings.workspaces.size = Math.round(v) / 100
             }
         }
     }
