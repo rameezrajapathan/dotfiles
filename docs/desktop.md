@@ -26,6 +26,22 @@ click turns it on or off), sound (scroll for volume, right click mutes), battery
 (right click for Do Not Disturb), a capture button, power and dividers. Status icons open their
 control center page. See [settings.md](settings.md#bar).
 
+The ten ready-made styles (shown with music paused; while something plays, the clock turns into a
+live spectrum and Now playing shows the track):
+
+| Style | |
+|---|---|
+| **Minimalist**<br>one pill | ![Minimalist bar: One pill in the middle. The original.](screenshots/bar-minimalist-v3.webp) |
+| **Focus**<br>one pill | ![Focus bar: Only the time. Nothing to pull you away.](screenshots/bar-focus-v3.webp) |
+| **Everyday**<br>islands | ![Everyday bar: Friendly and familiar: apps, date, battery, sound. No tech clutter.](screenshots/bar-everyday-v3.webp) |
+| **On the go**<br>one pill | ![On the go bar: A small pill for laptops: Wi-Fi, battery and time.](screenshots/bar-onthego-v3.webp) |
+| **Music lover**<br>islands | ![Music lover bar: What's playing up front, sound and Bluetooth close at hand.](screenshots/bar-music-v3.webp) |
+| **Developer**<br>full width | ![Developer bar: Window title, CPU and memory, tray and meetings.](screenshots/bar-developer-v3.webp) |
+| **Islands**<br>islands | ![Islands bar: A pill on each side and one in the middle.](screenshots/bar-islands-v3.webp) |
+| **Floating**<br>full width | ![Floating bar: A full bar with space around it.](screenshots/bar-floating-v3.webp) |
+| **Classic**<br>full width | ![Classic bar: Edge to edge and square, like a traditional desktop.](screenshots/bar-classic-v3.webp) |
+| **Maximalist**<br>full width | ![Maximalist bar: Everything, all at once.](screenshots/bar-maximalist-v3.webp) |
+
 ## Calendar
 
 Click the clock (or the date). The time, the month (arrows or scroll change it, the month name
@@ -46,6 +62,8 @@ are saved in `~/.local/state/quickshell/weather.json`. `qs ipc call weather togg
 `qs ipc call weather refresh` reloads it.
 
 ## Control center
+
+![Control center in a three-column Custom layout](screenshots/controlcenter-v3.webp)
 
 The profile picture drops down one window, attached to the bar, holding everything else as
 widgets. Pick its layout on [Settings > Control center](settings.md#control-center):
@@ -139,6 +157,8 @@ loads after its own rules. Edit `monitors.lua` only to change those defaults.
 
 ## Launcher (Super + A)
 
+![Launcher](screenshots/launcher-v3.webp)
+
 Apps, most used first. A first character switches mode:
 
 | Prefix | Mode | Enter | Shift + Enter |
@@ -157,6 +177,10 @@ login.
 
 ## Overlays
 
+| | |
+|---|---|
+| ![Power menu](screenshots/power-v3.webp) | ![Wallpaper picker](screenshots/wallpaper-v3.webp) |
+
 - **Power menu** (Super + Escape): lock, log out, suspend, restart, shut down (L / E / S / R / P).
 - **Password prompts** for system changes (pkexec, the Date & time page, updates) are the shell's own
   polkit agent (`quickshell/PolkitDialog.qml`): Enter authenticates, Esc cancels. If another agent
@@ -165,7 +189,11 @@ login.
 - **Overview** (Super + Tab): every workspace in a row with live previews. Like Alt + Tab: hold
   Super, Tab or Shift + Tab moves, releasing Super switches, Esc cancels.
 - **Drop-down terminal** (Super + \`): stays running while hidden.
+- **Wallpaper picker** (Super + Shift + W): a strip of `~/Pictures/Wallpapers`; picking one
+  recolors everything ([theming.md](theming.md)).
 - **Cheatsheet** (Super + ?): every shortcut, read live from Hyprland.
+
+![Cheatsheet](screenshots/cheatsheet-v3.webp)
 - **Volume and brightness indicator** when those keys are used.
 
 ## Notifications
@@ -176,7 +204,7 @@ through Do Not Disturb (Super + Shift + N).
 
 ## Lock screen
 
-![Lock screen](screenshots/lock-v2.webp)
+![Lock screen](screenshots/lock-v3.webp)
 
 Part of the shell (`quickshell/Lock.qml`), split in two over the blurred wallpaper. The left half
 has the date and a big clock, now playing (controls and a live spectrum) and suspend, restart and
@@ -216,3 +244,8 @@ kitty with starship, eza and zoxide. Super + T opens it with fastfetch. Its font
 Settings > Fonts & icons (a font theme or the terminal font). The cursor glides to
 where it jumps, with a short trail (`cursor_trail` in `kitty/.config/kitty/kitty.conf`), and its
 blink fades.
+
+Terminal apps follow the wallpaper too: btop (`btop/.config/btop/btop.conf` picks the generated
+`wallpaper` theme with a transparent background), cava, peaclock, superfile and Neovim. To open one
+floating in a fixed spot, add it as a terminal app in
+[Settings > Window rules](settings.md#window-rules).

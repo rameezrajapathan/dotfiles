@@ -1,17 +1,37 @@
 import QtQuick
 import QtQuick.Layouts
 
-// Choose one app from a list: the chosen one with its icon, click to see the others.
-// options: [{ id, name, icon }]
+// Choose one app from a list: the chosen one with its icon, click to see the others (with a
+// search box above them when there are many). options: [{ id, name, icon }]
 ColumnLayout {
     id: root
     property var options: []
     property string current
     property string placeholder: "Not set"
     property bool expanded: false
+    property bool searchable: options.length > 8
+    property string query
     signal picked(string id)
 
     readonly property var chosen: options.find(o => o.id === current) ?? null
+    readonly property var shown: {
+        const q = query.trim().toLowerCase();
+        if (!q)
+            return options;
+        const name = o => o.name.toLowerCase();
+        // Names starting with the query first, then names or classes containing it
+        return options.filter(o => name(o).includes(q) || o.id.toLowerCase().includes(q))
+            .sort((a, b) => name(b).startsWith(q) - name(a).startsWith(q));
+    }
+
+    onExpandedChanged: {
+        if (expanded && searchable)
+            search.focusInput();
+        else {
+            search.clear();
+            query = "";
+        }
+    }
 
     spacing: 6
 
@@ -62,18 +82,40 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: root.expanded ? Math.min(list.contentHeight + 12, 300) : 0
+        Layout.preferredHeight: root.expanded ? (search.visible ? search.height + 6 : 0) + Math.min(Math.max(list.contentHeight, empty.visible ? 40 : 0) + 12, 300) : 0
         visible: Layout.preferredHeight > 0
         clip: true
         radius: 12
         color: Qt.alpha(Theme.base, 0.6)
         Behavior on Layout.preferredHeight { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
 
+        SettingsTextField {
+            id: search
+            visible: root.searchable
+            anchors { top: parent.top; left: parent.left; right: parent.right; margins: 6 }
+            placeholder: "Search " + root.options.length + " apps…"
+            onEdited: t => root.query = t
+            onEntered: t => {
+                // Enter picks the first match
+                if (t.trim() && root.shown.length) {
+                    root.picked(root.shown[0].id);
+                    root.expanded = false;
+                }
+            }
+        }
+
+        Label {
+            id: empty
+            visible: root.shown.length === 0
+            anchors { top: list.top; horizontalCenter: parent.horizontalCenter; topMargin: 10 }
+            text: "No apps match “" + root.query.trim() + "”"
+            color: Theme.subtext
+        }
+
         ListView {
             id: list
-            anchors.fill: parent
-            anchors.margins: 6
-            model: root.options
+            anchors { top: search.visible ? search.bottom : parent.top; left: parent.left; right: parent.right; bottom: parent.bottom; margins: 6 }
+            model: root.shown
             spacing: 2
             clip: true
             boundsBehavior: Flickable.StopAtBounds

@@ -123,7 +123,9 @@ Singleton {
 
             property var hypr: ({})
             property var startup: []
-            // Window rules page: [{ cls, name, icon, float, center, size, pin, fullscreen, workspace, silent, opacity, noBlur }]
+            // Window rules page: [{ cls, name, icon, entry, float, position ("" | center | top-left ... |
+            // exact), x, y, size, pin, fullscreen, workspace, silent, opacity, noBlur, terminal, command }]
+            // (older rules have center instead of position)
             property var windowRules: []
 
             // hypridle timers in minutes, 0 = never (hypr/scripts/idle.sh reads these)

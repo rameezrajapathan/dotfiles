@@ -23,7 +23,7 @@ state=$HOME/.local/state/pikadots
 backups=$state/backups
 
 # Stow packages, in link order
-packages=(hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk cava superfile git zsh plasma pikadots)
+packages=(hypr quickshell fuzzel kitty starship fastfetch fontconfig matugen gtk cava superfile btop git zsh plasma pikadots)
 services=(gcr-ssh-agent.socket)
 # System services the bar relies on (enabled with sudo when off)
 system_services=(NetworkManager.service bluetooth.service power-profiles-daemon.service)

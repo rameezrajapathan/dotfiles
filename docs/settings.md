@@ -8,7 +8,7 @@ window: categories on the left, one page at a time on the right. Everything appl
 Enter or a click opens the page, scrolls to the setting and highlights it. Esc clears the search,
 then closes the window.
 
-![Effects page](screenshots/settings-effects.webp)
+![Appearance page](screenshots/settings-appearance-v3.webp)
 
 ## Pages
 
@@ -21,7 +21,7 @@ then closes the window.
 | Accessibility | `accessibility` | Screen zoom around the pointer (Hyprland `cursor:zoom_factor`, not saved; Super + Alt + = / − / 0), text size for the shell, GTK and Qt apps (`hypr/scripts/accessibility.sh`), reduce motion (the shell's transitions become instant through `Theme.ms()`, Hyprland, GTK and KDE animations off; spinners keep turning) |
 | Windows | `windows` | Tiling layout (dwindle, master, scrolling), gaps, border width, resize on borders, corner roundness and shape |
 | Effects | `effects` | Blur (strength, passes, vibrancy), window opacity, dimming, shadows, how panels open and close (Slide, Morph, Spring, Liquid, Reveal or Fade, each with a live preview, and their speed), animation speed and workspace switch style (the bar's workspace number animates the same way) |
-| Window rules | `rules` | Per app (window class; open windows listed first): floating, centered, size, on every workspace, fullscreen, no blur, workspace (and whether to switch to it), opacity. Written to `~/.local/state/pikadots/window-rules.lua`, loaded at the end of `hypr/rules.lua`; Hyprland reloads after a change |
+| Window rules | `rules` | Per app (window class; searchable picker, open windows listed first): floating, position (auto, one of nine spots on a 3×3 grid kept clear of the bar and screen edges, or exact x/y; *Use the open window* copies an open window's place and size), size, on every workspace, fullscreen, no blur, workspace (and whether to switch to it), opacity; ▶ opens the app. **Terminal apps** (a command such as `cava` or `peaclock`, or an installed terminal entry such as btop) get a launcher entry from `hypr/scripts/terminal-app.sh` in `~/.local/share/applications` that opens them in the default terminal with their own class (`pikadots-<name>`), so the rule matches them and not every terminal; deleting the rule removes the entry. Written to `~/.local/state/pikadots/window-rules.lua`, loaded at the end of `hypr/rules.lua`; Hyprland reloads after a change |
 | Keyboard & mouse | `input` | Keyboard layouts and options, key repeat, pointer speed and acceleration, focus follows mouse, touchpad, cursor theme and size |
 | Notifications | `notifications` | Do Not Disturb, daily quiet hours, popup position, duration, count and width, test notification |
 | Launcher | `launcher` | Columns, icon size, most used first, forget usage, each typed mode on or off; clipboard history size, keep copied text when the app closes (wl-clip-persist), clear history |
@@ -37,7 +37,7 @@ then closes the window.
 | Updates | `updates` | pikadots (what's new on the remote, local changes and unpushed commits; Update runs `pikadots update` in a terminal) and system packages (pacman via checkupdates, AUR via yay/paru, Flatpak; Update system runs in a terminal), check interval and notifications |
 | About | `about` | This machine and versions |
 
-![Fonts & icons page](screenshots/settings-fonts-v2.webp)
+![Fonts & icons page](screenshots/settings-fonts-v3.webp)
 
 ## Where choices are kept
 
@@ -92,7 +92,7 @@ them for your user, for example
 
 ## Bar
 
-![Bar page](screenshots/settings-bar.webp)
+![Bar page](screenshots/settings-bar-v3.webp)
 
 A style sets the layout, size, spacing, roundness, outline and items all at once
 (`quickshell/BarStyles.qml`); changing any of them makes it "Custom", and the last custom setup
@@ -103,7 +103,11 @@ profile (control center), power and dividers. Dividers hide themselves when ther
 one side. Panels drop out of the pill that holds their item (the clock's calendar, the sound
 icon's Sound tab...), or hang from a full-width bar under it.
 
+Pictures of all ten styles are in [desktop.md](desktop.md#the-bar).
+
 ## Control center
+
+![Control center page](screenshots/settings-controlcenter-v3.webp)
 
 Three layouts, each drawn on its card: **One glance** (one column, the default), **Bento** (three
 columns) and **Custom**. Changing a widget or the column count while a ready-made layout is on
@@ -114,6 +118,38 @@ while nothing plays), notifications (fill the rest of their column beside others
 system usage, calendar, weather, updates, shortcuts and tray. Quick tiles are one ordered list for
 both tile widgets. Kept in `settings.json` as `controlCenter: { style, custom, tiles }`
 (CCStyles.qml lists the widgets, tiles and layouts).
+
+## Effects
+
+![Effects page](screenshots/settings-effects-v3.webp)
+
+Blur, transparency, shadows and motion. *How panels open* picks one of six styles (Slide, Morph,
+Spring, Liquid, Reveal, Fade), each with a live preview, plus a speed.
+
+## Window rules
+
+![Window rules page](screenshots/settings-rules-v3.webp)
+
+Each rule is one line (the app, and what the rule does in a few words) with ▶ to open the app, ✎ to
+expand it for editing and 🗑 to delete it; new rules open expanded. Rules apply to windows opened
+after a change.
+
+- **Add one** by picking an app (type to search; open windows come first) or by typing a
+  **terminal app** command such as `cava` or `peaclock`. Terminal apps would otherwise all be the
+  terminal's window class, so `hypr/scripts/terminal-app.sh` gives each a launcher entry in
+  `~/.local/share/applications` that opens it in the default terminal with a class of its own
+  (`pikadots-cava`). Installed terminal entries (btop, Neovim) are copied the same way and hide
+  the original; deleting the rule removes the copy. Your own entries are never overwritten.
+- **Position** (floating windows): Auto, one of nine spots on a 3×3 grid (corners, edges and center,
+  kept clear of the bar and the screen edges by Hyprland's outer gap), or **Exact** x and y in
+  logical pixels from the top-left corner. With the app open, *Use the open window* saves where
+  it is and how big, so you can drag a window into place and keep it there.
+- **Size**, on every workspace, fullscreen, no blur, a workspace (and whether to switch to it) and
+  opacity.
+
+Rules are kept in `settings.json` (`windowRules`) and written to
+`~/.local/state/pikadots/window-rules.lua` as `hl.window_rule()` calls; spots become `move`
+expressions such as `(monitor_w-window_w-10) (monitor_h-window_h-10)`.
 
 ## Date & time
 

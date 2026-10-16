@@ -23,11 +23,15 @@ machine keeps its own; `hypr/scripts/hyprpaper.sh` starts hyprpaper with it and 
 
 The thresholds are at the top of `main()` in that script.
 
-| Colorful → dark | Bright → light | Black and white → grey |
-|---|---|---|
-| ![](screenshots/theme-dark-v2.webp) | ![](screenshots/theme-light-v2.webp) | ![](screenshots/theme-mono-v2.webp) |
+| Colorful → dark | Bright → light |
+|---|---|
+| ![](screenshots/theme-dark-v3.webp) | ![](screenshots/theme-light-v3.webp) |
+| **Black and white → grey** | **Bright black and white → light grey** |
+| ![](screenshots/theme-mono-v3.webp) | ![](screenshots/theme-mono-light-v3.webp) |
 
 ## What gets recolored
+
+![Firefox, VS Code and superfile in the wallpaper's colors](screenshots/apps-v3.webp)
 
 | App | Updates |
 |---|---|
@@ -38,6 +42,7 @@ The thresholds are at the top of `main()` in that script.
 | GTK apps (translucent, like kitty) | GTK3 live, GTK4 on restart |
 | Qt and KDE apps ([kdeglobals](#qt-and-kde-apps)) | Live |
 | cava | Live |
+| btop (transparent, `color_theme = "wallpaper"`; USR2 reload) | Live |
 | Firefox and Zen ([Pywalfox](#firefox-and-zen)) | Live |
 | VS Code and Code - OSS ([Pikadots theme](#vs-code-and-code---oss)) | Live |
 | Keyboard lighting (ASUS) | Live |

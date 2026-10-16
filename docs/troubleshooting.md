@@ -22,6 +22,8 @@ Start with `pikadots health`, then `pikadots repair`.
 | A USB drive doesn't open | Click it in the Drives tab; `udisksctl status` lists what udisks sees |
 | Game mode stuck on after a crash | `rm $XDG_RUNTIME_DIR/pikadots-gamemode && hyprctl reload` |
 | A window rule makes an app unusable | Delete it in Settings > Window rules, or `rm ~/.local/state/pikadots/window-rules.lua && hyprctl reload` |
+| btop (or another terminal app) closes right away, "No UTF-8 locale detected" | The session locale isn't UTF-8: `localectl set-locale LANG=en_US.UTF-8` (your language with `.UTF-8`; `locale -a` lists them), then log out and back in |
+| A terminal app ignores its window rule | Open it from the launcher entry the rule made (Settings > Window rules > Terminal app), not a plain terminal: only that one has the rule's class |
 | Screen stuck zoomed in | Super + Alt + 0 |
 | Annotate or Edit does nothing | `sudo pacman -S satty` (also in `packages.txt`) |
 

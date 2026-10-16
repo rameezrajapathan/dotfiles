@@ -47,6 +47,8 @@ mv "$state/starship.toml.tmp" "$state/starship.toml"
 pkill -USR1 -x kitty || true
 # cava reloads its config (and so themes/wallpaper) on USR1
 pkill -USR1 -x cava || true
+# btop reloads its config and theme (themes/wallpaper.theme) on USR2
+pkill -USR2 -x btop || true
 # Zen and Firefox through the Pywalfox extension: one socket per open browser (pywalfox-host),
 # plus the default one for a browser started through the package's own manifest
 if command -v pywalfox >/dev/null; then

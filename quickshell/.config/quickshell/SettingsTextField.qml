@@ -7,12 +7,20 @@ Rectangle {
     id: root
     property string text
     property string placeholder
+    // What's typed now (text is only the starting value)
+    readonly property alias currentText: input.text
     signal accepted(string text)
     // Every keystroke, for live filters
     signal edited(string text)
+    // Enter only (not focus leaving)
+    signal entered(string text)
 
     function clear() {
         input.text = "";
+    }
+
+    function focusInput() {
+        input.forceActiveFocus();
     }
 
     implicitWidth: 240
@@ -47,6 +55,7 @@ Rectangle {
         clip: true
         onTextChanged: root.edited(text)
         onAccepted: {
+            root.entered(text);
             root.accepted(text);
             focus = false;
         }
