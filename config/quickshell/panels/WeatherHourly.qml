@@ -5,7 +5,7 @@ import qs.widgets
 Item {
     id: root
     readonly property var hours: Weather.hourly
-    readonly property real column: 48
+    readonly property real column: width > 0 ? width / Math.max(1, Math.floor(width / 46)) : 48
     readonly property real curveTop: 58
     readonly property real curveHeight: 22
     readonly property real minTemp: Math.min(...hours.map(h => h.temp))
@@ -125,7 +125,9 @@ Item {
         acceptedButtons: Qt.NoButton
         onWheel: wheel => {
             const delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
-            flick.contentX = Math.max(0, Math.min(flick.contentWidth - flick.width, flick.contentX - delta * 1.5));
+            const step = (delta < 0 ? 1 : -1) * root.column * Math.max(1, Math.round(Math.abs(delta) / 120));
+            const target = Math.round((flick.contentX + step) / root.column) * root.column;
+            flick.contentX = Math.max(0, Math.min(flick.contentWidth - flick.width, target));
         }
     }
 }

@@ -17,7 +17,7 @@ Item {
     readonly property bool playing: player?.isPlaying ?? false
     readonly property bool hasLength: (player?.lengthSupported ?? false) && (player?.length ?? 0) > 0
 
-    implicitHeight: 460
+    implicitHeight: player ? Math.max(460, content.implicitHeight + 2 * content.anchors.margins) : 460
 
     Timer {
         interval: 1000
@@ -54,6 +54,7 @@ Item {
     }
 
     ColumnLayout {
+        id: content
         anchors.fill: parent
         anchors.margins: Theme.pad(24, 24)
         visible: root.player !== null

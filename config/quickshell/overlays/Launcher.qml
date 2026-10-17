@@ -521,6 +521,7 @@ PanelWindow {
                 id: grid
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.maximumHeight: Math.max(cellHeight, Math.floor((parent.height - y - (footerRow.visible ? footerRow.implicitHeight + 14 : 0)) / cellHeight) * cellHeight)
                 cellWidth: width / root.columns
                 cellHeight: root.mode === "apps" ? root.cellSize : root.mode === "emoji" ? 76 : 60
                 clip: true
@@ -665,6 +666,7 @@ PanelWindow {
             }
 
             RowLayout {
+                id: footerRow
                 Layout.fillWidth: true
                 spacing: 10
                 readonly property var item: root.results[grid.currentIndex] ?? null

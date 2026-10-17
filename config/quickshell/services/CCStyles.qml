@@ -57,9 +57,9 @@ Singleton {
             id: "bento", label: "Bento", icon: "dashboard",
             description: "A wide dashboard: controls, now and what needs you, side by side.",
             columns: [
-                ["header", "tilesSmall", "sliders", "tray"],
-                ["mediaLarge", "calendar", "weather", "system"],
-                ["updates", "notifications", "actions"]
+                ["header", "tilesSmall", "sliders", "actions", "tray"],
+                ["mediaLarge", "calendar", "weather"],
+                ["updates", "notifications", "system"]
             ]
         }
     ]

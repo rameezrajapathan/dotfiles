@@ -73,7 +73,12 @@ Singleton {
 
     function round(base, width, height) {
         const r = base * roundness;
-        return width === undefined ? r : Math.max(0, Math.min(r, Math.min(width, height) / 2));
+        if (width === undefined)
+            return r;
+        const short = Math.min(width, height);
+        const boxy = Math.max(width, height) < 1.6 * short;
+        const limit = boxy ? Math.max(base, short * 0.3) : short / 2;
+        return Math.max(0, Math.min(r, limit, short / 2));
     }
 
     function pad(base, radius, width, height) {

@@ -3,6 +3,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import qs.services
 import qs.widgets
@@ -141,9 +142,23 @@ PanelWindow {
                 }
             }
 
+            FadeMask {
+                id: sheetFade
+                target: sheetFlick
+                size: 56
+            }
+
             Flickable {
+                id: sheetFlick
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                layer.enabled: sheetFade.needed
+                layer.effect: MultiEffect {
+                    maskEnabled: true
+                    maskSource: sheetFade
+                    maskThresholdMin: 0.5
+                    maskSpreadAtMin: 1
+                }
                 implicitHeight: columnsRow.implicitHeight
                 contentHeight: columnsRow.implicitHeight
                 boundsBehavior: Flickable.StopAtBounds

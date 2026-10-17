@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import qs.panels
 import qs.services
@@ -143,9 +144,21 @@ PanelWindow {
                 }
             }
 
+            FadeMask {
+                id: overviewFade
+                target: overviewFlick
+            }
+
             Flickable {
                 id: overviewFlick
                 anchors.fill: parent
+                layer.enabled: overviewFade.needed
+                layer.effect: MultiEffect {
+                    maskEnabled: true
+                    maskSource: overviewFade
+                    maskThresholdMin: 0.5
+                    maskSpreadAtMin: 1
+                }
                 opacity: root.detail ? 0 : 1
                 visible: opacity > 0
                 Behavior on opacity { NumberAnimation { duration: Theme.ms(root.detail ? 90 : 220) } }
@@ -233,8 +246,20 @@ PanelWindow {
                     }
                 }
 
+                FadeMask {
+                    id: detailFade
+                    target: detailFlick
+                }
+
                 Flickable {
                     id: detailFlick
+                    layer.enabled: detailFade.needed
+                    layer.effect: MultiEffect {
+                        maskEnabled: true
+                        maskSource: detailFade
+                        maskThresholdMin: 0.5
+                        maskSpreadAtMin: 1
+                    }
                     x: Math.round((parent.width - detailLayer.pageWidth) / 2)
                     width: detailLayer.pageWidth
                     anchors { top: detailHeader.bottom; bottom: parent.bottom; topMargin: -12 }

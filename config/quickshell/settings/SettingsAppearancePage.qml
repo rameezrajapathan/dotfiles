@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Qt.labs.folderlistmodel
 import qs.bar
@@ -35,12 +36,25 @@ SettingsPage {
         title: "Wallpaper"
         subtitle: root.folder.replace(Quickshell.env("HOME"), "~")
 
+        FadeMask {
+            id: stripFade
+            target: strip
+            size: 56
+        }
+
         ListView {
             id: strip
             Layout.fillWidth: true
             Layout.preferredHeight: 150
             Layout.topMargin: 14
             Layout.bottomMargin: 4
+            layer.enabled: stripFade.needed
+            layer.effect: MultiEffect {
+                maskEnabled: true
+                maskSource: stripFade
+                maskThresholdMin: 0.5
+                maskSpreadAtMin: 1
+            }
             orientation: ListView.Horizontal
             leftMargin: Theme.pad(14, 16)
             rightMargin: Theme.pad(14, 16)

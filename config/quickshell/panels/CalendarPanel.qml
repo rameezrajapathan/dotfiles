@@ -64,7 +64,7 @@ PanelWindow {
         open: root.open
         kind: "calendar"
         sheetWidth: 320
-        sheetHeight: content.implicitHeight + 28
+        sheetHeight: content.implicitHeight + 2 * Theme.pad(14, 24)
         onClosed: root.visible = false
         onDismiss: root.open = false
 

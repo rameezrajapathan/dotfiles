@@ -9,6 +9,8 @@ Rectangle {
     property string label
     property string detail
     property string shortLabel: ""
+    property string compactLabel: ""
+    readonly property bool narrow: width < 200
     property bool active: false
     property bool hasMore: false
     property bool small: false
@@ -40,13 +42,13 @@ Rectangle {
     RowLayout {
         visible: !root.small
         anchors.fill: parent
-        anchors.leftMargin: Theme.pad(16, 20, parent.width, parent.height)
-        spacing: 12
+        anchors.leftMargin: Theme.pad(root.narrow ? 12 : 16, 20, parent.width, parent.height)
+        spacing: root.narrow ? 9 : 12
 
         Icon {
             name: root.icon
             filled: root.active
-            size: 22
+            size: root.narrow ? 20 : 22
             color: root.fg
             Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
         }
@@ -55,9 +57,10 @@ Rectangle {
             spacing: 1
             Label {
                 Layout.fillWidth: true
-                text: root.label
+                text: root.narrow && root.compactLabel ? root.compactLabel : root.label
                 color: root.fg
                 font.weight: Font.DemiBold
+                font.pixelSize: root.narrow ? Theme.fontSize - 1 : Theme.fontSize
                 elide: Text.ElideRight
             }
             Label {
@@ -65,20 +68,20 @@ Rectangle {
                 visible: text !== ""
                 text: root.detail
                 color: root.active ? Qt.alpha(Theme.selectedText, 0.75) : Theme.subtext
-                font.pixelSize: Theme.fontSize - 2
+                font.pixelSize: root.narrow ? Theme.fontSize - 3 : Theme.fontSize - 2
                 elide: Text.ElideRight
             }
         }
         Item {
             visible: root.hasMore
             Layout.fillHeight: true
-            implicitWidth: 42
+            implicitWidth: root.narrow ? 30 : 38
 
-            Rectangle {
+            GlassDivider {
                 anchors { left: parent.left; verticalCenter: parent.verticalCenter }
-                width: 1
+                width: Glass.active ? 2 : 1
                 height: parent.height - 24
-                color: root.active ? Qt.alpha(Theme.selectedText, 0.2) : Qt.alpha(Theme.overlay, 0.3)
+                strength: 0.5
             }
             Rectangle {
                 anchors.fill: parent
@@ -133,12 +136,22 @@ Rectangle {
                 onClicked: root.more()
             }
         }
-        Label {
-            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        TextMetrics {
+            id: smallMetrics
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSize - 1
+            font.weight: Font.DemiBold
             text: root.shortLabel || root.label
+        }
+        Label {
+            id: smallLabel
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            text: root.compactLabel && smallMetrics.advanceWidth > width ? root.compactLabel : root.shortLabel || root.label
             color: root.fg
             font.pixelSize: Theme.fontSize - 1
             font.weight: Font.DemiBold
+            fontSizeMode: Text.HorizontalFit
+            minimumPixelSize: Theme.fontSize - 4
             elide: Text.ElideRight
         }
     }

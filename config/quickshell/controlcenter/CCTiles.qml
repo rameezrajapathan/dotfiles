@@ -66,7 +66,7 @@ GridLayout {
         case "dnd": return {
             icon: NotificationService.dnd ? "do_not_disturb_on" : "do_not_disturb_off", label: "Do Not Disturb",
             detail: NotificationService.dnd ? "Urgent only" : NotificationService.scheduledQuiet ? "Quiet hours" : "Off",
-            active: NotificationService.dnd, more: "notifications", short: "Do not disturb"
+            active: NotificationService.dnd, more: "notifications", short: "Do not disturb", compact: "DND"
         };
         case "night": return {
             icon: "nightlight", label: "Night light",
@@ -89,7 +89,7 @@ GridLayout {
         case "mic": {
             const muted = root.source?.audio?.muted ?? true;
             return {
-                icon: muted ? "mic_off" : "mic", label: "Microphone", detail: muted ? "Muted" : "On",
+                icon: muted ? "mic_off" : "mic", label: "Microphone", compact: "Mic", detail: muted ? "Muted" : "On",
                 active: !muted, more: "audio"
             };
         }
@@ -171,6 +171,7 @@ GridLayout {
             icon: tileInfo.icon
             label: tileInfo.label
             shortLabel: tileInfo.short ?? ""
+            compactLabel: tileInfo.compact ?? ""
             detail: tileInfo.detail
             active: tileInfo.active
             hasMore: tileInfo.more !== ""

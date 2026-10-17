@@ -66,7 +66,7 @@ SettingsPage {
 
     SettingsSection {
         title: "Borders"
-        subtitle: "Border colors follow the wallpaper."
+        subtitle: Glass.active ? "Glass draws the border colors (Appearance › Glass)." : "Border colors follow the wallpaper."
         readonly property var keys: ["general.border_size", "general.resize_on_border"]
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)

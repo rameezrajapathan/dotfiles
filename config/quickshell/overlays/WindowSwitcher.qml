@@ -111,8 +111,8 @@ PanelWindow {
     Sheet {
         open: root.open
         anchorIds: ["workspaces"]
-        sheetWidth: Math.min(root.width - Theme.barSpaceX - 80, row.implicitWidth + 32)
-        sheetHeight: row.implicitHeight + 32
+        sheetWidth: Math.min(root.width - Theme.barSpaceX - 80, row.implicitWidth + 2 * Theme.pad(16, 24))
+        sheetHeight: row.implicitHeight + 2 * Theme.pad(16, 24)
         onClosed: root.visible = false
         onDismiss: root.close()
 

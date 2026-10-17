@@ -4,8 +4,8 @@ import qs.services
 
 Shape {
     id: root
-    readonly property Item host: parent && parent.radius === undefined && parent.parent ? parent.parent : parent
-    readonly property real hostAlpha: host && host.color !== undefined ? Math.max(host.color.a, host.border && host.border.width > 0 ? host.border.color.a : 0) : 1
+    readonly property var host: parent && parent.radius === undefined && parent.parent ? parent.parent : parent
+    readonly property real hostAlpha: host && host.color !== undefined ? host.color.a : 1
     property real radius: host?.radius ?? 0
     property real strength: 1
     property real borderWidth: 1

@@ -60,6 +60,8 @@ Rectangle {
                     Layout.fillWidth: true
                     text: bindRow.modelData.desc
                     color: Theme.subtext
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
                     elide: Text.ElideRight
                 }
 

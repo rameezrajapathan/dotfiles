@@ -82,8 +82,8 @@ PanelWindow {
     Sheet {
         open: root.open
         anchorIds: ["power"]
-        sheetWidth: tiles.implicitWidth + 56
-        sheetHeight: content.implicitHeight + 52
+        sheetWidth: tiles.implicitWidth + 2 * Theme.pad(28, 24)
+        sheetHeight: content.implicitHeight + 2 * Theme.pad(26, 24)
         onClosed: root.visible = false
         onDismiss: root.open = false
 
@@ -142,13 +142,15 @@ PanelWindow {
                     required property int index
                     readonly property bool selected: root.current === index
                     readonly property color tint: modelData.danger ? Theme.red : Theme.accent
+                    readonly property color fill: modelData.danger ? Theme.red : Theme.selectedFill
+                    readonly property color fillText: modelData.danger ? Theme.accentText : Theme.selectedText
 
                     implicitWidth: 120
                     implicitHeight: 132
                     radius: Theme.round(22, width, height)
-                    color: selected ? tint : Theme.glassFill(1)
+                    color: selected ? fill : Theme.glassFill(1)
                     border.width: Glass.active ? 0 : 1
-                    border.color: selected ? tint : Qt.alpha(Theme.text, 0.08)
+                    border.color: selected ? fill : Qt.alpha(Theme.text, 0.08)
                     GlassRim {
                         strength: tile.selected ? 0.5 : 1
                     }
@@ -164,13 +166,13 @@ PanelWindow {
                             Layout.alignment: Qt.AlignHCenter
                             name: tile.modelData.icon
                             filled: tile.selected
-                            color: tile.selected ? Theme.accentText : tile.tint
+                            color: tile.selected ? tile.fillText : tile.tint
                             size: 40
                         }
                         Label {
                             Layout.alignment: Qt.AlignHCenter
                             text: tile.modelData.label
-                            color: tile.selected ? Theme.accentText : Theme.text
+                            color: tile.selected ? tile.fillText : Theme.text
                             font.pixelSize: Theme.fontSize + 1
                             font.bold: tile.selected
                         }
@@ -186,7 +188,7 @@ PanelWindow {
                         Label {
                             anchors.centerIn: parent
                             text: tile.modelData.key
-                            color: tile.selected ? Theme.accentText : Theme.subtext
+                            color: tile.selected ? tile.fillText : Theme.subtext
                             font.pixelSize: Theme.fontSize - 2
                             font.bold: true
                         }

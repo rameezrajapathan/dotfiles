@@ -74,7 +74,7 @@ PanelWindow {
         open: root.open
         kind: "weather"
         sheetWidth: 560
-        sheetHeight: content.implicitHeight + 40
+        sheetHeight: content.implicitHeight + 2 * Theme.pad(20, 24)
         onClosed: root.visible = false
         onDismiss: root.open = false
 
@@ -340,30 +340,37 @@ PanelWindow {
                     Rectangle {
                         id: stat
                         required property var modelData
+                        readonly property real inset: Theme.pad(12, 12, width, height)
                         Layout.fillWidth: true
+                        Layout.preferredWidth: 1
                         Layout.preferredHeight: 56
                         radius: Theme.round(12, width, height)
                         color: Qt.alpha(Theme.surface, 0.5)
 
                         Icon {
-                            x: 12
+                            x: stat.inset
                             anchors.verticalCenter: parent.verticalCenter
                             name: stat.modelData.icon
                             size: 18
                             color: Theme.subtext
                         }
                         Column {
-                            x: 40
+                            x: stat.inset + 28
+                            width: stat.width - x - stat.inset
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 2
                             Label {
+                                width: parent.width
                                 text: stat.modelData.value
                                 font.bold: true
+                                elide: Text.ElideRight
                             }
                             Label {
+                                width: parent.width
                                 text: stat.modelData.label
                                 color: Theme.subtext
                                 font.pixelSize: Theme.fontSize - 2
+                                elide: Text.ElideRight
                             }
                         }
                         GlassRim {}

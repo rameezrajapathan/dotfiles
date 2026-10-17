@@ -4,6 +4,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Qt.labs.folderlistmodel
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import qs.services
 import qs.widgets
@@ -93,7 +94,7 @@ PanelWindow {
         id: strip
         open: root.open
         sheetWidth: Math.round(root.width * 0.7)
-        sheetHeight: content.implicitHeight + 28
+        sheetHeight: content.implicitHeight + 2 * Theme.pad(14, 24)
         onClosed: root.visible = false
         onDismiss: root.open = false
 
@@ -197,6 +198,21 @@ PanelWindow {
                 color: Theme.overlay
             }
 
+            Rectangle {
+                id: fadeMask
+                visible: false
+                width: list.width
+                height: list.height
+                layer.enabled: true
+                gradient: Gradient {
+                    orientation: Gradient.Horizontal
+                    GradientStop { position: 0; color: list.atXBeginning ? "black" : "transparent" }
+                    GradientStop { position: Math.min(0.5, 48 / Math.max(1, list.width)); color: "black" }
+                    GradientStop { position: Math.max(0.5, 1 - 48 / Math.max(1, list.width)); color: "black" }
+                    GradientStop { position: 1; color: list.atXEnd ? "black" : "transparent" }
+                }
+            }
+
             ListView {
                 id: list
                 Layout.fillWidth: true
@@ -205,6 +221,13 @@ PanelWindow {
                 orientation: ListView.Horizontal
                 spacing: 10
                 clip: true
+                layer.enabled: true
+                layer.effect: MultiEffect {
+                    maskEnabled: true
+                    maskSource: fadeMask
+                    maskThresholdMin: 0.5
+                    maskSpreadAtMin: 1
+                }
                 keyNavigationWraps: true
                 highlightMoveDuration: 150
                 model: root.shown

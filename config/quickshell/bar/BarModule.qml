@@ -92,10 +92,20 @@ Loader {
     }
     Component {
         id: launcher
-        BarLogo {
+        Item {
+            implicitWidth: Theme.pillCircle
+            implicitHeight: Theme.pillCircle
+
+            BarLogo {
+                anchors.centerIn: parent
+                width: Theme.pillCircle - 6
+                height: Theme.pillCircle - 6
+                fillMode: Image.PreserveAspectFit
+                sourceSize.width: 2 * width
+                sourceSize.height: 2 * height
+            }
             MouseArea {
                 anchors.fill: parent
-                anchors.margins: -4
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.action("launcher")
             }

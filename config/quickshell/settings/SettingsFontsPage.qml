@@ -32,6 +32,7 @@ SettingsPage {
                         readonly property bool selected: FontThemes.current === modelData.id
 
                         Layout.fillWidth: true
+                        Layout.fillHeight: true
                         Layout.preferredWidth: 1
                         implicitHeight: cardColumn.implicitHeight + 24
                         radius: Theme.round(14, width, height)
@@ -74,11 +75,21 @@ SettingsPage {
                             }
                             Text {
                                 Layout.fillWidth: true
+                                Layout.preferredHeight: Math.ceil(fontMetricsVibe.height * 2)
                                 text: card.modelData.vibe
                                 color: Theme.subtext
                                 font.family: card.modelData.font
                                 font.pixelSize: 13
+                                wrapMode: Text.Wrap
+                                maximumLineCount: 2
                                 elide: Text.ElideRight
+                                verticalAlignment: Text.AlignTop
+
+                                FontMetrics {
+                                    id: fontMetricsVibe
+                                    font.family: card.modelData.font
+                                    font.pixelSize: 13
+                                }
                             }
                             Text {
                                 Layout.fillWidth: true
@@ -93,10 +104,14 @@ SettingsPage {
                                 Layout.fillWidth: true
                                 text: [card.modelData.font, card.modelData.displayFont, card.modelData.monoFont]
                                     .filter((f, i, a) => a.indexOf(f) === i).join(" · ")
+                                Layout.preferredHeight: 28
                                 color: Theme.overlay
                                 font.family: Theme.font
                                 font.pixelSize: 10
+                                wrapMode: Text.Wrap
+                                maximumLineCount: 2
                                 elide: Text.ElideRight
+                                verticalAlignment: Text.AlignTop
                             }
                         }
 
