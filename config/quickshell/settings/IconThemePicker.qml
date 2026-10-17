@@ -120,6 +120,7 @@ ColumnLayout {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.pending = card.modelData.family === Settings.appearance.iconTheme ? "" : card.modelData.family
                 }
+                GlassRim {}
             }
         }
     }

@@ -366,6 +366,7 @@ PanelWindow {
                                 font.pixelSize: Theme.fontSize - 2
                             }
                         }
+                        GlassRim {}
                     }
                 }
             }
@@ -389,7 +390,7 @@ PanelWindow {
             height: searchColumn.implicitHeight + 16
             radius: Theme.round(16, width, height)
             color: Theme.base
-            border.width: 1
+            border.width: Glass.active ? 0 : 1
             border.color: Qt.alpha(Theme.text, 0.1)
             opacity: root.searchOpen ? 1 : 0
             scale: root.searchOpen ? 1 : 0.96
@@ -448,6 +449,7 @@ PanelWindow {
                         interval: 300
                         onTriggered: Weather.search(searchInput.text)
                     }
+                    GlassRim {}
                 }
 
                 WeatherSearchRow {
@@ -476,6 +478,7 @@ PanelWindow {
                     }
                 }
             }
+            GlassRim {}
         }
     }
 }

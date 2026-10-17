@@ -13,12 +13,12 @@ Rectangle {
     property real glyphSize: size * 0.42
     signal clicked()
 
-    readonly property color fg: filled || checked ? Theme.accentText : Theme.text
+    readonly property color fg: filled || checked ? Theme.selectedText : Theme.text
 
     implicitWidth: size
     implicitHeight: size
     radius: Theme.round(mouse.pressed ? size * 0.22 : checked ? size * 0.3 : size / 2, width, height)
-    color: filled || checked ? (mouse.containsMouse ? Qt.lighter(Theme.accent, 1.08) : Theme.accent)
+    color: filled || checked ? (mouse.containsMouse ? Qt.lighter(Theme.selectedFill, 1.08) : Theme.selectedFill)
         : mouse.containsMouse ? Qt.alpha(Theme.accent, 0.24) : Qt.alpha(Theme.accent, 0.13)
     opacity: enabled ? 1 : 0.4
     Behavior on radius { NumberAnimation { duration: Theme.ms(260); easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
@@ -49,4 +49,6 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
+
+    GlassRim {}
 }

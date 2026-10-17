@@ -116,6 +116,7 @@ SettingsPage {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: BarStyles.apply(card.modelData.id)
                         }
+                        GlassRim {}
                     }
                 }
             }
@@ -268,6 +269,7 @@ SettingsPage {
                                         enabled: false
                                     }
                                 }
+                                GlassRim {}
                             }
                             RowLayout {
                                 Layout.leftMargin: 4
@@ -298,6 +300,7 @@ SettingsPage {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: Settings.workspaces.style = wsCard.modelData.id
                         }
+                        GlassRim {}
                     }
                 }
             }

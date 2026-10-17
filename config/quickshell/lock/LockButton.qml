@@ -57,6 +57,7 @@ Item {
             font.family: Theme.displayFont
             color: root.armed ? Theme.red : Theme.text
         }
+        GlassRim {}
     }
 
     MouseArea {

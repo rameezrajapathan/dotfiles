@@ -29,6 +29,7 @@ Item {
             color: root.dimmed ? Theme.overlay : Theme.accent
             gradient: Theme.accentFill(!root.dimmed)
         }
+        GlassRim {}
     }
 
     Rectangle {

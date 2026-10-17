@@ -146,9 +146,12 @@ PanelWindow {
                     implicitWidth: 120
                     implicitHeight: 132
                     radius: Theme.round(22, width, height)
-                    color: selected ? tint : Qt.alpha(Theme.surface, 0.5)
-                    border.width: 1
+                    color: selected ? tint : Theme.glassFill(1)
+                    border.width: Glass.active ? 0 : 1
                     border.color: selected ? tint : Qt.alpha(Theme.text, 0.08)
+                    GlassRim {
+                        strength: tile.selected ? 0.5 : 1
+                    }
                     scale: selected ? 1.06 : 1
                     Behavior on color { ColorAnimation { duration: Theme.ms(140) } }
                     Behavior on scale { NumberAnimation { duration: Theme.ms(140); easing.type: Easing.OutCubic } }
@@ -187,6 +190,7 @@ PanelWindow {
                             font.pixelSize: Theme.fontSize - 2
                             font.bold: true
                         }
+                        GlassRim {}
                     }
 
                     MouseArea {

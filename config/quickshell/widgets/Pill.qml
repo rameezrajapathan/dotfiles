@@ -11,14 +11,18 @@ Rectangle {
     implicitWidth: icon ? implicitHeight : label.implicitWidth + 16
     implicitHeight: 22
     radius: Theme.round(height / 2, width, height)
-    color: active ? Theme.accent : mouse.containsMouse ? Theme.overlay : Theme.surface
+    color: active ? Theme.selectedFill : mouse.containsMouse ? Theme.overlay : Theme.glassFill(2)
     gradient: Theme.accentFill(active)
+
+    GlassRim {
+        strength: 0.7
+    }
 
     Label {
         id: label
         visible: !root.icon
         anchors.centerIn: parent
-        color: root.active ? Theme.accentText : Theme.text
+        color: root.active ? Theme.selectedText : Theme.text
         font.pixelSize: Theme.fontSize - 2
     }
 
@@ -27,7 +31,7 @@ Rectangle {
         anchors.centerIn: parent
         name: root.icon
         size: 16
-        color: root.active ? Theme.accentText : Theme.text
+        color: root.active ? Theme.selectedText : Theme.text
     }
 
     MouseArea {

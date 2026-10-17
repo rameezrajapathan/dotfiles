@@ -61,6 +61,7 @@ Rectangle {
                 xScale: root.g.bodyScale
                 yScale: root.g.bodyScale
             }
+            GlassRim {}
         }
 
         Item {
@@ -87,6 +88,7 @@ Rectangle {
                         height: 14
                         radius: Theme.round(5, width, height)
                         color: index === 0 || index === 3 ? Theme.accent : Qt.alpha(Theme.base, 0.6)
+                        GlassRim {}
                     }
                 }
             }
@@ -112,5 +114,7 @@ Rectangle {
         Rectangle { x: 4; anchors.verticalCenter: parent.verticalCenter; width: 7; height: 7; radius: Theme.round(3.5, width, height); color: Theme.accent }
         Rectangle { anchors.centerIn: parent; width: 18; height: 3; radius: Theme.round(1.5, width, height); color: Theme.overlay }
         Rectangle { anchors.right: parent.right; anchors.rightMargin: 4; anchors.verticalCenter: parent.verticalCenter; width: 7; height: 7; radius: Theme.round(3.5, width, height); color: Theme.overlay }
+        GlassRim {}
     }
+    GlassRim {}
 }

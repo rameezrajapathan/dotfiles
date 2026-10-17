@@ -26,8 +26,9 @@ Rectangle {
         width: target?.width ?? 0
         height: parent.height - 8
         radius: Theme.round(height / 2, width, height)
-        color: Theme.accent
+        color: Theme.selectedFill
         gradient: Theme.accentFill(true)
+        GlassRim {}
         Behavior on x { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
         Behavior on width { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutQuint } }
     }
@@ -61,13 +62,13 @@ Rectangle {
                         name: option.modelData.icon ?? ""
                         size: 16
                         filled: option.selected
-                        color: option.selected ? Theme.accentText : Theme.text
+                        color: option.selected ? Theme.selectedText : Theme.text
                     }
                     Label {
                         visible: text !== ""
                         anchors.verticalCenter: parent.verticalCenter
                         text: option.modelData.label ?? ""
-                        color: option.selected ? Theme.accentText : Theme.text
+                        color: option.selected ? Theme.selectedText : Theme.text
                         font.pixelSize: Theme.fontSize - 1
                         font.weight: option.selected ? Font.DemiBold : Font.Normal
                     }
@@ -81,4 +82,5 @@ Rectangle {
             }
         }
     }
+    GlassRim {}
 }

@@ -172,6 +172,7 @@ PanelWindow {
                             }
                         }
                     }
+                    GlassRim {}
                 }
                 Pill {
                     icon: "folder_open"
@@ -238,6 +239,7 @@ PanelWindow {
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
                         }
+                        GlassRim {}
                     }
 
                     Label {

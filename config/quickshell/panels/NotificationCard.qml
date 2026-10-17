@@ -29,9 +29,15 @@ Rectangle {
 
     implicitHeight: layout.implicitHeight + inset * 2 + (expires ? 8 : 0)
     radius: Theme.round(18, width, height)
-    color: Qt.alpha(Theme.base, 0.92)
+    color: "transparent"
     border.width: 1
-    border.color: Theme.gradientAccent && (!root.critical) ? "transparent" : Qt.alpha(root.tint, critical ? 0.7 : 0.35)
+    border.color: Theme.gradientAccent && (!root.critical) ? "transparent" : Qt.alpha(root.tint, critical ? 0.7 : Glass.active ? 0.2 : 0.35)
+    GlassPanel {
+        radius: root.radius
+        tint: root.popup ? Theme.denseTranslucent : Theme.glassFill(1)
+        lens: root.popup
+        tracking: root.popup
+    }
     GradientBorder {
         active: !root.critical
         strength: 0.35

@@ -12,7 +12,7 @@ Rectangle {
     implicitHeight: 32
     radius: Theme.round(height / 2, width, height)
     color: chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.base, 0.6)
-    border.width: 1
+    border.width: Glass.active ? 0 : 1
     border.color: Qt.alpha(Theme.overlay, 0.3)
 
     Row {
@@ -30,4 +30,5 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: chip.clicked()
     }
+    GlassRim {}
 }

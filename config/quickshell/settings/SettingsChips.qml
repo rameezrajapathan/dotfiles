@@ -21,7 +21,7 @@ Flow {
             implicitWidth: label.implicitWidth + 26
             implicitHeight: 30
             radius: Theme.round(height / 2, width, height)
-            color: selected ? Theme.accent : mouse.containsMouse ? Qt.alpha(Theme.overlay, 0.35) : Qt.alpha(Theme.base, 0.6)
+            color: selected ? Theme.selectedFill : mouse.containsMouse ? Qt.alpha(Theme.overlay, 0.35) : Qt.alpha(Theme.base, 0.6)
             gradient: Theme.accentFill(selected)
             border.width: selected ? 0 : 1
             border.color: Qt.alpha(Theme.overlay, 0.3)
@@ -31,7 +31,7 @@ Flow {
                 id: label
                 anchors.centerIn: parent
                 text: chip.modelData.label
-                color: chip.selected ? Theme.accentText : Theme.text
+                color: chip.selected ? Theme.selectedText : Theme.text
                 font.pixelSize: Theme.fontSize - 1
                 font.weight: chip.selected ? Font.DemiBold : Font.Normal
             }
@@ -43,6 +43,7 @@ Flow {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.picked(chip.modelData.value)
             }
+            GlassRim {}
         }
     }
 }

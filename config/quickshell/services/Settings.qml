@@ -11,6 +11,7 @@ Singleton {
 
     readonly property string path: Quickshell.env("HOME") + "/.config/pikadots/settings.json"
     readonly property JsonObject appearance: adapter.appearance
+    readonly property JsonObject glass: adapter.glass
     readonly property JsonObject bar: adapter.bar
     readonly property JsonObject workspaces: adapter.workspaces
     readonly property JsonObject controlCenter: adapter.controlCenter
@@ -101,6 +102,13 @@ Singleton {
                 property string themeMode: "auto"
                 property string scheme: "auto"
                 property bool gradient: false
+            }
+
+            property JsonObject glass: JsonObject {
+                property string preset: "frosted"
+                property var custom: ({})
+                property real lightAngle: -40
+                property bool color: false
             }
 
             property var hypr: ({})

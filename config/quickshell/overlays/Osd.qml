@@ -115,9 +115,13 @@ PanelWindow {
         width: parent.width
         height: parent.height
         radius: Theme.round(height / 2, width, height)
-        color: Qt.alpha(Theme.base, 0.92)
+        color: "transparent"
         border.width: 1
-        border.color: Theme.gradientAccent ? "transparent" : Qt.alpha(Theme.accent, 0.3)
+        border.color: Theme.gradientAccent || Glass.active ? "transparent" : Qt.alpha(Theme.accent, 0.3)
+        GlassPanel {
+            radius: pill.radius
+            tint: Theme.denseTranslucent
+        }
         GradientBorder {
             strength: 0.3
         }

@@ -38,11 +38,12 @@ Item {
         NumberAnimation { target: glow; property: "opacity"; to: 0; duration: Theme.ms(420); easing.type: Easing.InQuad }
     }
 
-    Rectangle {
+    GlassDivider {
+        vertical: false
         visible: root.separator && root.parent && root.parent.children[0] !== root
         anchors { top: parent.top; left: parent.left; right: parent.right; leftMargin: Theme.pad(62, 16); rightMargin: Theme.pad(16, 16) }
-        height: 1
-        color: Qt.alpha(Theme.overlay, 0.25)
+        height: Glass.active ? 2 : 1
+        strength: 0.45
     }
 
     GridLayout {

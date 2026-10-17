@@ -77,6 +77,7 @@ ColumnLayout {
             cursorShape: Qt.PointingHandCursor
             onClicked: root.expanded = !root.expanded
         }
+        GlassRim {}
     }
 
     Rectangle {
@@ -160,5 +161,6 @@ ColumnLayout {
                 }
             }
         }
+        GlassRim {}
     }
 }

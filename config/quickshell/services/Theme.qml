@@ -8,7 +8,12 @@ import qs.widgets
 Singleton {
     id: root
     readonly property color base: colors.base
-    readonly property color baseTranslucent: Qt.alpha(colors.base, Settings.appearance.panelOpacity)
+    readonly property color baseTranslucent: Qt.alpha(colors.base, Glass.tint)
+    readonly property color denseTranslucent: Qt.alpha(colors.base, Glass.active ? Math.max(Glass.tint, 0.55) : 0.92)
+    function glassFill(level, hovered) {
+        const a = level === 0 ? Glass.tint : level === 1 ? Glass.card : Math.min(1, Glass.card + 0.2);
+        return Qt.alpha(surface, Math.min(1, a + (hovered ? 0.15 : 0)));
+    }
     readonly property color surface: colors.surface
     readonly property color overlay: colors.overlay
     readonly property color text: colors.text
@@ -19,7 +24,9 @@ Singleton {
     readonly property color accent2: multiColor ? colors.accent2 : accent
     readonly property color accent3: multiColor && colors.accent3 !== "" ? colors.accent3 : accent2
     readonly property var accents: [accent, accent2, accent3]
-    readonly property bool gradientAccent: Settings.appearance.gradient
+    readonly property bool gradientAccent: Settings.appearance.gradient && !Glass.neutral
+    readonly property color selectedFill: Glass.neutral ? Qt.rgba(1, 1, 1, Glass.light ? 0.75 : 0.2) : accent
+    readonly property color selectedText: Glass.neutral ? text : accentText
     readonly property color accentEnd: multiColor ? accent2 : shade(accent)
     function mix(a, b, t) {
         return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t);

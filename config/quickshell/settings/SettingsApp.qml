@@ -96,7 +96,7 @@ Scope {
             implicitWidth: 1040
             implicitHeight: 720
             minimumSize: Qt.size(420, 420)
-            color: Qt.alpha(Theme.base, 0.94)
+            color: Qt.alpha(Theme.base, Glass.active ? Glass.value("window") : 0.94)
             onClosed: root.open = false
 
             readonly property var shownPages: {
@@ -294,6 +294,7 @@ Scope {
                                     }
                                 }
                             }
+                            GlassRim {}
                         }
 
                         Flickable {
@@ -381,6 +382,7 @@ Scope {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: window.jump(hitRow.modelData)
                                         }
+                                        GlassRim {}
                                     }
                                 }
                                 Item {
@@ -417,7 +419,7 @@ Scope {
                                             Layout.fillWidth: true
                                             implicitHeight: 38
                                             radius: Theme.round(13, width, height)
-                                            color: entry.current ? Theme.accent
+                                            color: entry.current ? Theme.selectedFill
                                                 : rowMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                                             gradient: Theme.accentFill(entry.current)
                                             Behavior on color { ColorAnimation { duration: Theme.ms(140) } }
@@ -432,19 +434,19 @@ Scope {
                                                     implicitWidth: 28
                                                     implicitHeight: 28
                                                     radius: Theme.round(9, width, height)
-                                                    color: entry.current ? Qt.alpha(Theme.accentText, 0.14) : Qt.alpha(Theme.accent, 0.16)
+                                                    color: entry.current ? Qt.alpha(Theme.selectedText, 0.14) : Qt.alpha(Theme.selectedFill, 0.16)
                                                     Icon {
                                                         anchors.centerIn: parent
                                                         name: entry.modelData.icon
                                                         size: 18
                                                         filled: entry.current
-                                                        color: entry.current ? Theme.accentText : Theme.accent
+                                                        color: entry.current ? Theme.selectedText : Theme.selectedFill
                                                     }
                                                 }
                                                 Label {
                                                     Layout.fillWidth: true
                                                     text: entry.modelData.title
-                                                    color: entry.current ? Theme.accentText : Theme.text
+                                                    color: entry.current ? Theme.selectedText : Theme.text
                                                     font.weight: entry.current ? Font.DemiBold : Font.Normal
                                                     elide: Text.ElideRight
                                                 }
@@ -529,6 +531,7 @@ Scope {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: window.drawerOpen = !window.drawerOpen
                             }
+                            GlassRim {}
                         }
                         Label {
                             Layout.fillWidth: true
@@ -557,6 +560,7 @@ Scope {
                                     search.forceActiveFocus();
                                 }
                             }
+                            GlassRim {}
                         }
                     }
                 }

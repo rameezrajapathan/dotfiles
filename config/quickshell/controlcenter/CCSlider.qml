@@ -64,4 +64,5 @@ Rectangle {
         color: root.value > 0.9 ? Theme.accentText : Theme.subtext
         font.pixelSize: Theme.fontSize - 1
     }
+    GlassRim {}
 }

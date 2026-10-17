@@ -61,9 +61,13 @@ PanelWindow {
         width: parent.width
         height: parent.height
         radius: Theme.round(height / 2, width, height)
-        color: Qt.alpha(Theme.base, 0.92)
+        color: "transparent"
         border.width: 1
         border.color: Qt.alpha(Theme.special, 0.5)
+        GlassPanel {
+            radius: card.radius
+            tint: Theme.denseTranslucent
+        }
 
         opacity: root.open ? 1 : 0
         y: root.open ? 0 : (root.edge === "bottom" ? 12 : -12)

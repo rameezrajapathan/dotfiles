@@ -278,6 +278,10 @@ setup_zen() {
 				echo 'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);' >>"$js"
 			grep -qs zen.theme.disable-lightweight "$js" ||
 				echo 'user_pref("zen.theme.disable-lightweight", false);' >>"$js"
+			grep -qs zen.widget.linux.transparency "$js" ||
+				echo 'user_pref("zen.widget.linux.transparency", true);' >>"$js"
+			grep -qs browser.tabs.allow_transparent_browser "$js" ||
+				echo 'user_pref("browser.tabs.allow_transparent_browser", true);' >>"$js"
 			ok "Zen profile ${profile} uses the wallpaper colors (after Zen restarts)"
 		done < <(sed -n 's/^Path=//p' "$ini")
 	done
@@ -471,6 +475,14 @@ cmd_health() {
 		ok "Settings app choices ($(jq '[.hypr // {} | keys[]] | length' "$settings") Hyprland option(s) changed)"
 	else
 		bad "Settings app file is not valid JSON: ${settings/#$HOME/\~} (fix or delete it)"
+	fi
+	local frag=$pkgdir/quickshell/shaders/glass.frag
+	if [[ ! -f $frag.qsb ]]; then
+		bad "glass shader not built (run ~/.config/hypr/scripts/shaders.sh)"
+	elif [[ $frag -nt $frag.qsb ]]; then
+		warn "glass shader is older than its source (run ~/.config/hypr/scripts/shaders.sh)"
+	else
+		ok "glass shader built ($(jq -r '.glass.preset // "frosted"' "$settings" 2>/dev/null || echo frosted) preset)"
 	fi
 	pgrep -x hypridle >/dev/null && ok "hypridle running (idle timers)" || warn "hypridle isn't running (~/.config/hypr/scripts/idle.sh starts it)"
 	if command -v pywalfox >/dev/null; then

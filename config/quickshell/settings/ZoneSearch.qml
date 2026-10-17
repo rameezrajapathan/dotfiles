@@ -75,6 +75,7 @@ ColumnLayout {
                     root.query = "";
                 }
             }
+            GlassRim {}
         }
     }
 

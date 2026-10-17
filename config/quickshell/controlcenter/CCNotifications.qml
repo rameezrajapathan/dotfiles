@@ -166,6 +166,7 @@ CCCard {
                         onClicked: row.modelData.dismiss()
                     }
                 }
+                GlassRim {}
             }
         }
 

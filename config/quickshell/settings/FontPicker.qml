@@ -84,6 +84,7 @@ ColumnLayout {
                 }
             }
         }
+        GlassRim {}
     }
 
     Rectangle {
@@ -133,6 +134,7 @@ ColumnLayout {
                         }
                     }
                 }
+                GlassRim {}
             }
 
             ListView {
@@ -201,5 +203,6 @@ ColumnLayout {
                 }
             }
         }
+        GlassRim {}
     }
 }

@@ -11,6 +11,12 @@ flock 9
 current=$(sed -n 's/^\s*path\s*=\s*//p' "$conf")
 current=${current/#\~/$HOME}
 
+glass_only=false
+if [[ ${1:-} == --glass ]]; then
+	glass_only=true
+	shift
+fi
+
 if [[ $# -gt 0 ]]; then
 	img=$(realpath "$1")
 	for monitor in $(hyprctl -j monitors | jq -r '.[].name'); do
@@ -24,10 +30,15 @@ fi
 settings=~/.config/pikadots/settings.json
 THEME_MODE=$(jq -r '.appearance.themeMode // "auto"' "$settings" 2>/dev/null || echo auto)
 THEME_SCHEME=$(jq -r '.appearance.scheme // "auto"' "$settings" 2>/dev/null || echo auto)
+glass_neutral=$(jq -r 'if ((.glass.preset // "frosted") != "off") and ((.glass.color // false) | not) then "yes" else "no" end' "$settings" 2>/dev/null || echo no)
+[[ $glass_neutral == yes && ! -e ${XDG_RUNTIME_DIR:-/tmp}/pikadots-gamemode ]] && THEME_SCHEME=monochrome
 export THEME_MODE THEME_SCHEME
 palette=$(python3 -I ~/.config/hypr/scripts/theme-palette.py "$img")
 mode=$(jq -r .theme.mode <<<"$palette")
 scheme=$(jq -r .theme.scheme <<<"$palette")
+python3 -I ~/.config/hypr/scripts/glass.py lua "$mode" || true
+glass=$(python3 -I ~/.config/hypr/scripts/glass.py json "$mode" 2>/dev/null || echo '{}')
+palette=$(jq -c --argjson glass "$glass" '. + $glass' <<<"$palette")
 matugen image "$img" --mode "$mode" --type "$scheme" --source-color-index 0 \
 	--import-json-string "$palette" --quiet
 
@@ -49,6 +60,11 @@ if command -v asusctl >/dev/null; then
 	[[ -n $accent ]] && asusctl aura effect static -c "$accent" >/dev/null 2>&1 || true
 fi
 hyprctl reload >/dev/null
+if $glass_only; then
+	python3 -I ~/.config/hypr/scripts/vscode-theme.py || true
+	python3 -I ~/.config/hypr/scripts/kde-theme.py || true
+	exit 0
+fi
 icon_theme=$("$(dirname "$0")/icons.sh" --name "$mode")
 if [[ $mode == light ]]; then
 	gtk_theme=adw-gtk3

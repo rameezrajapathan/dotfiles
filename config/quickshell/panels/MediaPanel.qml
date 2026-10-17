@@ -210,7 +210,7 @@ Item {
                     implicitWidth: chipRow.implicitWidth + 20
                     implicitHeight: 32
                     radius: Theme.round(current ? 10 : height / 2, width, height)
-                    color: current ? Theme.accent : chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.accent, 0.1)
+                    color: current ? Theme.selectedFill : chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.accent, 0.1)
                     Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
                     Behavior on radius { NumberAnimation { duration: Theme.ms(200) } }
 
@@ -227,7 +227,7 @@ Item {
                             Layout.maximumWidth: 120
                             text: chip.modelData.identity
                             font.pixelSize: Theme.fontSize - 1
-                            color: chip.current ? Theme.accentText : Theme.text
+                            color: chip.current ? Theme.selectedText : Theme.text
                             elide: Text.ElideRight
                         }
                     }

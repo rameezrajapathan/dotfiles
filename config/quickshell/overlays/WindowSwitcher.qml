@@ -171,6 +171,7 @@ PanelWindow {
                             live: card.selected
                             constraintSize: Qt.size(parent.width, parent.height)
                         }
+                        GlassRim {}
                     }
 
                     RowLayout {

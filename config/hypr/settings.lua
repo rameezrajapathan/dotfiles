@@ -81,6 +81,20 @@ hl.animation({ leaf = "fade", enabled = true, speed = 3, bezier = "default" })
 hl.animation({ leaf = "borderangle", enabled = false })
 hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 2, bezier = "default", style = "slidefadevert" })
 
+do
+	local ok, glass = pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/glass.lua")
+	if ok and type(glass) == "table" and glass.enabled then
+		local active = glass.active_border
+		if not glass.neutral then
+			local accent = colors.active_border
+			local list = type(accent) == "table" and accent.colors or { accent }
+			active = { colors = { glass.rim, list[1], list[2] or glass.active_border.colors[3] }, angle = glass.angle }
+		end
+		glass.config.general = { col = { active_border = active, inactive_border = glass.inactive_border } }
+		hl.config(glass.config)
+	end
+end
+
 pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/hypr-settings.lua")
 
 local gamemode = io.open((os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/pikadots-gamemode")

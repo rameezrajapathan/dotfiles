@@ -50,4 +50,5 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: row.picked()
     }
+    GlassRim {}
 }

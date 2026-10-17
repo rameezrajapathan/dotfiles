@@ -132,9 +132,19 @@ Item {
             width: statusRow.implicitWidth + 2 * Theme.pillInset + 8
             height: Theme.pillHeight
             radius: Theme.round(height / 2, width, height)
-            color: Qt.alpha(Theme.base, 0.55)
-            border.width: 1
+            color: "transparent"
+            border.width: Glass.active ? 0 : 1
             border.color: Qt.alpha(Theme.text, 0.08)
+            onYChanged: statusGlass.updateMap()
+
+            GlassPanel {
+                id: statusGlass
+                radius: statusPill.radius
+                tint: Qt.alpha(Theme.base, 0.55)
+                backdropItem: root
+                backdropSource: root.lock.wallpaper
+                fill: false
+            }
 
             Row {
                 id: statusRow
@@ -165,11 +175,12 @@ Item {
                     color: Theme.subtext
                 }
 
-                Rectangle {
+                GlassDivider {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 1
+                    width: Glass.active ? 2 : 1
                     height: 14
-                    color: Qt.alpha(Theme.text, 0.2)
+                    vertical: true
+                    strength: 0.33
                 }
 
                 Icon {
@@ -201,6 +212,7 @@ Item {
 
                 Item { width: 2; height: 1 }
             }
+            GlassRim {}
         }
 
         Column {
@@ -282,9 +294,19 @@ Item {
                 width: 380
                 height: 96
                 radius: Theme.round(24, width, height)
-                color: Qt.alpha(Theme.base, 0.5)
-                border.width: 1
+                color: "transparent"
+                border.width: Glass.active ? 0 : 1
                 border.color: Qt.alpha(Theme.text, 0.08)
+                onYChanged: mediaGlass.updateMap()
+
+                GlassPanel {
+                    id: mediaGlass
+                    radius: mediaCard.radius
+                    tint: Qt.alpha(Theme.base, 0.5)
+                    backdropItem: root
+                    backdropSource: root.lock.wallpaper
+                    fill: false
+                }
                 opacity: root.player ? 1 : 0
                 visible: root.player !== null && Settings.lock.showMedia
                 Behavior on opacity { NumberAnimation { duration: Theme.ms(300) } }
@@ -314,6 +336,7 @@ Item {
                         size: 28
                         color: Theme.subtext
                     }
+                    GlassRim {}
                 }
 
                 Column {
@@ -366,7 +389,7 @@ Item {
                             height: width
                             radius: Theme.round(width / 2, width, height)
                             anchors.verticalCenter: parent.verticalCenter
-                            color: main ? Theme.accent : controlMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
+                            color: main ? Theme.selectedFill : controlMouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                             scale: controlMouse.pressed ? 0.9 : 1
                             Behavior on scale { NumberAnimation { duration: Theme.ms(100) } }
 
@@ -374,7 +397,7 @@ Item {
                                 anchors.centerIn: parent
                                 size: parent.main ? 16 : 13
                                 kind: parent.main ? (root.player?.isPlaying ? "pause" : "play") : parent.modelData
-                                color: parent.main ? Theme.accentText : Theme.text
+                                color: parent.main ? Theme.selectedText : Theme.text
                             }
 
                             MouseArea {
@@ -391,9 +414,11 @@ Item {
                                     else if (parent.main && p.canTogglePlaying) p.togglePlaying();
                                 }
                             }
+                            GlassRim {}
                         }
                     }
                 }
+                GlassRim {}
             }
 
             Row {
@@ -719,6 +744,7 @@ Item {
                 }
 
                 ListModel { id: dots }
+                GlassRim {}
             }
 
             Text {

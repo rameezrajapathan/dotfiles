@@ -170,6 +170,7 @@ SettingsPage {
                             text: { const p = modelData.split(/\s+/); return p[0] + (p.length > 1 ? " " + p[p.length - 1] : ""); }
                             font.pixelSize: Theme.fontSize - 2
                         }
+                        GlassRim {}
                     }
                 }
             }

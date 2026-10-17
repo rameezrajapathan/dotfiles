@@ -117,16 +117,14 @@ Item {
         return Qt.rect(a, d, la, ld);
     }
 
-    Item {
+    GlassSurface {
         id: background
         visible: root.covering
         width: root.length
         height: root.shapeBottom + Math.max(root.sheetDepth, root.curHeight)
-        opacity: root.color.a
-        layer.enabled: true
+        tint: root.color
+        band: 16
         transform: Matrix4x4 { matrix: root.edgeMatrix }
-
-        readonly property color solid: Qt.rgba(root.color.r, root.color.g, root.color.b, 1)
 
         Item {
             x: root.curX

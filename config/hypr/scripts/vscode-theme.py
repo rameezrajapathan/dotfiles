@@ -214,6 +214,18 @@ GLASS_CSS = (
     ".monaco-workbench .part, .monaco-workbench .part > .content,\n"
     ".monaco-workbench .editor-group-container > .title, .monaco-workbench .editor-container {\n"
     "  background-color: transparent !important;\n}\n"
+    ".monaco-workbench .tabs-container > .tab {\n  border-radius: 999px !important;\n  margin: 4px 2px !important;\n"
+    "  height: calc(100% - 8px) !important;\n}\n"
+    ".monaco-workbench .tabs-container > .tab.active, .monaco-workbench .statusbar-item:hover,\n"
+    ".monaco-workbench .monaco-button, .monaco-workbench .monaco-inputbox {\n"
+    "  box-shadow: inset 0 1px rgba(255, 255, 255, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.10) !important;\n}\n"
+    ".monaco-workbench .monaco-button, .monaco-workbench .monaco-inputbox, .monaco-workbench .statusbar-item,\n"
+    ".monaco-workbench .action-item .action-label, .monaco-workbench .monaco-list-row {\n  border-radius: 999px !important;\n}\n"
+    ".monaco-workbench .quick-input-widget, .monaco-editor .suggest-widget, .monaco-editor .find-widget,\n"
+    ".monaco-workbench .monaco-hover, .monaco-workbench .monaco-menu-container, .monaco-workbench .context-view .monaco-menu {\n"
+    "  border-radius: 18px !important;\n  overflow: hidden;\n"
+    "  box-shadow: inset 0 1px rgba(255, 255, 255, 0.30), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 12px 32px rgba(0, 0, 0, 0.35) !important;\n}\n"
+    ".monaco-workbench .part > .title, .monaco-workbench .pane-header {\n  border: none !important;\n}\n"
 )
 
 PRELUDE = """// %s (made by hypr/scripts/vscode-theme.py from %s)

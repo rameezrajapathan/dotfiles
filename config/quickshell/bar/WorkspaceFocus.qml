@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Hyprland
 import QtQuick
 import qs.services
+import qs.widgets
 
 Item {
     id: root
@@ -44,13 +45,15 @@ Item {
         id: circle
         anchors.fill: parent
         radius: Theme.round(width / 2, width, height)
-        color: Theme.accent
+        color: Theme.selectedFill
         gradient: Theme.accentFill(true)
         border.width: root.urgent ? 2 : 0
         border.color: Theme.red
         scale: mouse.pressed ? 0.9 : mouse.containsMouse ? 1.08 : 1
         Behavior on scale { NumberAnimation { duration: Theme.ms(120); easing.type: Easing.OutCubic } }
         clip: true
+
+        GlassRim {}
 
         Text {
             id: oldNumber
@@ -61,7 +64,7 @@ Item {
             x: root.style.vertical ? 0 : root.outOffset
             y: root.style.vertical ? root.outOffset : 0
             opacity: root.style.fade ? Math.max(0, 1 - root.progress) : 1
-            color: Theme.accentText
+            color: Theme.selectedText
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             font.family: Theme.font
@@ -76,7 +79,7 @@ Item {
             x: root.style.vertical ? 0 : root.inOffset
             y: root.style.vertical ? root.inOffset : 0
             opacity: root.style.fade ? Math.min(1, root.progress) : 1
-            color: Theme.accentText
+            color: Theme.selectedText
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             font.family: Theme.font

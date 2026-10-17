@@ -14,9 +14,13 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: 58
     radius: Theme.round(14, width, height)
-    color: active ? Theme.accent : tileMouse.containsMouse ? Theme.surface : Qt.alpha(Theme.surface, 0.6)
+    color: active ? Theme.selectedFill : Theme.glassFill(2, tileMouse.containsMouse)
     gradient: Theme.accentFill(active)
     Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+
+    GlassRim {
+        strength: tile.active ? 0.6 : 1
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -27,7 +31,7 @@ Rectangle {
         Icon {
             name: tile.icon
             filled: tile.active
-            color: tile.active ? Theme.accentText : Theme.text
+            color: tile.active ? Theme.selectedText : Theme.text
             size: 22
         }
         ColumnLayout {
@@ -37,7 +41,7 @@ Rectangle {
             Label {
                 Layout.fillWidth: true
                 text: tile.label
-                color: tile.active ? Theme.accentText : Theme.text
+                color: tile.active ? Theme.selectedText : Theme.text
                 font.bold: true
                 font.pixelSize: Theme.fontSize - 1
                 elide: Text.ElideRight
@@ -45,7 +49,7 @@ Rectangle {
             Label {
                 Layout.fillWidth: true
                 text: tile.detail
-                color: tile.active ? Qt.alpha(Theme.accentText, 0.75) : Theme.subtext
+                color: tile.active ? Qt.alpha(Theme.selectedText, 0.75) : Theme.subtext
                 font.pixelSize: Theme.fontSize - 3
                 elide: Text.ElideRight
             }

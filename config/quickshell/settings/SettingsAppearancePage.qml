@@ -101,6 +101,7 @@ SettingsPage {
                         name: "image"
                         color: Theme.overlay
                     }
+                    GlassRim {}
                 }
                 Rectangle {
                     anchors.fill: picture
@@ -176,7 +177,7 @@ SettingsPage {
         SettingsRow {
             icon: "palette"
             title: "Palette style"
-            description: "How strongly the wallpaper's colors show through."
+            description: Glass.neutral ? "Glass is colorless right now. Turn on Glass › Wallpaper color to use a palette." : "How strongly the wallpaper's colors show through."
             below: true
             SettingsChips {
                 options: [
@@ -225,7 +226,7 @@ SettingsPage {
                     Layout.fillWidth: true
                     implicitHeight: 34
                     radius: Theme.round(12, width, height)
-                    border.width: 1
+                    border.width: Glass.active ? 0 : 1
                     border.color: Qt.alpha(Theme.overlay, 0.3)
                     gradient: Gradient {
                         orientation: Gradient.Horizontal
@@ -236,6 +237,7 @@ SettingsPage {
                         GradientStop { position: 0.76; color: Theme.multiColor ? Theme.accent3 : Theme.special }
                         GradientStop { position: 1; color: Theme.text }
                     }
+                    GlassRim {}
                 }
                 Flow {
                     Layout.fillWidth: true
@@ -274,6 +276,7 @@ SettingsPage {
                                     font.pixelSize: Theme.fontSize - 3
                                 }
                             }
+                            GlassRim {}
                         }
                     }
                 }
@@ -295,19 +298,96 @@ SettingsPage {
     }
 
     SettingsSection {
-        title: "Transparency"
+        title: "Glass"
 
         SettingsRow {
-            icon: "opacity"
-            title: "Bar and panels"
-            description: "Background opacity of the bar pill and drop-down panels."
+            icon: "blur_on"
+            title: "Material"
+            description: "Liquid glass for the shell, Hyprland windows, terminals and apps. Frosted stays easy to read; Clear shows the most of the wallpaper."
+            SettingsSegmented {
+                options: Glass.names.map(n => ({ value: n, label: Glass.labels[n] }))
+                current: Glass.preset
+                onPicked: v => Glass.setPreset(v)
+            }
+        }
+
+        SettingsRow {
+            below: true
+            separator: Glass.preset !== "off"
+            icon: "preview"
+            title: "Preview"
+            description: Glass.active ? "How panels look over your wallpaper." : "Glass is off: plain translucent panels."
+            GlassPreview {
+                Layout.fillWidth: true
+            }
+        }
+
+        SettingsRow {
+            visible: Glass.preset !== "off"
+            icon: "colors"
+            title: "Wallpaper color"
+            description: "Off makes the shell, window borders and apps colorless, like clear glass. On keeps the wallpaper's colors."
+            Switch {
+                checked: Settings.glass.color
+                onToggled: Glass.setColor(!checked)
+            }
+        }
+
+        SettingsRow {
+            visible: Glass.preset !== "off"
+            icon: "light_mode"
+            title: "Light direction"
+            description: "Where the rim highlight catches the light. 0° is straight above."
             SettingsSlider {
-                value: Math.round(Settings.appearance.panelOpacity * 100)
-                suffix: "%"
-                from: 40
-                to: 100
+                from: -180
+                to: 180
                 stepSize: 5
-                onMoved: v => Settings.appearance.panelOpacity = v / 100
+                value: Settings.glass.lightAngle
+                suffix: "°"
+                onMoved: v => Glass.setLightAngle(v)
+            }
+        }
+
+        Repeater {
+            model: [
+                { key: "tint", icon: "opacity", title: "Shell tint", description: "Opacity of the bar and panels.", from: 20, to: 95, scale: 100, suffix: "%" },
+                { key: "card", icon: "dashboard", title: "Cards", description: "Opacity of cards and tiles inside panels.", from: 10, to: 90, scale: 100, suffix: "%" },
+                { key: "window", icon: "web_asset", title: "App windows", description: "GTK, VS Code and Zen window backgrounds.", from: 30, to: 100, scale: 100, suffix: "%" },
+                { key: "terminal", icon: "terminal", title: "Terminal", description: "kitty background opacity.", from: 30, to: 100, scale: 100, suffix: "%" },
+                { key: "rim", icon: "highlight", title: "Rim light", description: "Brightness of the specular edge.", from: 0, to: 100, scale: 100, suffix: "%" },
+                { key: "refraction", icon: "lens_blur", title: "Refraction", description: "How strongly panel edges bend the wallpaper behind them.", from: 0, to: 100, scale: 100, suffix: "%" },
+                { key: "chroma", icon: "gradient", title: "Color fringe", description: "Chromatic split along refracting edges.", from: 0, to: 100, scale: 100, suffix: "%" },
+                { key: "blurSize", icon: "blur_medium", title: "Blur radius", description: "Hyprland blur size behind windows and panels.", from: 2, to: 16, scale: 1, suffix: "" },
+                { key: "blurPasses", icon: "layers", title: "Blur passes", description: "More passes give a smoother, heavier blur.", from: 1, to: 5, scale: 1, suffix: "" },
+                { key: "vibrancy", icon: "palette", title: "Vibrancy", description: "Saturation boost of colors seen through the glass.", from: 0, to: 100, scale: 100, suffix: "%" },
+                { key: "inactiveOpacity", icon: "select_window", title: "Inactive windows", description: "Opacity of unfocused windows.", from: 50, to: 100, scale: 100, suffix: "%" }
+            ]
+
+            SettingsRow {
+                required property var modelData
+                visible: Glass.preset === "custom"
+                icon: modelData.icon
+                title: modelData.title
+                description: modelData.description
+                SettingsSlider {
+                    from: modelData.from
+                    to: modelData.to
+                    stepSize: 1
+                    value: Math.round((Glass.value(modelData.key) ?? 0) * modelData.scale)
+                    suffix: modelData.suffix
+                    onMoved: v => Glass.setCustom(modelData.key, modelData.scale === 1 ? Math.round(v) : Math.round(v) / modelData.scale)
+                }
+            }
+        }
+
+        SettingsRow {
+            visible: Glass.preset === "custom"
+            icon: "shadow"
+            title: "Shadows"
+            description: "Soft shadows under panels and windows."
+            Switch {
+                checked: Glass.value("shadows") ?? false
+                onToggled: Glass.setCustom("shadows", !checked)
             }
         }
     }

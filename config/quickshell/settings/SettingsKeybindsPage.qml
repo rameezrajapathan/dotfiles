@@ -75,7 +75,7 @@ SettingsPage {
                                 implicitHeight: 24
                                 radius: Theme.round(7, width, height)
                                 color: Qt.alpha(Theme.base, 0.7)
-                                border.width: 1
+                                border.width: Glass.active ? 0 : 1
                                 border.color: Qt.alpha(Theme.text, 0.12)
 
                                 Label {
@@ -86,6 +86,7 @@ SettingsPage {
                                     font.pixelSize: Theme.fontSize - 2
                                     font.bold: true
                                 }
+                                GlassRim {}
                             }
                         }
                     }

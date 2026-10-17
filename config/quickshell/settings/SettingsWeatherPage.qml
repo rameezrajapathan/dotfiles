@@ -120,6 +120,7 @@ SettingsPage {
                                 root.query = "";
                             }
                         }
+                        GlassRim {}
                     }
                 }
             }

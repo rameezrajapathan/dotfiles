@@ -65,7 +65,9 @@ ColumnLayout {
         Layout.fillWidth: true
         implicitHeight: card.implicitHeight
         radius: Theme.round(16, width, height)
-        color: Qt.alpha(Theme.surface, 0.45)
+        color: Theme.glassFill(1)
+
+        GlassRim {}
 
         ColumnLayout {
             id: card

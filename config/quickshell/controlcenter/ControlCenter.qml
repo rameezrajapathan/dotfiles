@@ -118,7 +118,7 @@ PanelWindow {
                 easing.overshoot: card.motionInfo.overshoot ?? 1.70158
             }
         }
-        color: Qt.alpha(Theme.base, 0.92)
+        color: Theme.denseTranslucent
         onClosed: {
             root.visible = false;
             root.detail = "";

@@ -1,6 +1,7 @@
 import QtQuick
 import qs.bar
 import qs.services
+import qs.widgets
 
 Item {
     id: root
@@ -38,6 +39,7 @@ Item {
         height: parent.height
         radius: Theme.round(4, width, height)
         color: Qt.alpha(Theme.base, 0.5)
+        GlassRim {}
     }
 
     component Shape: Rectangle {

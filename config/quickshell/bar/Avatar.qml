@@ -32,4 +32,5 @@ ClippingRectangle {
         size: root.size * 0.65
         color: Theme.subtext
     }
+    GlassRim {}
 }

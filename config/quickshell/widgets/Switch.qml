@@ -9,7 +9,7 @@ Rectangle {
     implicitWidth: 36
     implicitHeight: 20
     radius: Theme.round(height / 2, width, height)
-    color: checked ? Theme.accent : Theme.surface
+    color: checked ? Theme.selectedFill : Theme.glassFill(2)
     gradient: Theme.accentFill(checked)
 
     Rectangle {
@@ -18,7 +18,7 @@ Rectangle {
         radius: Theme.round(7, width, height)
         anchors.verticalCenter: parent.verticalCenter
         x: root.checked ? parent.width - width - 3 : 3
-        color: root.checked ? Theme.accentText : Theme.subtext
+        color: root.checked ? Theme.selectedText : Theme.subtext
 
         Behavior on x { NumberAnimation { duration: Theme.ms(120) } }
     }
@@ -28,4 +28,5 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.toggled()
     }
+    GlassRim {}
 }

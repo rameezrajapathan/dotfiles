@@ -171,9 +171,11 @@ ColumnLayout {
                                     }
                                 }
                             }
+                            GlassRim {}
                         }
                     }
                 }
+                GlassRim {}
             }
         }
     }

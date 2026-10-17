@@ -15,14 +15,18 @@ Rectangle {
     signal clicked()
     signal more()
 
-    readonly property color fg: active ? Theme.accentText : Theme.text
+    readonly property color fg: active ? Theme.selectedText : Theme.text
 
     implicitHeight: small ? 76 : 64
     radius: Theme.round(20, width, height)
-    color: active ? (mainMouse.containsMouse ? Qt.lighter(Theme.accent, 1.06) : Theme.accent)
-        : mainMouse.containsMouse ? Qt.alpha(Theme.surface, 0.85) : Qt.alpha(Theme.surface, 0.55)
+    color: active ? (mainMouse.containsMouse ? Qt.lighter(Theme.selectedFill, 1.06) : Theme.selectedFill)
+        : Theme.glassFill(2, mainMouse.containsMouse)
     gradient: Theme.accentFill(active)
     Behavior on color { ColorAnimation { duration: Theme.ms(150) } }
+
+    GlassRim {
+        strength: root.active ? 0.6 : 1
+    }
 
     MouseArea {
         id: mainMouse
@@ -60,7 +64,7 @@ Rectangle {
                 Layout.fillWidth: true
                 visible: text !== ""
                 text: root.detail
-                color: root.active ? Qt.alpha(Theme.accentText, 0.75) : Theme.subtext
+                color: root.active ? Qt.alpha(Theme.selectedText, 0.75) : Theme.subtext
                 font.pixelSize: Theme.fontSize - 2
                 elide: Text.ElideRight
             }
@@ -74,13 +78,13 @@ Rectangle {
                 anchors { left: parent.left; verticalCenter: parent.verticalCenter }
                 width: 1
                 height: parent.height - 24
-                color: root.active ? Qt.alpha(Theme.accentText, 0.2) : Qt.alpha(Theme.overlay, 0.3)
+                color: root.active ? Qt.alpha(Theme.selectedText, 0.2) : Qt.alpha(Theme.overlay, 0.3)
             }
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 4
                 radius: Theme.round(14, width, height)
-                color: moreMouse.containsMouse ? Qt.alpha(root.active ? Theme.accentText : Theme.text, 0.1) : "transparent"
+                color: moreMouse.containsMouse ? Qt.alpha(root.active ? Theme.selectedText : Theme.text, 0.1) : "transparent"
             }
             Icon {
                 anchors.centerIn: parent

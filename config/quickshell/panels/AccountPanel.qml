@@ -58,6 +58,7 @@ Item {
                         size: 28
                         color: Theme.text
                     }
+                    GlassRim {}
                 }
                 MouseArea {
                     id: pictureMouse
@@ -196,6 +197,7 @@ Item {
                         Quickshell.execDetached(action.modelData.command);
                     }
                 }
+                GlassRim {}
             }
         }
     }

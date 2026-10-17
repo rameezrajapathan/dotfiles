@@ -71,4 +71,5 @@ Rectangle {
             color: Theme.overlay
         }
     }
+    GlassRim {}
 }

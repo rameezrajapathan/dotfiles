@@ -150,12 +150,13 @@ Rectangle {
             }
         }
 
-        Rectangle {
+        GlassDivider {
             visible: SpeedTest.running || SpeedTest.hasResult
             Layout.fillWidth: true
             Layout.topMargin: 2
-            implicitHeight: 1
-            color: Qt.alpha(Theme.overlay, 0.35)
+            implicitHeight: Glass.active ? 2 : 1
+            vertical: false
+            strength: 0.58
         }
         RowLayout {
             visible: SpeedTest.running || SpeedTest.hasResult
@@ -239,4 +240,5 @@ Rectangle {
             }
         }
     }
+    GlassRim {}
 }

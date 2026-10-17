@@ -80,6 +80,7 @@ Item {
                         radius: Theme.round(2, width, height)
                         color: drive.modelData.used / Math.max(1, drive.modelData.size) > 0.9 ? Theme.red : Theme.accent
                     }
+                    GlassRim {}
                 }
             }
         }

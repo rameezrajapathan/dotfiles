@@ -86,6 +86,7 @@ SettingsPage {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: CCStyles.apply(card.modelData.id)
                         }
+                        GlassRim {}
                     }
                 }
             }

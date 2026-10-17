@@ -161,12 +161,13 @@ PanelWindow {
                 }
             }
 
-            Rectangle {
+            GlassDivider {
                 visible: Settings.datetime.worldClocks.length > 0
                 Layout.fillWidth: true
                 Layout.topMargin: 4
-                implicitHeight: 1
-                color: Qt.alpha(Theme.overlay, 0.3)
+                implicitHeight: Glass.active ? 2 : 1
+                vertical: false
+                strength: 0.5
             }
             Repeater {
                 model: Settings.datetime.worldClocks
@@ -221,14 +222,16 @@ PanelWindow {
 
                         Layout.fillWidth: true
                         implicitHeight: 30
-                        radius: Theme.round(6, width, height)
-                        color: isToday ? Theme.accent : "transparent"
+                        radius: Glass.active ? height / 2 : Theme.round(6, width, height)
+                        color: isToday ? Theme.selectedFill : "transparent"
+
+                        GlassRim {}
 
                         Label {
                             anchors.centerIn: parent
                             text: modelData.getDate()
                             font.bold: parent.isToday
-                            color: parent.isToday ? Theme.accentText
+                            color: parent.isToday ? Theme.selectedText
                                 : !parent.inMonth ? Theme.surface
                                 : modelData.getDay() % 6 === 0 ? Theme.subtext
                                 : Theme.text

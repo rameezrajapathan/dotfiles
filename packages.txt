@@ -82,3 +82,4 @@ libsecret
 restic
 python-icalendar
 python-recurring-ical-events
+qt6-shadertools

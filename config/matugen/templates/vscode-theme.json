@@ -3,7 +3,7 @@
   "type": "{{mode}}",
   "semanticHighlighting": true,
   "colors": {
-    "pikadots.glass": "{{colors.surface.default.hex}}d9",
+    "pikadots.glass": "{{colors.surface.default.hex}}{{glass.window_hex}}",
     "focusBorder": "{{colors.primary.default.hex}}80",
     "contrastBorder": "#00000000",
     "foreground": "{{colors.on_surface.default.hex}}",

@@ -378,7 +378,10 @@ PanelWindow {
                 Layout.fillWidth: true
                 implicitHeight: 52
                 radius: Theme.round(16, width, height)
-                color: Qt.alpha(Theme.surface, 0.7)
+                color: Theme.glassFill(2)
+                GlassRim {
+                    visible: !search.activeFocus && Glass.rim > 0
+                }
                 border.width: 2
                 border.color: Theme.gradientAccent && (search.activeFocus) ? "transparent" : search.activeFocus ? Qt.alpha(Theme.accent, 0.6) : "transparent"
                 GradientBorder {
@@ -473,7 +476,10 @@ PanelWindow {
                         implicitWidth: chipRow.implicitWidth + 20
                         implicitHeight: 30
                         radius: Theme.round(15, width, height)
-                        color: chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Qt.alpha(Theme.surface, 0.6)
+                        color: chipMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Theme.glassFill(2)
+                        GlassRim {
+                            strength: 0.7
+                        }
 
                         RowLayout {
                             id: chipRow
@@ -556,6 +562,7 @@ PanelWindow {
                         radius: Theme.round(cell.list ? 14 : 18, width, height)
                         color: !cell.selected && mouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
                         Behavior on color { ColorAnimation { duration: Theme.ms(100) } }
+                        GlassRim {}
                     }
 
                     ColumnLayout {

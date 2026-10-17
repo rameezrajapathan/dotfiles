@@ -232,6 +232,7 @@ SettingsPage {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: Settings.appearance.panelAnimation = card.modelData.id
                         }
+                        GlassRim {}
                     }
                 }
             }

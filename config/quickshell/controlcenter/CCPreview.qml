@@ -1,5 +1,6 @@
 import QtQuick
 import qs.services
+import qs.widgets
 
 Item {
     id: root
@@ -21,7 +22,7 @@ Item {
         height: parent.height
         radius: Theme.round(8, width, height)
         color: Qt.alpha(Theme.base, 0.85)
-        border.width: 1
+        border.width: Glass.active ? 0 : 1
         border.color: Qt.alpha(Theme.overlay, 0.25)
 
         Row {
@@ -54,5 +55,6 @@ Item {
                 }
             }
         }
+        GlassRim {}
     }
 }

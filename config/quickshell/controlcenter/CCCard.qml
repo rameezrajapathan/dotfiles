@@ -1,5 +1,6 @@
 import QtQuick
 import qs.services
+import qs.widgets
 
 Rectangle {
     id: root
@@ -8,8 +9,10 @@ Rectangle {
     signal clicked()
 
     radius: Theme.round(22, width, height)
-    color: clickable && mouse.containsMouse ? Qt.alpha(Theme.surface, 0.5) : Qt.alpha(Theme.surface, 0.3)
+    color: Theme.glassFill(1, clickable && mouse.containsMouse)
     Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+
+    GlassRim {}
 
     MouseArea {
         id: mouse

@@ -56,3 +56,4 @@ if [[ -n $FASTFETCH ]]; then
 fi
 
 command -v mise >/dev/null && eval "$(mise activate zsh)"
+export PATH="/home/pika/.dotnetup:$PATH"

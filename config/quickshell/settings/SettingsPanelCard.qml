@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.panels
 import qs.services
+import qs.widgets
 
 Rectangle {
     id: root
@@ -20,4 +21,5 @@ Rectangle {
                 c.width = Qt.binding(() => holder.width);
         }
     }
+    GlassRim {}
 }

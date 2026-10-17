@@ -96,12 +96,14 @@ CCCard {
                         height: 28
                         radius: Theme.round(14, width, height)
                         visible: modelData.today
-                        color: Theme.accent
+                        color: Theme.selectedFill
+
+                        GlassRim {}
                     }
                     Label {
                         anchors.centerIn: parent
                         text: modelData.day
-                        color: modelData.today ? Theme.accentText : !modelData.inMonth ? Qt.alpha(Theme.overlay, 0.6)
+                        color: modelData.today ? Theme.selectedText : !modelData.inMonth ? Qt.alpha(Theme.overlay, 0.6)
                             : modelData.weekend ? Theme.overlay : Theme.text
                         font.weight: modelData.today ? Font.DemiBold : Font.Normal
                         font.pixelSize: Theme.fontSize - 1

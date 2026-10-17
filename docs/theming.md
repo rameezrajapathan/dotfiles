@@ -53,6 +53,70 @@ The thresholds are at the top of `main()` in that script.
 Without generated files everything falls back to Catppuccin Mocha. To change which color goes
 where, edit the template for that app.
 
+## Liquid glass
+
+One setting, **Settings › Appearance › Glass**, makes the shell, Hyprland and the apps translucent
+together. Presets live in `quickshell/services/glass-presets.json`:
+
+| | Off | Frosted (default) | Clear |
+|---|---|---|---|
+| Bar and panels | 85% | 68% | 42% |
+| GTK, VS Code, Zen windows | 70% | 80% | 62% |
+| kitty | 85% | 80% | 62% |
+| Rim light, refraction | none | soft | strong |
+| Hyprland blur (size/passes), shadows | your Effects page | 8/3, on | 10/4, on |
+
+Custom starts from the current preset and shows a slider for each value. Off is the look from
+before glass.
+
+**Colorless by default.** While glass is on, everything is made of clear glass. `theme.sh` uses
+the monochrome palette for the shell and every app, gradient accents are off, and selected items
+(pills, toggles, tabs, today in the calendar, the workspace circle) are brighter glass with a rim
+instead of an accent fill. Glass › **Wallpaper color** brings the wallpaper's palette back. Terminal
+ANSI colors are kept either way.
+
+**Pills everywhere.** Separators are short glass capsules that fade at both ends (`GlassDivider.qml`).
+Cards, rows, fields and buttons get a light-facing rim (`GlassRim.qml`). In apps:
+
+- kitty uses round powerline tabs;
+- GTK buttons, entries and dropdowns are pills, and popovers, cards and menus get 18px corners with
+  a rim;
+- Code - OSS has pill tabs, buttons and inputs, and rounded rimmed widgets;
+- btop, superfile and lualine already use rounded borders.
+
+**In the shell.** Panels, the bar, the OSD, popups and lock screen cards are drawn by
+`widgets/GlassSurface.qml`, which runs `shaders/glass.frag`. The shader finds each edge from the
+shape itself, so pills, islands and sheets with ears all work. It adds:
+
+- a 1px rim that is brightest where it faces the light (Light direction, 0° = above);
+- a band along the edge that bends a soft copy of the wallpaper, with a slight color fringe;
+- a soft shadow under drop-down sheets.
+
+Hyprland blurs what is behind (`ignore_alpha 0.25` on `quickshell-*` layers). The edge band bends
+the wallpaper, not the windows behind it, so it is kept narrow over windows. Cards, tiles and pills
+inside panels use `GlassRim.qml` (a gradient stroke) and `Theme.glassFill()`. After editing the
+shader, run `hypr/scripts/shaders.sh` (needs `qt6-shadertools`). The compiled `.qsb` is in the repo,
+and `pikadots health` warns when it is older than the source.
+
+**Everywhere else.** `theme.sh` (or `theme.sh --glass`, which the Settings app runs) calls
+`hypr/scripts/glass.py`, which does two things:
+
+- It adds `glass.*` values to matugen's input. The templates use them: GTK `alpha()` backgrounds and
+  a headerbar highlight, kitty `background_opacity`, VS Code `pikadots.glass`, Zen's browser
+  background (`color-mix`), fuzzel and hyprlock.
+- It writes `~/.local/state/pikadots/glass.lua`: blur, vibrancy, noise, shadows, inactive opacity
+  and window borders drawn as a colorless glass rim (a white gradient along the light direction)
+  plus Hyprland's inner `glow` for a frosted edge. With Wallpaper color on, the active border
+  also carries the accent. Scratchpad borders turn white too.
+  `settings.lua` loads it before your Effects page values, so anything you set there still wins.
+  Picking a preset clears your blur, shadow and inactive-opacity values so the preset shows.
+
+Zen needs `zen.widget.linux.transparency` (written by `pikadots repair`) and a restart. Qt apps
+only get the matching colors, because Qt widgets can't be translucent without Kvantum. Game mode
+turns glass off. Rim and refraction stop, and Hyprland drops blur and shadows.
+
+IPC: `qs ipc call glass preset off|frosted|clear|custom`, `qs ipc call glass cycle`.
+
 ## Qt and KDE apps
 
 Qt apps only take a theme from `~/.config/kdeglobals`, the file Plasma uses too.

@@ -18,10 +18,10 @@
 }
 :root[lwtheme],
 :root[lwtheme] .zen-browser-generic-background {
-  --zen-main-browser-background: var(--lwt-accent-color) !important;
-  --zen-main-browser-background-toolbar: var(--lwt-accent-color) !important;
-  --zen-main-browser-background-old: var(--lwt-accent-color) !important;
-  --zen-main-browser-background-toolbar-old: var(--lwt-accent-color) !important;
+  --zen-main-browser-background: color-mix(in srgb, var(--lwt-accent-color) {{glass.window_pct}}, transparent) !important;
+  --zen-main-browser-background-toolbar: color-mix(in srgb, var(--lwt-accent-color) {{glass.window_pct}}, transparent) !important;
+  --zen-main-browser-background-old: color-mix(in srgb, var(--lwt-accent-color) {{glass.window_pct}}, transparent) !important;
+  --zen-main-browser-background-toolbar-old: color-mix(in srgb, var(--lwt-accent-color) {{glass.window_pct}}, transparent) !important;
 }
 :root[lwtheme] .tabbrowser-tab[selected] .tab-background {
   background-color: var(--toolbar-background-color) !important;
@@ -44,11 +44,19 @@
 }
 :root:not([lwtheme]),
 :root:not([lwtheme]) .zen-browser-generic-background {
-  --zen-main-browser-background: {{colors.surface.default.hex}} !important;
-  --zen-main-browser-background-toolbar: {{colors.surface.default.hex}} !important;
-  --zen-main-browser-background-old: {{colors.surface.default.hex}} !important;
-  --zen-main-browser-background-toolbar-old: {{colors.surface.default.hex}} !important;
+  --zen-main-browser-background: color-mix(in srgb, {{colors.surface.default.hex}} {{glass.window_pct}}, transparent) !important;
+  --zen-main-browser-background-toolbar: color-mix(in srgb, {{colors.surface.default.hex}} {{glass.window_pct}}, transparent) !important;
+  --zen-main-browser-background-old: color-mix(in srgb, {{colors.surface.default.hex}} {{glass.window_pct}}, transparent) !important;
+  --zen-main-browser-background-toolbar-old: color-mix(in srgb, {{colors.surface.default.hex}} {{glass.window_pct}}, transparent) !important;
 }
 :root:not([lwtheme]) .tabbrowser-tab[selected] .tab-background {
   background-color: {{colors.surface_container_highest.default.hex}} !important;
+}
+
+#zen-main-app-wrapper,
+#navigator-toolbox {
+  background-color: transparent !important;
+}
+#tabbrowser-tabbox {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, {{glass.rim_alpha}}), 0 0 0 1px rgba(255, 255, 255, {{glass.rim_alpha}}) !important;
 }

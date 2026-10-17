@@ -1,8 +1,9 @@
 import QtQuick
 import qs.services
+import qs.widgets
 
-Rectangle {
-    implicitWidth: Theme.barVertical ? 14 : 1
-    implicitHeight: Theme.barVertical ? 1 : 14
-    color: Qt.alpha(Theme.overlay, 0.6)
+GlassDivider {
+    vertical: !Theme.barVertical
+    implicitWidth: Theme.barVertical ? 16 : (Glass.active ? 3 : 1)
+    implicitHeight: Theme.barVertical ? (Glass.active ? 3 : 1) : 16
 }

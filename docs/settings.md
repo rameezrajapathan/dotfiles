@@ -14,7 +14,7 @@ then closes the window.
 
 | Page | `open` name | What's in it |
 |---|---|---|
-| Appearance | `appearance` | Wallpaper strip (click to apply and recolor), light/dark/auto mode, palette style (tonal, vivid, expressive, neutral, monochrome, …), current palette, Qt and KDE apps on/off, bar and panel opacity, corner roundness for the whole shell and Hyprland windows (0% square, 100% default, 200% circles and pills) |
+| Appearance | `appearance` | Wallpaper strip (click to apply and recolor), light/dark/auto mode, palette style (tonal, vivid, expressive, neutral, monochrome, …), current palette, Qt and KDE apps on/off, **Glass** (Off, Frosted, Clear or Custom with a live preview; wallpaper color (off = colorless glass); light direction; in Custom: shell tint, cards, app windows, terminal, rim light, refraction, color fringe, blur radius and passes, vibrancy, inactive windows, shadows — see [theming.md](theming.md#liquid-glass)), corner roundness for the whole shell and Hyprland windows (0% square, 100% default, 200% circles and pills) |
 | Fonts & icons | `fonts` | Font themes (interface + heading + terminal font pairings), or each font on its own: interface, display (headings, lock clock), terminal (kitty); optionally used by GTK apps too; text size; shell symbol style (Rounded, Outlined, Sharp), and weight; app icon theme |
 | Bar | `bar` | Styles (Minimalist, Focus, Everyday, On the go, Music lover, Developer, Islands, Floating, Classic, Maximalist, Custom); layout (one pill, islands, full width), height, space above and at the sides, outline; the items in each section; 24-hour clock, seconds, music spectrum |
 | Control center | `controlcenter` | Layout (One glance, Bento or Custom, with a drawing of each), the widgets in each of one to three columns, and the quick tiles in order (Wi-Fi, Bluetooth, VPN, Do Not Disturb, night light, power profile, keep awake, game mode, microphone, record, color picker). Saved as `controlCenter` in `settings.json` |
@@ -47,6 +47,7 @@ Nothing in the repo changes; your choices stay on this machine:
 |---|---|---|
 | `~/.config/pikadots/settings.json` | the app (`quickshell/services/Settings.qml`) | the shell, and these scripts in `hypr/scripts`: `theme.sh` (mode, palette style), `idle.sh` (timers), `fonts.sh`, `icons.sh`, `kde-theme.py`, `accessibility.sh`, `clipboard.sh` |
 | `~/.local/state/pikadots/hypr-settings.lua` | Windows, Effects, Keyboard & mouse (`quickshell/services/Hypr.qml`) | end of `hypr/settings.lua` |
+| `~/.local/state/pikadots/glass.lua` | Appearance › Glass (`hypr/scripts/glass.py`, run by `theme.sh`) | `hypr/settings.lua`, before `hypr-settings.lua` |
 | `~/.local/state/pikadots/window-rules.lua` | Window rules | end of `hypr/rules.lua` |
 | `~/.local/state/pikadots/autostart.lua` | Startup apps | `hypr/scripts/startup-apps.sh` (from `hypr/autostart.lua`), once the tray is up |
 | `$XDG_RUNTIME_DIR/hypridle.conf` | `hypr/scripts/idle.sh` at login and after a change | hypridle (`hypridle.conf` in the repo shows the defaults) |

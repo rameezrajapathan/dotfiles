@@ -100,7 +100,7 @@ PanelWindow {
         implicitHeight: content.implicitHeight + 48
         radius: Theme.round(24, width, height)
         color: Theme.baseTranslucent
-        border.width: 1
+        border.width: Glass.active ? 0 : 1
         border.color: Qt.alpha(Theme.overlay, 0.4)
 
         transform: Translate { id: shakeOffset }
@@ -166,7 +166,7 @@ PanelWindow {
                 implicitHeight: 42
                 radius: Theme.round(14, width, height)
                 color: Qt.alpha(Theme.base, 0.6)
-                border.width: 1
+                border.width: Glass.active ? 0 : 1
                 border.color: root.flow?.supplementaryIsError ? Theme.red : input.activeFocus ? Theme.accent : "transparent"
 
                 TextInput {
@@ -193,6 +193,7 @@ PanelWindow {
                         color: Theme.overlay
                     }
                 }
+                GlassRim {}
             }
 
             Label {
@@ -228,6 +229,7 @@ PanelWindow {
                 }
             }
         }
+        GlassRim {}
     }
 
     component DialogButton: Rectangle {
@@ -239,13 +241,13 @@ PanelWindow {
         implicitWidth: label.implicitWidth + 28
         implicitHeight: 34
         radius: Theme.round(height / 2, width, height)
-        color: primary ? (mouse.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)
+        color: primary ? (mouse.containsMouse ? Qt.lighter(Theme.selectedFill, 1.1) : Theme.selectedFill)
             : mouse.containsMouse ? Theme.overlay : Theme.surface
 
         Label {
             id: label
             anchors.centerIn: parent
-            color: button.primary ? Theme.accentText : Theme.text
+            color: button.primary ? Theme.selectedText : Theme.text
             font.bold: button.primary
         }
         MouseArea {

@@ -15,7 +15,8 @@ hl.window_rule({ match = { class = "blueman-manager" }, float = true })
 hl.window_rule({ match = { class = "steam" }, float = true })
 hl.window_rule({ match = { class = "^org.quickshell$", title = "^Settings$" }, float = true, center = true, size = "1040 720" })
 
-hl.layer_rule({ match = { namespace = "^quickshell.*$" }, blur = true, ignore_alpha = 0.4, no_anim = true })
+hl.layer_rule({ match = { namespace = "^quickshell.*$" }, blur = true, ignore_alpha = 0.25, no_anim = true })
+hl.layer_rule({ match = { namespace = "^launcher$" }, blur = true, ignore_alpha = 0.25 })
 
 hl.window_rule({
 	match = { class = "^dropterm$" },
@@ -27,6 +28,10 @@ hl.window_rule({
 
 local ok, theme = pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hyprland.lua")
 local special_border = ok and theme.special_border or "rgb(f5c2e7)"
+local glass_ok, glass = pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/glass.lua")
+if glass_ok and type(glass) == "table" and glass.enabled and glass.neutral then
+	special_border = glass.special_border
+end
 hl.window_rule({ match = { workspace = "s[true]" }, border_color = special_border })
 
 pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/window-rules.lua")

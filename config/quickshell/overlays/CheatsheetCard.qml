@@ -11,7 +11,7 @@ Rectangle {
     implicitHeight: cardContent.implicitHeight + 32
     radius: Theme.round(18, width, height)
     color: Theme.baseTranslucent
-    border.width: 1
+    border.width: Glass.active ? 0 : 1
     border.color: Qt.alpha(Theme.text, 0.08)
 
     MouseArea {
@@ -75,7 +75,7 @@ Rectangle {
                             implicitHeight: 24
                             radius: Theme.round(7, width, height)
                             color: Qt.alpha(Theme.surface, 0.9)
-                            border.width: 1
+                            border.width: Glass.active ? 0 : 1
                             border.color: Qt.alpha(Theme.text, 0.12)
 
                             Rectangle {
@@ -83,6 +83,7 @@ Rectangle {
                                 height: 3
                                 radius: Theme.round(6, width, height)
                                 color: Qt.alpha(Theme.base, 0.5)
+                                GlassRim {}
                             }
 
                             Label {
@@ -94,10 +95,12 @@ Rectangle {
                                 font.pixelSize: Theme.fontSize - 2
                                 font.bold: true
                             }
+                            GlassRim {}
                         }
                     }
                 }
             }
         }
     }
+    GlassRim {}
 }

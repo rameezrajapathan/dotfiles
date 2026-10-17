@@ -107,6 +107,7 @@ SettingsPage {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: FontThemes.apply(card.modelData)
                         }
+                        GlassRim {}
                     }
                 }
             }
@@ -247,6 +248,7 @@ SettingsPage {
                             filled: parent.parent.modelData.filled
                             size: 28
                         }
+                        GlassRim {}
                     }
                 }
             }

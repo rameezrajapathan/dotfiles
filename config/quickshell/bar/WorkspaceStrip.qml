@@ -132,15 +132,15 @@ Item {
                     radius: Theme.round(root.style === "boxes" ? 7 : Math.min(width, height) / 2, width, height)
                     color: {
                         if (root.style === "boxes")
-                            return ws.active ? Theme.accent : ws.used || !root.opts.markOccupied ? Qt.alpha(Theme.surface, 0.9) : "transparent";
+                            return ws.active ? Theme.selectedFill : ws.used || !root.opts.markOccupied ? Qt.alpha(Theme.surface, 0.9) : "transparent";
                         if (dotLike) {
                             if (ws.active && !(root.style === "dots" && root.glides))
-                                return Theme.accent;
+                                return Theme.selectedFill;
                             if (ws.alert)
                                 return Theme.red;
                             return !root.opts.markOccupied || ws.used ? Qt.alpha(Theme.text, 0.75) : "transparent";
                         }
-                        return Theme.accent;
+                        return Theme.selectedFill;
                     }
                     border.width: (dotLike || root.style === "boxes") && !ws.used && !ws.active && root.opts.markOccupied ? 1.5 : 0
                     border.color: ws.alert ? Theme.red : Qt.alpha(Theme.text, 0.35)
@@ -155,7 +155,7 @@ Item {
                         || root.style === "icons" && !ws.used
                     text: ws.text
                     color: ws.active
-                        ? (root.style === "underline" ? Theme.accent : root.style === "icons" ? Theme.text : Theme.accentText)
+                        ? (root.style === "underline" ? Theme.selectedFill : root.style === "icons" ? Theme.text : Theme.selectedText)
                         : ws.restColor
                     font.bold: ws.active
                     font.pixelSize: root.style === "pills" ? Math.round(11 * root.size)

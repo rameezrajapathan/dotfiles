@@ -192,6 +192,7 @@ Item {
                             }
                         }
                     }
+                    GlassRim {}
                 }
             }
         }
