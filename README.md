@@ -48,6 +48,9 @@ the items you pick ([more](docs/desktop.md#the-bar)).
 
 - **Colors from the wallpaper**: the bar, terminal, Neovim, btop, cava, VS Code, Firefox, GTK and
   Qt/KDE apps, lock screen and keyboard lights follow it. Bright wallpapers give a light theme, black and white ones a grey theme.
+- **Liquid glass**: the bar, panels, windows and terminal turn translucent together, with a rim of
+  light and a slight refraction at the edges. Frosted by default, or Clear, Off or your own mix in
+  Settings > Appearance > Glass ([more](docs/theming.md#liquid-glass)).
 - **A bar your way**: by default one minimal pill with workspaces, the clock (a live spectrum while
   music plays) and your profile picture, which opens a control center: quick tiles,
   sliders, music, notifications and more at a glance, in one column, a three-column Bento or

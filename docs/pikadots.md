@@ -96,5 +96,5 @@ packages.txt  pacman packages; aur.txt: AUR packages
 
 The shell (`config/quickshell/`) is split by role: `bar/`, `controlcenter/`,
 `panels/` (control center pages), `overlays/` (launcher, overview, switcher, OSD, popups),
-`lock/`, `settings/` (the Settings app), `services/` (singletons: state and system access) and
-`widgets/` (shared controls). Files import other folders as `import qs.<folder>`.
+`lock/`, `settings/` (the Settings app), `services/` (singletons: state and system access),
+`widgets/` (shared controls) and `shaders/` (the glass shader and its compiled `.qsb`). Files import other folders as `import qs.<folder>`.
