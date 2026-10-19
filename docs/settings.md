@@ -8,7 +8,7 @@ window: categories on the left, one page at a time on the right. Everything appl
 Enter or a click opens the page, scrolls to the setting and highlights it. Esc clears the search,
 then closes the window.
 
-![Appearance page](screenshots/settings-appearance-v3.webp)
+![Appearance page](screenshots/settings-appearance-v4.webp)
 
 ## Pages
 
@@ -37,7 +37,7 @@ then closes the window.
 | Updates | `updates` | pikadots (what's new on the remote, local changes and unpushed commits; Update runs `pikadots update` in a terminal) and system packages (pacman via checkupdates, AUR via yay/paru, Flatpak; Update system runs in a terminal), check interval and notifications |
 | About | `about` | This machine and versions |
 
-![Fonts & icons page](screenshots/settings-fonts-v3.webp)
+![Fonts & icons page](screenshots/settings-fonts-v4.webp)
 
 ## Where choices are kept
 
@@ -93,7 +93,7 @@ them for your user, for example
 
 ## Bar
 
-![Bar page](screenshots/settings-bar-v3.webp)
+![Bar page](screenshots/settings-bar-v4.webp)
 
 A style sets the layout, size, spacing, outline and items all at once
 (`quickshell/services/BarStyles.qml`); changing any of them makes it "Custom", and the last custom setup
@@ -108,7 +108,7 @@ Pictures of all ten styles are in [desktop.md](desktop.md#the-bar).
 
 ## Control center
 
-![Control center page](screenshots/settings-controlcenter-v3.webp)
+![Control center page](screenshots/settings-controlcenter-v4.webp)
 
 Three layouts, each drawn on its card: **One glance** (one column, the default), **Bento** (three
 columns) and **Custom**. Changing a widget or the column count while a ready-made layout is on
@@ -122,14 +122,14 @@ both tile widgets. Kept in `settings.json` as `controlCenter: { style, custom, t
 
 ## Effects
 
-![Effects page](screenshots/settings-effects-v3.webp)
+![Effects page](screenshots/settings-effects-v4.webp)
 
 Blur, transparency, shadows and motion. *How panels open* picks one of six styles (Slide, Morph,
 Spring, Liquid, Reveal, Fade), each with a live preview, plus a speed.
 
 ## Window rules
 
-![Window rules page](screenshots/settings-rules-v3.webp)
+![Window rules page](screenshots/settings-rules-v4.webp)
 
 Each rule is one line (the app, and what the rule does in a few words) with ▶ to open the app, ✎ to
 expand it for editing and 🗑 to delete it; new rules open expanded. Rules apply to windows opened

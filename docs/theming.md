@@ -25,13 +25,13 @@ The thresholds are at the top of `main()` in that script.
 
 | Colorful → dark | Bright → light |
 |---|---|
-| ![](screenshots/theme-dark-v3.webp) | ![](screenshots/theme-light-v3.webp) |
+| ![](screenshots/theme-dark-v4.webp) | ![](screenshots/theme-light-v4.webp) |
 | **Black and white → grey** | **Bright black and white → light grey** |
-| ![](screenshots/theme-mono-v3.webp) | ![](screenshots/theme-mono-light-v3.webp) |
+| ![](screenshots/theme-mono-v4.webp) | ![](screenshots/theme-mono-light-v4.webp) |
 
 ## What gets recolored
 
-![Firefox, VS Code and superfile in the wallpaper's colors](screenshots/apps-v3.webp)
+![Firefox, VS Code and superfile in the wallpaper's colors](screenshots/apps-v4.webp)
 
 | App | Updates |
 |---|---|

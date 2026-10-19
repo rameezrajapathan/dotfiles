@@ -3,28 +3,28 @@
 A Hyprland desktop for Arch Linux and CachyOS that takes its colors from the wallpaper, with a
 Quickshell bar and a `pikadots` command to install, check, repair and update it.
 
-![Floating Neovim, fastfetch, cava, btop and peaclock under the bar's pill, all in the wallpaper's colors](docs/screenshots/desktop-v3.webp)
+![Neovim, btop, fastfetch, cava and peaclock on a clean grid under the bar's pill, all in the wallpaper's colors](docs/screenshots/desktop-v4.webp)
 
 ## One desktop, any wallpaper
 
 | | |
 |---|---|
-| ![Dark theme from a colorful wallpaper](docs/screenshots/theme-dark-v3.webp) | ![Light theme from a bright wallpaper](docs/screenshots/theme-light-v3.webp) |
-| ![Grey theme from a black and white forest photo](docs/screenshots/theme-mono-v3.webp) | ![Light grey theme from a black and white mountain photo](docs/screenshots/theme-mono-light-v3.webp) |
+| ![Dark theme from a colorful wallpaper](docs/screenshots/theme-dark-v4.webp) | ![Light theme from a bright wallpaper](docs/screenshots/theme-light-v4.webp) |
+| ![Grey theme from a black and white forest photo](docs/screenshots/theme-mono-v4.webp) | ![Light grey theme from a black and white mountain photo](docs/screenshots/theme-mono-light-v4.webp) |
 
 Apps follow too: Firefox (Pywalfox), VS Code (its own Pikadots theme) and superfile, next to kitty,
 Neovim, btop, cava and the GTK and Qt apps.
 
-![Firefox, VS Code and superfile in the wallpaper's colors](docs/screenshots/apps-v3.webp)
+![Firefox, VS Code and superfile in the wallpaper's colors](docs/screenshots/apps-v4.webp)
 
 ## Screenshots
 
 | | |
 |---|---|
-| ![Control center](docs/screenshots/controlcenter-v3.webp) Control center (Super + S) | ![Launcher](docs/screenshots/launcher-v3.webp) Launcher (Super + A) |
-| ![Wallpaper picker](docs/screenshots/wallpaper-v3.webp) Wallpapers (Super + Shift + W) | ![Power menu](docs/screenshots/power-v3.webp) Power menu (Super + Escape) |
-| ![Keyboard shortcuts](docs/screenshots/cheatsheet-v3.webp) Shortcuts (Super + ?) | ![Lock screen](docs/screenshots/lock-v3.webp) Lock screen (Super + L) |
-| ![Settings: Appearance](docs/screenshots/settings-appearance-v3.webp) Settings (Super + ,) | ![Settings: Window rules](docs/screenshots/settings-rules-v3.webp) Window rules |
+| ![Control center](docs/screenshots/controlcenter-v4.webp) Control center (Super + S) | ![Launcher](docs/screenshots/launcher-v4.webp) Launcher (Super + A) |
+| ![Wallpaper picker](docs/screenshots/wallpaper-v4.webp) Wallpapers (Super + Shift + W) | ![Power menu](docs/screenshots/power-v4.webp) Power menu (Super + Escape) |
+| ![Keyboard shortcuts](docs/screenshots/cheatsheet-v4.webp) Shortcuts (Super + ?) | ![Overview](docs/screenshots/overview-v4.webp) Overview (Super + Tab) |
+| ![Settings: Appearance](docs/screenshots/settings-appearance-v4.webp) Settings (Super + ,) | ![Settings: Window rules](docs/screenshots/settings-rules-v4.webp) Window rules |
 
 ## Bar styles
 
@@ -33,16 +33,16 @@ the items you pick ([more](docs/desktop.md#the-bar)).
 
 | Style | |
 |---|---|
-| **Minimalist**<br>one pill | ![Minimalist bar: One pill in the middle. The original.](docs/screenshots/bar-minimalist-v3.webp) |
-| **Focus**<br>one pill | ![Focus bar: Only the time. Nothing to pull you away.](docs/screenshots/bar-focus-v3.webp) |
-| **Everyday**<br>islands | ![Everyday bar: Friendly and familiar: apps, date, battery, sound. No tech clutter.](docs/screenshots/bar-everyday-v3.webp) |
-| **On the go**<br>one pill | ![On the go bar: A small pill for laptops: Wi-Fi, battery and time.](docs/screenshots/bar-onthego-v3.webp) |
-| **Music lover**<br>islands | ![Music lover bar: What's playing up front, sound and Bluetooth close at hand.](docs/screenshots/bar-music-v3.webp) |
-| **Developer**<br>full width | ![Developer bar: Window title, CPU and memory, tray and meetings.](docs/screenshots/bar-developer-v3.webp) |
-| **Islands**<br>islands | ![Islands bar: A pill on each side and one in the middle.](docs/screenshots/bar-islands-v3.webp) |
-| **Floating**<br>full width | ![Floating bar: A full bar with space around it.](docs/screenshots/bar-floating-v3.webp) |
-| **Classic**<br>full width | ![Classic bar: Edge to edge and square, like a traditional desktop.](docs/screenshots/bar-classic-v3.webp) |
-| **Maximalist**<br>full width | ![Maximalist bar: Everything, all at once.](docs/screenshots/bar-maximalist-v3.webp) |
+| **Minimalist**<br>one pill | ![Minimalist bar: One pill in the middle. The original.](docs/screenshots/bar-minimalist-v4.webp) |
+| **Focus**<br>one pill | ![Focus bar: Only the time. Nothing to pull you away.](docs/screenshots/bar-focus-v4.webp) |
+| **Everyday**<br>islands | ![Everyday bar: Friendly and familiar: apps, date, battery, sound. No tech clutter.](docs/screenshots/bar-everyday-v4.webp) |
+| **On the go**<br>one pill | ![On the go bar: A small pill for laptops: Wi-Fi, battery and time.](docs/screenshots/bar-onthego-v4.webp) |
+| **Music lover**<br>islands | ![Music lover bar: What's playing up front, sound and Bluetooth close at hand.](docs/screenshots/bar-music-v4.webp) |
+| **Developer**<br>full width | ![Developer bar: Window title, CPU and memory, tray and meetings.](docs/screenshots/bar-developer-v4.webp) |
+| **Islands**<br>islands | ![Islands bar: A pill on each side and one in the middle.](docs/screenshots/bar-islands-v4.webp) |
+| **Floating**<br>full width | ![Floating bar: A full bar with space around it.](docs/screenshots/bar-floating-v4.webp) |
+| **Classic**<br>full width | ![Classic bar: Edge to edge and square, like a traditional desktop.](docs/screenshots/bar-classic-v4.webp) |
+| **Maximalist**<br>full width | ![Maximalist bar: Everything, all at once.](docs/screenshots/bar-maximalist-v4.webp) |
 
 ## Features
 
