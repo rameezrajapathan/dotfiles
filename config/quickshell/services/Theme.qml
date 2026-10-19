@@ -62,10 +62,14 @@ Singleton {
     readonly property int barSpaceX: barVertical ? barHeight : 0
     readonly property int barSpaceY: barVertical ? 0 : barHeight
     readonly property int barGap: Math.min(Settings.bar.gap, Math.floor((barHeight - 24) / 2))
-    readonly property int pillHeight: barHeight - 2 * barGap
+    readonly property bool barAttached: Settings.bar.attached === true
+    readonly property int barEdgeGap: barAttached ? 0 : barGap
+    readonly property int barCrossStart: barPosition === "top" || barPosition === "left" ? barEdgeGap : barGap
+    readonly property int pillHeight: barHeight - barGap - barEdgeGap
     readonly property int pillInset: Math.max(5, Math.round((pillHeight - 28) / 2))
     readonly property int pillCircle: pillHeight - 2 * pillInset
     readonly property real pillRadius: round(pillHeight / 2, pillHeight, pillHeight)
+    readonly property int barEar: barAttached ? Math.max(6, Math.round(Math.min(pillRadius, 14 * Math.max(0.5, roundness)))) : 0
     readonly property string iconFont: "Material Symbols " + Settings.appearance.iconStyle
     readonly property int iconSize: 20
     readonly property int iconWeight: Settings.appearance.iconWeight

@@ -20,9 +20,13 @@ PanelWindow {
         left: edge !== "right"
         right: edge !== "left"
     }
-    implicitHeight: Theme.barHeight
-    implicitWidth: Theme.barHeight
+    implicitHeight: Theme.barHeight + Theme.barEar
+    implicitWidth: Theme.barHeight + Theme.barEar
+    exclusiveZone: Theme.barHeight
     color: "transparent"
+    mask: Region {
+        item: layout
+    }
 
     CalendarPanel {
         id: calendarPanel
@@ -82,7 +86,11 @@ PanelWindow {
     }
 
     BarLayout {
-        anchors.fill: parent
+        id: layout
+        x: bar.edge === "right" ? parent.width - width : 0
+        y: bar.edge === "bottom" ? parent.height - height : 0
+        width: Theme.barVertical ? Theme.barHeight : parent.width
+        height: Theme.barVertical ? parent.height : Theme.barHeight
         opacity: (Panels.covered[bar.screen.name] ?? 0) > 0 ? 0 : 1
         settingsActive: controlCenter.open
         onAction: name => {

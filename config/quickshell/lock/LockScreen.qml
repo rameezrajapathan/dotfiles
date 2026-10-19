@@ -127,7 +127,7 @@ Item {
         Rectangle {
             id: statusPill
             anchors.horizontalCenter: parent.horizontalCenter
-            y: root.shown ? (Theme.barHeight - Theme.pillHeight) / 2 : -height
+            y: root.shown ? Theme.barGap : -height
             Behavior on y { NumberAnimation { duration: Theme.ms(700); easing.type: Easing.OutQuint } }
             width: statusRow.implicitWidth + 2 * Theme.pillInset + 8
             height: Theme.pillHeight

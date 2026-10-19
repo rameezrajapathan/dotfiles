@@ -60,11 +60,12 @@ Item {
     readonly property Item shape: bar.shapes[anchor.index] ?? bar.shapes[1]
     readonly property real shapeX: shape.along
     readonly property real shapeWidth: shape.size
-    readonly property real shapeTop: Theme.barGap
+    readonly property real shapeTop: Theme.barEdgeGap
     readonly property real shapeHeight: Theme.pillHeight
     readonly property real shapeBottom: shapeTop + shapeHeight
     readonly property real shapeRadius: Theme.pillRadius
     readonly property real reach: ear + radius + 4
+    readonly property real overscan: Theme.barAttached ? 16 : 0
 
     readonly property bool pillFlushLeft: shapeX < reach
     readonly property bool pillFlushRight: length - shapeX - shapeWidth < reach
@@ -120,59 +121,77 @@ Item {
     GlassSurface {
         id: background
         visible: root.covering
-        width: root.length
-        height: root.shapeBottom + Math.max(root.sheetDepth, root.curHeight)
+        width: root.length + 2 * root.overscan
+        height: root.shapeBottom + Math.max(root.sheetDepth, root.curHeight) + root.overscan
         tint: root.color
         band: 16
-        transform: Matrix4x4 { matrix: root.edgeMatrix }
+        transform: Matrix4x4 {
+            matrix: root.edgeMatrix.times(Qt.matrix4x4(1, 0, 0, -root.overscan, 0, 1, 0, -root.overscan, 0, 0, 1, 0, 0, 0, 0, 1))
+        }
 
         Item {
-            x: root.curX
-            y: root.shapeBottom
-            width: root.curWidth
-            height: root.curHeight
-            clip: true
+            x: root.overscan
+            y: root.overscan
 
-            Rectangle {
-                y: root.slide
-                width: parent.width
-                height: root.shapeNow.reveal || root.shapeNow.h >= 1 ? root.sheetDepth : root.curHeight
-                color: background.solid
-                opacity: root.shapeNow.body
-                radius: root.radius
-                topLeftRadius: root.strip || root.flushLeft ? 0 : root.radius * root.topRound
-                topRightRadius: root.strip || root.flushRight ? 0 : root.radius * root.topRound
-                transform: Scale {
-                    origin.x: root.curWidth / 2
-                    xScale: root.shapeNow.bodyScale
-                    yScale: root.shapeNow.bodyScale
+            Item {
+                x: root.curX
+                y: root.shapeBottom
+                width: root.curWidth
+                height: root.curHeight
+                clip: true
+
+                Rectangle {
+                    y: root.slide
+                    width: parent.width
+                    height: root.shapeNow.reveal || root.shapeNow.h >= 1 ? root.sheetDepth : root.curHeight
+                    color: background.solid
+                    opacity: root.shapeNow.body
+                    radius: root.radius
+                    topLeftRadius: root.strip || root.flushLeft ? 0 : root.radius * root.topRound
+                    topRightRadius: root.strip || root.flushRight ? 0 : root.radius * root.topRound
+                    transform: Scale {
+                        origin.x: root.curWidth / 2
+                        xScale: root.shapeNow.bodyScale
+                        yScale: root.shapeNow.bodyScale
+                    }
                 }
             }
-        }
 
-        Rectangle {
-            readonly property real r: root.shapeRadius
-            readonly property real square: r * (1 - root.shown)
-            x: root.shapeX
-            y: root.shapeTop
-            width: root.shapeWidth
-            height: root.shapeHeight + (root.strip ? 0 : 2 * root.shown)
-            color: background.solid
-            topLeftRadius: r
-            topRightRadius: r
-            bottomLeftRadius: root.strip && !root.flushLeft ? r : square
-            bottomRightRadius: root.strip && !root.flushRight ? r : square
-        }
+            Rectangle {
+                readonly property real r: root.shapeRadius
+                readonly property real square: r * (1 - root.shown)
+                x: root.shapeX
+                y: root.shapeTop - root.overscan
+                width: root.shapeWidth
+                height: root.shapeHeight + root.overscan + (root.strip ? 0 : 2 * root.shown)
+                color: background.solid
+                topLeftRadius: Theme.barAttached ? 0 : r
+                topRightRadius: Theme.barAttached ? 0 : r
+                bottomLeftRadius: root.shape.flushStart ? 0 : root.strip && !root.flushLeft ? r : square
+                bottomRightRadius: root.shape.flushEnd ? 0 : root.strip && !root.flushRight ? r : square
+            }
 
-        Ear {
-            visible: !root.flushLeft
-            x: root.strip ? root.curX - size + 1 : root.shapeX - size + 1
-            mirrored: false
-        }
-        Ear {
-            visible: !root.flushRight
-            x: root.strip ? root.curX + root.curWidth - 1 : root.shapeX + root.shapeWidth - 1
-            mirrored: true
+            BarEars {
+                along: root.shapeX
+                size: root.shapeWidth
+                thickness: root.shapeBottom
+                ear: Theme.barEar
+                flushStart: root.shape.flushStart
+                flushEnd: root.shape.flushEnd
+                overscan: root.overscan
+                color: background.solid
+            }
+
+            Ear {
+                visible: !root.flushLeft
+                x: root.strip ? root.curX - size + 1 : root.shapeX - size + 1
+                mirrored: false
+            }
+            Ear {
+                visible: !root.flushRight
+                x: root.strip ? root.curX + root.curWidth - 1 : root.shapeX + root.shapeWidth - 1
+                mirrored: true
+            }
         }
     }
 

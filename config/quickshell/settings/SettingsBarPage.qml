@@ -155,8 +155,8 @@ SettingsPage {
         }
         SettingsRow {
             icon: "vertical_align_top"
-            title: "Space at the edge"
-            description: "0 sticks the bar to the screen's edge."
+            title: Settings.bar.attached ? "Space before windows" : "Space at the edge"
+            description: Settings.bar.attached ? "Room between the bar and windows." : "0 sticks the bar to the screen's edge."
             SettingsSlider {
                 from: 0
                 to: 12
@@ -166,7 +166,16 @@ SettingsPage {
             }
         }
         SettingsRow {
-            visible: Settings.bar.layout !== "pill"
+            icon: "rounded_corner"
+            title: "Attached to the edge"
+            description: "The bar grows out of the screen's edge, with curved corners where it meets it."
+            Switch {
+                checked: Settings.bar.attached
+                onToggled: Settings.bar.attached = !checked
+            }
+        }
+        SettingsRow {
+            visible: Settings.bar.layout !== "pill" && !Settings.bar.attached
             icon: "settings_ethernet"
             title: "Space at the sides"
             SettingsSlider {
@@ -179,6 +188,7 @@ SettingsPage {
             }
         }
         SettingsRow {
+            visible: !Settings.bar.attached
             icon: "border_style"
             title: "Outline"
             description: "A thin line around the bar's shapes."

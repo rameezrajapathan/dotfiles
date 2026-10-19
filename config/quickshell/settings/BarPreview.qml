@@ -8,10 +8,13 @@ Item {
     property var config
     readonly property real k: 0.42
 
-    readonly property real barH: Math.max(8, (config.height - 2 * Math.min(config.gap, (config.height - 24) / 2)) * k)
-    readonly property real gap: Math.min(config.gap, (config.height - 24) / 2) * k
-    readonly property real side: config.layout === "pill" ? 0 : config.sideGap * k + 3
+    readonly property bool attached: config.attached ?? Settings.bar.attached
+    readonly property real innerGap: Math.min(config.gap, (config.height - 24) / 2)
+    readonly property real barH: Math.max(8, (config.height - (attached ? 1 : 2) * innerGap) * k)
+    readonly property real gap: attached ? 0 : innerGap * k
+    readonly property real side: config.layout === "pill" ? 0 : attached ? 0 : config.sideGap * k + 3
     readonly property real r: Theme.round(barH / 2, barH, barH)
+    readonly property real ear: attached ? Math.max(3, Math.min(r, 6)) : 0
     readonly property var sections: {
         if (config.layout !== "pill")
             return [config.left, config.center, config.right];
@@ -43,12 +46,30 @@ Item {
     }
 
     component Shape: Rectangle {
+        id: shape
+        readonly property bool flushStart: root.attached && x < 1
+        readonly property bool flushEnd: root.attached && x + width > root.width - 1
         y: root.gap
         height: root.barH
         radius: root.r
+        topLeftRadius: root.attached ? 0 : root.r
+        topRightRadius: root.attached ? 0 : root.r
+        bottomLeftRadius: flushStart ? 0 : root.r
+        bottomRightRadius: flushEnd ? 0 : root.r
         color: Theme.base
-        border.width: root.config.border ? 1 : 0
+        border.width: root.config.border && !root.attached ? 1 : 0
         border.color: Qt.alpha(Theme.overlay, 0.6)
+
+        BarEars {
+            x: -shape.x
+            along: shape.x
+            size: shape.width
+            thickness: shape.height
+            ear: root.ear
+            flushStart: shape.flushStart
+            flushEnd: shape.flushEnd
+            color: shape.color
+        }
     }
 
     Shape {

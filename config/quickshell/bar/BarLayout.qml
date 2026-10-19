@@ -12,7 +12,7 @@ Item {
     readonly property bool strip: layout === "full"
     readonly property bool vertical: Theme.barVertical
     readonly property real length: vertical ? height : width
-    readonly property real sideGap: layout === "pill" ? 0 : Settings.bar.sideGap
+    readonly property real sideGap: layout === "pill" || Theme.barAttached ? 0 : Settings.bar.sideGap
     readonly property real padding: Theme.pillInset + Math.round((1 - Math.min(1, Theme.roundness)) * 6)
     readonly property var shapes: [shape0, shape1, shape2]
     readonly property var rows: [row0, row1, row2]
@@ -76,7 +76,7 @@ Item {
     }
     BarRow {
         id: row1
-        readonly property real gapBetween: root.strip ? 24 : 2 * root.padding + 10
+        readonly property real gapBetween: root.strip ? 24 : 2 * root.padding + 10 + 2 * Theme.barEar
         readonly property real minAlong: row0.visible && row0.hasContent ? row0.along + row0.length + gapBetween : 0
         readonly property real maxAlong: row2.visible && row2.hasContent ? row2.along - gapBetween - length : root.length - length
         along: Math.round(Math.max(minAlong, Math.min(maxAlong, (root.length - length) / 2)))

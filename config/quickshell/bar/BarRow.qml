@@ -24,8 +24,8 @@ GridLayout {
     flow: vertical ? GridLayout.TopToBottom : GridLayout.LeftToRight
     rowSpacing: vertical ? 10 : 0
     columnSpacing: vertical ? 0 : 12
-    x: vertical ? Theme.barGap + (Theme.pillHeight - width) / 2 : along
-    y: vertical ? along : Theme.barGap + (Theme.pillHeight - height) / 2
+    x: vertical ? Theme.barCrossStart + (Theme.pillHeight - width) / 2 : along
+    y: vertical ? along : Theme.barCrossStart + (Theme.pillHeight - height) / 2
 
     function dividerShown(index) {
         let before = false;

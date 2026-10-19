@@ -211,6 +211,7 @@ Singleton {
                 property int gap: 4
                 property int sideGap: 8
                 property bool border: false
+                property bool attached: false
                 property var custom: null
                 property bool musicBars: true
                 property bool clock24: false
