@@ -30,8 +30,8 @@ Singleton {
 
     readonly property bool active: preset !== "off" && !Toggles.gameMode
     readonly property bool neutral: active && !Settings.glass.color
-    readonly property real tint: values.tint ?? fallback.tint
-    readonly property real card: values.card ?? fallback.card
+    readonly property real tint: forMode(values.tint ?? fallback.tint)
+    readonly property real card: forMode(values.card ?? fallback.card)
     readonly property real rim: active ? values.rim ?? 0 : 0
     readonly property real refraction: active ? values.refraction ?? 0 : 0
     readonly property real chroma: values.chroma ?? 0
@@ -42,14 +42,23 @@ Singleton {
     readonly property color rimColor: Qt.rgba(1, 1, 1, light ? 0.95 : 0.6)
     readonly property color rimShade: light ? Qt.rgba(0, 0, 0, 0.08) : Qt.rgba(1, 1, 1, 0.05)
     readonly property color shadowColor: light ? Qt.rgba(0, 0, 0, 0.18) : Qt.rgba(0, 0, 0, 0.45)
+    readonly property bool flat: !active
+    readonly property color outline: light ? Qt.rgba(0, 0, 0, 0.14) : Qt.rgba(1, 1, 1, 0.12)
+    readonly property bool panelShadows: shadows || flat
+    readonly property color panelShadow: flat ? (light ? Qt.rgba(0, 0, 0, 0.12) : Qt.rgba(0, 0, 0, 0.4)) : shadowColor
 
     readonly property string wallpaper: {
         const match = /^\s*path\s*=\s*(.+?)\s*$/m.exec(wallpaperConf.text() ?? "");
         return match ? "file://" + match[1].replace(/^~(?=\/)/, Quickshell.env("HOME")) : "";
     }
 
+    function forMode(a) {
+        return light && active ? 1 - (1 - a) * 0.55 : a;
+    }
+
     function value(key) {
-        return values[key] ?? fallback[key];
+        const v = values[key] ?? fallback[key];
+        return ["window", "view", "popover", "terminal"].includes(key) ? forMode(v) : v;
     }
 
     function setPreset(name) {
@@ -93,7 +102,7 @@ Singleton {
 
     Timer {
         id: applyTimer
-        interval: 700
+        interval: 300
         onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/theme.sh", "--glass"])
     }
 

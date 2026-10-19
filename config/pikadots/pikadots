@@ -344,7 +344,7 @@ generate_colors() {
 		palette=$(python3 -I "$HOME/.config/hypr/scripts/theme-palette.py" "$img") &&
 			matugen image "$img" --mode "$(jq -r .theme.mode <<<"$palette")" \
 				--type "$(jq -r .theme.scheme <<<"$palette")" --source-color-index 0 \
-				--import-json-string "$palette" --quiet &&
+				--import-json-string "$(jq -c --arg wallpaper "$img" '. + {wallpaper: $wallpaper}' <<<"$palette")" --quiet &&
 			ok "colors from ${img/#$HOME/\~}" || bad "matugen failed"
 	fi
 }

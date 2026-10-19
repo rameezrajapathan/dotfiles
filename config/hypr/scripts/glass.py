@@ -33,6 +33,20 @@ def resolve():
     return values
 
 
+def for_mode(values, mode):
+    if mode != "light" or values["preset"] == "off":
+        return values
+    lift = lambda a: 1 - (1 - a) * 0.55
+    values = dict(values)
+    for key in ("window", "view", "popover", "terminal", "tint", "card"):
+        if key in values:
+            values[key] = lift(values[key])
+    values["inactiveOpacity"] = 1 - (1 - values["inactiveOpacity"]) * 0.5
+    values["brightness"] = max(values["brightness"], 1.0) + 0.08
+    values["vibrancy_darkness"] = 0.0
+    return values
+
+
 def hexa(a):
     return f"{max(0, min(255, round(a * 255))):02x}"
 
@@ -100,7 +114,7 @@ def lua(values, mode):
         f"\t\t\t\tsize = {int(values['blurSize'])},\n"
         f"\t\t\t\tpasses = {int(values['blurPasses'])},\n"
         f"\t\t\t\tvibrancy = {values['vibrancy']},\n"
-        "\t\t\t\tvibrancy_darkness = 0.2,\n"
+        f"\t\t\t\tvibrancy_darkness = {values.get('vibrancy_darkness', 0.2)},\n"
         f"\t\t\t\tnoise = {values['noise']},\n"
         f"\t\t\t\tcontrast = {values['contrast']},\n"
         f"\t\t\t\tbrightness = {values['brightness']},\n"
@@ -128,7 +142,7 @@ def lua(values, mode):
 def main():
     command = sys.argv[1] if len(sys.argv) > 1 else "json"
     mode = sys.argv[2] if len(sys.argv) > 2 else "dark"
-    values = resolve()
+    values = for_mode(resolve(), mode)
     if command == "json":
         print(json.dumps(matugen(values, mode)))
     elif command == "lua":

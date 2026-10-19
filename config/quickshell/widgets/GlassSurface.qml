@@ -7,7 +7,7 @@ Item {
     default property alias shape: holder.data
     property color tint: Theme.baseTranslucent
     property real band: 14
-    property real rim: Glass.rim
+    property real rim: Glass.flat ? 1 / 0.35 : Glass.rim
     property real refraction: Glass.refraction
     property bool lens: true
     property bool shadow: true
@@ -19,7 +19,7 @@ Item {
     property bool fill: backdropItem !== null
     readonly property bool shaderReady: effect.status !== ShaderEffect.Error
     readonly property color solid: shaderReady ? "white" : Qt.rgba(tint.r, tint.g, tint.b, 1)
-    readonly property real pad: shadow && Glass.shadows ? shadowSpread + Math.max(Math.abs(shadowOffset.x), Math.abs(shadowOffset.y)) : 2
+    readonly property real pad: shadow && Glass.panelShadows ? shadowSpread + Math.max(Math.abs(shadowOffset.x), Math.abs(shadowOffset.y)) : 2
 
     property vector4d backdropA: Qt.vector4d(0, 0, 0, 0)
     property vector4d backdropB: Qt.vector4d(0, 0, 0, 0)
@@ -127,16 +127,16 @@ Item {
         property vector4d backdropA: root.backdropA
         property vector4d backdropB: root.backdropB
         property color tint: root.tint
-        property color rimColor: Glass.rimColor
-        property color shadowColor: root.shadow && Glass.shadows ? Glass.shadowColor : "transparent"
-        property point lightDir: root.itemLight
+        property color rimColor: Glass.flat ? Glass.outline : Glass.rimColor
+        property color shadowColor: root.shadow && Glass.panelShadows ? Glass.panelShadow : "transparent"
+        property point lightDir: Glass.flat ? Qt.point(0, 0) : root.itemLight
         property point shadowOffset: root.shadowOffset
         property real band: root.band
         property real rim: root.rim
         property real refraction: root.refraction
         property real chroma: Glass.chroma
         property real lens: root.lens && root.mapped && wall.status === Image.Ready ? 1 : 0
-        property real shadowSpread: root.shadow && Glass.shadows ? root.shadowSpread : 0
+        property real shadowSpread: root.shadow && Glass.panelShadows ? root.shadowSpread : 0
         property real fill: root.fill ? 1 : 0
     }
 }

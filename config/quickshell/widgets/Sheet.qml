@@ -44,9 +44,13 @@ Item {
     readonly property real sheetDepth: vertical ? sheetWidth : sheetHeight
 
     property var anchor: ({ index: bar.strip ? 0 : 1, cx: length / 2 })
-    onOpenChanged: {
-        if (open)
+    function measureAnchor() {
+        if (open && length > 0)
             anchor = bar.anchorFor(anchorIds);
+    }
+    onLengthChanged: Qt.callLater(measureAnchor)
+    onOpenChanged: {
+        measureAnchor();
         const style = PanelMotion.info(motion);
         motionAnim.stop();
         motionAnim.to = open ? 1 : 0;

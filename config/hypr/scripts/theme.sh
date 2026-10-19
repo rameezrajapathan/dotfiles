@@ -27,19 +27,26 @@ else
 	img=$current
 fi
 
+small=$state/wallpaper-small.png
+stamp="$img $(stat -c %Y "$img" 2>/dev/null)"
+if [[ ! -s $small || $(cat "$state/wallpaper-small.src" 2>/dev/null) != "$stamp" ]]; then
+	magick -define jpeg:size=1024x1024 "$img[0]" -resize '512x512>' "$small"
+	printf '%s' "$stamp" >"$state/wallpaper-small.src"
+fi
+
 settings=~/.config/pikadots/settings.json
 THEME_MODE=$(jq -r '.appearance.themeMode // "auto"' "$settings" 2>/dev/null || echo auto)
 THEME_SCHEME=$(jq -r '.appearance.scheme // "auto"' "$settings" 2>/dev/null || echo auto)
 glass_neutral=$(jq -r 'if ((.glass.preset // "frosted") != "off") and ((.glass.color // false) | not) then "yes" else "no" end' "$settings" 2>/dev/null || echo no)
 [[ $glass_neutral == yes && ! -e ${XDG_RUNTIME_DIR:-/tmp}/pikadots-gamemode ]] && THEME_SCHEME=monochrome
 export THEME_MODE THEME_SCHEME
-palette=$(python3 -I ~/.config/hypr/scripts/theme-palette.py "$img")
+palette=$(python3 -I ~/.config/hypr/scripts/theme-palette.py "$small")
 mode=$(jq -r .theme.mode <<<"$palette")
 scheme=$(jq -r .theme.scheme <<<"$palette")
 python3 -I ~/.config/hypr/scripts/glass.py lua "$mode" || true
 glass=$(python3 -I ~/.config/hypr/scripts/glass.py json "$mode" 2>/dev/null || echo '{}')
-palette=$(jq -c --argjson glass "$glass" '. + $glass' <<<"$palette")
-matugen image "$img" --mode "$mode" --type "$scheme" --source-color-index 0 \
+palette=$(jq -c --argjson glass "$glass" --arg wallpaper "$img" '. + $glass + {wallpaper: $wallpaper}' <<<"$palette")
+matugen image "$small" --mode "$mode" --type "$scheme" --source-color-index 0 \
 	--import-json-string "$palette" --quiet
 
 sed '/^\[palettes\.main\]/,$d' ~/.config/starship.toml >"$state/starship.toml.tmp"

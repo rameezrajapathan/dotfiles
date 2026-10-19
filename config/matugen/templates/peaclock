@@ -1,6 +1,6 @@
 style background clear
 style active-bg {{colors.primary.default.hex}}
-style inactive-bg {{colors.surface_container_high.default.hex}}
+style inactive-bg clear
 style colon-bg {{colors.tertiary.default.hex}}
 style active-fg clear
 style inactive-fg clear

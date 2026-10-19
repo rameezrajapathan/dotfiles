@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 theme=$HOME/.local/state/theme/cmatrix
-[[ -r $theme && -t 1 ]] || exec /usr/bin/cmatrix "$@"
+[[ -t 1 ]] || exec /usr/bin/cmatrix "$@"
+terminfo=$HOME/.local/state/pikadots/terminfo
+clear=$TERM-clearbg
+if TERMINFO_DIRS="$terminfo" infocmp "$clear" >/dev/null 2>&1 || {
+	mkdir -p "$terminfo"
+	printf '%s,\n\tsetab=\\E[%%?%%p1%%{0}%%=%%t49%%e%%p1%%{8}%%<%%t4%%p1%%d%%e%%p1%%{16}%%<%%t10%%p1%%{8}%%-%%d%%e48;5;%%p1%%d%%;m,\n\tuse=%s,\n' "$clear" "$TERM" |
+		tic -x -o "$terminfo" - 2>/dev/null
+}; then
+	export TERM=$clear TERMINFO_DIRS="$terminfo:${TERMINFO_DIRS:-}"
+fi
+[[ -r $theme ]] || exec /usr/bin/cmatrix "$@"
 mapfile -t seq <"$theme"
 printf "${seq[0]}"
 trap 'printf "${seq[1]}"' EXIT
