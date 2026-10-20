@@ -9,7 +9,7 @@ Start with `pikadots health`, then `pikadots repair`.
 | Hyprland config errors | `hyprctl reload && hyprctl configerrors` |
 | Bar missing or stuck | `qs kill; setsid -f ~/.config/hypr/scripts/shell.sh` (starts it with your icon theme) |
 | Bar errors | `qs log` |
-| A display setting left a screen unusable | **reset** in the Displays tab, or `rm ~/.local/state/pikadots/monitors.lua && hyprctl reload` |
+| A display setting left a screen unusable | The reset button (circular arrow) on that screen's card in the Displays tab, shown once a screen has saved settings, or `rm ~/.local/state/pikadots/monitors.lua && hyprctl reload` |
 | Colors not updated | `~/.config/hypr/scripts/theme.sh` |
 | Backup failed | `journalctl --user -u pikadots-backup` |
 | Notifications look plain | Another daemon (mako, dunst, swaync) took over; `pikadots repair` masks it |
@@ -20,11 +20,14 @@ Start with `pikadots health`, then `pikadots repair`.
 | Qt/KDE apps look wrong, or Plasma has the wallpaper colors | Turn Settings > Appearance > "Qt and KDE apps" off and on, or `python3 ~/.config/hypr/scripts/kde-theme.py restore` to put Plasma's back |
 | No password prompt appears | `qs log \| grep -i polkit`; if the shell couldn't register, hyprpolkitagent should be running (`pgrep hyprpolkitagent`) |
 | A USB drive doesn't open | Click it in the Drives tab; `udisksctl status` lists what udisks sees |
-| Game mode stuck on after a crash | `rm $XDG_RUNTIME_DIR/pikadots-gamemode && hyprctl reload` |
+| Game mode stuck on after a crash | Turn it off in the Account tab, or `qs ipc call quicksettings gameMode`; that also resets the power profile and Do Not Disturb. Last resort: `rm $XDG_RUNTIME_DIR/pikadots-gamemode && hyprctl reload` (leaves the power profile and Do Not Disturb as game mode set them) |
 | A window rule makes an app unusable | Delete it in Settings > Window rules, or `rm ~/.local/state/pikadots/window-rules.lua && hyprctl reload` |
 | btop (or another terminal app) closes right away, "No UTF-8 locale detected" | The session locale isn't UTF-8: `localectl set-locale LANG=en_US.UTF-8` (your language with `.UTF-8`; `locale -a` lists them), then log out and back in |
 | A terminal app ignores its window rule | Open it from the launcher entry the rule made (Settings > Window rules > Terminal app), not a plain terminal: only that one has the rule's class |
 | Screen stuck zoomed in | Super + Alt + 0 |
 | Annotate or Edit does nothing | `sudo pacman -S satty` (also in `packages.txt`) |
 
-Programs start from `config/hypr/autostart.lua`, not systemd.
+Programs start from `config/hypr/autostart.lua`, not systemd. Your startup apps are in
+`~/.local/state/pikadots/autostart.lua`, started by `hypr/scripts/startup-apps.sh`. Only the
+backup timer (`pikadots-backup.timer`) and the SSH agent (`gcr-ssh-agent.socket`) are systemd
+user units.

@@ -1,0 +1,62 @@
+Window.SetBackgroundTopColor(@BASE@);
+Window.SetBackgroundBottomColor(@BASE@);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+spinner.image = Image("spinner.png");
+spinner.sprite = Sprite(spinner.image);
+spinner.angle = 0;
+prompt.sprite = Sprite();
+bullets.sprite = Sprite();
+
+fun place() {
+    cx = Window.GetX() + Window.GetWidth() / 2;
+    cy = Window.GetY() + Window.GetHeight() / 2;
+    global.logo.sprite.SetPosition(cx - global.logo.image.GetWidth() / 2, cy - global.logo.image.GetHeight() / 2 - 40, 1);
+    global.spinner.sprite.SetPosition(cx - global.spinner.image.GetWidth() / 2, cy + global.logo.image.GetHeight() / 2 + 40, 1);
+}
+
+fun refresh_callback() {
+    place();
+    global.spinner.angle += 0.1;
+    if (global.spinner.angle > 6.2832)
+        global.spinner.angle -= 6.2832;
+    global.spinner.sprite.SetImage(global.spinner.image.Rotate(global.spinner.angle));
+}
+
+fun display_normal_callback() {
+    global.spinner.sprite.SetOpacity(1);
+    global.prompt.sprite.SetOpacity(0);
+    global.bullets.sprite.SetOpacity(0);
+}
+
+fun display_password_callback(text, count) {
+    global.spinner.sprite.SetOpacity(0);
+    if (text == "")
+        text = "Password";
+    image = Image.Text(text, @TEXT@, 1);
+    global.prompt.sprite.SetImage(image);
+    global.prompt.sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - image.GetWidth() / 2, global.spinner.sprite.GetY(), 2);
+    global.prompt.sprite.SetOpacity(1);
+    dots = "";
+    for (i = 0; i < count; i++)
+        dots = dots + "●";
+    if (dots == "")
+        dots = " ";
+    image = Image.Text(dots, @ACCENT@, 1);
+    global.bullets.sprite.SetImage(image);
+    global.bullets.sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - image.GetWidth() / 2, global.spinner.sprite.GetY() + 32, 2);
+    global.bullets.sprite.SetOpacity(1);
+}
+
+fun message_callback(text) {
+    image = Image.Text(text, @SUBTEXT@, 1);
+    global.message.sprite = Sprite(image);
+    global.message.sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - image.GetWidth() / 2, Window.GetY() + Window.GetHeight() - 80, 2);
+}
+
+place();
+Plymouth.SetRefreshFunction(refresh_callback);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetMessageFunction(message_callback);

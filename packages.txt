@@ -3,6 +3,7 @@
 # Desktop
 hyprland
 quickshell
+qt6-shadertools
 hypridle
 hyprlock
 hyprpaper
@@ -82,4 +83,3 @@ libsecret
 restic
 python-icalendar
 python-recurring-ical-events
-qt6-shadertools

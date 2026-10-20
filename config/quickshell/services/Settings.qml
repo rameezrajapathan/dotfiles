@@ -62,6 +62,12 @@ Singleton {
         Quickshell.execDetached(["python3", "-I", Quickshell.env("HOME") + "/.config/hypr/scripts/kde-theme.py"]);
     }
 
+    function applyFolderColor() {
+        saveTimer.stop();
+        file.writeAdapter();
+        Quickshell.execDetached(["python3", "-I", Quickshell.env("HOME") + "/.config/hypr/scripts/folders.py", "--force"]);
+    }
+
     IpcHandler {
         target: "settings"
         function open(page: string): void {
@@ -96,9 +102,9 @@ Singleton {
                 property real roundness: 1
                 property string iconTheme: "Papirus"
                 property bool qtTheme: true
+                property bool folderAccent: false
                 property string panelAnimation: "slide"
                 property real panelSpeed: 1
-                property real panelOpacity: 0.8
                 property string themeMode: "auto"
                 property string scheme: "auto"
                 property bool gradient: false

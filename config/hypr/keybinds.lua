@@ -141,6 +141,7 @@ hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 3%- && qs ipc call osd volume"), { locked = true, repeating = true, description = "Lower volume" })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && qs ipc call osd volume"), { locked = true, description = "Toggle audio mute" })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && qs ipc call osd mic"), { locked = true, description = "Toggle microphone mute" })
+hl.bind(mod .. " + ALT + M", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && qs ipc call osd mic"), { locked = true, description = "Toggle microphone mute" })
 hl.bind(mod .. " + SHIFT + M", hl.dsp.exec_cmd("qs ipc call media toggle"), { description = "Open music player" })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs ipc call media playPause"), { locked = true, description = "Play / pause media" })

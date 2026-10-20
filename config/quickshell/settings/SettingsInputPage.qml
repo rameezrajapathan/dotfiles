@@ -6,7 +6,7 @@ import qs.widgets
 SettingsPage {
     id: root
     title: "Keyboard & mouse"
-    subtitle: "Typing, pointing and the cursor."
+    subtitle: "Typing and pointing."
 
     onShownChanged: if (shown) Hypr.refresh()
 
@@ -151,33 +151,6 @@ SettingsPage {
                 value: Hypr.value("input.touchpad.scroll_factor") ?? 1
                 suffix: "×"
                 onMoved: v => Hypr.set("input.touchpad.scroll_factor", v)
-            }
-        }
-    }
-
-    SettingsSection {
-        title: "Cursor"
-        readonly property var keys: ["pikadots.cursorTheme", "pikadots.cursorSize"]
-        canReset: root.changed(keys)
-        onReset: Hypr.reset(keys)
-
-        SettingsRow {
-            icon: "arrow_selector_tool"
-            title: "Cursor theme"
-            below: true
-            SettingsChips {
-                options: Hypr.cursorThemes.map(t => ({ value: t, label: t.replace(/[-_]/g, " ") }))
-                current: Hypr.value("pikadots.cursorTheme")
-                onPicked: v => Hypr.set("pikadots.cursorTheme", v)
-            }
-        }
-        SettingsRow {
-            icon: "format_size"
-            title: "Cursor size"
-            SettingsSegmented {
-                options: [24, 28, 32, 40, 48].map(n => ({ value: n, label: String(n) }))
-                current: Hypr.value("pikadots.cursorSize")
-                onPicked: v => Hypr.set("pikadots.cursorSize", v)
             }
         }
     }

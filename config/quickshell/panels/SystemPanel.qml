@@ -34,6 +34,21 @@ Item {
             }
         }
     }
+    property var snapshots: null
+
+    Process {
+        id: snapshotReader
+        command: [Quickshell.env("HOME") + "/.config/hypr/scripts/snapshots.sh"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.snapshots = JSON.parse(text);
+                } catch (e) {
+                    root.snapshots = null;
+                }
+            }
+        }
+    }
     property var lastCpu: null
     property real cpu: 0
 
@@ -81,7 +96,10 @@ Item {
         info = next;
     }
 
-    onShownChanged: if (shown) reader.running = true
+    onShownChanged: if (shown) {
+        reader.running = true;
+        snapshotReader.running = true;
+    }
 
     Process {
         id: reader
@@ -179,6 +197,26 @@ Item {
                 Pill {
                     icon: "backup"
                     onClicked: Quickshell.execDetached(["systemctl", "--user", "start", "--no-block", "pikadots-backup.service"])
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                visible: root.snapshots?.count != null
+                spacing: 8
+
+                Icon {
+                    name: "history"
+                    size: 18
+                    color: Date.now() / 1000 - (root.snapshots?.latest ?? 0) > 604800 ? Theme.yellow : Theme.accent
+                }
+                Label {
+                    Layout.fillWidth: true
+                    text: !root.snapshots?.count ? "No system snapshots"
+                        : "Snapshot " + root.ago(root.snapshots.latest) + "  ·  " + root.snapshots.count
+                            + (root.snapshots.source === "grub-btrfs" ? " in the boot menu" : " snapshots")
+                    color: Theme.text
+                    elide: Text.ElideRight
                 }
             }
 

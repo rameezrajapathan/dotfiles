@@ -48,6 +48,8 @@ glass=$(python3 -I ~/.config/hypr/scripts/glass.py json "$mode" 2>/dev/null || e
 palette=$(jq -c --argjson glass "$glass" --arg wallpaper "$img" '. + $glass + {wallpaper: $wallpaper}' <<<"$palette")
 matugen image "$small" --mode "$mode" --type "$scheme" --source-color-index 0 \
 	--import-json-string "$palette" --quiet
+icon_theme=$("$(dirname "$0")/icons.sh" --name "$mode")
+printf '[main]\nicon-theme=%s\n' "$icon_theme" >>"$state/fuzzel.ini"
 
 sed '/^\[palettes\.main\]/,$d' ~/.config/starship.toml >"$state/starship.toml.tmp"
 cat "$state/starship-palette.toml" >>"$state/starship.toml.tmp"
@@ -56,6 +58,13 @@ mv "$state/starship.toml.tmp" "$state/starship.toml"
 pkill -USR1 -x kitty || true
 pkill -USR1 -x cava || true
 pkill -USR2 -x btop || true
+if command -v nvim >/dev/null; then
+	for sock in "${XDG_RUNTIME_DIR:-/tmp}"/nvim.*.0; do
+		[[ -S $sock ]] || continue
+		timeout 1 nvim --server "$sock" --remote-expr \
+			"execute('if get(g:, \"colors_name\", \"\") ==# \"pikadots\" | colorscheme pikadots | endif')" >/dev/null 2>&1 || true
+	done
+fi
 if command -v pywalfox >/dev/null; then
 	for tmp in /tmp "${XDG_RUNTIME_DIR:-/tmp}"/pywalfox/*/; do
 		{ TMPDIR=$tmp pywalfox "$mode" && TMPDIR=$tmp pywalfox update; } >/dev/null 2>&1 || true
@@ -66,13 +75,13 @@ if command -v asusctl >/dev/null; then
 	[[ $scheme == scheme-monochrome ]] && accent=ffffff
 	[[ -n $accent ]] && asusctl aura effect static -c "$accent" >/dev/null 2>&1 || true
 fi
+setsid -f python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 9>&- || true
 hyprctl reload >/dev/null
 if $glass_only; then
 	python3 -I ~/.config/hypr/scripts/vscode-theme.py || true
 	python3 -I ~/.config/hypr/scripts/kde-theme.py || true
 	exit 0
 fi
-icon_theme=$("$(dirname "$0")/icons.sh" --name "$mode")
 if [[ $mode == light ]]; then
 	gtk_theme=adw-gtk3
 else

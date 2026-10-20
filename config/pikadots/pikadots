@@ -16,7 +16,9 @@ links=(
 	"fontconfig .config/fontconfig"
 	"fuzzel .config/fuzzel"
 	"git .config/git"
+	"lazygit/config.yml .config/lazygit/config.yml"
 	"btop/btop.conf .config/btop/btop.conf"
+	"mpv/mpv.conf .config/mpv/mpv.conf"
 	"cava/config .config/cava/config"
 	"superfile/config.toml .config/superfile/config.toml"
 	"superfile/hotkeys.toml .config/superfile/hotkeys.toml"
@@ -288,6 +290,34 @@ setup_zen() {
 	return 0
 }
 
+setup_mpv() {
+	command -v mpv >/dev/null || return 0
+	mkdir -p "$state"
+	[[ -e $state/mpv-font.conf ]] || : >"$state/mpv-font.conf"
+	ok "mpv follows the wallpaper colors and the shell font"
+}
+
+setup_thunderbird() {
+	local ini dir profile css js line
+	line="@import url(\"file://$HOME/.local/state/theme/thunderbird-userChrome.css\");"
+	for ini in "$HOME/.config/thunderbird/profiles.ini" "$HOME/.thunderbird/profiles.ini"; do
+		[[ -f $ini ]] || continue
+		dir=${ini%/*}
+		while IFS= read -r profile; do
+			[[ -f $dir/$profile/prefs.js ]] || continue
+			css=$dir/$profile/chrome/userChrome.css js=$dir/$profile/user.js
+			mkdir -p "${css%/*}"
+			if ! grep -qsF "$line" "$css"; then
+				{ echo "$line"; cat "$css" 2>/dev/null || true; } >"$css.tmp" && mv "$css.tmp" "$css"
+			fi
+			grep -qs legacyUserProfileCustomizations "$js" ||
+				echo 'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);' >>"$js"
+			ok "Thunderbird profile ${profile} uses the wallpaper colors (after Thunderbird restarts)"
+		done < <(sed -n 's/^Path=//p' "$ini")
+	done
+	return 0
+}
+
 setup_vscode() {
 	command -v code-oss >/dev/null || command -v code >/dev/null || command -v codium >/dev/null || return 0
 	local out line
@@ -367,6 +397,8 @@ cmd_install() {
 	enable_services
 	setup_pywalfox
 	setup_zen
+	setup_thunderbird
+	setup_mpv
 	setup_vscode
 	setup_default_apps
 	step "Colors"
@@ -410,6 +442,14 @@ cmd_uninstall() {
 		info "nothing was backed up"
 	fi
 	rm -f "$state/installed"
+	if [[ -e $greeter_conf || -d $greeter_dir ]]; then
+		step "Login screen"
+		(cmd_greeter --reset)
+	fi
+	if [[ -d $splash_dir ]]; then
+		step "Boot splash"
+		(cmd_splash --reset)
+	fi
 	step "Packages (optional)"
 	remove_packages
 	step "Done"
@@ -498,6 +538,21 @@ cmd_health() {
 		gh auth status >/dev/null 2>&1 && ok "GitHub CLI signed in" || warn "GitHub CLI not signed in (gh auth login)"
 	fi
 	[[ -f $HOME/.config/pikadots/calendar.url ]] && ok "calendar link set" || info "no calendar link (~/.config/pikadots/calendar.url)"
+	if [[ -f $repo/docs/keybindings.md ]]; then
+		local drift
+		drift=$(cmd_docs_check --summary 2>/dev/null)
+		if [[ $drift == "0 0" ]]; then
+			ok "keybinding docs match keybinds.lua"
+		elif [[ -n $drift ]]; then
+			warn "keybinding docs: ${drift% *} bind(s) undocumented, ${drift#* } row(s) with unbound keys (pikadots docs-check)"
+		fi
+	fi
+
+	step "Login and boot"
+	check_greeter
+
+	step "Snapshots"
+	check_snapshots
 
 	step "Backups"
 	local status="$state/backup.json"
@@ -540,6 +595,8 @@ cmd_repair() {
 	enable_services
 	setup_pywalfox
 	setup_zen
+	setup_thunderbird
+	setup_mpv
 	setup_vscode
 	setup_default_apps
 	step "Colors"
@@ -567,7 +624,12 @@ cmd_update() {
 		warn "no remote set; nothing to pull"
 		return
 	fi
+	if snapper_root; then
+		step "Snapshot"
+		snapshot_before_update
+	fi
 	cmd_repair
+	snapshot_after_update
 }
 
 cmd_backup_init() {
@@ -680,22 +742,285 @@ cmd_import() {
 	fi
 }
 
+snapper_root() { command -v snapper >/dev/null && [[ -f /etc/snapper/configs/root ]]; }
+
+check_snapshots() {
+	if ! command -v snapper >/dev/null; then
+		info "snapper not installed; skipped"
+		return
+	fi
+	local json source count latest age
+	json=$("$pkgdir/hypr/scripts/snapshots.sh" 2>/dev/null)
+	if [[ $(jq -r '.config // false' <<<"$json" 2>/dev/null) != true ]]; then
+		warn "snapper has no root config (sudo snapper -c root create-config /)"
+		return
+	fi
+	pacman -Q snap-pac >/dev/null 2>&1 && ok "snapper root config, snap-pac snapshots every pacman run" || ok "snapper root config"
+	source=$(jq -r .source <<<"$json")
+	if [[ -z $source ]]; then
+		info "listing snapshots needs root here, so their age isn't checked"
+		return
+	fi
+	count=$(jq -r .count <<<"$json") latest=$(jq -r '.latest // 0' <<<"$json")
+	[[ $source == grub-btrfs ]] && source=" in the boot menu" || source=""
+	if ((count == 0)); then
+		warn "no snapshots yet"
+		return
+	fi
+	age=$(($(date +%s) - latest))
+	if ((age >= 7 * 86400)); then
+		warn "latest snapshot $((age / 86400)) days ago ($count$source)"
+	elif ((age >= 48 * 3600)); then
+		ok "latest snapshot $((age / 86400)) days ago ($count$source)"
+	elif ((age >= 3600)); then
+		ok "latest snapshot $((age / 3600)) h ago ($count$source)"
+	else
+		ok "latest snapshot $((age / 60)) min ago ($count$source)"
+	fi
+}
+
+update_snapshot=
+snapshot_before_update() {
+	snapper_root || return 0
+	if pacman -Q snap-pac >/dev/null 2>&1; then
+		info "snap-pac snapshots the system around pacman, so no extra snapshot"
+		return 0
+	fi
+	update_snapshot=$(sudo snapper -c root create --type pre --cleanup-algorithm number --print-number \
+		--description "pikadots update") && ok "snapshot $update_snapshot taken (roll back with snapper or the boot menu)" ||
+		{ update_snapshot=; warn "couldn't take a snapshot; updating anyway"; }
+}
+
+snapshot_after_update() {
+	[[ -n $update_snapshot ]] || return 0
+	sudo snapper -c root create --type post --pre-number "$update_snapshot" --cleanup-algorithm number \
+		--description "pikadots update" >/dev/null && ok "snapshot after the update paired with $update_snapshot"
+}
+
+display_manager() {
+	local unit
+	unit=$(readlink -f /etc/systemd/system/display-manager.service 2>/dev/null)
+	unit=${unit##*/}
+	echo "${unit%.service}"
+}
+
+greeter_dir=/var/lib/pikadots/greeter
+greeter_conf=/etc/plasmalogin.conf.d/pikadots.conf
+greeter_kdeglobals=/var/lib/plasmalogin/.config/kdeglobals
+
+greeter_colors() {
+	grep -qs '^PikadotsApplied=true' "$HOME/.config/kdeglobals" || return 1
+	awk '
+		/^\[/ { keep = /^\[(Colors|ColorEffects):/ || /^\[WM\]/; general = /^\[General\]/; if (keep) print; next }
+		keep { print }
+		general && /^(ColorScheme|AccentColor)=/ { extra = extra $0 "\n" }
+		END { if (extra != "") printf "[General]\n%s", extra }
+	' "$HOME/.config/kdeglobals"
+}
+
+check_greeter() {
+	local dm img copy
+	dm=$(display_manager)
+	case $dm in
+	plasmalogin)
+		if [[ -f $greeter_conf ]]; then
+			img=$(wallpaper)
+			copy=$(find "$greeter_dir" -maxdepth 1 -name 'wallpaper.*' 2>/dev/null | head -1)
+			if [[ -n $img && -n $copy ]] && ! cmp -s "$img" "$copy"; then
+				warn "login screen shows an older wallpaper (pikadots greeter)"
+			else
+				ok "login screen uses the wallpaper and colors (Plasma Login Manager)"
+			fi
+		else
+			info "login screen: Plasma Login Manager defaults (pikadots greeter themes it)"
+		fi
+		;;
+	"") info "no display manager" ;;
+	*) info "login screen: $dm (pikadots greeter supports Plasma Login Manager only)" ;;
+	esac
+	if command -v plymouth-set-default-theme >/dev/null; then
+		local theme
+		theme=$(plymouth-set-default-theme 2>/dev/null)
+		[[ $theme == pikadots ]] && ok "boot splash: pikadots" || info "boot splash: ${theme:-none} (pikadots splash themes it)"
+	fi
+}
+
+cmd_greeter() {
+	printf '%spikadots greeter%s\n' "$bold" "$reset"
+	local dm img ext tmp colors
+	dm=$(display_manager)
+	[[ $dm == plasmalogin ]] ||
+		die "only Plasma Login Manager is supported (this machine uses ${dm:-no display manager})"
+	if [[ ${1:-} == --reset ]]; then
+		if [[ ! -e $greeter_conf && ! -d $greeter_dir ]]; then
+			ok "the login screen already uses its own settings"
+			return
+		fi
+		info "with sudo, this will:"
+		info "  remove $greeter_conf and $greeter_dir"
+		info "  put back the login screen's previous colors ($greeter_kdeglobals)"
+		confirm "Reset the login screen?" || exit 0
+		sudo rm -f "$greeter_conf" || die "sudo failed"
+		if sudo test -f "$greeter_dir/kdeglobals.orig"; then
+			sudo install -o plasmalogin -g plasmalogin -m 644 "$greeter_dir/kdeglobals.orig" "$greeter_kdeglobals"
+		elif sudo test -f "$greeter_dir/kdeglobals.none"; then
+			sudo rm -f "$greeter_kdeglobals"
+		fi
+		sudo rm -rf "$greeter_dir"
+		ok "login screen back to its defaults (shows at the next login)"
+		return
+	fi
+	img=$(wallpaper)
+	[[ -n $img ]] || die "no wallpaper set"
+	ext=${img##*.}
+	tmp=$(mktemp -d)
+	trap 'rm -rf "$tmp"' RETURN
+	cat >"$tmp/pikadots.conf" <<-EOF
+		[Greeter]
+		WallpaperPluginId=org.kde.image
+
+		[Greeter][Wallpaper][org.kde.image][General]
+		Image=file://$greeter_dir/wallpaper.${ext,,}
+	EOF
+	colors=$(greeter_colors) && printf '%s\n' "$colors" >"$tmp/kdeglobals"
+
+	info "with sudo, this will:"
+	info "  copy ${img/#$HOME/\~} to $greeter_dir/wallpaper.${ext,,}"
+	info "  write $greeter_conf:"
+	sed 's/^/        /' "$tmp/pikadots.conf"
+	if [[ -f $tmp/kdeglobals ]]; then
+		info "  give the login screen the wallpaper colors ($(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null | grep -q dark && echo dark || echo light), accent $(jq -r .accent "$HOME/.local/state/theme/quickshell.json" 2>/dev/null)):"
+		info "    $greeter_kdeglobals (the current one is kept for --reset)"
+	else
+		info "  colors stay as they are (the Qt/KDE theme isn't applied; Settings > Appearance)"
+	fi
+	grep -qs '^\[Greeter\]\[Wallpaper\]' /etc/plasmalogin.conf &&
+		warn "/etc/plasmalogin.conf sets its own wallpaper, which wins over pikadots.conf; clear it in System Settings > Login Screen"
+	confirm "Apply?" || exit 0
+
+	sudo install -Dm 644 "$img" "$greeter_dir/wallpaper.${ext,,}" || die "sudo failed"
+	sudo install -Dm 644 "$tmp/pikadots.conf" "$greeter_conf"
+	if [[ -f $tmp/kdeglobals ]]; then
+		if ! sudo test -e "$greeter_dir/kdeglobals.orig" && ! sudo test -e "$greeter_dir/kdeglobals.none"; then
+			if sudo test -f "$greeter_kdeglobals"; then
+				sudo cp "$greeter_kdeglobals" "$greeter_dir/kdeglobals.orig"
+			else
+				sudo touch "$greeter_dir/kdeglobals.none"
+			fi
+		fi
+		sudo install -d -o plasmalogin -g plasmalogin -m 755 "${greeter_kdeglobals%/*}"
+		sudo install -o plasmalogin -g plasmalogin -m 644 "$tmp/kdeglobals" "$greeter_kdeglobals"
+	fi
+	ok "login screen updated (shows at the next login; pikadots greeter --reset undoes it)"
+	info "run it again after changing the wallpaper"
+}
+
+splash_dir=/usr/share/plymouth/themes/pikadots
+
+rgb() { awk -v h="${1#\#}" 'BEGIN { printf "%.3f, %.3f, %.3f", strtonum("0x" substr(h, 1, 2)) / 255, strtonum("0x" substr(h, 3, 2)) / 255, strtonum("0x" substr(h, 5, 2)) / 255 }'; }
+
+splash_logo() {
+	local id f
+	id=$(sed -n 's/^LOGO=//p' /etc/os-release 2>/dev/null | tr -d '"')
+	for f in ${id:+/usr/share/icons/Papirus/64x64/apps/distributor-logo-$id.svg /usr/share/icons/$id.svg \
+		/usr/share/icons/hicolor/scalable/apps/$id.svg /usr/share/pixmaps/$id.svg /usr/share/pixmaps/$id.png} \
+		/usr/share/icons/Papirus/64x64/apps/distributor-logo-archlinux.svg /usr/share/pixmaps/archlinux-logo.svg; do
+		[[ -f $f ]] && { echo "$f"; return; }
+	done
+	return 1
+}
+
+cmd_splash() {
+	printf '%spikadots splash%s\n' "$bold" "$reset"
+	command -v plymouth-set-default-theme >/dev/null || die "plymouth isn't installed"
+	local current previous palette=$HOME/.local/state/theme/quickshell.json
+	current=$(plymouth-set-default-theme)
+	if [[ ${1:-} == --reset ]]; then
+		if [[ $current != pikadots && ! -d $splash_dir ]]; then
+			ok "the boot splash is already $current"
+			return
+		fi
+		previous=$(cat "$state/splash-previous" 2>/dev/null || cat "$splash_dir/previous" 2>/dev/null)
+		info "with sudo, this will:"
+		if [[ -n $previous ]]; then
+			info "  switch the boot splash from $current back to $previous and rebuild the initramfs"
+		else
+			info "  no earlier splash was recorded, so switch to the distribution default and rebuild the initramfs"
+		fi
+		info "  remove $splash_dir"
+		confirm "Restore ${previous:-the default splash}?" || exit 0
+		if [[ -n $previous && -d /usr/share/plymouth/themes/$previous ]]; then
+			sudo plymouth-set-default-theme -R "$previous" || die "plymouth-set-default-theme failed"
+		else
+			sudo plymouth-set-default-theme --reset --rebuild-initrd || die "plymouth-set-default-theme failed"
+			previous=$(plymouth-set-default-theme)
+		fi
+		sudo rm -rf "$splash_dir"
+		rm -f "$state/splash-previous"
+		ok "boot splash: $previous"
+		return
+	fi
+	[[ -f $palette ]] || die "no wallpaper colors yet (pikadots repair)"
+	local base text subtext accent surface logo tmp
+	base=$(jq -r .base "$palette") text=$(jq -r .text "$palette") subtext=$(jq -r .subtext "$palette")
+	accent=$(jq -r .accent "$palette") surface=$(jq -r .surface "$palette")
+	logo=$(splash_logo) || die "no distribution logo found"
+	command -v magick >/dev/null || die "imagemagick isn't installed"
+	tmp=$(mktemp -d)
+	trap 'rm -rf "$tmp"' RETURN
+	magick -background none -density 600 "$logo" -resize 160x160 -fill "$text" -colorize 100 "$tmp/logo.png" &&
+		magick -size 72x72 xc:none -fill none -strokewidth 6 -stroke "$surface" -draw 'circle 36,36 36,6' \
+			-stroke "$accent" -draw 'arc 6,6 66,66 -90,30' -depth 8 "$tmp/spinner.png" || die "couldn't draw the splash images"
+	cp "$pkgdir/plymouth/pikadots.plymouth" "$tmp/"
+	sed -e "s/@BASE@/$(rgb "$base")/g" -e "s/@TEXT@/$(rgb "$text")/g" -e "s/@SUBTEXT@/$(rgb "$subtext")/g" \
+		-e "s/@ACCENT@/$(rgb "$accent")/g" "$pkgdir/plymouth/pikadots.script" >"$tmp/pikadots.script"
+
+	info "with sudo, this will:"
+	info "  install a pikadots theme in $splash_dir: the ${logo##*/} logo over $base, spinner in $accent"
+	info "  switch the boot splash from $current to pikadots and rebuild the initramfs (takes a minute)"
+	[[ $current == pikadots ]] || info "  remember $current, so pikadots splash --reset can bring it back"
+	grep -qw splash /proc/cmdline || warn "the kernel command line has no 'splash', so the splash may not show"
+	confirm "Install the boot splash?" || exit 0
+
+	if [[ $current != pikadots ]]; then
+		mkdir -p "$state"
+		echo "$current" >"$state/splash-previous"
+	fi
+	sudo install -d "$splash_dir" || die "sudo failed"
+	sudo install -m 644 "$tmp"/{pikadots.plymouth,pikadots.script,logo.png,spinner.png} "$splash_dir/"
+	[[ -s $state/splash-previous ]] && sudo install -m 644 "$state/splash-previous" "$splash_dir/previous"
+	sudo plymouth-set-default-theme -R pikadots || die "plymouth-set-default-theme failed"
+	ok "boot splash: pikadots (pikadots splash --reset brings back $(cat "$state/splash-previous" 2>/dev/null || echo the old one))"
+	info "run it again after changing the wallpaper"
+}
+
+cmd_docs_check() {
+	python3 -I "$pkgdir/pikadots/docs-check.py" "$repo" "$@"
+}
+
 usage() {
 	cat <<'EOF'
 pikadots: install, check and maintain these dotfiles (Hyprland + Quickshell on Arch/CachyOS).
 
   pikadots install      packages, links into $HOME (existing files backed up), services, colors
-  pikadots uninstall    remove the links, restore the backed-up files, stop the services,
-                        then optionally remove the packages pikadots installed
+  pikadots uninstall    remove the links, restore the backed-up files, stop the backup timer,
+                        undo the Qt/KDE and VS Code themes, then optionally remove the packages
+                        pikadots installed
   pikadots health       check packages, links, services, configs, keyring, backups, …
   pikadots repair       fix what health finds: packages, links, services, colors, reloads
   pikadots link         link the files in config/ into $HOME (see the links table)
-  pikadots update       pull the repo, then repair if anything new came in
+  pikadots update       pull the repo, then repair if anything new came in (with a snapper
+                        snapshot first when snapper is set up and snap-pac isn't)
   pikadots backup       back up now (restic; see pikadots-backup)
   pikadots backup-init  create the backup password and repository, enable the daily backup
   pikadots export [FILE]  save the Settings app's choices, wallpaper and profile picture to one
                         file (default ~/pikadots-settings-DATE.tar.gz) to set up another machine
   pikadots import FILE  apply an exported file (or a settings.json); your current ones are backed up
+  pikadots greeter [--reset]  login screen (Plasma Login Manager) with the wallpaper and its colors;
+                        shows what it changes, asks, then uses sudo
+  pikadots splash [--reset]   boot splash (Plymouth) with the distro logo and an accent spinner;
+                        shows what it changes, asks, then uses sudo; --reset restores the old one
+  pikadots docs-check   compare config/hypr/keybinds.lua with docs/keybindings.md
 EOF
 }
 
@@ -710,6 +1035,9 @@ case ${1:-help} in
 	backup-init) cmd_backup_init ;;
 	export) cmd_export "${2:-}" ;;
 	import) cmd_import "${2:-}" ;;
+	greeter) cmd_greeter "${2:-}" ;;
+	splash) cmd_splash "${2:-}" ;;
+	docs-check) cmd_docs_check ;;
 	help | -h | --help) usage ;;
 	*) usage; exit 1 ;;
 esac

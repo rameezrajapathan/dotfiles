@@ -1,3 +1,4 @@
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import qs.services
@@ -7,6 +8,14 @@ SettingsPage {
     id: root
     title: "Fonts & icons"
     subtitle: "Pick a font theme, or choose each font yourself. Changes apply right away."
+
+    Process {
+        id: folderTool
+        property bool found: false
+        running: true
+        command: ["sh", "-c", "command -v papirus-folders"]
+        onExited: code => found = code === 0
+    }
 
     SettingsSection {
         title: "Font theme"
@@ -281,6 +290,20 @@ SettingsPage {
             IconThemePicker {
                 id: picker
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 16) }
+            }
+        }
+
+        SettingsRow {
+            visible: folderTool.found && Settings.appearance.iconTheme.startsWith("Papirus")
+            icon: "folder"
+            title: "Folder color follows accent"
+            description: "Recolors Papirus folders to the closest papirus-folders color when the wallpaper changes. Asks for your password when the color changes."
+            Switch {
+                checked: Settings.appearance.folderAccent
+                onToggled: {
+                    Settings.appearance.folderAccent = !checked;
+                    Settings.applyFolderColor();
+                }
             }
         }
     }

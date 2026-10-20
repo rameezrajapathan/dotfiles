@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=pikadots
+Description=Boot splash in the pikadots wallpaper colors
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/pikadots
+ScriptFile=/usr/share/plymouth/themes/pikadots/pikadots.script

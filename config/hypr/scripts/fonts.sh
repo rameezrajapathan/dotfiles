@@ -17,6 +17,12 @@ else
 fi
 pkill -USR1 -x kitty || true
 
+if [ -n "$ui" ]; then
+    printf 'osd-font="%s"\nsub-font="%s"\n' "$ui" "$ui" > "$state/mpv-font.conf"
+else
+    : > "$state/mpv-font.conf"
+fi
+
 if [ "$apps" = "true" ] && [ -n "$ui" ]; then
     gsettings set org.gnome.desktop.interface font-name "$ui 10"
     [ -n "$mono" ] && gsettings set org.gnome.desktop.interface monospace-font-name "$mono 10"

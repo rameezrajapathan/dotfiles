@@ -2,13 +2,23 @@ pragma Singleton
 
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import QtQuick
 
 Singleton {
     id: root
 
-    readonly property var pattern: /^(org\.mozilla\.Thunderbird|thunderbird|chrome-[a-p]+-.+)$/
+    readonly property var regexes: appList.text().split("\n").map(l => l.trim()).filter(Boolean)
+    readonly property var pattern: regexes.length ? new RegExp(regexes.map(r => `(?:${r})`).join("|")) : /(?!)/
     readonly property string workspace: "special:background"
+
+    FileView {
+        id: appList
+        path: Quickshell.env("HOME") + "/.config/hypr/background-apps.txt"
+        blockLoading: true
+        watchChanges: true
+        onFileChanged: reload()
+    }
 
     function appId(t) {
         return t?.wayland?.appId ?? t?.lastIpcObject?.class ?? "";

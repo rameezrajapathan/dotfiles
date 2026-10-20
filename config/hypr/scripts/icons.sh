@@ -34,7 +34,10 @@ theme=$(variant "$(current_mode)")
 gsettings set org.gnome.desktop.interface icon-theme "$theme"
 mkdir -p "$state"
 variant dark >"$state/icon-theme"
+fuzzel_ini=~/.local/state/theme/fuzzel.ini
+[[ -f $fuzzel_ini ]] && sed -i "s/^icon-theme=.*/icon-theme=$theme/" "$fuzzel_ini"
 python3 -I ~/.config/hypr/scripts/kde-theme.py || true
+setsid -f python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 || true
 
 if [[ ${1:-} == --restart-shell ]]; then
 	qs kill >/dev/null 2>&1 || true

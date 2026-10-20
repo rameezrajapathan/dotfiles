@@ -41,7 +41,12 @@ PACKAGE = {
                 "id": "pikadots.glass",
                 "description": "See-through background of the transparent Code - OSS window",
                 "defaults": {"dark": "#131314d9", "light": "#f8f9fad9", "highContrast": "#000000"},
-            }
+            },
+            {
+                "id": "pikadots.popover",
+                "description": "See-through background of menus, pickers and dialogs in the transparent Code - OSS window",
+                "defaults": {"dark": "#131314c2", "light": "#f8f9fac2", "highContrast": "#000000"},
+            },
         ],
     },
 }
@@ -132,6 +137,10 @@ def settings_keys():
         "editor.cursorBlinking": "smooth",
         "editor.cursorSmoothCaretAnimation": "on",
         "terminal.integrated.cursorStyle": "block",
+        "terminal.integrated.cursorBlinking": True,
+        "terminal.integrated.smoothScrolling": True,
+        "editor.smoothScrolling": True,
+        "workbench.list.smoothScrolling": True,
         "editor.padding": {"top": 12, "bottom": 12},
     }
     font = mono_font()
@@ -176,6 +185,7 @@ def apply():
     if theme is None:
         return
     for themes in glob.glob(os.path.join(HOME, ".vscode*/extensions", f"{EXT_ID}-*", "themes")):
+        write_if_changed(os.path.join(os.path.dirname(themes), "package.json"), json.dumps(PACKAGE, indent=2))
         target = os.path.join(themes, "pikadots.json")
         try:
             with open(target) as f:
@@ -199,33 +209,80 @@ GLASS_CODE = os.path.join(HOME, ".local/bin/code")
 GLASS_DESKTOP = os.path.join(HOME, ".local/share/applications/code-oss.desktop")
 MARK = "pikadots: transparent Code - OSS"
 
-CLEAR = """editor-background editorGutter-background minimap-background editorOverviewRuler-background
+CLEAR = """editorGutter-background minimap-background editorOverviewRuler-background
 breadcrumb-background editorGroupHeader-tabsBackground editorGroupHeader-noTabsBackground
 editorGroup-emptyBackground titleBar-activeBackground titleBar-inactiveBackground
-activityBar-background sideBar-background sideBarSectionHeader-background panel-background
-panelSectionHeader-background outputView-background auxiliaryBar-background statusBar-background
-statusBar-noFolderBackground terminal-background welcomePage-background""".split()
+activityBar-background sideBar-background sideBarSectionHeader-background sideBarTitle-background
+panel-background panelSectionHeader-background outputView-background auxiliaryBar-background
+statusBar-background statusBar-noFolderBackground terminal-background welcomePage-background
+editorPane-background surface-background modernUI-shellBackground modernUI-inactiveShellBackground
+modernActivityBar-background modernActivityBar-inactiveBackground multiDiffEditor-background
+notebook-editorBackground peekViewEditor-background peekViewEditorGutter-background
+agents-background agentsPanel-background activeSessionView-background
+inactiveSessionView-background editorStickyScroll-shadow sideBarStickyScroll-shadow panelStickyScroll-shadow
+outputViewStickyScroll-shadow terminalStickyScroll-shadow""".split()
+
+GLASSY = """editorStickyScroll-background editorStickyScrollGutter-background sideBarStickyScroll-background
+panelStickyScroll-background outputViewStickyScroll-background terminalStickyScroll-background
+peekViewEditorStickyScroll-background peekViewEditorStickyScrollGutter-background""".split()
+
+POPOVER = """quickInput-background editorWidget-background editorHoverWidget-background editorSuggestWidget-background
+menu-background notifications-background dropdown-listBackground debugExceptionWidget-background
+editorStickyScrollHover-background""".split()
+
+POPUPS = """.quick-input-widget, .monaco-editor .suggest-widget, .monaco-editor .find-widget, .monaco-hover,
+.monaco-workbench .monaco-menu-container, .context-view .monaco-menu, .monaco-dialog-box, .notification-toast,
+.notifications-center, .monaco-editor .parameter-hints-widget, .monaco-select-box-dropdown-container,
+.monaco-workbench .part.modal-editor-part""".replace("\n", " ")
 
 GLASS_CSS = (
     "html, body { background: transparent !important; }\n"
     ".monaco-workbench {\n  background-color: var(--vscode-pikadots-glass) !important;\n"
     + "".join(f"  --vscode-{v}: transparent !important;\n" for v in CLEAR)
+    + "".join(f"  --vscode-{v}: color-mix(in srgb, var(--vscode-editor-background) 25%, transparent) !important;\n" for v in GLASSY)
+    + "  --pikadots-popup: color-mix(in srgb, var(--vscode-pikadots-popover) 35%, var(--vscode-editor-background));\n"
+    + "  --pikadots-panel: color-mix(in srgb, var(--vscode-pikadots-popover) 12%, var(--vscode-editor-background));\n"
+    + "".join(f"  --vscode-{v}: var(--pikadots-popup) !important;\n" for v in POPOVER)
     + "}\n"
+    + POPUPS + " {\n  background-color: var(--pikadots-popup) !important;\n}\n"
+    ".monaco-workbench .part.modal-editor-part, .monaco-dialog-box {\n  background-color: var(--pikadots-panel) !important;\n}\n"
+    ".monaco-workbench .part .monaco-editor, .monaco-workbench .part .monaco-editor-background,\n"
+    ".monaco-workbench .part .monaco-editor .margin, .monaco-workbench .part .monaco-editor .inputarea.ime-input {\n"
+    "  background-color: transparent !important;\n}\n"
     ".monaco-workbench .part, .monaco-workbench .part > .content,\n"
     ".monaco-workbench .editor-group-container > .title, .monaco-workbench .editor-container {\n"
     "  background-color: transparent !important;\n}\n"
     ".monaco-workbench .tabs-container > .tab {\n  border-radius: 999px !important;\n  margin: 4px 2px !important;\n"
     "  height: calc(100% - 8px) !important;\n}\n"
+    ".monaco-workbench .tabs-container > .tab .tab-label, .monaco-workbench .tabs-container > .tab .tab-actions {\n"
+    "  line-height: calc(var(--editor-group-tab-height, 35px) - 8px) !important;\n}\n"
     ".monaco-workbench .tabs-container > .tab.active, .monaco-workbench .statusbar-item:hover,\n"
     ".monaco-workbench .monaco-button, .monaco-workbench .monaco-inputbox {\n"
     "  box-shadow: inset 0 1px rgba(255, 255, 255, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.10) !important;\n}\n"
     ".monaco-workbench .monaco-button, .monaco-workbench .monaco-inputbox, .monaco-workbench .statusbar-item,\n"
     ".monaco-workbench .action-item .action-label, .monaco-workbench .monaco-list-row {\n  border-radius: 999px !important;\n}\n"
-    ".monaco-workbench .quick-input-widget, .monaco-editor .suggest-widget, .monaco-editor .find-widget,\n"
-    ".monaco-workbench .monaco-hover, .monaco-workbench .monaco-menu-container, .monaco-workbench .context-view .monaco-menu {\n"
-    "  border-radius: 18px !important;\n  overflow: hidden;\n"
-    "  box-shadow: inset 0 1px rgba(255, 255, 255, 0.30), 0 0 0 1px rgba(255, 255, 255, 0.10), 0 12px 32px rgba(0, 0, 0, 0.35) !important;\n}\n"
+    + POPUPS + " {\n  border-radius: 14px !important;\n  overflow: hidden;\n"
+    "  box-shadow: inset 0 1px rgba(255, 255, 255, 0.14), 0 0 0 1px color-mix(in srgb, var(--vscode-focusBorder) 45%, transparent),\n"
+    "    0 12px 32px rgba(0, 0, 0, 0.35) !important;\n}\n"
+    ".monaco-workbench .quick-input-widget {\n  padding: 6px 6px 2px !important;\n}\n"
+    ".quick-input-widget .quick-input-header {\n  padding: 0 0 6px !important;\n}\n"
+    ".quick-input-widget .monaco-inputbox, .monaco-dialog-box .monaco-inputbox, .monaco-workbench .suggest-input-container {\n"
+    "  border-radius: 10px !important;\n}\n"
+    ".quick-input-widget .monaco-inputbox > .ibwrapper > .input {\n  padding: 7px 12px !important;\n}\n"
+    ".quick-input-widget .monaco-list-rows, .monaco-editor .suggest-widget .monaco-list-rows,\n"
+    ".monaco-select-box-dropdown-container .monaco-list-rows {\n  background: transparent !important;\n}\n"
+    ".quick-input-widget .monaco-list-row, .monaco-editor .suggest-widget .monaco-list-row,\n"
+    ".context-view .monaco-menu .action-item .action-label, .context-view .monaco-menu .action-menu-item {\n"
+    "  border-radius: 8px !important;\n}\n"
+    ".monaco-workbench .modal-editor-part {\n  --vscode-editor-background: transparent;\n"
+    "  --vscode-editorGroupHeader-tabsBackground: transparent;\n  --vscode-editorPane-background: transparent;\n"
+    "}\n"
+    ".monaco-workbench .monaco-modal-editor-block, .monaco-dialog-modal-block {\n"
+    "  background-color: rgba(0, 0, 0, 0.3) !important;\n}\n"
     ".monaco-workbench .part > .title, .monaco-workbench .pane-header {\n  border: none !important;\n}\n"
+    ".monaco-workbench .notifications-list-container .monaco-list-row {\n  border-radius: 0 !important;\n}\n"
+        ".monaco-editor .sticky-widget, .monaco-workbench .monaco-tree-sticky-container {\n"
+    "  backdrop-filter: blur(24px) saturate(1.4);\n  box-shadow: none !important;\n}\n"
 )
 
 PRELUDE = """// %s (made by hypr/scripts/vscode-theme.py from %s)

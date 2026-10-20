@@ -130,6 +130,7 @@ Singleton {
         Quickshell.execDetached(["sh", "-c", 'hyprctl setcursor "$1" "$2" >/dev/null; '
             + 'gsettings set org.gnome.desktop.interface cursor-theme "$1"; gsettings set org.gnome.desktop.interface cursor-size "$2"',
             "sh", theme, size]);
+        Settings.applyQtTheme();
     }
 
     Timer {

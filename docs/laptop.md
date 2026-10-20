@@ -12,7 +12,7 @@
 | 30 min | Suspend |
 
 These are the defaults; change them in Settings > Power (`hypr/scripts/idle.sh` writes the hypridle
-config from your choices at login). Keep awake (Account tab or the Power page) holds this off.
+config from your choices at login, and again right after you change a value there). Keep awake (Account tab or the Power page) holds this off.
 
 ## Power
 
@@ -37,7 +37,8 @@ With `asusctl` (installed automatically on ASUS laptops):
   bar's tray is ready (`hypr/scripts/startup-apps.sh`), so tray apps like OneDrive hide to the
   tray when closed. Nothing else is started at login.
 - **Thunderbird and Chrome apps** (Teams, WhatsApp) have no tray, so Super + Q hides them instead
-  of closing them. They appear in the tray pill; right click quits. The list is in
-  `hypr/background.lua`. Hidden ones come back to the current workspace when you click their
+  of closing them. They appear in the tray pill; right click quits. The list is
+  `hypr/background-apps.txt` (one window-class regex per line), read by both Hyprland and the
+  shell. Hidden ones come back to the current workspace when you click their
   tray icon, open them from the launcher or click one of their notifications. Ones added as
   Startup apps start hidden.

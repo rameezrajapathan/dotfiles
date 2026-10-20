@@ -23,8 +23,19 @@ the middle and right. Besides the ones above there are the weather (click for th
 date, the apps button (distro logo, opens the launcher), the focused window's title, now playing
 (right click plays or pauses, scroll skips), the tray, CPU and memory, network, Bluetooth (right
 click turns it on or off), sound (scroll for volume, right click mutes), battery, notifications
-(right click for Do Not Disturb), a capture button, power and dividers. Status icons open their
-control center page. See [settings.md](settings.md#bar).
+(right click for Do Not Disturb), a capture button (right click takes a region screenshot), power
+and dividers. Status icons open their control center page. Some items only show when they have
+something to show (now playing, the tray, battery on a laptop...). See
+[settings.md](settings.md#bar).
+
+The bar can sit on any edge of the screen, and can be attached to it (it grows out of the edge
+with curved corners). The workspaces item has eight styles, from a single rolling number to dots,
+pills or app icons ([settings.md](settings.md#workspaces)).
+
+While a special workspace is open over a workspace (the scratchpads on Super + F1 / F2, the
+drop-down terminal, hidden background apps), the workspaces item shows its name in a chip in the
+special color (click to hide it), and a short toast names it as it opens with the key that hides
+it (`bar/SpecialChip.qml`, `overlays/SpecialToast.qml`). Its windows get a border in that color.
 
 The ten ready-made styles (shown with music paused; while something plays, the clock turns into a
 live spectrum and Now playing shows the track):
@@ -65,14 +76,15 @@ are saved in `~/.local/state/quickshell/weather.json`. `qs ipc call weather togg
 
 ![Control center in a three-column Custom layout](screenshots/controlcenter-v4.webp)
 
-The profile picture drops down one window, attached to the bar, holding everything else as
+The profile picture opens one window, attached to the bar, holding everything else as
 widgets. Pick its layout on [Settings > Control center](settings.md#control-center):
 
 - **One glance** (the default): one column with your profile, lock/settings/power, quick tiles,
   volume and brightness, what's playing, the latest notifications, status chips (CPU, memory,
   drives, updates, GitHub, recording) and the tray.
-- **Bento**: three columns: controls; music, calendar, weather and system usage; updates,
-  notifications and shortcuts (capture, wallpaper, settings).
+- **Bento**: three columns: profile & power, small quick tiles, sliders, shortcuts (capture,
+  wallpaper, settings) and the tray; large music, calendar and weather; updates, notifications
+  and system usage.
 - **Custom**: any of the widgets in one to three columns, in your order.
 
 The quick tiles (the same set for every layout, picked on the settings page) toggle on click; the
@@ -96,7 +108,7 @@ The details pages:
 | Displays | [Displays](#displays) |
 | Drives | USB drives, SD cards and disk images (only while one is attached): click opens it in the file manager (mounting it, or asking for the passphrase of an encrypted drive), eject unmounts and powers it off, a bar shows how full it is |
 | Battery | Time left, charge limit, power mode, GPU mode on ROG laptops |
-| System | CPU, memory, GPU and disk with temperatures, busiest processes, last backup |
+| System | CPU, memory, GPU and disk with temperatures, busiest processes, last backup, and with snapper the system snapshots ("Snapshot 40 min ago · 50 in the boot menu", yellow after 7 days; [more](pikadots.md#snapshots)) |
 | Capture | Screenshot or record a region, window or screen; annotate a region (satty) or copy the text in it (tesseract). Screenshot notifications have an Edit button that opens satty |
 | GitHub | Notifications; only after `gh auth login` |
 
@@ -108,16 +120,16 @@ Super + A.
 
 Panels that come out of the bar (control center, calendar, weather, launcher, wallpaper picker,
 power menu, overview, Alt + Tab) share one animation, picked on Settings › Effects: **Slide**
-(down from under the pill, the default), **Morph** (the pill stretches into the panel), **Spring**
-(Morph with a soft overshoot), **Liquid** (widens, then pours down), **Reveal** (uncovered from the
-top) or **Fade**, at 50–200% speed. Closing is a quick ease-out in every style. `PanelMotion.qml`
+(out from under the item, the default), **Morph** (the bar's pill stretches into the panel),
+**Spring** (Morph with a soft overshoot), **Liquid** (widens, then pours out), **Reveal**
+(uncovered from the bar's side) or **Fade**, at 50–200% speed. Closing is a quick ease-out in every style. `PanelMotion.qml`
 holds the curves and shapes; `Sheet.qml` applies them.
 
 Selection highlights (launcher, Alt + Tab,
 workspace pill) glide instead of jumping. The control center, calendar, weather, launcher, wallpaper picker,
-power menu, overview (one row of workspaces) and Alt + Tab switcher come out of the bar: from the
-pill that holds the item they belong to (its bottom squares off and the panel comes out from under
-it), or from under that item on a full-width bar. Only one is open at a time: opening
+power menu, overview (one row of workspaces) and Alt + Tab switcher come out of whichever edge
+the bar is on, next to the item they belong to (on a pill, its side facing the panel squares off
+and the panel grows out of it). Only one is open at a time: opening
 another (or the cheatsheet) closes it. When the keyboard moves focus to another window (arrows, Alt
 + Tab), the mouse pointer glides there instead of jumping (Hyprland's own warps are off:
 `cursor.no_warps` in `settings.lua`, done by `CursorGlide.qml`); it stays put when the mouse did the
@@ -166,7 +178,7 @@ Apps, most used first. A first character switches mode:
 | `=` | Calculator (`=5 GiB to MB`) | Copy result | |
 | `>` | Command | Run | Run in a terminal |
 | `:` | Emoji | Copy | |
-| `~` | Projects (git repos you visit) | Default editor | Terminal there |
+| `~` | Projects (code folders you visit, [more](developer.md)) | Default editor | Terminal there |
 | `+` | Clipboard history | Copy | |
 
 In clipboard mode Ctrl + P pins a clip (or unpins it), Shift + Delete removes one and Ctrl + Shift +
@@ -187,23 +199,26 @@ login.
   already holds the session, it retries a few times, then starts hyprpolkitagent instead.
 - **Alt + Tab**: live window previews; release Alt to switch.
 - **Overview** (Super + Tab): every workspace in a row with live previews. Like Alt + Tab: hold
-  Super, Tab or Shift + Tab moves, releasing Super switches, Esc cancels.
+  Super, Tab / Shift + Tab or Left / Right moves, releasing Super or Enter switches, 1–9 jumps
+  straight to that workspace, Esc cancels. Clicking the current workspace in the bar opens it too.
 - **Drop-down terminal** (Super + \`): stays running while hidden.
 - **Wallpaper picker** (Super + Shift + W): a strip of `~/Pictures/Wallpapers`; picking one
   recolors everything ([theming.md](theming.md)).
 - **Cheatsheet** (Super + ?): every shortcut, read live from Hyprland.
+- **On-screen indicator** for volume, microphone mute, screen brightness and keyboard backlight
+  when those keys are used.
 
 ![Cheatsheet](screenshots/cheatsheet-v4.webp)
-- **Volume and brightness indicator** when those keys are used.
 
 ## Notifications
 
-Popups at the top right by default (Settings > Notifications sets the corner, size and timeout);
-hovering pauses the timeout. Critical ones stay until dismissed and get
-through Do Not Disturb (Super + Shift + N).
+Popups at the top right by default; Settings > Notifications puts them top left, top, top right,
+bottom left or bottom right and sets how long they stay, how many show at once and their width.
+With *Let apps choose how long* on, an app's own timeout wins. Hovering pauses the timeout.
+Critical ones stay until dismissed and get through Do Not Disturb (Super + Shift + N). Super + N
+opens the list (the control center's Notifications page).
 
 ## Lock screen
-
 
 Part of the shell (`quickshell/lock/Lock.qml`), split in two over the blurred wallpaper. The left half
 has the date and a big clock, now playing (controls and a live spectrum) and suspend, restart and
@@ -214,7 +229,8 @@ without input it rests: the blur softens and the right half dims to "Press any k
 mouse movement wakes it; Esc clears the pill.
 
 Locks after 10 minutes idle (Settings > Power), before suspend, or with Super + L. Settings >
-Lock screen sets the blur, rest delay and what it shows. `hypr/scripts/lock.sh` falls
+Lock screen sets the blur, rest delay and what it shows, shows the idle lock time (*Change* opens
+Settings > Power) and has a *Lock now* button. `hypr/scripts/lock.sh` falls
 back to hyprlock if the shell isn't running, and a restarted shell locks again if it crashed while
 locked.
 
@@ -239,12 +255,15 @@ open a terminal also use; `pikadots install` writes it with kitty if it's missin
 
 ## Terminal
 
-kitty with starship, eza and zoxide. Super + T opens it with fastfetch. Its font is set in
+kitty with starship, eza and zoxide. Super + T opens it with fastfetch. In zsh, `ls`, `ll`
+(long, with git status), `la` (hidden files too) and `lt` (a tree) are eza, and `cd` is zoxide, so
+`cd proj` jumps to a folder you've visited. kitty's shortcuts are in
+[keybindings.md](keybindings.md#terminal-kitty). Its font is set in
 Settings > Fonts & icons (a font theme or the terminal font). The cursor glides to
 where it jumps, with a short trail (`cursor_trail` in `config/kitty/kitty.conf`), and its
 blink fades.
 
 Terminal apps follow the wallpaper too: btop (`config/btop/btop.conf` picks the generated
-`wallpaper` theme with a transparent background), cava, peaclock, superfile and Neovim. To open one
-floating in a fixed spot, add it as a terminal app in
-[Settings > Window rules](settings.md#window-rules).
+`wallpaper` theme with a transparent background), cava, peaclock, superfile, lazygit, eza's
+listings and Neovim (with the [`pikadots` colorscheme](theming.md#neovim)). To open one floating
+in a fixed spot, add it as a terminal app in [Settings > Window rules](settings.md#window-rules).

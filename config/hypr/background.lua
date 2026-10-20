@@ -1,11 +1,42 @@
 local M = {}
 local dispatch = require("dispatch")
 
-M.classes = {
-	"^org%.mozilla%.Thunderbird$",
-	"^thunderbird$",
-	"^chrome%-%l+%-.+$",
-}
+local function lua_pattern(regex)
+	local out, class, escaped = {}, false, false
+	for c in regex:gmatch(".") do
+		if escaped then
+			table.insert(out, "%" .. c)
+			escaped = false
+		elseif c == "\\" then
+			escaped = true
+		elseif c == "-" and not class then
+			table.insert(out, "%-")
+		elseif c == "%" then
+			table.insert(out, "%%")
+		else
+			if c == "[" then
+				class = true
+			elseif c == "]" then
+				class = false
+			end
+			table.insert(out, c)
+		end
+	end
+	return table.concat(out)
+end
+
+M.regexes = {}
+M.classes = {}
+local list = io.open(os.getenv("HOME") .. "/.config/hypr/background-apps.txt")
+if list then
+	for line in list:lines() do
+		if line:match("%S") then
+			table.insert(M.regexes, line)
+			table.insert(M.classes, lua_pattern(line))
+		end
+	end
+	list:close()
+end
 
 M.workspace = "special:background"
 
@@ -44,8 +75,7 @@ end
 
 function M.start(cmds)
 	local rules = {}
-	for _, pattern in ipairs(M.classes) do
-		local regex = pattern:gsub("%%l%+", "[a-p]+"):gsub("%%(.)", "\\%1")
+	for _, regex in ipairs(M.regexes) do
 		table.insert(rules, hl.window_rule({ match = { class = regex }, workspace = M.workspace .. " silent" }))
 	end
 	for _, cmd in ipairs(cmds) do

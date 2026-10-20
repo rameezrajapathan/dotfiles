@@ -17,7 +17,7 @@ Scope {
 
     readonly property var pages: [
         { key: "appearance", group: "Personalize", title: "Appearance", icon: "palette",
-            keywords: "wallpaper colors theme dark light mode palette scheme transparency opacity roundness rounded corners radius square circle", component: appearancePage },
+            keywords: "wallpaper colors theme dark light mode palette scheme transparency opacity roundness rounded corners radius square circle cursor pointer size", component: appearancePage },
         { key: "fonts", group: "Personalize", title: "Fonts & icons", icon: "font_download",
             keywords: "font typeface text size icons weight", component: fontsPage },
         { key: "bar", group: "Personalize", title: "Bar", icon: "toolbar",
@@ -33,7 +33,7 @@ Scope {
         { key: "rules", group: "Desktop", title: "Window rules", icon: "select_window",
             keywords: "window rules float floating center size workspace opacity pin fullscreen blur app class", component: rulesPage },
         { key: "input", group: "Desktop", title: "Keyboard & mouse", icon: "keyboard",
-            keywords: "keyboard layout language repeat mouse pointer sensitivity acceleration touchpad tap scroll cursor", component: inputPage },
+            keywords: "keyboard layout language repeat mouse pointer sensitivity acceleration touchpad tap scroll", component: inputPage },
         { key: "notifications", group: "Shell", title: "Notifications", icon: "notifications",
             keywords: "notifications popups do not disturb dnd quiet hours schedule position timeout", component: notificationsPage },
         { key: "launcher", group: "Shell", title: "Launcher", icon: "apps",

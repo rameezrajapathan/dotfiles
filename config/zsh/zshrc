@@ -48,6 +48,22 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=245'
 ZSH_HIGHLIGHT_STYLES[comment]='fg=240'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=245'
 
+zmodload -F zsh/stat b:zstat
+theme_colors=~/.local/state/theme/zsh-colors.zsh
+theme_colors_mtime=
+load_theme_colors() {
+  local -a mtime
+  zstat -A mtime +mtime $theme_colors 2>/dev/null || return 0
+  [[ $mtime[1] == $theme_colors_mtime ]] && return 0
+  theme_colors_mtime=$mtime[1]
+  source $theme_colors
+}
+load_theme_colors
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd load_theme_colors
+
+[[ -f ~/.local/state/theme/lazygit.yml ]] && export LG_CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/lazygit/config.yml,$HOME/.local/state/theme/lazygit.yml"
+
 eval "$(zoxide init zsh --cmd cd)"
 
 if [[ -n $FASTFETCH ]]; then
@@ -56,4 +72,4 @@ if [[ -n $FASTFETCH ]]; then
 fi
 
 command -v mise >/dev/null && eval "$(mise activate zsh)"
-export PATH="/home/pika/.dotnetup:$PATH"
+[[ -d ~/.dotnetup ]] && path=(~/.dotnetup $path)

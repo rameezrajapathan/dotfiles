@@ -14,6 +14,8 @@ SettingsPage {
     title: "Appearance"
     subtitle: "Colors come from your wallpaper. Pick one, then fine-tune the mode and palette."
 
+    onShownChanged: if (shown) Hypr.refresh()
+
     readonly property string folder: Quickshell.env("HOME") + "/Pictures/Wallpapers"
     readonly property string current: wallpaperConf.text().match(/^\s*path\s*=\s*(.+)$/m)?.[1]?.trim().replace(/^~/, Quickshell.env("HOME")) ?? ""
 
@@ -402,6 +404,34 @@ SettingsPage {
             Switch {
                 checked: Glass.value("shadows") ?? false
                 onToggled: Glass.setCustom("shadows", !checked)
+            }
+        }
+    }
+
+    SettingsSection {
+        title: "Cursor"
+        readonly property var keys: ["pikadots.cursorTheme", "pikadots.cursorSize"]
+        canReset: keys.some(k => Hypr.changed(k))
+        onReset: Hypr.reset(keys)
+
+        SettingsRow {
+            icon: "arrow_selector_tool"
+            title: "Cursor theme"
+            description: "Themes with cursors in ~/.icons, ~/.local/share/icons or /usr/share/icons. Applies to Hyprland, GTK and Qt apps."
+            below: true
+            SettingsChips {
+                options: Hypr.cursorThemes.map(t => ({ value: t, label: t.replace(/[-_]/g, " ") }))
+                current: Hypr.value("pikadots.cursorTheme")
+                onPicked: v => Hypr.set("pikadots.cursorTheme", v)
+            }
+        }
+        SettingsRow {
+            icon: "format_size"
+            title: "Cursor size"
+            SettingsSegmented {
+                options: [24, 28, 32, 40, 48].map(n => ({ value: n, label: String(n) }))
+                current: Hypr.value("pikadots.cursorSize")
+                onPicked: v => Hypr.set("pikadots.cursorSize", v)
             }
         }
     }

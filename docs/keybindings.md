@@ -18,10 +18,10 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Super + B | Browser |
 | Super + C | Text editor |
 | Super + E | File manager |
-| Super + N | Notifications |
+| Super + N | Notifications (the control center's Notifications page) |
 | Super + Shift + N | Do Not Disturb |
-| Super + S | Control center; Esc, arrows / Tab / J K and 1–9 work inside |
-| Super + , | Settings app (appearance, desktop, shell, devices, power, apps); Ctrl+F searches |
+| Super + S | Control center; on a details page Esc, Backspace or Alt + Left goes back, Esc again closes |
+| Super + , | [Settings app](settings.md); Ctrl + F searches, Ctrl + Tab / Ctrl + Shift + Tab change page, Esc closes the page list (narrow window), clears the search, then closes |
 | Super + Ctrl + W | Weather |
 | Super + Shift + M | Music player (control center's Music tab) |
 | Super + Shift + C | Color picker (copies hex) |
@@ -34,8 +34,8 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 
 | Keys | Action |
 |---|---|
-| Alt + Tab | Switch windows |
-| Super + Tab | Switch workspaces (hold Super, Tab to move, release to switch; Shift + Tab goes back) |
+| Alt + Tab | Switch windows (hold Alt; Shift goes back) |
+| Super + Tab | Overview: hold Super, Tab / Shift + Tab or Left / Right move, release Super or Enter switches, 1–9 jumps there, Esc cancels |
 | Super + Q | Close (Thunderbird and Chrome apps hide instead) |
 | Super + F | Floating |
 | Super + Ctrl + M | Maximize |
@@ -43,10 +43,12 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Super + W | Group windows |
 | Super + Arrows | Move focus |
 | Super + Shift + Arrows | Move the window |
-| Super + J | Change split direction |
-| Super + [ / ] | Open the next window on the left / right of this one |
+| Super + J | Change split direction (dwindle layout only) |
+| Super + [ / ] | Open the next window on the left / right of this one (dwindle layout only) |
 | Super + - / = | Narrower / wider (Shift: shorter / taller) |
 | Super + left / right drag | Move / resize (or hold Super + Z / X) |
+
+The layout (dwindle, master or scrolling) is set in Settings > Windows.
 
 ## Workspaces and monitors
 
@@ -77,10 +79,35 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Print | Region → clipboard |
 | Ctrl + Print | Screen → clipboard |
 | Alt + Print | Window → clipboard |
+| Ctrl / Alt + ROG key | Screen / window → clipboard (ASUS ROG laptops) |
 | Super + Shift + F | Region → clipboard and `~/Pictures/Screenshots` |
 | Shift + Print | Region → draw on it in satty (Ctrl + C copies, Ctrl + S saves) |
 | Super + Shift + T | Text in a region → clipboard (tesseract) |
 | Super + Shift + R | Record a region (again to stop) |
 | Super + Alt + R | Record the screen (again to stop) |
 
-Recordings go to `~/Videos/Recordings`.
+Recordings include the desktop audio (the default output) and go to `~/Videos/Recordings`.
+
+## Media and hardware keys
+
+| Keys | Action |
+|---|---|
+| Volume up / down, mute | Output volume in 3% steps, with the on-screen indicator |
+| Mic mute, Super + Alt + M | Microphone on / off, with the on-screen indicator |
+| Play / pause, next, previous | The current player |
+| Brightness up / down | Screen brightness in 5% steps |
+| Keyboard backlight up / down | Keyboard brightness |
+| Closing the lid | Turns the laptop screen off when an external monitor is on; opening it brings it back |
+
+All of these except the keyboard backlight also work on the lock screen.
+
+## Terminal (kitty)
+
+| Keys | Action |
+|---|---|
+| Ctrl + T | New tab |
+| Ctrl + Shift + N | New window |
+| Ctrl + + / − / 0 | Bigger / smaller / reset text |
+| Ctrl + F2 | Move the tab's window into a window of its own |
+
+Selecting text copies it.

@@ -12,6 +12,8 @@ SETTINGS = os.path.join(HOME, ".config/pikadots/settings.json")
 BACKUP = os.path.join(HOME, ".local/state/pikadots/kdeglobals-plasma.json")
 SCHEME = os.path.join(HOME, ".local/share/color-schemes/Pikadots.colors")
 ICONS = os.path.join(HOME, ".config/hypr/scripts/icons.sh")
+KCMINPUTRC = os.path.join(HOME, ".config/kcminputrc")
+CURSOR_KEYS = ["cursorTheme", "cursorSize"]
 
 SECTIONS = [
     "Colors:Button",
@@ -58,7 +60,7 @@ def write_ini(path, sections):
         out.append(f"[{name}]")
         out += [f"{k}={v}" for k, v in entries]
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix=".kdeglobals.")
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix="." + os.path.basename(path) + ".")
     with os.fdopen(fd, "w", encoding="utf-8") as f:
         f.write("\n".join(out) + "\n")
     os.replace(tmp, path)
@@ -106,7 +108,28 @@ def snapshot(sections):
     return {
         "sections": {n: section(sections, n) for n in SECTIONS},
         "keys": {s: {k: get_key(sections, s, k) for k in keys} for s, keys in KEYS.items()},
+        "kcminputrc": cursor_snapshot(),
     }
+
+def cursor_snapshot():
+    sections = read_ini(KCMINPUTRC)
+    return {k: get_key(sections, "Mouse", k) for k in CURSOR_KEYS}
+
+def cursor_settings():
+    try:
+        with open(SETTINGS, encoding="utf-8") as f:
+            hypr = json.load(f).get("hypr", {})
+    except (OSError, ValueError, AttributeError):
+        hypr = {}
+    return str(hypr.get("pikadots.cursorTheme") or "Bibata-Modern-Ice"), str(hypr.get("pikadots.cursorSize") or 28)
+
+def set_cursor(values):
+    sections = read_ini(KCMINPUTRC)
+    if all(get_key(sections, "Mouse", k) == v for k, v in values.items()):
+        return
+    for key, value in values.items():
+        set_key(sections, "Mouse", key, value)
+    write_ini(KCMINPUTRC, sections)
 
 def put_back(sections, saved):
     for name, entries in saved["sections"].items():
@@ -192,6 +215,9 @@ def notify():
         run("--object-path", "/KGlobalSettings", "--signal", "org.kde.KGlobalSettings.notifyChange",
             str(change), "0")
     run("--object-path", "/KIconLoader", "--signal", "org.kde.KIconLoader.iconChanged", "0")
+    run("--object-path", "/kcminputrc", "--signal", "org.kde.kconfig.notify.ConfigChanged",
+        "{'Mouse': [b'cursorTheme', b'cursorSize']}")
+    run("--object-path", "/KGlobalSettings", "--signal", "org.kde.KGlobalSettings.notifyChange", "5", "0")
 
 def restore():
     sections = read_ini(KDEGLOBALS)
@@ -204,6 +230,8 @@ def restore():
         saved = None
     if saved:
         put_back(sections, saved)
+        if "kcminputrc" in saved:
+            set_cursor(saved["kcminputrc"])
     else:
         set_key(sections, *MARKER, None)
     write_ini(KDEGLOBALS, sections)
@@ -230,6 +258,9 @@ def apply():
                 if key not in saved["keys"].setdefault(name, {}):
                     saved["keys"][name][key] = get_key(sections, name, key)
                     added = True
+        if "kcminputrc" not in saved:
+            saved["kcminputrc"] = cursor_snapshot()
+            added = True
         if added:
             with open(BACKUP, "w", encoding="utf-8") as f:
                 json.dump(saved, f, indent=1)
@@ -260,6 +291,8 @@ def apply():
         set_key(sections, "KDE", "AnimationDurationFactor", "0")
     set_key(sections, *MARKER, "true")
     write_ini(KDEGLOBALS, sections)
+    theme, size = cursor_settings()
+    set_cursor({"cursorTheme": theme, "cursorSize": size})
 
     scheme = [["General", [["ColorScheme", "Pikadots"], ["Name", "Pikadots (wallpaper)"]]]]
     scheme += [[n, e] for n, e in generated.items() if n != "WM"]
