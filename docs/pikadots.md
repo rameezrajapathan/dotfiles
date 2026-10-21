@@ -36,6 +36,10 @@ pikadots help         this list
    `~/.local/state/pikadots/backups/<date>/`. `pikadots link` does only this step.
 3. Asks for your git name and email, saved to `~/.config/git/user`. `config/git` is linked as a
    whole, so the file sits in the repo folder, but `config/git/.gitignore` keeps it out of git.
+   Sets up the starship prompt, wallpaper colors for `eza`, the `ls`/`ll`/`la`/`lt` aliases,
+   zoxide (`cd`) and mise for bash, zsh, fish and nushell, whichever you use: zsh through
+   `~/.zshrc`, bash with one line added to `~/.bashrc`, fish in `~/.config/fish/conf.d`, and
+   nushell in `~/.local/share/nushell/vendor/autoload`. Other shells are left alone.
 4. Enables NetworkManager, Bluetooth, power-profiles-daemon and the SSH agent, masks other
    notification daemons (mako, dunst, swaync) so the shell shows notifications, and enables the
    daily backup timer if a restic password already exists.

@@ -524,6 +524,52 @@ git_identity() {
 	ok "git identity saved"
 }
 
+login_shell() { basename "$(getent passwd "$USER" | cut -d: -f7)"; }
+
+bash_line='[[ -f ~/.config/pikadots/pikadots.bash ]] && . ~/.config/pikadots/pikadots.bash'
+fish_conf=$HOME/.config/fish/conf.d/pikadots.fish
+nu_autoload=$HOME/.local/share/nushell/vendor/autoload
+
+shell_ready() {
+	case $1 in
+	zsh) linked zsh/zshrc .zshrc ;;
+	bash) grep -qsxF "$bash_line" "$HOME/.bashrc" && linked shell/pikadots.bash .config/pikadots/pikadots.bash ;;
+	fish) linked shell/pikadots.fish .config/fish/conf.d/pikadots.fish ;;
+	nu) linked shell/pikadots.nu .local/share/nushell/vendor/autoload/pikadots.nu ;;
+	esac
+}
+
+setup_shells() {
+	mkdir -p "$HOME/.config/pikadots"
+	ln -sfn "$pkgdir/shell/pikadots.bash" "$HOME/.config/pikadots/pikadots.bash"
+	grep -qsxF "$bash_line" "$HOME/.bashrc" || printf '\n%s\n' "$bash_line" >>"$HOME/.bashrc"
+	if has fish; then
+		mkdir -p "${fish_conf%/*}"
+		ln -sfn "$pkgdir/shell/pikadots.fish" "$fish_conf"
+	fi
+	if has nu; then
+		mkdir -p "$nu_autoload"
+		ln -sfn "$pkgdir/shell/pikadots.nu" "$nu_autoload/pikadots.nu"
+		has starship && starship init nu >"$nu_autoload/pikadots-starship.nu"
+		has zoxide && zoxide init nushell --cmd cd >"$nu_autoload/pikadots-zoxide.nu"
+		has mise && mise activate nu >"$nu_autoload/pikadots-mise.nu"
+	fi
+	local shell
+	shell=$(login_shell)
+	case $shell in
+	bash | zsh | fish | nu) ok "prompt, colors and aliases set up for $shell (your login shell)" ;;
+	*) info "your login shell is $shell; pikadots sets up bash, zsh, fish and nushell, so $shell is left alone" ;;
+	esac
+}
+
+remove_shells() {
+	[[ -f $HOME/.bashrc ]] && grep -vxF "$bash_line" "$HOME/.bashrc" >"$HOME/.bashrc.tmp" && mv "$HOME/.bashrc.tmp" "$HOME/.bashrc"
+	rm -f "$HOME/.config/pikadots/pikadots.bash"
+	[[ -L $fish_conf ]] && rm -f "$fish_conf"
+	rm -f "$nu_autoload"/pikadots*.nu
+	ok "shell setup removed (bash, fish, nushell)"
+}
+
 wallpaper() {
 	local img
 	img=$(sed -n 's/^\s*path\s*=\s*//p' "$HOME/.config/hypr/wallpaper.conf" 2>/dev/null)
@@ -578,6 +624,7 @@ cmd_install() {
 	step "Links"
 	link_packages
 	git_identity
+	setup_shells
 	step "Services"
 	enable_services
 	setup_pywalfox
@@ -618,6 +665,7 @@ cmd_uninstall() {
 		linked "$src" "$dst" || continue
 		rm "$HOME/$dst" && ok "unlinked $dst" || bad "couldn't unlink $dst"
 	done
+	remove_shells
 	step "Restore"
 	local first
 	first=$(ls -1d "$backups"/*/ 2>/dev/null | head -1)
@@ -667,6 +715,18 @@ cmd_health() {
 		[[ -e $pkgdir/$src ]] || continue
 		linked "$src" "$dst" && ok "~/$dst" || bad "~/$dst isn't linked"
 	done
+	local shell
+	shell=$(login_shell)
+	case $shell in
+	bash | zsh | fish | nu)
+		if shell_ready "$shell"; then
+			ok "$shell (your login shell) has the prompt, colors and aliases"
+		elif [[ $shell != zsh ]]; then
+			bad "$shell (your login shell) isn't set up (run repair)"
+		fi
+		;;
+	*) info "login shell $shell isn't one pikadots sets up (bash, zsh, fish, nushell)" ;;
+	esac
 
 	step "Services"
 	local s
@@ -784,6 +844,7 @@ cmd_repair() {
 	install_packages
 	step "Links"
 	link_packages
+	setup_shells
 	step "Services"
 	enable_services
 	setup_pywalfox
