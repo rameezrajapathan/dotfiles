@@ -72,3 +72,27 @@ if [[ -n $FASTFETCH ]]; then
 fi
 
 command -v mise >/dev/null && eval "$(mise activate zsh)"
+
+_pikadots_starship=${commands[starship]} _pikadots_mise=${commands[mise]} _pikadots_zoxide=${commands[zoxide]}
+_pikadots_unhook() {
+  local exit_status=$?
+  if [[ -n $_pikadots_starship && ! -x $_pikadots_starship ]]; then
+    _pikadots_starship=
+    precmd_functions=(${precmd_functions:#prompt_starship_precmd})
+    preexec_functions=(${preexec_functions:#prompt_starship_preexec})
+    PROMPT='%n@%m:%~%# ' RPROMPT= PROMPT2='> '
+  fi
+  if [[ -n $_pikadots_mise && ! -x $_pikadots_mise ]]; then
+    _pikadots_mise=
+    add-zsh-hook -d precmd _mise_hook_precmd
+    add-zsh-hook -d chpwd _mise_hook_chpwd
+  fi
+  if [[ -n $_pikadots_zoxide && ! -x $_pikadots_zoxide ]]; then
+    _pikadots_zoxide=
+    chpwd_functions=(${chpwd_functions:#__zoxide_hook})
+    __zoxide_z() { builtin cd "$@" }
+    __zoxide_zi() { builtin cd "$@" }
+  fi
+  return $exit_status
+}
+precmd_functions=(_pikadots_unhook $precmd_functions)

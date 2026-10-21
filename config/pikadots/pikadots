@@ -58,6 +58,7 @@ if [[ -t 1 ]]; then
 else
 	bold= dim= red= green= yellow= blue= reset=
 fi
+trap 'printf "\n%sinterrupted%s\n" "$yellow" "$reset" >&2; exit 130' INT
 problems=0
 step() { printf '\n%s%s::%s %s%s\n' "$bold" "$blue" "$reset$bold" "$*" "$reset"; }
 ok() { printf '  %s✓%s %s\n' "$green" "$reset" "$*"; }
@@ -688,6 +689,7 @@ cmd_uninstall() {
 	[[ $pm == dnf ]] && remove_extras
 	step "Done"
 	info "your backups, keyring and git identity are untouched"
+	info "a terminal opened before this update may show 'No such file' errors; open a new one"
 }
 
 cmd_health() {

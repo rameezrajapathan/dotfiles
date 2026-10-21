@@ -22,6 +22,35 @@ shopt -s histappend
 command -v zoxide >/dev/null && eval "$(zoxide init bash --cmd cd)"
 command -v mise >/dev/null && eval "$(mise activate bash)"
 
+_pikadots_starship=$(command -v starship) _pikadots_mise=$(command -v mise) _pikadots_zoxide=$(command -v zoxide)
+_pikadots_unhook() {
+	local status=$?
+	if [[ -n $_pikadots_starship && ! -x $_pikadots_starship ]]; then
+		_pikadots_starship=
+		starship_precmd() { eval "${STARSHIP_PROMPT_COMMAND-}"; }
+		starship_preexec() { :; }
+		starship_preexec_all() { :; }
+		PS0= PS1='\u@\h:\w\$ ' PS2='> '
+	fi
+	if [[ -n $_pikadots_mise && ! -x $_pikadots_mise ]]; then
+		_pikadots_mise=
+		_mise_hook() { :; }
+		_mise_hook_chpwd() { :; }
+	fi
+	if [[ -n $_pikadots_zoxide && ! -x $_pikadots_zoxide ]]; then
+		_pikadots_zoxide=
+		__zoxide_hook() { :; }
+		__zoxide_z() { builtin cd "$@"; }
+		__zoxide_zi() { builtin cd "$@"; }
+	fi
+	return $status
+}
+if [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == "declare -a"* ]]; then
+	PROMPT_COMMAND=(_pikadots_unhook "${PROMPT_COMMAND[@]}")
+else
+	PROMPT_COMMAND="_pikadots_unhook${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+fi
+
 if [[ -n $FASTFETCH ]]; then
 	unset FASTFETCH
 	fastfetch
