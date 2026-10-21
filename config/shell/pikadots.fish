@@ -3,6 +3,33 @@ status is-interactive; or return
 fish_add_path -g ~/.local/bin
 set -g fish_greeting
 
+set -g __pikadots_starship (command -s starship)
+set -g __pikadots_mise (command -s mise)
+set -g __pikadots_zoxide (command -s zoxide)
+function __pikadots_unhook --on-event fish_prompt
+    if test -n "$__pikadots_starship"; and not test -x "$__pikadots_starship"
+        set -g __pikadots_starship
+        functions -e fish_right_prompt __starship_reset_transient
+        function fish_prompt
+            printf '%s@%s %s> ' $USER $hostname (prompt_pwd)
+        end
+    end
+    if test -n "$__pikadots_mise"; and not test -x "$__pikadots_mise"
+        set -g __pikadots_mise
+        functions -e __mise_env_eval __mise_env_eval_on_prompt __mise_env_eval_2 __mise_cd_hook
+    end
+    if test -n "$__pikadots_zoxide"; and not test -x "$__pikadots_zoxide"
+        set -g __pikadots_zoxide
+        functions -e __zoxide_hook
+        function __zoxide_z
+            __zoxide_cd_internal $argv
+        end
+        function __zoxide_zi
+            __zoxide_cd_internal $argv
+        end
+    end
+end
+
 test -f ~/.local/state/theme/starship.toml; and set -gx STARSHIP_CONFIG ~/.local/state/theme/starship.toml
 type -q starship; and starship init fish | source
 

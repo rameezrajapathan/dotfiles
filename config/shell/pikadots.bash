@@ -35,6 +35,7 @@ _pikadots_unhook() {
 	if [[ -n $_pikadots_mise && ! -x $_pikadots_mise ]]; then
 		_pikadots_mise=
 		_mise_hook() { :; }
+		_mise_hook_prompt_command() { :; }
 		_mise_hook_chpwd() { :; }
 	fi
 	if [[ -n $_pikadots_zoxide && ! -x $_pikadots_zoxide ]]; then
