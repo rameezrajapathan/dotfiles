@@ -1,6 +1,7 @@
 pragma Singleton
 
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
 import qs.bar
@@ -18,9 +19,58 @@ Singleton {
     ]
 
     property var binds: []
+    property var entries: []
+    property var all: []
+    readonly property string luaPath: Quickshell.env("HOME") + "/.local/state/pikadots/keybinds.lua"
+
+    property string fileState: "default"
 
     function refresh() {
         reader.running = true;
+        status.running = true;
+    }
+
+    function canon(combo) {
+        const order = ["SUPER", "CTRL", "ALT", "SHIFT"];
+        const parts = combo.split("+").map(p => p.trim());
+        const key = parts.pop() ?? "";
+        const mods = parts.map(m => ({ CONTROL: "CTRL", MOD4: "SUPER", WIN: "SUPER" })[m.toUpperCase()] ?? m.toUpperCase());
+        mods.sort((a, b) => (order.indexOf(a) + 1 || 9) - (order.indexOf(b) + 1 || 9));
+        return mods.concat([key.toLowerCase()]).join(" + ");
+    }
+
+    function comboOf(mask, key) {
+        return [[64, "SUPER"], [4, "CTRL"], [8, "ALT"], [1, "SHIFT"]].filter(m => mask & m[0]).map(m => m[1]).concat([key]).join(" + ");
+    }
+
+    function owner(combo, except) {
+        const id = canon(combo);
+        return all.find(b => b.current === id && b.id !== except) ?? null;
+    }
+
+    function rebind(id, combo) {
+        if (!id)
+            return;
+        const map = Object.assign({}, Settings.keybinds);
+        if (!combo || canon(combo) === id)
+            delete map[id];
+        else
+            map[id] = combo;
+        Settings.keybinds = map;
+        const lines = ["return {"];
+        for (const k of Object.keys(map))
+            lines.push(`\t[${JSON.stringify(k)}] = ${JSON.stringify(map[k])},`);
+        lines.push("}");
+        luaFile.setText(lines.join("\n") + "\n");
+        reloadTimer.restart();
+    }
+
+    function resetAll() {
+        resetter.running = true;
+    }
+
+    function record(on) {
+        Quickshell.execDetached(["hyprctl", "dispatch", `hl.dsp.submap("${on ? "pikadots-record" : "reset"}")`]);
     }
 
     function keyName(key) {
@@ -51,9 +101,25 @@ Singleton {
     function load(json) {
         const rows = [];
         const byId = {};
+        const original = {};
+        for (const k of Object.keys(Settings.keybinds))
+            original[canon(Settings.keybinds[k])] = k;
+        const list = [];
+        const shown = [];
         for (const b of JSON.parse(json)) {
-            if (!b.has_description || b.submap !== "" || b.key === "" || b.key.startsWith("switch:"))
+            if (b.submap !== "" || b.key === "")
                 continue;
+            const current = canon(comboOf(b.modmask, b.key));
+            const entry = { id: original[current] ?? current, current: current, desc: b.description };
+            list.push(entry);
+            if (!b.has_description || b.key.startsWith("switch:"))
+                continue;
+            shown.push(Object.assign(entry, {
+                keys: modNames(b.modmask).concat([keyName(b.key)]),
+                changed: entry.id !== current,
+                editable: !b.mouse && !b.key.startsWith("mouse"),
+                group: groups.find(g => g.pattern.test(b.description)).title
+            }));
             let mask = b.modmask;
             let key = keyName(b.key);
             if (b.key === "slash" && mask & 1) {
@@ -74,11 +140,53 @@ Singleton {
                 row.alts.push(key);
             }
         }
+        all = list;
+        entries = shown;
         binds = rows.map(r => ({
             desc: r.desc,
             keys: r.mods.concat([r.alts.join(" / ")]),
             group: groups.find(g => g.pattern.test(r.desc)).title
         }));
+    }
+
+    FileView {
+        id: luaFile
+        path: root.luaPath
+        printErrors: false
+    }
+
+    Timer {
+        id: reloadTimer
+        interval: 300
+        onTriggered: Quickshell.execDetached(["hyprctl", "reload"])
+    }
+
+    Timer {
+        id: refreshTimer
+        interval: 700
+        onTriggered: root.refresh()
+    }
+
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (event.name === "configreloaded")
+                refreshTimer.restart();
+        }
+    }
+
+    Process {
+        id: status
+        command: [Quickshell.env("HOME") + "/.local/bin/pikadots", "keybinds", "status"]
+        stdout: StdioCollector {
+            onStreamFinished: root.fileState = text.trim()
+        }
+    }
+
+    Process {
+        id: resetter
+        command: [Quickshell.env("HOME") + "/.local/bin/pikadots", "keybinds", "reset"]
+        onExited: refreshTimer.restart()
     }
 
     Process {

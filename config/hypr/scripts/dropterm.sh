@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-running=$(hyprctl clients -j | jq 'any(.[]; .class == "dropterm")')
-if [[ $running != true ]]; then
+address() { hyprctl clients -j | jq -r 'first(.[] | select(.class == "dropterm") | .address) // empty'; }
+shown() { [[ $(hyprctl monitors -j | jq 'any(.[]; .specialWorkspace.name == "special:dropterm")') == true ]]; }
+
+if [[ -z $(address) ]]; then
 	"$(dirname "$0")/app.sh" terminal --app-id=dropterm &
 	for _ in $(seq 20); do
 		sleep 0.1
-		[[ $(hyprctl clients -j | jq 'any(.[]; .class == "dropterm")') == true ]] && break
+		[[ -n $(address) ]] && break
 	done
-	shown=$(hyprctl monitors -j | jq 'any(.[]; .specialWorkspace.name == "special:dropterm")')
-	[[ $shown == true ]] && exit 0
+	shown || hyprctl dispatch 'hl.dsp.workspace.toggle_special("dropterm")' >/dev/null
+else
+	hyprctl dispatch 'hl.dsp.workspace.toggle_special("dropterm")' >/dev/null
 fi
-hyprctl dispatch 'hl.dsp.workspace.toggle_special("dropterm")' >/dev/null
+shown && hyprctl dispatch "hl.dsp.focus({ window = \"address:$(address)\" })" >/dev/null

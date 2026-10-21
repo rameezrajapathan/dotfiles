@@ -27,6 +27,7 @@ Singleton {
     readonly property JsonObject accessibility: adapter.accessibility
     property alias startup: adapter.startup
     property alias windowRules: adapter.windowRules
+    property alias keybinds: adapter.keybinds
 
     signal openRequested(string page)
 
@@ -66,6 +67,13 @@ Singleton {
         saveTimer.stop();
         file.writeAdapter();
         Quickshell.execDetached(["python3", "-I", Quickshell.env("HOME") + "/.config/hypr/scripts/folders.py", "--force"]);
+    }
+
+    IpcHandler {
+        target: "keybinds"
+        function clear(): void {
+            root.keybinds = {};
+        }
     }
 
     IpcHandler {
@@ -120,6 +128,7 @@ Singleton {
             property var hypr: ({})
             property var startup: []
             property var windowRules: []
+            property var keybinds: ({})
 
             property JsonObject idle: JsonObject {
                 property int dimMinutes: 5

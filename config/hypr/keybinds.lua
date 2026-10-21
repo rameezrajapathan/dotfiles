@@ -52,6 +52,8 @@ hl.bind(mod .. " + Q", require("background").hide_or_close, { description = "Clo
 hl.bind(mod .. " + F", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating window" })
 hl.bind(mod .. " + CTRL + M", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle maximized window" })
 hl.bind(mod .. " + W", hl.dsp.group.toggle(), { description = "Toggle window group" })
+hl.bind(mod .. " + ALT + right", hl.dsp.group.next(), { description = "Next window in group" })
+hl.bind(mod .. " + ALT + left", hl.dsp.group.prev(), { description = "Previous window in group" })
 hl.bind(mod .. " + M", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen window" })
 
 hl.bind(mod .. " + left", hl.dsp.focus({ direction = "left" }), { description = "Focus window left" })
@@ -65,6 +67,8 @@ hl.bind(mod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }), { desc
 hl.bind(mod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" }), { description = "Move window right" })
 
 hl.bind(mod .. " + CTRL + left", dispatch.focus_monitor("left"), { description = "Focus monitor left" })
+hl.bind(mod .. " + CTRL + down", dispatch.focus_monitor("down"), { description = "Focus monitor down" })
+hl.bind(mod .. " + CTRL + up", dispatch.focus_monitor("up"), { description = "Focus monitor up" })
 hl.bind(mod .. " + CTRL + right", dispatch.focus_monitor("right"), { description = "Focus monitor right" })
 hl.bind(mod .. " + CTRL + H", dispatch.focus_monitor("left"), { description = "Focus monitor left" })
 hl.bind(mod .. " + CTRL + J", dispatch.focus_monitor("down"), { description = "Focus monitor down" })
@@ -84,10 +88,6 @@ hl.bind(mod .. " + Page_Down", hl.dsp.focus({ workspace = "e+1" }), { descriptio
 hl.bind(mod .. " + Page_Up", hl.dsp.focus({ workspace = "e-1" }), { description = "Switch to previous workspace" })
 hl.bind(mod .. " + U", hl.dsp.focus({ workspace = "e+1" }), { description = "Switch to next workspace" })
 hl.bind(mod .. " + I", hl.dsp.focus({ workspace = "e-1" }), { description = "Switch to previous workspace" })
-hl.bind(mod .. " + CTRL + down", hl.dsp.window.move({ workspace = "e+1" }), { description = "Move window to next workspace" })
-hl.bind(mod .. " + CTRL + up", hl.dsp.window.move({ workspace = "e-1" }), { description = "Move window to previous workspace" })
-hl.bind(mod .. " + CTRL + U", hl.dsp.window.move({ workspace = "e+1" }), { description = "Move window to next workspace" })
-hl.bind(mod .. " + CTRL + I", hl.dsp.window.move({ workspace = "e-1" }), { description = "Move window to previous workspace" })
 
 hl.bind(mod .. " + SHIFT + Page_Down", hl.dsp.window.move({ workspace = "e+1" }), { description = "Move window to next workspace" })
 hl.bind(mod .. " + SHIFT + Page_Up", hl.dsp.window.move({ workspace = "e-1" }), { description = "Move window to previous workspace" })
@@ -115,7 +115,6 @@ hl.bind(mod .. " + ALT + F2", function() dispatch.move_silently("special:magic1"
 hl.bind(mod .. " + bracketleft", dispatch.try(hl.dsp.layout("preselect l")), { description = "Preselect left split" })
 hl.bind(mod .. " + bracketright", dispatch.try(hl.dsp.layout("preselect r")), { description = "Preselect right split" })
 hl.bind(mod .. " + J", dispatch.try(hl.dsp.layout("togglesplit")), { description = "Toggle split direction" })
-hl.bind(mod .. " + CTRL + F", hl.dsp.window.fullscreen(), { description = "Toggle fullscreen window" })
 
 hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Drag window" })
 hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window" })

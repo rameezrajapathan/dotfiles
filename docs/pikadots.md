@@ -15,6 +15,7 @@ pikadots export       save your settings to one file
 pikadots import FILE  apply an exported file on this machine
 pikadots greeter [--reset]  login screen with the wallpaper (Plasma Login Manager)
 pikadots splash [--reset]   boot splash (Plymouth) in the wallpaper colors
+pikadots keybinds [status|reset]  reset restores the default keybinds.lua and clears Settings shortcut changes
 pikadots docs-check   compare keybinds.lua with docs/keybindings.md
 pikadots help         this list
 ```

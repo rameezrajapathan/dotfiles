@@ -994,6 +994,55 @@ cmd_splash() {
 	info "run it again after changing the wallpaper"
 }
 
+cmd_keybinds() {
+	local rel=config/hypr/keybinds.lua
+	local modified=0
+	if ! git -C "$repo" cat-file -e "HEAD:$rel" 2>/dev/null; then
+		modified=-1
+	elif ! git -C "$repo" diff --quiet HEAD -- "$rel"; then
+		modified=1
+	fi
+	case ${1:-status} in
+		status)
+			case $modified in
+				-1) echo unknown ;;
+				1) echo modified ;;
+				*) echo default ;;
+			esac
+			;;
+		reset)
+			step "Keybindings"
+			if ((modified == 1)); then
+				mkdir -p "$backups"
+				local copy=$backups/keybinds-$(date +%Y%m%d-%H%M%S).lua
+				cp "$repo/$rel" "$copy"
+				git -C "$repo" checkout HEAD -- "$rel" && ok "keybinds.lua restored to the default (your edited copy: $copy)"
+			elif ((modified == -1)); then
+				warn "$repo isn't a git checkout, so keybinds.lua can't be restored"
+			else
+				ok "keybinds.lua is already the default"
+			fi
+			if pgrep -x qs >/dev/null && qs ipc call keybinds clear >/dev/null 2>&1; then
+				ok "Settings shortcut changes cleared"
+			elif [[ -f $HOME/.config/pikadots/settings.json ]]; then
+				python3 -I - "$HOME/.config/pikadots/settings.json" <<'PY'
+import json, sys
+with open(sys.argv[1]) as f:
+    data = json.load(f)
+data["keybinds"] = {}
+with open(sys.argv[1], "w") as f:
+    json.dump(data, f, indent=4)
+PY
+				ok "Settings shortcut changes cleared"
+			fi
+			mkdir -p "$state"
+			printf 'return {}\n' >"$state/keybinds.lua"
+			hyprctl reload >/dev/null 2>&1 && ok "Hyprland reloaded"
+			;;
+		*) die "usage: pikadots keybinds [status|reset]" ;;
+	esac
+}
+
 cmd_docs_check() {
 	python3 -I "$pkgdir/pikadots/docs-check.py" "$repo" "$@"
 }
@@ -1020,6 +1069,9 @@ pikadots: install, check and maintain these dotfiles (Hyprland + Quickshell on A
                         shows what it changes, asks, then uses sudo
   pikadots splash [--reset]   boot splash (Plymouth) with the distro logo and an accent spinner;
                         shows what it changes, asks, then uses sudo; --reset restores the old one
+  pikadots keybinds [status|reset]  status says whether keybinds.lua differs from the repo's
+                        committed one; reset restores it (your edited copy is backed up) and
+                        clears the shortcuts changed in Settings > Keybindings
   pikadots docs-check   compare config/hypr/keybinds.lua with docs/keybindings.md
 EOF
 }
@@ -1037,6 +1089,7 @@ case ${1:-help} in
 	import) cmd_import "${2:-}" ;;
 	greeter) cmd_greeter "${2:-}" ;;
 	splash) cmd_splash "${2:-}" ;;
+	keybinds) cmd_keybinds "${2:-}" ;;
 	docs-check) cmd_docs_check ;;
 	help | -h | --help) usage ;;
 	*) usage; exit 1 ;;
