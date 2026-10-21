@@ -61,7 +61,7 @@ pipewire-pulseaudio
 wireplumber
 upower
 udisks2
-power-profiles-daemon
+ppd-service
 
 # Shell
 zsh

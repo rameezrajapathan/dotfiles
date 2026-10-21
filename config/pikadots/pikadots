@@ -42,7 +42,7 @@ system_services=(NetworkManager.service bluetooth.service power-profiles-daemon.
 other_notifiers=(mako.service dunst.service swaync.service)
 keep_packages=(networkmanager networkmanager-openvpn bluez bluez-utils pipewire-pulse wireplumber
 	upower power-profiles-daemon zsh git neovim xdg-utils xdg-user-dirs gnome-keyring libsecret
-	restic asusctl NetworkManager NetworkManager-openvpn pipewire-pulseaudio gcr curl unzip xz python3-pip)
+	restic asusctl tuned tuned-ppd NetworkManager NetworkManager-openvpn pipewire-pulseaudio gcr curl unzip xz python3-pip)
 if command -v pacman >/dev/null; then
 	pm=pacman
 elif command -v dnf >/dev/null; then
@@ -69,6 +69,14 @@ confirm() {
 	local answer
 	read -rp "  $1 [y/N] " answer
 	[[ $answer == [yY]* ]]
+}
+
+system_units() {
+	local s
+	for s in "${system_services[@]}"; do
+		[[ $s == power-profiles-daemon.service ]] && rpm -q --quiet tuned-ppd 2>/dev/null && s=tuned-ppd.service
+		echo "$s"
+	done
 }
 
 linked() {
@@ -381,7 +389,7 @@ link_packages() {
 
 enable_services() {
 	local s
-	for s in "${system_services[@]}"; do
+	for s in $(system_units); do
 		systemctl is-enabled -q "$s" 2>/dev/null && continue
 		sudo systemctl enable --now "$s" >/dev/null 2>&1 && ok "$s" || bad "couldn't enable $s"
 	done
@@ -662,7 +670,7 @@ cmd_health() {
 
 	step "Services"
 	local s
-	for s in "${system_services[@]}" ; do
+	for s in $(system_units); do
 		systemctl is-active -q "$s" && ok "$s" || bad "$s not running"
 	done
 	for s in "${services[@]}"; do
