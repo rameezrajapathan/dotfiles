@@ -49,9 +49,13 @@ Item {
             }
         }
         ShapePath {
+            id: arcPath
             fillColor: "transparent"
             strokeColor: root.dimmed ? Theme.overlay : root.tint
-            strokeGradient: root.dimmed || !Theme.gradientAccent ? null : arcGradient
+            Component.onCompleted: {
+                if ("strokeGradient" in arcPath)
+                    arcPath.strokeGradient = Qt.binding(() => root.dimmed || !Theme.gradientAccent ? null : arcGradient);
+            }
             strokeWidth: root.shown > 0.005 ? root.thickness : 0
             capStyle: ShapePath.RoundCap
             PathAngleArc {

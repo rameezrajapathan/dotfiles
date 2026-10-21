@@ -1,0 +1,9 @@
+# Fedora COPR repositories pikadots enables before installing packages-fedora.txt (Arch ignores this file)
+# lukenukem/asus-linux is added on ASUS laptops for asusctl
+
+sdegler/hyprland
+errornointernet/quickshell
+atim/starship
+atim/lazygit
+jdxcode/mise
+peterwu/rendezvous

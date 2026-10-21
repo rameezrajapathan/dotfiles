@@ -1,5 +1,29 @@
 local mod = "SUPER"
 local dispatch = require("dispatch")
+
+local ok, changed = pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/keybinds.lua")
+if not ok or type(changed) ~= "table" then
+	changed = {}
+end
+local mod_order = { SUPER = 1, CTRL = 2, ALT = 3, SHIFT = 4 }
+local function canon(combo)
+	local parts = {}
+	for part in combo:gmatch("[^+]+") do
+		parts[#parts + 1] = part:match("^%s*(.-)%s*$")
+	end
+	local key = table.remove(parts):lower()
+	table.sort(parts, function(a, b) return (mod_order[a] or 9) < (mod_order[b] or 9) end)
+	parts[#parts + 1] = key
+	return table.concat(parts, " + ")
+end
+local hl_bind = hl.bind
+hl.bind = function(combo, action, opts)
+	return hl_bind(changed[canon(combo)] or combo, action, opts)
+end
+
+hl.define_submap("pikadots-record", function()
+	hl_bind("SUPER + CTRL + ALT + SHIFT + Escape", hl.dsp.submap("reset"))
+end)
 local function script(cmd)
 	return hl.dsp.exec_cmd("~/.config/hypr/scripts/" .. cmd)
 end

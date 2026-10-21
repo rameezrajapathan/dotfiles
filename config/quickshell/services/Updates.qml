@@ -15,7 +15,7 @@ Singleton {
     readonly property string afterRun: "; qs ipc call updates check >/dev/null 2>&1; echo; read -rp 'Done. Press Enter to close… ' _"
 
     readonly property int behind: pikadots?.behind ?? 0
-    readonly property int systemCount: system ? system.pacman.length + system.aur.length + system.flatpak.length : 0
+    readonly property int systemCount: system ? system.packages.length + system.aur.length + system.flatpak.length : 0
     readonly property int count: behind + systemCount
 
     property int notifiedBehind: 0
@@ -46,7 +46,7 @@ Singleton {
 
     function updateSystem() {
         const helper = system?.helper || "";
-        const steps = [helper ? helper + " -Syu" : "sudo pacman -Syu"];
+        const steps = [helper ? helper + " -Syu" : system?.manager === "Fedora" ? "sudo dnf upgrade --refresh" : "sudo pacman -Syu"];
         if ((system?.flatpak.length ?? 0) > 0)
             steps.push("flatpak update");
         Apps.terminal(["sh", "-c", steps.join(" && ") + afterRun]);
@@ -78,7 +78,7 @@ Singleton {
     }
 
     FileView {
-        path: "/var/log/pacman.log"
+        path: root.system?.log ?? "/var/log/pacman.log"
         preload: false
         watchChanges: true
         onFileChanged: settleTimer.restart()

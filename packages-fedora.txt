@@ -1,0 +1,87 @@
+# Packages pikadots installs on Fedora (dnf, Fedora repos plus the COPRs in copr.txt). One per line; # starts a comment.
+# Not packaged for Fedora (or too old there), so pikadots downloads them instead: matugen 4, FiraCode Nerd Font, Fira Sans,
+# Material Symbols, superfile, papirus-folders, pywalfox, recurring-ical-events. wl-clip-persist is skipped.
+
+# Desktop
+hyprland
+quickshell
+qt6-qtshadertools
+hypridle
+hyprlock
+hyprpaper
+hyprpolkitagent
+hyprpicker
+hyprsunset
+xdg-desktop-portal-hyprland
+xdg-user-dirs
+ImageMagick
+adw-gtk3-theme
+papirus-icon-theme
+papirus-icon-theme-dark
+papirus-icon-theme-light
+bibata-cursor-themes
+
+# Apps and tools the shell calls
+kitty
+fuzzel
+fastfetch
+starship
+cava
+btop
+grim
+slurp
+wl-clipboard
+cliphist
+wf-recorder
+satty
+tesseract
+tesseract-langpack-eng
+jq
+brightnessctl
+libnotify
+qalculate
+unicode-emoji
+zoxide
+eza
+xdg-utils
+pavucontrol
+Thunar
+curl
+unzip
+xz
+
+# System services
+NetworkManager
+NetworkManager-openvpn
+nm-connection-editor
+zenity
+xdg-terminal-exec
+bluez
+pipewire-pulseaudio
+wireplumber
+upower
+udisks2
+ppd-service
+
+# Shell
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+
+# Developer
+git
+git-credential-libsecret
+neovim
+git-delta
+gh
+lazygit
+mise
+gnome-keyring
+seahorse
+libsecret
+gcr
+
+# Backups and calendar
+restic
+python3-icalendar
+python3-pip

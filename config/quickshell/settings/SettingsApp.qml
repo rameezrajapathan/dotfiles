@@ -63,7 +63,7 @@ Scope {
         { key: "startup", group: "System", title: "Startup apps", icon: "rocket_launch",
             keywords: "startup autostart login apps commands", component: startupPage },
         { key: "updates", group: "System", title: "Updates", icon: "system_update_alt",
-            keywords: "updates upgrade pikadots dotfiles git pull packages pacman aur flatpak", component: updatesPage },
+            keywords: "updates upgrade pikadots dotfiles git pull packages pacman aur dnf flatpak", component: updatesPage },
         { key: "about", group: "System", title: "About", icon: "info",
             keywords: "about version system hyprland quickshell kernel memory cpu", component: aboutPage }
     ]

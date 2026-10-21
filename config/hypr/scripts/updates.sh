@@ -32,14 +32,19 @@ repo_json() {
 }
 
 system_json() {
-	local pacman="[]" aur="[]" flatpak="[]" helper
-	command -v checkupdates >/dev/null && pacman=$(timeout 120 checkupdates 2>/dev/null | lines_json)
-	helper=$(command -v paru || command -v yay || true)
-	[ -n "$helper" ] && aur=$(timeout 120 "$helper" -Qua 2>/dev/null | lines_json)
+	local packages="[]" aur="[]" flatpak="[]" helper="" manager=Arch log=/var/log/pacman.log
+	if command -v pacman >/dev/null; then
+		command -v checkupdates >/dev/null && packages=$(timeout 120 checkupdates 2>/dev/null | lines_json)
+		helper=$(command -v paru || command -v yay || true)
+		[ -n "$helper" ] && aur=$(timeout 120 "$helper" -Qua 2>/dev/null | lines_json)
+	elif command -v dnf >/dev/null; then
+		manager=Fedora log=/var/log/dnf5.log
+		packages=$(timeout 180 dnf -q check-upgrade 2>/dev/null | awk 'NF == 3 && $1 ~ /\./ { sub(/\.[^.]+$/, "", $1); print $1 " " $2 }' | lines_json)
+	fi
 	command -v flatpak >/dev/null && flatpak=$(timeout 60 flatpak remote-ls --updates --columns=application,version 2>/dev/null | lines_json)
-	jq -n --argjson pacman "$pacman" --argjson aur "$aur" --argjson flatpak "$flatpak" \
-		--arg helper "$(basename "${helper:-}")" \
-		'{pacman: $pacman, aur: $aur, flatpak: $flatpak, helper: $helper}'
+	jq -n --argjson packages "$packages" --argjson aur "$aur" --argjson flatpak "$flatpak" \
+		--arg helper "$(basename "${helper:-}")" --arg manager "$manager" --arg log "$log" \
+		'{packages: $packages, aur: $aur, flatpak: $flatpak, helper: $helper, manager: $manager, log: $log}'
 }
 
 if [ "${1:-}" = repo ]; then

@@ -23,12 +23,23 @@ pikadots help         this list
 ## install
 
 1. Installs [`packages.txt`](../packages.txt) with pacman, [`aur.txt`](../aur.txt) with yay or paru
-   when present, and `asusctl` on ASUS laptops.
+   when present, and `asusctl` on ASUS laptops. On Fedora it enables the COPR repositories in
+   [`copr.txt`](../copr.txt) (plus `lukenukem/asus-linux` on ASUS laptops), installs
+   [`packages-fedora.txt`](../packages-fedora.txt) with dnf, and downloads what Fedora doesn't
+   package (or ships too old): matugen 4, `spf` (superfile) and `papirus-folders` into
+   `~/.local/bin`; FiraCode Nerd Font, Fira Sans and Material Symbols into
+   `~/.local/share/fonts/pikadots`; pywalfox and recurring-ical-events with `pip --user`.
+   `uninstall` offers to remove them again. wl-clip-persist has no Fedora package, so copied text
+   isn't kept after its app closes.
 2. Links the files in `config/` into `$HOME` (`config/hypr` → `~/.config/hypr`; the full list is the
    `links` table at the top of `config/pikadots/pikadots`). Files in the way are moved to
    `~/.local/state/pikadots/backups/<date>/`. `pikadots link` does only this step.
 3. Asks for your git name and email, saved to `~/.config/git/user`. `config/git` is linked as a
    whole, so the file sits in the repo folder, but `config/git/.gitignore` keeps it out of git.
+   Sets up the starship prompt, wallpaper colors for `eza`, the `ls`/`ll`/`la`/`lt` aliases,
+   zoxide (`cd`) and mise for bash, zsh, fish and nushell, whichever you use: zsh through
+   `~/.zshrc`, bash with one line added to `~/.bashrc`, fish in `~/.config/fish/conf.d`, and
+   nushell in `~/.local/share/nushell/vendor/autoload`. Other shells are left alone.
 4. Enables NetworkManager, Bluetooth, power-profiles-daemon and the SSH agent, masks other
    notification daemons (mako, dunst, swaync) so the shell shows notifications, and enables the
    daily backup timer if a restic password already exists.
@@ -43,7 +54,7 @@ pikadots help         this list
 
 ## health and repair
 
-`health` prints a ✓ / ! / ✗ line for: packages (and AUR packages), links, services and the
+`health` prints a ✓ / ! / ✗ line for: packages (and AUR packages, or on Fedora the downloaded fonts and tools), links, services and the
 backup timer, Hyprland config errors, Quickshell showing notifications (not another daemon),
 Quickshell running without errors, generated colors, `settings.json` being valid JSON, the glass
 shader's `.qsb` being built and newer than its source, hypridle, the Pywalfox helper, git identity,
@@ -165,6 +176,7 @@ docs/         these pages and their screenshots
 wallpapers/   copied to ~/Pictures/Wallpapers on install
 install.sh    first-time setup (runs pikadots install)
 packages.txt  pacman packages; aur.txt: AUR packages
+packages-fedora.txt  dnf packages; copr.txt: COPR repositories (Fedora)
 ```
 
 Most folders are linked whole, but some apps only get single files linked, such as

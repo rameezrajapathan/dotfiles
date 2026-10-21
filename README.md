@@ -1,6 +1,6 @@
 # pikadots
 
-A Hyprland desktop for Arch Linux and CachyOS that takes its colors from the wallpaper, with a
+A Hyprland desktop for Arch Linux, CachyOS and Fedora that takes its colors from the wallpaper, with a
 Quickshell bar and a `pikadots` command to install, check, repair and update it.
 
 ![Neovim, btop, fastfetch, cava and peaclock on a clean grid under the bar's pill, all in the wallpaper's colors](docs/screenshots/desktop-v4.webp)
@@ -79,7 +79,8 @@ edge of the screen, with the items you pick ([more](docs/desktop.md#the-bar)).
 
 ## Install
 
-Needs Arch Linux or a derivative, and a login manager with a Hyprland session.
+Needs Arch Linux or a derivative, or Fedora 43 or newer, and a login manager with a Hyprland session.
+On Fedora, Hyprland, Quickshell and a few tools come from COPR repositories ([`copr.txt`](copr.txt)).
 
 ```sh
 git clone https://github.com/rameezrajapathan/dotfiles.git ~/dotfiles

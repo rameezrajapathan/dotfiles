@@ -18,7 +18,7 @@ full) output=$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name') ;;
 esac
 
 missing() {
-	notify-send -a Screenshot -u critical "$1 isn't installed" "sudo pacman -S $2"
+	notify-send -a Screenshot -u critical "$1 isn't installed" "$(command -v dnf >/dev/null && echo "sudo dnf install" || echo "sudo pacman -S") $2"
 	exit 1
 }
 
@@ -52,7 +52,7 @@ edit)
 	edit "$last"
 	;;
 text)
-	command -v tesseract >/dev/null || missing tesseract "tesseract tesseract-data-eng"
+	command -v tesseract >/dev/null || missing tesseract "tesseract tesseract-$(command -v dnf >/dev/null && echo langpack || echo data)-eng"
 	text=$(grim ${geom:+-g "$geom"} ${output:+-o "$output"} - | tesseract stdin stdout 2>/dev/null | sed -e 's/[[:space:]]*$//' -e '/./,$!d')
 	if [[ -z $text ]]; then
 		notify-send -a Screenshot "No text found" "Try a larger or sharper area."

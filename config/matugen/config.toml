@@ -84,6 +84,10 @@ output_path = "~/.local/state/theme/cmatrix"
 input_path = "~/.config/matugen/templates/zsh-colors.zsh"
 output_path = "~/.local/state/theme/zsh-colors.zsh"
 
+[templates.eza]
+input_path = "~/.config/matugen/templates/eza-colors"
+output_path = "~/.local/state/theme/eza-colors"
+
 [templates.lazygit]
 input_path = "~/.config/matugen/templates/lazygit.yml"
 output_path = "~/.local/state/theme/lazygit.yml"

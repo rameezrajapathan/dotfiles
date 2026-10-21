@@ -14,17 +14,23 @@ Shape {
     opacity: strength
     preferredRendererType: Shape.CurveRenderer
 
+    property LinearGradient accentGradient: LinearGradient {
+        x1: 0
+        y1: 0
+        x2: root.width
+        y2: root.height
+        GradientStop { position: 0; color: Theme.accent }
+        GradientStop { position: 1; color: Theme.accentEnd }
+    }
+
     ShapePath {
+        id: borderPath
         fillColor: "transparent"
         strokeWidth: root.borderWidth
         strokeColor: Theme.accent
-        strokeGradient: LinearGradient {
-            x1: 0
-            y1: 0
-            x2: root.width
-            y2: root.height
-            GradientStop { position: 0; color: Theme.accent }
-            GradientStop { position: 1; color: Theme.accentEnd }
+        Component.onCompleted: {
+            if ("strokeGradient" in borderPath)
+                borderPath.strokeGradient = root.accentGradient;
         }
         PathRectangle {
             x: root.borderWidth / 2
