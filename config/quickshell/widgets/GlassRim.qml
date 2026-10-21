@@ -33,10 +33,14 @@ Shape {
     }
 
     ShapePath {
+        id: rimPath
         fillColor: "transparent"
         strokeWidth: root.borderWidth
         strokeColor: Glass.flat ? Glass.outline : Glass.rimColor
-        strokeGradient: Glass.flat ? null : root.rimGradient
+        Component.onCompleted: {
+            if ("strokeGradient" in rimPath)
+                rimPath.strokeGradient = Qt.binding(() => Glass.flat ? null : root.rimGradient);
+        }
         PathRectangle {
             x: root.borderWidth / 2
             y: root.borderWidth / 2
