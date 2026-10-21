@@ -232,14 +232,26 @@ live. Light and dark follow the desktop (`window.autoDetectColorScheme`). The ed
 kitty's feel: the terminal font from Settings > Fonts, a block cursor that blinks softly and
 glides, and 12px of padding.
 
-**Transparency** (Code - OSS only): Arch's Code - OSS runs on the system Electron from a small
+**Transparency** (Code - OSS and VS Code): Arch's Code - OSS runs on the system Electron from a small
 launcher, `/usr/lib/code/code.mjs`. `vscode-theme.py` writes a copy to
 `~/.local/share/pikadots/code-oss/code.mjs` that opens windows transparent, clears the parts'
 backgrounds and paints one tint under them (the theme's `pikadots.glass`, whose alpha is Glass's app windows value), so text
 stays solid and Hyprland blurs the wallpaper behind. `~/.local/bin/code-oss` (and `code`) and
 `~/.local/share/applications/code-oss.desktop` start it; they're rewritten on every theme change,
-so a Code - OSS update is picked up. Microsoft's VS Code bundles its own Electron and stays opaque.
-Restart Code - OSS once after installing.
+so a Code - OSS update is picked up.
+
+Microsoft's VS Code bundles its own Electron, which always loads the app next to its binary, so
+`vscode-theme.py` mirrors `/usr/share/code` into `~/.local/share/pikadots/vscode`: symlinks for
+everything but the binary (a reflink copy, free on btrfs) and `resources/app/package.json`, whose
+`main` points at `pikadots.mjs` (the same glass prelude, then VS Code's own `out/main.js`).
+`~/.local/bin/code` and the two `com.microsoft.VSCode*.desktop` copies start it; when an update
+changes the binary, `code` rebuilds the mirror first (or falls back to `/usr/bin/code`). VS Code's
+"modern UI" paints its shell from `--modern-ui-*` variables, which are cleared too.
+Restart the editor once after installing.
+
+At login, `vscode-theme.py sync` (from `autostart.lua`) keeps this in step with what's installed:
+an editor installed since gets the extension and its transparent launcher, and an uninstalled
+one's launcher, desktop entry and mirror are removed, so `code` always opens an editor that exists.
 
 The settings it replaced are kept in `~/.local/state/pikadots/vscode-<editor>.json`;
 `vscode-theme.py restore` (also run by `pikadots uninstall`) puts them back, removes the extension

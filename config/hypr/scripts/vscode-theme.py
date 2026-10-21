@@ -222,6 +222,9 @@ agents-background agentsPanel-background activeSessionView-background
 inactiveSessionView-background editorStickyScroll-shadow sideBarStickyScroll-shadow panelStickyScroll-shadow
 outputViewStickyScroll-shadow terminalStickyScroll-shadow""".split()
 
+MODERN = """modern-ui-shell-background modern-ui-connected-tab-surface
+modern-ui-connected-tab-strip-background""".split()
+
 GLASSY = """editorStickyScroll-background editorStickyScrollGutter-background sideBarStickyScroll-background
 panelStickyScroll-background outputViewStickyScroll-background terminalStickyScroll-background
 peekViewEditorStickyScroll-background peekViewEditorStickyScrollGutter-background""".split()
@@ -239,6 +242,7 @@ GLASS_CSS = (
     "html, body { background: transparent !important; }\n"
     ".monaco-workbench {\n  background-color: var(--vscode-pikadots-glass) !important;\n"
     + "".join(f"  --vscode-{v}: transparent !important;\n" for v in CLEAR)
+    + "".join(f"  --{v}: transparent !important;\n" for v in MODERN)
     + "".join(f"  --vscode-{v}: color-mix(in srgb, var(--vscode-editor-background) 25%, transparent) !important;\n" for v in GLASSY)
     + "  --pikadots-popup: color-mix(in srgb, var(--vscode-pikadots-popover) 35%, var(--vscode-editor-background));\n"
     + "  --pikadots-panel: color-mix(in srgb, var(--vscode-pikadots-popover) 12%, var(--vscode-editor-background));\n"
@@ -334,17 +338,19 @@ def write_if_changed(path, text, mode=0o644):
 def ours(path):
     try:
         with open(path) as f:
-            return MARK in f.read()
+            text = f.read()
+            return MARK in text or VS_MARK in text
     except OSError:
         return False
 
-def glass():
+def glass_oss():
     try:
         with open(SYSTEM_LAUNCHER) as f:
             launcher = f.read()
         with open(SYSTEM_SCRIPT) as f:
             script = f.read()
     except OSError:
+        unglass_oss()
         return
     if "import.meta.dirname" not in launcher or SYSTEM_LAUNCHER not in script:
         print("Code - OSS's launcher changed; it stays opaque", file=sys.stderr)
@@ -359,7 +365,10 @@ def glass():
     write_if_changed(GLASS_LAUNCHER, shebang + prelude + launcher)
     script = script.replace("#!/bin/bash\n", "#!/bin/bash\n# %s\n" % MARK, 1)
     write_if_changed(GLASS_SCRIPT, script.replace(SYSTEM_LAUNCHER, GLASS_LAUNCHER), 0o755)
-    if not os.path.lexists(GLASS_CODE):
+    other = os.path.exists(os.path.join(VSCODE_ROOT, "code"))
+    if other and os.path.islink(GLASS_CODE) and os.readlink(GLASS_CODE) == "code-oss":
+        os.remove(GLASS_CODE)
+    elif not other and not os.path.lexists(GLASS_CODE):
         os.symlink("code-oss", GLASS_CODE)
     try:
         with open(SYSTEM_DESKTOP) as f:
@@ -369,17 +378,131 @@ def glass():
     except OSError:
         pass
 
-def unglass():
+def unglass_oss():
     for path in (GLASS_DESKTOP, GLASS_SCRIPT, GLASS_LAUNCHER):
         if ours(path):
             os.remove(path)
     if os.path.islink(GLASS_CODE) and os.readlink(GLASS_CODE) == "code-oss":
         os.remove(GLASS_CODE)
 
-def install():
-    found = editors()
+VSCODE_ROOT = "/usr/share/code"
+VSCODE_DESKTOPS = ("com.microsoft.VSCode.desktop", "com.microsoft.VSCode.UrlHandler.desktop")
+VSCODE_MIRROR = os.path.join(HOME, ".local/share/pikadots/vscode")
+VSCODE_ENTRY = os.path.join(VSCODE_MIRROR, "resources/app/pikadots.mjs")
+VS_MARK = "pikadots: transparent VS Code"
+
+VSCODE_SCRIPT = """#!/bin/bash
+# %s
+
+set -euo pipefail
+
+mirror=%s
+stamp() { stat -c %%s.%%Y "$1" 2>/dev/null || true; }
+if [[ "$(stamp %s/code)" != "$(stamp "$mirror/code")" ]]; then
+    python3 -I %s glass >/dev/null 2>&1 || true
+    [[ "$(stamp %s/code)" == "$(stamp "$mirror/code")" ]] || exec /usr/bin/code "$@"
+fi
+
+flags=()
+flags_file="${XDG_CONFIG_HOME:-$HOME/.config}/code-flags.conf"
+if [[ -f "${flags_file}" ]]; then
+    read -ra flags <<< "$(sed 's/#.*//' "${flags_file}" | tr '\\n' ' ')"
+fi
+
+ELECTRON_RUN_AS_NODE=1 exec "$mirror/code" "$mirror/resources/app/out/cli.js" "$@" "${flags[@]}"
+"""
+
+def link_tree(src, dst, special):
+    os.makedirs(dst, exist_ok=True)
+    names = set(os.listdir(src))
+    for name in os.listdir(dst):
+        path = os.path.join(dst, name)
+        if os.path.islink(path) and (name not in names or name in special):
+            os.remove(path)
+    for name in names - set(special):
+        path, target = os.path.join(dst, name), os.path.join(src, name)
+        if os.path.islink(path) and os.readlink(path) == target:
+            continue
+        if os.path.lexists(path):
+            os.remove(path)
+        os.symlink(target, path)
+
+def mirror_vscode():
+    app = os.path.join(VSCODE_ROOT, "resources/app")
+    with open(os.path.join(app, "package.json")) as f:
+        package = json.load(f)
+    main = os.path.normpath(os.path.join(app, package["main"]))
+    if not os.path.exists(main):
+        raise OSError(main)
+    mirror_app = os.path.join(VSCODE_MIRROR, "resources/app")
+    link_tree(VSCODE_ROOT, VSCODE_MIRROR, ("code", "resources"))
+    link_tree(os.path.join(VSCODE_ROOT, "resources"), os.path.join(VSCODE_MIRROR, "resources"), ("app",))
+    link_tree(app, mirror_app, ("package.json", "pikadots.mjs"))
+    package["main"] = "./pikadots.mjs"
+    write_if_changed(os.path.join(mirror_app, "package.json"), json.dumps(package, indent=2))
+    prelude = PRELUDE % (VS_MARK, main, json.dumps(GLASS_CSS))
+    write_if_changed(VSCODE_ENTRY, prelude + "await import(%s);\n" % json.dumps("file://" + main))
+    src, dst = os.path.join(VSCODE_ROOT, "code"), os.path.join(VSCODE_MIRROR, "code")
+    a = os.stat(src)
+    try:
+        b = os.stat(dst)
+        if (a.st_size, a.st_mtime_ns) == (b.st_size, b.st_mtime_ns):
+            return
+    except OSError:
+        pass
+    subprocess.run(["cp", "--reflink=auto", "--preserve=mode,timestamps", src, dst + ".tmp"], check=True)
+    os.replace(dst + ".tmp", dst)
+
+def glass_vscode():
+    if not os.path.exists(os.path.join(VSCODE_ROOT, "code")):
+        unglass_vscode()
+        return
+    if os.path.islink(GLASS_CODE) and os.readlink(GLASS_CODE) == "code-oss":
+        os.remove(GLASS_CODE)
+    if os.path.lexists(GLASS_CODE) and not ours(GLASS_CODE):
+        print(f"{GLASS_CODE} isn't ours; VS Code stays opaque", file=sys.stderr)
+        return
+    try:
+        mirror_vscode()
+    except (OSError, KeyError, ValueError, subprocess.CalledProcessError) as e:
+        print(f"VS Code stays opaque: {e}", file=sys.stderr)
+        return
+    script = os.path.join(HOME, ".config/hypr/scripts/vscode-theme.py")
+    write_if_changed(GLASS_CODE, VSCODE_SCRIPT % (VS_MARK, VSCODE_MIRROR, VSCODE_ROOT, script, VSCODE_ROOT), 0o755)
+    for name in VSCODE_DESKTOPS:
+        try:
+            with open(os.path.join("/usr/share/applications", name)) as f:
+                desktop = f.read()
+        except OSError:
+            continue
+        desktop = re.sub(r"^Exec=code(?= |$)", "Exec=" + GLASS_CODE, desktop, flags=re.M)
+        desktop = desktop.replace("[Desktop Entry]\n", "[Desktop Entry]\n# %s\n" % VS_MARK, 1)
+        write_if_changed(os.path.join(HOME, ".local/share/applications", name), desktop)
+
+def unglass_vscode():
+    for name in VSCODE_DESKTOPS:
+        path = os.path.join(HOME, ".local/share/applications", name)
+        if ours(path):
+            os.remove(path)
+    if not os.path.islink(GLASS_CODE) and ours(GLASS_CODE):
+        os.remove(GLASS_CODE)
+    if ours(VSCODE_ENTRY):
+        shutil.rmtree(VSCODE_MIRROR)
+
+def glass():
+    glass_vscode()
+    glass_oss()
+
+def unglass():
+    unglass_oss()
+    unglass_vscode()
+
+def install(only=None):
+    glass()
+    found = [e for e in editors() if only is None or e[0] in only]
     if not found:
-        print("no VS Code, Code - OSS or VSCodium found")
+        if only is None:
+            print("no VS Code, Code - OSS or VSCodium found")
         return 0
     with tempfile.TemporaryDirectory() as tmp:
         vsix = os.path.join(tmp, f"{EXT_ID}-{VERSION}.vsix")
@@ -399,6 +522,14 @@ def install():
             print(f"{name} uses the wallpaper colors")
     apply()
     return 1 if failed else 0
+
+def sync():
+    glass()
+    new = [name for name, _, _, exts in editors() if not glob.glob(os.path.join(exts, f"{EXT_ID}-*"))]
+    if new:
+        return install(new)
+    apply()
+    return 0
 
 def restore():
     for name, cmd, user_dir, _ in editors():
@@ -427,5 +558,9 @@ if __name__ == "__main__":
         sys.exit(restore())
     elif cmd == "apply":
         apply()
+    elif cmd == "glass":
+        glass()
+    elif cmd == "sync":
+        sys.exit(sync())
     else:
-        sys.exit("usage: vscode-theme.py [apply | install | restore]")
+        sys.exit("usage: vscode-theme.py [apply | install | restore | glass | sync]")

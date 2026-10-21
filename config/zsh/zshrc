@@ -72,4 +72,3 @@ if [[ -n $FASTFETCH ]]; then
 fi
 
 command -v mise >/dev/null && eval "$(mise activate zsh)"
-[[ -d ~/.dotnetup ]] && path=(~/.dotnetup $path)
