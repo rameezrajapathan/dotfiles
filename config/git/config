@@ -19,7 +19,7 @@
 	conflictStyle = zdiff3
 
 [credential]
-	helper = /usr/lib/git-core/git-credential-libsecret
+	helper = libsecret
 [credential "https://github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential

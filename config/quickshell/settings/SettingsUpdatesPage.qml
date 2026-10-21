@@ -139,7 +139,7 @@ SettingsPage {
         SettingsRow {
             icon: "deployed_code_update"
             title: Updates.systemCount > 0 ? Updates.systemCount + " package update" + (Updates.systemCount === 1 ? "" : "s") : "Packages are up to date"
-            description: root.sys ? ["Arch " + root.sys.pacman.length, (root.sys.helper ? "AUR " : "") + (root.sys.helper ? root.sys.aur.length : ""),
+            description: root.sys ? [(root.sys.manager || "Arch") + " " + root.sys.packages.length, (root.sys.helper ? "AUR " : "") + (root.sys.helper ? root.sys.aur.length : ""),
                                      "Flatpak " + root.sys.flatpak.length].filter(s => s.trim()).join(" · ")
                 : "Not checked yet"
             Pill {
@@ -157,7 +157,7 @@ SettingsPage {
             Flow {
                 spacing: 6
                 Repeater {
-                    model: root.sys ? root.sys.pacman.concat(root.sys.aur, root.sys.flatpak).slice(0, 60) : []
+                    model: root.sys ? root.sys.packages.concat(root.sys.aur, root.sys.flatpak).slice(0, 60) : []
                     Rectangle {
                         required property string modelData
                         implicitWidth: pkg.implicitWidth + 18
@@ -206,7 +206,7 @@ SettingsPage {
         SettingsRow {
             icon: "inventory_2"
             title: "Include system packages"
-            description: "pacman, AUR and Flatpak. Off: only pikadots."
+            description: "System packages (pacman and AUR, or dnf) and Flatpak. Off: only pikadots."
             Switch {
                 checked: Settings.updates.system
                 onToggled: Settings.updates.system = !checked

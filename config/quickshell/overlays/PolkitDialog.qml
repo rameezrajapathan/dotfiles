@@ -67,7 +67,7 @@ PanelWindow {
                 agentLoader.active = true;
             } else {
                 stop();
-                Quickshell.execDetached(["sh", "-c", "pgrep -x hyprpolkitagent >/dev/null || exec /usr/lib/hyprpolkitagent/hyprpolkitagent"]);
+                Quickshell.execDetached(["sh", "-c", "pgrep -x hyprpolkitagent >/dev/null || exec $(ls /usr/lib/hyprpolkitagent/hyprpolkitagent /usr/libexec/hyprpolkitagent 2>/dev/null | head -1)"]);
             }
         }
     }

@@ -42,7 +42,16 @@ system_services=(NetworkManager.service bluetooth.service power-profiles-daemon.
 other_notifiers=(mako.service dunst.service swaync.service)
 keep_packages=(networkmanager networkmanager-openvpn bluez bluez-utils pipewire-pulse wireplumber
 	upower power-profiles-daemon zsh git neovim xdg-utils xdg-user-dirs gnome-keyring libsecret
-	restic asusctl)
+	restic asusctl NetworkManager NetworkManager-openvpn pipewire-pulseaudio gcr curl unzip xz python3-pip)
+if command -v pacman >/dev/null; then
+	pm=pacman
+elif command -v dnf >/dev/null; then
+	pm=dnf
+else
+	pm=
+fi
+extras_dir=$HOME/.local/share/fonts/pikadots
+[[ :$PATH: == *":$HOME/.local/bin:"* ]] || export PATH=$HOME/.local/bin:$PATH
 
 if [[ -t 1 ]]; then
 	bold=$'\e[1m' dim=$'\e[2m' red=$'\e[31m' green=$'\e[32m' yellow=$'\e[33m' blue=$'\e[34m' reset=$'\e[0m'
@@ -70,12 +79,28 @@ list() { grep -vE '^\s*(#|$)' "$repo/$1" 2>/dev/null; }
 
 is_asus() { grep -qi asus /sys/class/dmi/id/sys_vendor 2>/dev/null; }
 
+package_list() { [[ $pm == dnf ]] && echo packages-fedora.txt || echo packages.txt; }
+
 wanted_packages() {
-	list packages.txt
+	list "$(package_list)"
 	is_asus && echo asusctl
 }
 
-missing_packages() { wanted_packages | xargs -r pacman -T 2>/dev/null; }
+not_installed() {
+	case $pm in
+	pacman) xargs -r pacman -T 2>/dev/null ;;
+	dnf) xargs -r rpm -q --whatprovides 2>/dev/null | sed -n 's/^no package provides //p' ;;
+	esac
+}
+
+only_installed() {
+	case $pm in
+	pacman) xargs -r pacman -Qq 2>/dev/null ;;
+	dnf) xargs -r rpm -q --qf '%{NAME}\n' 2>/dev/null | grep -v ' ' ;;
+	esac
+}
+
+missing_packages() { wanted_packages | not_installed; }
 
 aur_helper() { command -v paru || command -v yay; }
 
@@ -90,11 +115,18 @@ removable_packages() {
 	if [[ -s $state/installed-packages ]]; then
 		candidates=$(cat "$state/installed-packages")
 	else
-		candidates=$(list packages.txt; list aur.txt)
+		candidates=$(list "$(package_list)"; [[ $pm == pacman ]] && list aur.txt)
 	fi
-	candidates=$(printf '%s\n' $candidates | grep -vxF -f <(printf '%s\n' "${keep_packages[@]}") |
-		xargs -r pacman -Qq 2>/dev/null)
+	candidates=$(printf '%s\n' $candidates | grep -vxF -f <(printf '%s\n' "${keep_packages[@]}") | only_installed)
 	[[ -z $candidates ]] && return
+	if [[ $pm == dnf ]]; then
+		local p
+		for p in $candidates; do
+			dnf -q repoquery --installed --whatrequires "$p" --qf '%{name}\n' 2>/dev/null |
+				grep -vxF -f <(printf '%s\n' $candidates) | grep -q . || echo "$p"
+		done
+		return
+	fi
 	LC_ALL=C pacman -Qi $candidates 2>/dev/null | awk -v list="$(echo $candidates)" '
 		BEGIN { n = split(list, a, " "); for (i = 1; i <= n; i++) want[a[i]] = 1 }
 		/^Name/ { name = $3; ok = 1; inreq = 0 }
@@ -138,29 +170,171 @@ remove_packages() {
 		;;
 	*) info "packages kept"; return ;;
 	esac
-	if sudo pacman -Rns $pkgs; then
+	local remove=(pacman -Rns)
+	[[ $pm == dnf ]] && remove=(dnf remove)
+	if sudo "${remove[@]}" $pkgs; then
 		ok "removed $(echo $pkgs | wc -w) package(s)"
 		[[ -f $state/installed-packages ]] &&
 			grep -vxF -f <(printf '%s\n' $pkgs) "$state/installed-packages" >"$state/installed-packages.tmp" &&
 			mv "$state/installed-packages.tmp" "$state/installed-packages"
 	else
-		bad "pacman didn't remove them"
+		bad "$pm didn't remove them"
 	fi
 }
 
+coprs() {
+	list copr.txt
+	is_asus && echo lukenukem/asus-linux
+}
+
+enable_coprs() {
+	local c repos=()
+	for c in $(coprs); do
+		compgen -G "/etc/yum.repos.d/_copr*:${c%/*}:${c#*/}.repo" >/dev/null || repos+=("$c")
+	done
+	((${#repos[@]})) || return 0
+	if ! dnf copr --help >/dev/null 2>&1; then
+		sudo dnf install -y dnf5-plugins >/dev/null || die "couldn't install dnf5-plugins (needed for COPR)"
+	fi
+	for c in "${repos[@]}"; do
+		sudo dnf copr enable -y "$c" >/dev/null 2>&1 && ok "COPR $c" || die "couldn't enable COPR $c"
+	done
+}
+
+has() { command -v "$1" >/dev/null; }
+
+matugen_4() {
+	local v
+	v=$(matugen --version 2>/dev/null) || return 1
+	v=${v#matugen }
+	((${v%%.*} >= 4))
+}
+
+missing_extras() {
+	matugen_4 || echo matugen
+	fc-list -q 'FiraCode Nerd Font' || echo firacode-nerd-font
+	fc-list -q 'Fira Sans' || echo fira-sans
+	fc-list -q 'Material Symbols Rounded' || echo material-symbols
+	has spf || echo superfile
+	has papirus-folders || echo papirus-folders
+	has pywalfox || echo pywalfox
+	python3 -c 'import recurring_ical_events' 2>/dev/null || echo recurring-ical-events
+}
+
+fetch() { curl -fsSL --retry 2 -o "$2" "$1"; }
+
+pip_user_list() { python3 -m pip list --user --format=freeze 2>/dev/null | sed 's/==.*//' | sort; }
+
+install_extra() {
+	local tmp=$1 style weight tag arch before
+	case $2 in
+	matugen)
+		tag=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/InioX/matugen/releases/latest) || return 1
+		tag=${tag##*/}
+		fetch "https://github.com/InioX/matugen/releases/download/$tag/matugen-${tag#v}-$(uname -m).tar.gz" "$tmp/matugen.tar.gz" &&
+			tar -xzf "$tmp/matugen.tar.gz" -C "$tmp" matugen &&
+			install -m755 "$tmp/matugen" "$HOME/.local/bin/matugen"
+		;;
+	firacode-nerd-font)
+		fetch https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.tar.xz "$tmp/firacode.tar.xz" &&
+			tar -xJf "$tmp/firacode.tar.xz" -C "$extras_dir" --wildcards 'FiraCodeNerdFont-*.ttf'
+		;;
+	fira-sans)
+		for weight in Light LightItalic Regular Italic Medium MediumItalic SemiBold SemiBoldItalic Bold BoldItalic; do
+			fetch "https://github.com/google/fonts/raw/main/ofl/firasans/FiraSans-$weight.ttf" "$extras_dir/FiraSans-$weight.ttf" || return 1
+		done
+		;;
+	material-symbols)
+		for style in Outlined Rounded Sharp; do
+			fetch "https://github.com/google/material-design-icons/raw/master/variablefont/MaterialSymbols$style%5BFILL,GRAD,opsz,wght%5D.ttf" \
+				"$extras_dir/MaterialSymbols$style[FILL,GRAD,opsz,wght].ttf" || return 1
+		done
+		;;
+	superfile)
+		case $(uname -m) in x86_64) arch=amd64 ;; aarch64) arch=arm64 ;; *) return 1 ;; esac
+		tag=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/yorukot/superfile/releases/latest) || return 1
+		tag=${tag##*/}
+		fetch "https://github.com/yorukot/superfile/releases/download/$tag/superfile-linux-$tag-$arch.tar.gz" "$tmp/spf.tar.gz" &&
+			tar -xzf "$tmp/spf.tar.gz" -C "$tmp" 2>/dev/null &&
+			install -m755 "$(find "$tmp" -type f -name spf | head -1)" "$HOME/.local/bin/spf"
+		;;
+	papirus-folders)
+		fetch https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/papirus-folders "$HOME/.local/bin/papirus-folders" &&
+			chmod +x "$HOME/.local/bin/papirus-folders"
+		;;
+	pywalfox | recurring-ical-events)
+		before=$(pip_user_list)
+		python3 -m pip install --user --quiet --disable-pip-version-check "$2" || return 1
+		comm -13 <(echo "$before") <(pip_user_list) >>"$state/pip-installed"
+		;;
+	esac
+}
+
+install_extras() {
+	local need tmp extra
+	need=$(missing_extras)
+	if [[ -n $need ]]; then
+		info "not packaged for Fedora, downloading: $(echo $need)"
+		tmp=$(mktemp -d)
+		mkdir -p "$extras_dir" "$HOME/.local/bin" "$state"
+		for extra in $need; do
+			if install_extra "$tmp" "$extra"; then
+				ok "$extra"
+				grep -qsx "$extra" "$state/installed-extras" || echo "$extra" >>"$state/installed-extras"
+			else
+				warn "couldn't install $extra"
+			fi
+		done
+		rm -rf "$tmp"
+		fc-cache -f "$extras_dir" >/dev/null 2>&1
+	fi
+	ok "fonts and tools from outside Fedora installed"
+	has wl-clip-persist || info "wl-clip-persist isn't packaged for Fedora; copied text goes away when its app closes"
+}
+
+remove_extras() {
+	[[ -s $state/installed-extras ]] || return 0
+	info "downloaded by pikadots: $(echo $(cat "$state/installed-extras"))"
+	confirm "Remove them?" || { info "kept"; return; }
+	local extra
+	while read -r extra; do
+		case $extra in
+		firacode-nerd-font | fira-sans | material-symbols) rm -rf "$extras_dir" ;;
+		matugen) rm -f "$HOME/.local/bin/matugen" ;;
+		superfile) rm -f "$HOME/.local/bin/spf" ;;
+		papirus-folders) rm -f "$HOME/.local/bin/papirus-folders" ;;
+		esac
+	done <"$state/installed-extras"
+	[[ -s $state/pip-installed ]] &&
+		python3 -m pip uninstall -y --quiet $(sort -u "$state/pip-installed") >/dev/null 2>&1
+	rm -f "$state/pip-installed"
+	fc-cache -f >/dev/null 2>&1
+	rm -f "$state/installed-extras"
+	ok "removed the downloaded fonts and tools"
+}
+
 install_packages() {
-	command -v pacman >/dev/null || die "pacman not found: pikadots needs Arch Linux or a derivative"
+	[[ -n $pm ]] || die "pikadots needs Arch Linux (pacman) or Fedora (dnf)"
+	[[ $pm == dnf ]] && enable_coprs
 	local missing
 	missing=$(missing_packages)
 	if [[ -n $missing ]]; then
 		info "installing: $(echo $missing)"
-		sudo pacman -S --needed $missing || die "pacman failed"
+		if [[ $pm == pacman ]]; then
+			sudo pacman -S --needed $missing || die "pacman failed"
+		else
+			sudo dnf install $missing || die "dnf failed"
+		fi
 		record_installed $missing
 	fi
 	ok "packages installed"
 
+	if [[ $pm == dnf ]]; then
+		install_extras
+		return
+	fi
 	local aur helper
-	aur=$(list aur.txt | xargs -r pacman -T 2>/dev/null)
+	aur=$(list aur.txt | not_installed)
 	if [[ -n $aur ]]; then
 		if helper=$(aur_helper); then
 			if "$helper" -S --needed $aur; then
@@ -370,11 +544,14 @@ generate_colors() {
 	if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
 		"$HOME/.config/hypr/scripts/theme.sh" "$img" >/dev/null 2>&1 && ok "colors from ${img/#$HOME/\~}" || bad "theme.sh failed"
 	else
-		local palette
-		palette=$(python3 -I "$HOME/.config/hypr/scripts/theme-palette.py" "$img") &&
-			matugen image "$img" --mode "$(jq -r .theme.mode <<<"$palette")" \
+		local palette mode glass
+		palette=$(python3 -I "$HOME/.config/hypr/scripts/theme-palette.py" "$img") && mode=$(jq -r .theme.mode <<<"$palette")
+		python3 -I "$HOME/.config/hypr/scripts/glass.py" lua "$mode" >/dev/null 2>&1
+		glass=$(python3 -I "$HOME/.config/hypr/scripts/glass.py" json "$mode" 2>/dev/null || echo '{}')
+		[[ -n $palette ]] &&
+			matugen image "$img" --mode "$mode" \
 				--type "$(jq -r .theme.scheme <<<"$palette")" --source-color-index 0 \
-				--import-json-string "$(jq -c --arg wallpaper "$img" '. + {wallpaper: $wallpaper}' <<<"$palette")" --quiet &&
+				--import-json-string "$(jq -c --argjson glass "$glass" --arg wallpaper "$img" '. + $glass + {wallpaper: $wallpaper}' <<<"$palette")" --quiet &&
 			ok "colors from ${img/#$HOME/\~}" || bad "matugen failed"
 	fi
 }
@@ -452,6 +629,7 @@ cmd_uninstall() {
 	fi
 	step "Packages (optional)"
 	remove_packages
+	[[ $pm == dnf ]] && remove_extras
 	step "Done"
 	info "your backups, keyring and git identity are untouched"
 }
@@ -463,9 +641,16 @@ cmd_health() {
 	local missing
 	missing=$(missing_packages)
 	[[ -z $missing ]] && ok "all $(wanted_packages | wc -l) packages installed" || bad "missing: $(echo $missing)"
-	local aur
-	aur=$(list aur.txt | xargs -r pacman -T 2>/dev/null)
-	[[ -z $aur ]] || warn "AUR packages missing: $(echo $aur)"
+	if [[ $pm == dnf ]]; then
+		local extra
+		for extra in $(missing_extras); do
+			warn "not installed: $extra (run repair)"
+		done
+	else
+		local aur
+		aur=$(list aur.txt | not_installed)
+		[[ -z $aur ]] || warn "AUR packages missing: $(echo $aur)"
+	fi
 
 	step "Links"
 	local entry src dst

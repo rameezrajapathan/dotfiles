@@ -115,7 +115,7 @@ SettingsPage {
             icon: "content_paste_go"
             title: "Keep copied text when the app closes"
             description: root.hasPersist ? "Otherwise what you copied is gone once its window closes."
-                : "Needs wl-clip-persist (sudo pacman -S wl-clip-persist)."
+                : "Needs wl-clip-persist (on Arch: sudo pacman -S wl-clip-persist)."
             enabled: root.hasPersist
             opacity: enabled ? 1 : 0.5
             Switch {

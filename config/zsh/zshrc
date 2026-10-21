@@ -36,9 +36,9 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+for f in /usr/share/{zsh/plugins/,}zsh-autosuggestions/zsh-autosuggestions.zsh; do [[ -r $f ]] && source $f && break; done
 
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+for f in /usr/share/{zsh/plugins/,}zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; do [[ -r $f ]] && source $f && break; done
 
 ZSH_HIGHLIGHT_STYLES[command]='fg=white'
 ZSH_HIGHLIGHT_STYLES[builtin]='fg=white'
