@@ -611,10 +611,20 @@ generate_colors() {
 	fi
 }
 
+kill_shell() {
+	pkill -u "$USER" -x 'qs|quickshell' >/dev/null 2>&1 || return 0
+	for _ in $(seq 20); do
+		pgrep -u "$USER" -x 'qs|quickshell' >/dev/null || return 0
+		sleep 0.1
+	done
+	pkill -9 -u "$USER" -x 'qs|quickshell' >/dev/null 2>&1
+	sleep 0.2
+}
+
 reload_desktop() {
 	[[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || return 0
 	hyprctl reload >/dev/null && ok "Hyprland reloaded"
-	qs kill >/dev/null 2>&1
+	kill_shell
 	hyprctl dispatch 'hl.dsp.exec_cmd("~/.config/hypr/scripts/shell.sh")' >/dev/null && ok "Quickshell restarted"
 }
 
@@ -753,7 +763,10 @@ cmd_health() {
 		notifier=$(busctl --user status org.freedesktop.Notifications 2>/dev/null | sed -n 's/^Comm=//p')
 		[[ $notifier == qs || $notifier == quickshell ]] && ok "Quickshell shows notifications" ||
 			bad "notifications are handled by ${notifier:-nothing}, not Quickshell (run repair)"
-		if pgrep -x qs >/dev/null || pgrep -x quickshell >/dev/null; then
+		local instances
+		instances=$(pgrep -u "$USER" -cx 'qs|quickshell')
+		((instances > 1)) && bad "$instances Quickshell instances running (run repair)"
+		if ((instances > 0)); then
 			errors=$(qs log 2>/dev/null | awk '/Reloading configuration/ { buf = "" } /ERROR/ { buf = $0 } END { print buf }')
 			[[ -z $errors ]] && ok "Quickshell running" || bad "Quickshell: $(sed 's/\x1b\[[0-9;]*m//g' <<<"$errors")"
 		else
@@ -961,7 +974,7 @@ cmd_import() {
 	[[ -f $tmp/pikadots-export.json ]] && info "from $(jq -r '"\(.host) on \(.date[:10])"' "$tmp/pikadots-export.json")"
 
 	step "Files"
-	qs kill >/dev/null 2>&1
+	kill_shell
 	backup=$backups/import-$(date +%Y%m%d-%H%M%S)
 	for f in "${settings_files[@]}" .face; do
 		[[ -f $tmp/$f ]] || continue

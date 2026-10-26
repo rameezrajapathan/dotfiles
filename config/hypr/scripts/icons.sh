@@ -40,8 +40,12 @@ python3 -I ~/.config/hypr/scripts/kde-theme.py || true
 setsid -f python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 || true
 
 if [[ ${1:-} == --restart-shell ]]; then
-	qs kill >/dev/null 2>&1 || true
-	sleep 0.5
+	pkill -u "$USER" -x 'qs|quickshell' >/dev/null 2>&1 || true
+	for _ in $(seq 20); do
+		pgrep -u "$USER" -x 'qs|quickshell' >/dev/null || break
+		sleep 0.1
+	done
+	pkill -9 -u "$USER" -x 'qs|quickshell' >/dev/null 2>&1 || true
 	setsid -f ~/.config/hypr/scripts/shell.sh >/dev/null 2>&1
 	for _ in $(seq 20); do
 		sleep 0.5
