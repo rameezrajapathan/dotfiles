@@ -60,6 +60,7 @@ Item {
 
                     Pill {
                         icon: "eject"
+                        tip: "Eject"
                         onClicked: Drives.eject(drive.modelData)
                     }
                 }

@@ -44,4 +44,10 @@ Item {
         }
         onWheel: wheel => wheel.angleDelta.y < 0 ? root.player?.next() : root.player?.previous()
     }
+
+    Tooltip {
+        active: Theme.barVertical
+        text: (root.player?.trackTitle || "Media") + " · Right-click to " + (root.player?.isPlaying ? "pause" : "play")
+        side: Theme.awayFromBar
+    }
 }

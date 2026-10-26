@@ -166,6 +166,10 @@ Rectangle {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.notification.dismiss()
                     }
+
+                    Tooltip {
+                        text: "Dismiss"
+                    }
                 }
             }
 

@@ -38,10 +38,12 @@ Item {
                 Pill {
                     visible: GitHub.unread > 0
                     icon: "done_all"
+                    tip: "Mark all as read"
                     onClicked: GitHub.markAllRead()
                 }
                 Pill {
                     icon: "open_in_new"
+                    tip: "Open on GitHub"
                     onClicked: {
                         root.closeRequested();
                         Quickshell.execDetached(["xdg-open", "https://github.com/notifications"]);

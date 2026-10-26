@@ -10,6 +10,7 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 | Keys | Action |
 |---|---|
 | Super + A | App launcher |
+| Super + D | Show or hide the dock |
 | Super + P | Projects |
 | Super + V | Clipboard history |
 | Super + T | Terminal with fastfetch |

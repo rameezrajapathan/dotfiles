@@ -2,6 +2,7 @@
 import Quickshell
 import QtQuick
 import qs.bar
+import qs.dock
 import qs.lock
 import qs.overlays
 import qs.services
@@ -13,6 +14,11 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
         Bar {}
+    }
+
+    Variants {
+        model: Quickshell.screens
+        DockWindow {}
     }
 
     Cheatsheet {}

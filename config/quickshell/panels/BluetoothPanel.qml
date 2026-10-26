@@ -79,6 +79,7 @@ Item {
                 }
                 Pill {
                     icon: "settings"
+                    tip: "Bluetooth settings"
                     onClicked: {
                         root.closeRequested();
                         Apps.terminal(["bluetoothctl"]);
@@ -125,6 +126,7 @@ Item {
                     Pill {
                         visible: !modelData.connected
                         icon: "delete"
+                        tip: "Forget device"
                         onClicked: modelData.forget()
                     }
                 }

@@ -82,6 +82,30 @@ SettingsPage {
         }
     }
 
+    SettingsSection {
+        title: "Tooltips"
+
+        SettingsRow {
+            icon: "tooltip"
+            title: "Show tooltips"
+            description: "Names icon-only buttons, with their shortcut, when you hover them."
+            Switch {
+                checked: root.a.tooltips
+                onToggled: root.a.tooltips = !checked
+            }
+        }
+        SettingsRow {
+            visible: root.a.tooltips
+            icon: "timer"
+            title: "Show after"
+            SettingsSegmented {
+                options: [200, 500, 800, 1200].map(ms => ({ value: ms, label: ms >= 1000 ? ms / 1000 + " s" : ms + " ms" }))
+                current: root.a.tooltipDelay
+                onPicked: v => root.a.tooltipDelay = v
+            }
+        }
+    }
+
     onShownChanged: if (shown) zoomReader.running = true
     Process {
         id: zoomReader

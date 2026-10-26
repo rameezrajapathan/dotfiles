@@ -70,4 +70,9 @@ Item {
                 root.clicked();
         }
     }
+
+    Tooltip {
+        text: Recorder.active ? "Stop recording" : "Capture screen · Right-click for a region screenshot"
+        side: Theme.awayFromBar
+    }
 }

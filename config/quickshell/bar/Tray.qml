@@ -4,6 +4,7 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import QtQuick
 import qs.services
+import qs.widgets
 
 Repeater {
     id: root
@@ -63,6 +64,11 @@ Repeater {
                 }
             }
             onWheel: wheel => icon.modelData.scroll(wheel.angleDelta.y / 120, false)
+        }
+
+        Tooltip {
+            text: icon.modelData.tooltipTitle || icon.modelData.title || icon.modelData.id
+            side: Theme.awayFromBar
         }
     }
 }

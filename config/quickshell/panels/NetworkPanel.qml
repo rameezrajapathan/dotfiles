@@ -79,11 +79,13 @@ Item {
                 }
                 Pill {
                     icon: SpeedTest.running ? "stop" : "speed"
+                    tip: SpeedTest.running ? "Stop speed test" : "Run speed test"
                     active: SpeedTest.running
                     onClicked: SpeedTest.running ? SpeedTest.cancel() : SpeedTest.start()
                 }
                 Pill {
                     icon: "settings"
+                    tip: "Network settings"
                     onClicked: {
                         root.closeRequested();
                         Apps.terminal(["nmtui"]);
@@ -163,6 +165,7 @@ Item {
                     Pill {
                         visible: modelData.known && !modelData.connected
                         icon: "delete"
+                        tip: "Forget network"
                         onClicked: modelData.forget()
                     }
 
@@ -188,10 +191,12 @@ Item {
                 }
                 Pill {
                     icon: "file_open"
+                    tip: "Import VPN config"
                     onClicked: root.addVpn("import")
                 }
                 Pill {
                     icon: "add"
+                    tip: "Add VPN"
                     onClicked: root.addVpn("new")
                 }
             }
@@ -219,6 +224,7 @@ Item {
                     Pill {
                         visible: !vpnRow.modelData.active && !vpnRow.switching
                         icon: "delete"
+                        tip: "Remove VPN"
                         onClicked: {
                             root.closeRequested();
                             VpnService.remove(vpnRow.modelData.name);

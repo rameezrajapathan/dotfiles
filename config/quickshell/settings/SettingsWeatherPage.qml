@@ -42,6 +42,7 @@ SettingsPage {
             description: Weather.region + (Weather.ready ? "  ·  " + Weather.temp(Weather.current.temp) + ", " + Weather.label(Weather.current.code).toLowerCase() : "")
             Pill {
                 icon: "refresh"
+                tip: "Refresh"
                 implicitHeight: 30
                 onClicked: Weather.refresh()
             }

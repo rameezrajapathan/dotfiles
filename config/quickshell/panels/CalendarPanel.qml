@@ -100,6 +100,7 @@ PanelWindow {
 
                 Pill {
                     icon: "chevron_left"
+                    tip: "Previous month"
                     onClicked: root.shift(-1)
                 }
                 Label {
@@ -113,9 +114,14 @@ PanelWindow {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.showToday()
                     }
+
+                    Tooltip {
+                        text: "Go to today"
+                    }
                 }
                 Pill {
                     icon: "chevron_right"
+                    tip: "Next month"
                     onClicked: root.shift(1)
                 }
             }

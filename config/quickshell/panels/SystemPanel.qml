@@ -134,6 +134,7 @@ Item {
                 }
                 Pill {
                     icon: "monitoring"
+                    tip: "Open system monitor"
                     onClicked: {
                         root.closeRequested();
                         Apps.terminal(["btop"]);
@@ -196,6 +197,7 @@ Item {
                 }
                 Pill {
                     icon: "backup"
+                    tip: "Back up now"
                     onClicked: Quickshell.execDetached(["systemctl", "--user", "start", "--no-block", "pikadots-backup.service"])
                 }
             }

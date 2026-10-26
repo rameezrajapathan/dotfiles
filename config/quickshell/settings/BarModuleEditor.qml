@@ -151,26 +151,31 @@ ColumnLayout {
                                     spacing: 2
                                     BarIconButton {
                                         icon: "chevron_left"; size: 16
+                                        tip: "Move to " + root.titles[column.index - 1]
                                         visible: column.index > 0
                                         onClicked: root.shift(column.key, item.index, -1)
                                     }
                                     BarIconButton {
                                         icon: "keyboard_arrow_up"; size: 16
+                                        tip: "Move up"
                                         visible: item.index > 0
                                         onClicked: root.move(column.key, item.index, -1)
                                     }
                                     BarIconButton {
                                         icon: "keyboard_arrow_down"; size: 16
+                                        tip: "Move down"
                                         visible: item.index < item.count - 1
                                         onClicked: root.move(column.key, item.index, 1)
                                     }
                                     BarIconButton {
                                         icon: "chevron_right"; size: 16
+                                        tip: "Move to " + root.titles[column.index + 1]
                                         visible: column.index < 2
                                         onClicked: root.shift(column.key, item.index, 1)
                                     }
                                     BarIconButton {
                                         icon: "close"; size: 16
+                                        tip: "Remove"
                                         color: Theme.red
                                         onClicked: root.remove(column.key, item.index)
                                     }

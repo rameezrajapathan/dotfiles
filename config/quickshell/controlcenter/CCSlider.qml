@@ -7,6 +7,7 @@ Rectangle {
     property real value: 0
     property string icon
     property bool dimmed: false
+    property string iconTip: ""
     signal moved(real value)
     signal iconClicked()
 
@@ -55,6 +56,10 @@ Rectangle {
             anchors.margins: -6
             cursorShape: Qt.PointingHandCursor
             onClicked: root.iconClicked()
+        }
+
+        Tooltip {
+            text: root.iconTip
         }
     }
 

@@ -74,6 +74,8 @@ SettingsPage {
             description: "Super + L"
             Pill {
                 icon: "lock"
+                tip: "Lock now"
+                tipKeys: "Super + L"
                 implicitHeight: 30
                 onClicked: Quickshell.execDetached(["loginctl", "lock-session"])
             }

@@ -126,6 +126,7 @@ Item {
                             Pill {
                                 visible: Displays.saved[card.m.description] !== undefined
                                 icon: "restart_alt"
+                                tip: "Reset to defaults"
                                 onClicked: Displays.reset(card.m)
                             }
                             Switch {

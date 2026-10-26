@@ -60,8 +60,8 @@ CCCard {
                     }
                 }
             }
-            CCIconButton { implicitWidth: 28; implicitHeight: 28; tone: "flat"; icon: "chevron_left"; iconSize: 18; onClicked: root.offset-- }
-            CCIconButton { implicitWidth: 28; implicitHeight: 28; tone: "flat"; icon: "chevron_right"; iconSize: 18; onClicked: root.offset++ }
+            CCIconButton { implicitWidth: 28; implicitHeight: 28; tone: "flat"; icon: "chevron_left"; iconSize: 18; tip: "Previous month"; onClicked: root.offset-- }
+            CCIconButton { implicitWidth: 28; implicitHeight: 28; tone: "flat"; icon: "chevron_right"; iconSize: 18; tip: "Next month"; onClicked: root.offset++ }
         }
 
         GridLayout {

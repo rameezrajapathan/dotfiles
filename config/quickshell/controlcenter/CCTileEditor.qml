@@ -78,16 +78,19 @@ ColumnLayout {
                         spacing: 2
                         BarIconButton {
                             icon: "chevron_left"; size: 16
+                            tip: "Move left"
                             visible: tile.index > 0
                             onClicked: root.move(tile.index, -1)
                         }
                         BarIconButton {
                             icon: "chevron_right"; size: 16
+                            tip: "Move right"
                             visible: tile.index < root.tiles.length - 1
                             onClicked: root.move(tile.index, 1)
                         }
                         BarIconButton {
                             icon: "close"; size: 16
+                            tip: "Remove"
                             color: Theme.red
                             onClicked: root.remove(tile.index)
                         }

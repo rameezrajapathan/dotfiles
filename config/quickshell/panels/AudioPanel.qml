@@ -48,6 +48,7 @@ Item {
                 }
                 Pill {
                     icon: "settings"
+                    tip: "Sound settings"
                     onClicked: {
                         root.closeRequested();
                         Quickshell.execDetached(["pavucontrol"]);
@@ -148,6 +149,10 @@ Item {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: if (row.node?.audio) row.node.audio.muted = !row.node.audio.muted
+            }
+
+            Tooltip {
+                text: row.muted ? "Unmute" : "Mute"
             }
         }
         Slider {

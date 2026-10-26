@@ -65,11 +65,13 @@ SettingsPage {
                     spacing: 8
                     Pill {
                         icon: "play_arrow"
+                        tip: "Run now"
                         implicitHeight: 30
                         onClicked: Quickshell.execDetached(["sh", "-c", item.modelData.command])
                     }
                     Pill {
                         icon: "delete"
+                        tip: "Remove"
                         implicitHeight: 30
                         onClicked: root.remove(item.index)
                     }

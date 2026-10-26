@@ -44,4 +44,9 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: Special.hide(root.name)
     }
+
+    Tooltip {
+        text: "Hide " + root.info.label
+        side: Theme.awayFromBar
+    }
 }

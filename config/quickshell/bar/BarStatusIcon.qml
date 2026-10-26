@@ -71,4 +71,9 @@ Item {
                 StatusInfo.sink.audio.volume = Math.max(0, Math.min(1, StatusInfo.sink.audio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05)));
         }
     }
+
+    Tooltip {
+        text: StatusInfo.tooltip(root.key)
+        side: Theme.awayFromBar
+    }
 }

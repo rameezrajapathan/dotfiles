@@ -303,17 +303,20 @@ SettingsPage {
                     spacing: 6
                     Pill {
                         icon: "play_arrow"
+                        tip: "Open the app"
                         implicitHeight: 30
                         onClicked: root.open(rule.r)
                     }
                     Pill {
                         icon: rule.open ? "expand_less" : "edit"
+                        tip: rule.open ? "Close editor" : "Edit rule"
                         active: rule.open
                         implicitHeight: 30
                         onClicked: root.setExpanded(rule.r.cls, !rule.open)
                     }
                     Pill {
                         icon: "delete"
+                        tip: "Remove rule"
                         implicitHeight: 30
                         onClicked: root.remove(rule.index)
                     }
@@ -393,6 +396,9 @@ SettingsPage {
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: root.update(rule.index, { position: spot.modelData, center: false })
+                                    }
+                                    Tooltip {
+                                        text: root.spotNames[spot.modelData] ?? ""
                                     }
                                     GlassRim {}
                                 }
@@ -533,6 +539,7 @@ SettingsPage {
                 }
                 Pill {
                     icon: "add"
+                    tip: "Add"
                     implicitHeight: 30
                     onClicked: root.addCommand(commandField.currentText)
                 }

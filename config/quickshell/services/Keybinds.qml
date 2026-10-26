@@ -11,7 +11,7 @@ Singleton {
     id: root
 
     readonly property var groups: [
-        { title: "Apps & system", icon: "apps", pattern: /^Open|launcher|clipboard|Lock|power|wallpaper|keybind|notification|Disturb|terminal|color|project|weather/i },
+        { title: "Apps & system", icon: "apps", pattern: /^Open|launcher|clipboard|Lock|power|wallpaper|keybind|notification|Disturb|terminal|color|project|weather|dock/i },
         { title: "Screenshots & recording", icon: "screenshot_region", pattern: /screenshot|record|capture|OCR/i },
         { title: "Media & hardware", icon: "graphic_eq", pattern: /volume|mute|media|track|brightness|zoom/i },
         { title: "Workspaces & monitors", icon: "space_dashboard", pattern: /workspace|monitor/i },

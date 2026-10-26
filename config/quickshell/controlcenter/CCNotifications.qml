@@ -163,6 +163,7 @@ CCCard {
                         tone: "flat"
                         icon: "close"
                         iconSize: 16
+                        tip: "Dismiss"
                         onClicked: row.modelData.dismiss()
                     }
                 }

@@ -3,6 +3,7 @@ import Quickshell.Hyprland
 import Quickshell.Widgets
 import QtQuick
 import qs.services
+import qs.widgets
 
 Repeater {
     id: root
@@ -16,6 +17,7 @@ Repeater {
 
         readonly property string selector: Background.selector(modelData)
         readonly property bool hidden: Background.isHidden(modelData)
+        readonly property string appName: DesktopEntries.heuristicLookup(Background.appId(modelData))?.name ?? modelData.title
         readonly property string iconPath: {
             const id = Background.appId(modelData);
             const icon = DesktopEntries.heuristicLookup(id)?.icon ?? id;
@@ -59,6 +61,11 @@ Repeater {
                     Background.dispatch(`hl.dsp.focus({ window = "${sel}" })`);
                 }
             }
+        }
+
+        Tooltip {
+            text: (app.hidden ? "Show " : app.modelData.activated ? "Hide " : "Focus ") + app.appName + " · Right-click to close"
+            side: Theme.awayFromBar
         }
     }
 }

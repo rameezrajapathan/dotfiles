@@ -22,10 +22,12 @@ Scope {
             keywords: "font typeface text size icons weight", component: fontsPage },
         { key: "bar", group: "Personalize", title: "Bar", icon: "toolbar",
             keywords: "bar pill height weather music spectrum clock 24 hour seconds", component: barPage },
+        { key: "dock", group: "Personalize", title: "Dock", icon: "dock_to_bottom",
+            keywords: "dock taskbar pinned apps running open windows previews auto hide intellihide magnify indicator", component: dockPage },
         { key: "controlcenter", group: "Personalize", title: "Control center", icon: "dashboard_customize",
             keywords: "control center quick settings tiles widgets layout bento columns custom panel", component: controlCenterPage },
         { key: "accessibility", group: "Personalize", title: "Accessibility", icon: "accessibility_new",
-            keywords: "accessibility zoom magnifier magnify larger text size bigger font reduce motion animations", component: accessibilityPage },
+            keywords: "accessibility zoom magnifier magnify larger text size bigger font reduce motion animations tooltips hover hints", component: accessibilityPage },
         { key: "windows", group: "Desktop", title: "Windows", icon: "select_window",
             keywords: "hyprland layout dwindle master scrolling gaps borders corner shape squircle resize", component: windowsPage },
         { key: "effects", group: "Desktop", title: "Effects", icon: "auto_awesome",
@@ -37,7 +39,7 @@ Scope {
         { key: "notifications", group: "Shell", title: "Notifications", icon: "notifications",
             keywords: "notifications popups do not disturb dnd quiet hours schedule position timeout", component: notificationsPage },
         { key: "launcher", group: "Shell", title: "Launcher", icon: "apps",
-            keywords: "launcher app grid columns icons most used calculator emoji clipboard projects run", component: launcherPage },
+            keywords: "launcher app grid columns icons most used calculator emoji clipboard projects run style centered fullscreen spotlight attached dock bar", component: launcherPage },
         { key: "weather", group: "Shell", title: "Weather", icon: "partly_cloudy_day",
             keywords: "weather temperature celsius fahrenheit city location forecast", component: weatherPage },
         { key: "lock", group: "Shell", title: "Lock screen", icon: "lock",
@@ -532,6 +534,9 @@ Scope {
                                 onClicked: window.drawerOpen = !window.drawerOpen
                             }
                             GlassRim {}
+                            Tooltip {
+                                text: window.drawerOpen ? "Hide pages" : "Show pages"
+                            }
                         }
                         Label {
                             Layout.fillWidth: true
@@ -561,6 +566,10 @@ Scope {
                                 }
                             }
                             GlassRim {}
+                            Tooltip {
+                                text: "Search settings"
+                                keys: "Ctrl + F"
+                            }
                         }
                     }
                 }
@@ -628,6 +637,7 @@ Scope {
     Component { id: appearancePage; SettingsAppearancePage {} }
     Component { id: fontsPage; SettingsFontsPage {} }
     Component { id: barPage; SettingsBarPage {} }
+    Component { id: dockPage; SettingsDockPage {} }
     Component { id: controlCenterPage; SettingsControlCenterPage {} }
     Component { id: windowsPage; SettingsWindowsPage {} }
     Component { id: effectsPage; SettingsEffectsPage {} }

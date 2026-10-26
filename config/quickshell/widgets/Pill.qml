@@ -6,6 +6,8 @@ Rectangle {
     property alias text: label.text
     property string icon: ""
     property bool active: false
+    property string tip: ""
+    property string tipKeys: ""
     signal clicked()
 
     implicitWidth: icon ? implicitHeight : label.implicitWidth + 16
@@ -40,5 +42,10 @@ Rectangle {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
+    }
+
+    Tooltip {
+        text: root.tip
+        keys: root.tipKeys
     }
 }

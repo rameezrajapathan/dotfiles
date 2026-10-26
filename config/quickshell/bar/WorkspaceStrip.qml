@@ -192,6 +192,13 @@ Item {
                             Windows.focusWorkspace(ws.wsId);
                     }
                 }
+
+                Tooltip {
+                    active: !label.visible
+                    text: ws.active ? "Open overview" : "Go to workspace " + ws.wsId
+                    keys: ws.active || ws.wsId > 9 ? "" : "Super + " + ws.wsId
+                    side: Theme.awayFromBar
+                }
             }
         }
     }

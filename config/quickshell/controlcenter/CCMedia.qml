@@ -44,6 +44,10 @@ CCCard {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.cc.openDetail("music")
             }
+
+            Tooltip {
+                text: "Open music"
+            }
         }
 
         ColumnLayout {
@@ -84,12 +88,14 @@ CCCard {
 
                 MusicButton {
                     glyph: "previous"
+                    tip: "Previous track"
                     size: 34
                     enabled: root.player?.canGoPrevious ?? false
                     onClicked: root.player.previous()
                 }
                 MusicButton {
                     glyph: root.playing ? "pause" : "play"
+                    tip: root.playing ? "Pause" : "Play"
                     size: 40
                     glyphSize: 16
                     filled: true
@@ -99,6 +105,7 @@ CCCard {
                 }
                 MusicButton {
                     glyph: "next"
+                    tip: "Next track"
                     size: 34
                     enabled: root.player?.canGoNext ?? false
                     onClicked: root.player.next()
@@ -140,6 +147,10 @@ CCCard {
                 height: 112
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.cc.openDetail("music")
+            }
+
+            Tooltip {
+                text: "Open music"
             }
         }
 
@@ -195,6 +206,7 @@ CCCard {
 
             MusicButton {
                 icon: "shuffle"
+                tip: checked ? "Turn off shuffle" : "Shuffle"
                 size: 36
                 enabled: root.player?.shuffleSupported ?? false
                 checked: root.player?.shuffle ?? false
@@ -202,6 +214,7 @@ CCCard {
             }
             MusicButton {
                 glyph: "previous"
+                tip: "Previous track"
                 size: 44
                 enabled: root.player?.canGoPrevious ?? false
                 onClicked: root.player.previous()
@@ -209,6 +222,7 @@ CCCard {
             MusicButton {
                 Layout.fillWidth: true
                 glyph: root.playing ? "pause" : "play"
+                tip: root.playing ? "Pause" : "Play"
                 size: 44
                 glyphSize: 18
                 filled: true
@@ -218,12 +232,14 @@ CCCard {
             }
             MusicButton {
                 glyph: "next"
+                tip: "Next track"
                 size: 44
                 enabled: root.player?.canGoNext ?? false
                 onClicked: root.player.next()
             }
             MusicButton {
                 icon: root.player?.loopState === MprisLoopState.Track ? "repeat_one" : "repeat"
+                tip: root.player?.loopState === MprisLoopState.None ? "Repeat all" : root.player?.loopState === MprisLoopState.Playlist ? "Repeat one" : "Turn off repeat"
                 size: 36
                 enabled: root.player?.loopSupported ?? false
                 checked: (root.player?.loopState ?? MprisLoopState.None) !== MprisLoopState.None

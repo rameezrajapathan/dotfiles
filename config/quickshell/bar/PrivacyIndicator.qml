@@ -49,4 +49,10 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
+
+    Tooltip {
+        active: Theme.barVertical
+        text: Privacy.summary
+        side: Theme.awayFromBar
+    }
 }

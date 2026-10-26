@@ -67,6 +67,9 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.changePicture()
                 }
+                Tooltip {
+                    text: User.avatar ? "Change picture" : "Add picture"
+                }
             }
 
             ColumnLayout {
@@ -97,6 +100,7 @@ Item {
                     Pill {
                         visible: User.avatar !== ""
                         icon: "delete"
+                        tip: "Remove picture"
                         onClicked: User.removePicture()
                     }
                 }

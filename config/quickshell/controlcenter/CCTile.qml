@@ -101,6 +101,10 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.more()
             }
+
+            Tooltip {
+                text: "More settings"
+            }
         }
         Item {
             visible: !root.hasMore
@@ -134,6 +138,10 @@ Rectangle {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.more()
+            }
+
+            Tooltip {
+                text: "More settings"
             }
         }
         TextMetrics {

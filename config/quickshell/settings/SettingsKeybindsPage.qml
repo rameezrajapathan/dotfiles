@@ -142,6 +142,7 @@ SettingsPage {
         }
         Pill {
             icon: "edit"
+            tip: "Edit in a text editor"
             active: root.confirmEdit
             implicitHeight: 34
             onClicked: root.confirmEdit = !root.confirmEdit
@@ -214,6 +215,7 @@ SettingsPage {
                         id: reset
                         visible: bind.modelData.changed
                         icon: "undo"
+                        tip: "Reset to default"
                         anchors { right: keys.left; rightMargin: 8; verticalCenter: parent.verticalCenter }
                         onClicked: Keybinds.rebind(bind.modelData.id, "")
                     }
@@ -255,6 +257,11 @@ SettingsPage {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: bind.active ? root.stop() : root.start(bind.modelData.id)
+
+                        Tooltip {
+                            text: "Change shortcut"
+                            active: bind.modelData.editable && !bind.active
+                        }
                     }
                 }
             }

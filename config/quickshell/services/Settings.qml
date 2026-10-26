@@ -13,6 +13,7 @@ Singleton {
     readonly property JsonObject appearance: adapter.appearance
     readonly property JsonObject glass: adapter.glass
     readonly property JsonObject bar: adapter.bar
+    readonly property JsonObject dock: adapter.dock
     readonly property JsonObject workspaces: adapter.workspaces
     readonly property JsonObject controlCenter: adapter.controlCenter
     property alias hypr: adapter.hypr
@@ -157,6 +158,7 @@ Singleton {
             }
 
             property JsonObject launcher: JsonObject {
+                property string style: "bar"
                 property int columns: 6
                 property int cellSize: 128
                 property bool mostUsedFirst: true
@@ -186,6 +188,8 @@ Singleton {
             property JsonObject accessibility: JsonObject {
                 property real textScale: 1
                 property bool reduceMotion: false
+                property bool tooltips: true
+                property int tooltipDelay: 500
             }
 
             property JsonObject drives: JsonObject {
@@ -214,6 +218,26 @@ Singleton {
                 property bool glide: true
                 property bool pillLabel: false
                 property real size: 1
+            }
+
+            property JsonObject dock: JsonObject {
+                property bool enabled: true
+                property string position: "bottom"
+                property string mode: "always"
+                property string screens: "all"
+                property var pinned: null
+                property int iconSize: 48
+                property bool magnify: false
+                property real magnifyScale: 1.6
+                property string glass: "system"
+                property string indicator: "dot"
+                property bool indicatorCount: false
+                property string indicatorColor: ""
+                property bool showRunning: true
+                property bool showSpecial: true
+                property int previewDelay: 400
+                property bool launchPulse: true
+                property bool launcherButton: false
             }
 
             property JsonObject bar: JsonObject {

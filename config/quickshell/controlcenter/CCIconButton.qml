@@ -9,6 +9,8 @@ Rectangle {
     property bool filled: false
     property int iconSize: 20
     property int badge: 0
+    property string tip: ""
+    property string tipKeys: ""
     signal clicked()
     signal rightClicked()
 
@@ -54,5 +56,10 @@ Rectangle {
             font.pixelSize: 9
             font.bold: true
         }
+    }
+
+    Tooltip {
+        text: root.tip
+        keys: root.tipKeys
     }
 }

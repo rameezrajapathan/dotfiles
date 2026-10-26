@@ -154,6 +154,11 @@ PanelWindow {
                                 searchInput.forceActiveFocus();
                             }
                         }
+
+                        Tooltip {
+                            text: "Change location"
+                            active: !root.searchOpen
+                        }
                     }
                 }
 
@@ -170,6 +175,7 @@ PanelWindow {
                 Pill {
                     id: refreshPill
                     icon: "refresh"
+                    tip: "Refresh"
                     onClicked: Weather.autoLocation ? Weather.locate() : Weather.refresh()
                     RotationAnimator on rotation {
                         running: Weather.loading

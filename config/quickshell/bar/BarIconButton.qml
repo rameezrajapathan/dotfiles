@@ -7,6 +7,8 @@ Item {
     property string icon
     property color color: Theme.text
     property int size: Theme.iconSize
+    property string tip: ""
+    property string tipKeys: ""
     signal clicked()
 
     implicitWidth: glyph.implicitWidth
@@ -27,5 +29,11 @@ Item {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
+    }
+
+    Tooltip {
+        text: root.tip
+        keys: root.tipKeys
+        side: Theme.awayFromBar
     }
 }

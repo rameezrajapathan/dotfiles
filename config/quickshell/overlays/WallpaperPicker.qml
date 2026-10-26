@@ -177,6 +177,7 @@ PanelWindow {
                 }
                 Pill {
                     icon: "folder_open"
+                    tip: "Open wallpaper folder"
                     onClicked: {
                         root.open = false;
                         Apps.files(root.folder);

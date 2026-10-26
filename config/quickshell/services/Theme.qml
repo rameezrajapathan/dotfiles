@@ -58,6 +58,7 @@ Singleton {
     }
     readonly property int barHeight: Settings.bar.height
     readonly property string barPosition: ["top", "bottom", "left", "right"].includes(Settings.bar.position) ? Settings.bar.position : "top"
+    readonly property string awayFromBar: ({ top: "bottom", bottom: "top", left: "right", right: "left" })[barPosition]
     readonly property bool barVertical: barPosition === "left" || barPosition === "right"
     readonly property int barSpaceX: barVertical ? barHeight : 0
     readonly property int barSpaceY: barVertical ? 0 : barHeight

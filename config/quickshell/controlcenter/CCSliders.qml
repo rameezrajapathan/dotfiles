@@ -27,6 +27,7 @@ ColumnLayout {
             icon: StatusInfo.icon("audio")
             value: root.sink?.audio?.volume ?? 0
             dimmed: root.sink?.audio?.muted ?? false
+            iconTip: dimmed ? "Unmute" : "Mute"
             onMoved: v => {
                 root.sink.audio.muted = false;
                 root.sink.audio.volume = v;
@@ -37,6 +38,7 @@ ColumnLayout {
             implicitWidth: 44
             implicitHeight: 44
             icon: (root.sink?.description ?? "").toLowerCase().includes("headphone") ? "headphones" : "speaker"
+            tip: "Sound settings"
             onClicked: root.cc.openDetail("audio")
         }
     }
@@ -51,6 +53,7 @@ ColumnLayout {
             icon: (root.source?.audio?.muted ?? false) ? "mic_off" : "mic"
             value: root.source?.audio?.volume ?? 0
             dimmed: root.source?.audio?.muted ?? false
+            iconTip: dimmed ? "Unmute microphone" : "Mute microphone"
             onMoved: v => {
                 root.source.audio.muted = false;
                 root.source.audio.volume = v;
@@ -61,6 +64,7 @@ ColumnLayout {
             implicitWidth: 44
             implicitHeight: 44
             icon: "settings_voice"
+            tip: "Microphone settings"
             onClicked: root.cc.openDetail("audio")
         }
     }
@@ -80,6 +84,7 @@ ColumnLayout {
             implicitWidth: 44
             implicitHeight: 44
             icon: "monitor"
+            tip: "Display settings"
             onClicked: root.cc.openDetail("display")
         }
     }

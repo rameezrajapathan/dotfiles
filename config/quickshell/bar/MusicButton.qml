@@ -11,6 +11,8 @@ Rectangle {
     property bool checked: false
     property real size: 48
     property real glyphSize: size * 0.42
+    property string tip: ""
+    property string tipKeys: ""
     signal clicked()
 
     readonly property color fg: filled || checked ? Theme.selectedText : Theme.text
@@ -51,4 +53,9 @@ Rectangle {
     }
 
     GlassRim {}
+
+    Tooltip {
+        text: root.tip
+        keys: root.tipKeys
+    }
 }

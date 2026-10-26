@@ -88,7 +88,7 @@ Loader {
     }
     Component {
         id: power
-        BarIconButton { icon: "power_settings_new"; onClicked: root.action("power") }
+        BarIconButton { icon: "power_settings_new"; tip: "Power menu"; tipKeys: "Super + Escape"; onClicked: root.action("power") }
     }
     Component {
         id: launcher
@@ -108,6 +108,12 @@ Loader {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.action("launcher")
+            }
+
+            Tooltip {
+                text: "Open launcher"
+                keys: "Super + A"
+                side: Theme.awayFromBar
             }
         }
     }
@@ -148,6 +154,12 @@ Loader {
                 anchors.margins: -4
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.action(clockItem.music ? "cc:music" : "calendar")
+            }
+
+            Tooltip {
+                active: clockItem.music
+                text: "Show media controls"
+                side: Theme.awayFromBar
             }
         }
     }
@@ -209,6 +221,12 @@ Loader {
                 anchors.margins: -6
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.action("cc:")
+            }
+
+            Tooltip {
+                text: "Open control center"
+                keys: "Super + S"
+                side: Theme.awayFromBar
             }
         }
     }

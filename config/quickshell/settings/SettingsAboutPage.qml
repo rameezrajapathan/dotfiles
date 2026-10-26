@@ -113,6 +113,7 @@ SettingsPage {
             description: "Your choices live here, outside the dotfiles repo."
             Pill {
                 icon: "open_in_new"
+                tip: "Edit in a text editor"
                 implicitHeight: 30
                 onClicked: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/app.sh", "editor", Settings.path])
             }

@@ -158,12 +158,16 @@ Item {
                         enabled: root.player?.shuffleSupported ?? false
                         checked: root.player?.shuffle ?? false
                         onClicked: root.player.shuffle = !root.player.shuffle
+
+                        tip: root.player?.shuffle ? "Turn off shuffle" : "Shuffle"
                     }
                     MusicButton {
                         glyph: "previous"
                         size: 52
                         enabled: root.player?.canGoPrevious ?? false
                         onClicked: root.player.previous()
+
+                        tip: "Previous track"
                     }
                     MusicButton {
                         Layout.fillWidth: true
@@ -174,12 +178,16 @@ Item {
                         checked: root.playing
                         enabled: root.player?.canTogglePlaying ?? false
                         onClicked: root.player.togglePlaying()
+
+                        tip: root.playing ? "Pause" : "Play"
                     }
                     MusicButton {
                         glyph: "next"
                         size: 52
                         enabled: root.player?.canGoNext ?? false
                         onClicked: root.player.next()
+
+                        tip: "Next track"
                     }
                     MusicButton {
                         icon: root.player?.loopState === MprisLoopState.Track ? "repeat_one" : "repeat"
@@ -189,6 +197,8 @@ Item {
                         onClicked: root.player.loopState = root.player.loopState === MprisLoopState.None ? MprisLoopState.Playlist
                             : root.player.loopState === MprisLoopState.Playlist ? MprisLoopState.Track
                             : MprisLoopState.None
+
+                        tip: root.player?.loopState === MprisLoopState.Playlist ? "Repeat one" : root.player?.loopState === MprisLoopState.Track ? "Turn off repeat" : "Repeat all"
                     }
                 }
             }
@@ -265,6 +275,8 @@ Item {
                     root.closeRequested();
                     root.player.raise();
                 }
+
+                tip: "Show player"
             }
 
             Item { Layout.fillWidth: true }

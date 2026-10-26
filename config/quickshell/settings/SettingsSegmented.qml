@@ -79,6 +79,10 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.picked(option.modelData.value)
                 }
+                Tooltip {
+                    text: option.modelData.tip ?? ""
+                    active: !option.modelData.label
+                }
             }
         }
     }

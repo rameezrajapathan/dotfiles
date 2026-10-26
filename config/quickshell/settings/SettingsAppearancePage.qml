@@ -163,6 +163,7 @@ SettingsPage {
             description: files.count + " pictures. Add more here and they show up above."
             Pill {
                 icon: "open_in_new"
+                tip: "Open in the file manager"
                 implicitHeight: 30
                 onClicked: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/app.sh", "files", root.folder])
             }

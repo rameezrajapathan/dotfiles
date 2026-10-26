@@ -38,7 +38,24 @@ PanelWindow {
     readonly property var modeInfo: modes[search.text.charAt(0)] ?? null
     readonly property string mode: modeInfo?.name ?? "apps"
     readonly property string query: (modeInfo ? search.text.slice(1) : search.text).trim()
-    readonly property int columns: mode === "apps" ? appColumns : mode === "emoji" ? 10 : 1
+    readonly property var styles: ["bar", "dock", "center", "fullscreen", "spotlight"]
+    property string activeStyle: "bar"
+    readonly property bool spotlight: activeStyle === "spotlight"
+    readonly property bool fullscreen: activeStyle === "fullscreen"
+    readonly property int cell: Math.round(cellSize * (fullscreen ? 1.35 : 1))
+    readonly property int fsWidth: Math.min(1500, width - 160)
+    readonly property int fsColumns: Math.max(4, Math.floor(fsWidth / cell))
+    readonly property int columns: mode === "apps" ? (spotlight ? 1 : fullscreen ? fsColumns : appColumns) : mode === "emoji" ? (spotlight ? 8 : 10) : 1
+    readonly property int cardWidth: Math.min(width - Theme.barSpaceX - 56, appColumns * cellSize + 40)
+    readonly property int cardHeight: Math.min(600, height - Theme.barSpaceY - 40)
+
+    property string category: ""
+    readonly property var categoryNames: [
+        ["", "All"], ["Network", "Internet"], ["Development", "Development"], ["Graphics", "Graphics"],
+        ["AudioVideo", "Media"], ["Office", "Office"], ["Game", "Games"], ["Education", "Education"],
+        ["Science", "Science"], ["Utility", "Utilities"], ["System", "System"], ["Settings", "Settings"]
+    ]
+    readonly property var categoryChips: categoryNames.filter(c => !c[0] || apps.some(e => e.categories.includes(c[0])))
 
     readonly property var apps: DesktopEntries.applications.values
         .filter(e => !e.noDisplay)
@@ -115,17 +132,18 @@ PanelWindow {
                     run: () => Quickshell.execDetached(["sh", "-c", "cliphist list | grep -m1 \"^" + c.id + "\t\" | cliphist decode | wl-copy"])
                 })));
         default:
-            return appResults(q).map(e => ({ title: e.name, app: e, run: () => launch(e) }));
+            return appResults(q).map(e => ({ title: e.name, subtitle: e.comment || e.genericName || "", app: e, run: () => launch(e) }));
         }
     }
 
     function appResults(q) {
+        const pool = fullscreen && category ? apps.filter(e => e.categories.includes(category)) : apps;
         if (q === "")
             return Settings.launcher.mostUsedFirst
-                ? apps.slice().sort((a, b) => (usage[b.id] ?? 0) - (usage[a.id] ?? 0) || a.name.localeCompare(b.name))
-                : apps;
+                ? pool.slice().sort((a, b) => (usage[b.id] ?? 0) - (usage[a.id] ?? 0) || a.name.localeCompare(b.name))
+                : pool;
         const scored = [];
-        for (const e of apps) {
+        for (const e of pool) {
             const s = score(e, q);
             if (s >= 0)
                 scored.push({ e: e, s: s });
@@ -157,17 +175,46 @@ PanelWindow {
         return Quickshell.iconPath(Quickshell.hasThemeIcon(e.icon) ? e.icon : "application-x-executable");
     }
 
-    function toggle() {
+    function toggle(style) {
+        if (dockWait.running) {
+            dockWait.stop();
+            finish();
+            return;
+        }
         if (open) {
             open = false;
             return;
         }
+        const want = styles.includes(style) ? style : styles.includes(Settings.launcher.style) ? Settings.launcher.style : "bar";
+        const name = screen?.name ?? "";
+        activeStyle = want === "dock" && !Dock.availableOn(name) ? "center" : want;
         search.text = "";
+        category = "";
         grid.currentIndex = 0;
         grid.positionViewAtBeginning();
         projectReader.running = true;
         visible = true;
+        if (activeStyle === "dock") {
+            Dock.holdScreen = name;
+            if (!Dock.places[name]?.shown) {
+                dockWait.restart();
+                return;
+            }
+        }
         open = true;
+    }
+
+    Timer {
+        id: dockWait
+        interval: Theme.ms(280)
+        onTriggered: root.open = true
+    }
+
+    function finish() {
+        if (open)
+            return;
+        visible = false;
+        Dock.holdScreen = "";
     }
 
     function activate(item, shift) {
@@ -326,7 +373,14 @@ PanelWindow {
     IpcHandler {
         target: "launcher"
         function toggle(): void {
-            root.toggle();
+            root.toggle("");
+        }
+        function toggleStyle(style: string): void {
+            root.toggle(style);
+        }
+        function style(name: string): void {
+            if (root.styles.includes(name))
+                Settings.launcher.style = name;
         }
         function forget(): void {
             root.usage = {};
@@ -334,7 +388,7 @@ PanelWindow {
         }
         function open(text: string): void {
             if (!root.open)
-                root.toggle();
+                root.toggle("");
             search.text = text;
         }
     }
@@ -350,9 +404,9 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: "black"
-        opacity: root.open ? 0.3 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.ms(180) } }
+        color: root.fullscreen ? Qt.alpha(Theme.base, 0.62) : "black"
+        opacity: root.open ? (root.fullscreen ? 1 : root.activeStyle === "dock" ? 0 : 0.3) : 0
+        Behavior on opacity { NumberAnimation { duration: Theme.ms(root.fullscreen ? 240 : 180) } }
     }
 
     MouseArea {
@@ -360,22 +414,126 @@ PanelWindow {
         onClicked: root.open = false
     }
 
+    property real shown: root.open && root.activeStyle !== "bar" ? 1 : 0
+    Behavior on shown { NumberAnimation { duration: Theme.ms(root.open ? 280 : 180); easing.type: Easing.OutCubic } }
+    onShownChanged: if (shown === 0 && activeStyle !== "bar") finish()
+
+    readonly property int spotlightHeight: {
+        const m = 2 * Theme.pad(20, 24);
+        if (search.text === "")
+            return m + 52 + (Object.keys(modes).length ? 14 + 30 : 0);
+        const rows = Math.max(1, Math.min(columns === 1 ? 7 : 4, Math.ceil(grid.count / columns)));
+        return m + 52 + 14 + rows * grid.cellHeight;
+    }
+
+    readonly property var dockPlace: Dock.places[screen?.name ?? ""] ?? null
+    readonly property rect floatTarget: {
+        const W = width;
+        const H = height;
+        if (spotlight) {
+            const w = Math.min(720, W - 80);
+            return Qt.rect((W - w) / 2, Math.round(H * 0.2), w, spotlightHeight);
+        }
+        const p = dockPlace;
+        if (activeStyle === "dock" && p) {
+            const gap = 12;
+            if (p.edge === "bottom") {
+                const h = Math.min(cardHeight, p.y - gap - Theme.barSpaceY - 24);
+                return Qt.rect(Math.max(16, Math.min(W - cardWidth - 16, p.x + p.width / 2 - cardWidth / 2)), p.y - gap - h, cardWidth, h);
+            }
+            const w = Math.min(cardWidth, (p.edge === "left" ? W - p.x - p.width : p.x) - gap - 24);
+            const y = Math.max(16, Math.min(H - cardHeight - 16, p.y + p.height / 2 - cardHeight / 2));
+            return Qt.rect(p.edge === "left" ? p.x + p.width + gap : p.x - gap - w, y, w, cardHeight);
+        }
+        return Qt.rect((W - cardWidth) / 2, (H - cardHeight) / 2, cardWidth, cardHeight);
+    }
+    readonly property rect floatFrom: {
+        const t = floatTarget;
+        const p = dockPlace;
+        if (activeStyle === "dock" && p)
+            return Qt.rect(p.x, p.y, p.width, p.height);
+        if (spotlight)
+            return Qt.rect(t.x, t.y - 12, t.width, t.height);
+        return Qt.rect(t.x + t.width * 0.03, t.y + t.height * 0.03, t.width * 0.94, t.height * 0.94);
+    }
+
     Sheet {
         id: card
-        open: root.open
+        open: root.open && root.activeStyle === "bar"
         anchorIds: ["launcher"]
-        sheetWidth: Math.min(root.width - Theme.barSpaceX - 56, root.appColumns * root.cellSize + 40)
-        sheetHeight: Math.min(600, root.height - Theme.barSpaceY - 40)
-        onClosed: root.visible = false
+        sheetWidth: root.cardWidth
+        sheetHeight: root.cardHeight
+        onClosed: if (root.activeStyle === "bar") root.finish()
         onDismiss: root.open = false
+
+        Item {
+            id: barSlot
+            anchors.fill: parent
+        }
+    }
+
+    Rectangle {
+        id: floatCard
+        readonly property real t: root.shown
+        readonly property bool morph: root.activeStyle === "dock"
+        visible: root.activeStyle !== "bar" && !root.fullscreen && t > 0
+        x: root.floatFrom.x + (root.floatTarget.x - root.floatFrom.x) * t
+        y: root.floatFrom.y + (root.floatTarget.y - root.floatFrom.y) * t
+        width: root.floatFrom.width + (root.floatTarget.width - root.floatFrom.width) * t
+        height: root.floatFrom.height + (root.floatTarget.height - root.floatFrom.height) * t
+        Behavior on height {
+            enabled: root.spotlight && floatCard.t === 1
+            NumberAnimation { duration: Theme.ms(160); easing.type: Easing.OutCubic }
+        }
+        opacity: morph ? 1 : t
+        radius: Theme.round(morph ? 22 + 2 * t : 24, width, height)
+        color: "transparent"
+
+        GlassPanel {
+            radius: floatCard.radius
+            tint: Theme.baseTranslucent
+            shadow: true
+            tracking: floatCard.t < 1 || root.spotlight
+        }
+
+        MouseArea {
+            anchors.fill: parent
+        }
+
+        Item {
+            id: floatSlot
+            anchors.fill: parent
+            clip: true
+            opacity: floatCard.morph ? Math.max(0, (floatCard.t - 0.45) / 0.55) : 1
+        }
+    }
+
+    Item {
+        id: fsSlot
+        visible: root.fullscreen && root.shown > 0
+        width: root.fsWidth
+        x: (root.width - width) / 2
+        y: Theme.barSpaceY + 64
+        height: root.height - y - 48
+        opacity: root.shown
+        scale: 1.04 - 0.04 * root.shown
+    }
+
+    Item {
+        id: body
+        parent: root.activeStyle === "bar" ? barSlot : root.fullscreen ? fsSlot : floatSlot
+        anchors.fill: parent
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Theme.pad(20, 24)
+            anchors.margins: root.fullscreen ? 0 : Theme.pad(20, 24)
             spacing: 14
 
             Rectangle {
+                id: searchBox
                 Layout.fillWidth: true
+                Layout.maximumWidth: root.fullscreen ? 720 : -1
+                Layout.alignment: Qt.AlignHCenter
                 implicitHeight: 52
                 radius: Theme.round(16, width, height)
                 color: Theme.glassFill(2)
@@ -461,7 +619,9 @@ PanelWindow {
             }
 
             RowLayout {
-                Layout.fillWidth: true
+                id: modeChips
+                Layout.fillWidth: !root.fullscreen
+                Layout.alignment: Qt.AlignHCenter
                 visible: search.text === ""
                 spacing: 8
 
@@ -517,13 +677,64 @@ PanelWindow {
                 }
             }
 
+            Row {
+                id: categoryRow
+                Layout.alignment: Qt.AlignHCenter
+                visible: root.fullscreen && root.mode === "apps"
+                spacing: 8
+
+                Repeater {
+                    model: root.categoryChips
+
+                    Rectangle {
+                        id: catChip
+                        required property var modelData
+                        readonly property bool selected: root.category === modelData[0]
+                        implicitWidth: catLabel.implicitWidth + 24
+                        implicitHeight: 30
+                        radius: Theme.round(15, width, height)
+                        color: selected ? Theme.selectedFill : catMouse.containsMouse ? Qt.alpha(Theme.accent, 0.22) : Theme.glassFill(2)
+                        gradient: Theme.accentFill(selected)
+                        GlassRim {
+                            strength: 0.7
+                        }
+
+                        Label {
+                            id: catLabel
+                            anchors.centerIn: parent
+                            text: catChip.modelData[1]
+                            color: catChip.selected ? Theme.selectedText : Theme.subtext
+                            font.pixelSize: Theme.fontSize - 1
+                        }
+
+                        MouseArea {
+                            id: catMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.category = catChip.modelData[0];
+                                grid.currentIndex = 0;
+                                search.forceActiveFocus();
+                            }
+                        }
+                    }
+                }
+            }
+
             GridView {
                 id: grid
+                visible: !(root.spotlight && search.text === "")
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.maximumHeight: Math.max(cellHeight, Math.floor((parent.height - y - (footerRow.visible ? footerRow.implicitHeight + 14 : 0)) / cellHeight) * cellHeight)
+                Layout.alignment: Qt.AlignTop
+                readonly property real space: parent.height - searchBox.implicitHeight - 14
+                    - (modeChips.visible ? modeChips.implicitHeight + 14 : 0)
+                    - (categoryRow.visible ? categoryRow.implicitHeight + 14 : 0)
+                    - (footerRow.visible ? footerRow.implicitHeight + 14 : 0)
+                Layout.maximumHeight: Math.max(cellHeight, Math.floor(space / cellHeight) * cellHeight)
                 cellWidth: width / root.columns
-                cellHeight: root.mode === "apps" ? root.cellSize : root.mode === "emoji" ? 76 : 60
+                cellHeight: root.mode === "apps" ? (root.columns === 1 ? 60 : root.cell) : root.mode === "emoji" ? 76 : 60
                 clip: true
                 model: root.results
                 highlightFollowsCurrentItem: true
@@ -570,11 +781,11 @@ PanelWindow {
                         anchors.centerIn: parent
                         width: parent.width - 20
                         spacing: 10
-                        visible: cell.modelData.app !== undefined
+                        visible: cell.modelData.app !== undefined && !cell.list
 
                         IconImage {
                             Layout.alignment: Qt.AlignHCenter
-                            implicitSize: Math.round(root.cellSize * 0.4)
+                            implicitSize: Math.round(root.cell * 0.4)
                             source: cell.modelData.app ? root.iconFor(cell.modelData.app) : ""
                             asynchronous: true
                             scale: cell.selected ? 1.08 : 1
@@ -606,8 +817,14 @@ PanelWindow {
                         spacing: 14
                         visible: cell.list
 
+                        IconImage {
+                            visible: cell.modelData.app !== undefined
+                            implicitSize: 32
+                            source: cell.modelData.app ? root.iconFor(cell.modelData.app) : ""
+                            asynchronous: true
+                        }
                         Icon {
-                            visible: !cell.modelData.thumb || thumb.status !== Image.Ready
+                            visible: cell.modelData.app === undefined && (!cell.modelData.thumb || thumb.status !== Image.Ready)
                             name: cell.modelData.symbol ?? ""
                             filled: cell.selected
                             color: cell.selected ? Theme.accent : Theme.subtext

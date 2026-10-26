@@ -252,6 +252,10 @@ PanelWindow {
                                         Windows.focus(win.modelData);
                                     }
                                 }
+
+                                Tooltip {
+                                    text: win.modelData.title ?? ""
+                                }
                             }
                         }
                         GlassRim {}

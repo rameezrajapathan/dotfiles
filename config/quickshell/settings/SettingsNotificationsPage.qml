@@ -130,6 +130,7 @@ SettingsPage {
             description: "Sends a test notification."
             Pill {
                 icon: "send"
+                tip: "Send a test notification"
                 implicitHeight: 30
                 onClicked: Quickshell.execDetached(["notify-send", "-a", "Settings", "-i", "preferences-desktop", "Hello from Settings", "This is how notifications look now."])
             }

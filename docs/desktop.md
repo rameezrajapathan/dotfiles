@@ -53,6 +53,28 @@ live spectrum and Now playing shows the track):
 | **Classic**<br>full width | ![Classic bar: Edge to edge and square, like a traditional desktop.](screenshots/bar-classic-v4.webp) |
 | **Maximalist**<br>full width | ![Maximalist bar: Everything, all at once.](screenshots/bar-maximalist-v4.webp) |
 
+## Dock (Super + D)
+
+A strip of app icons on its own screen edge (bottom by default; left or right, never the bar's
+edge). Pinned apps come first in your order, then a divider and the apps you have open that
+aren't pinned, in the order you opened them. One icon per app, however many windows it has;
+apps on special workspaces (scratchpads, the drop-down terminal, background apps) count too and
+get a badge when every window is there.
+
+- **Click** an app that isn't open to start it (the icon pulses until its window shows up). Click
+  an open app to focus its last window, opening its workspace or special workspace if needed;
+  click again to cycle through its windows. **Middle-click** opens a new window.
+- **Hover** for live window previews. Click one to go to that window, ✕ or middle-click closes it.
+- **Right-click** for New window (with its keybinding, if it has one), the app's own actions
+  (such as New Private Window), Keep in Dock / Remove from Dock, Close and Dock settings.
+- **Drag** icons to reorder pins, drag an open app among them to pin it, or drag a pin off the
+  dock to remove it.
+- **Super + D** hides it or brings it back. With auto-hide or intellihide, rest the pointer on
+  the edge to show it. It always hides for a fullscreen window.
+
+Everything else is in Settings > Dock. From a script: `qs ipc call dock toggle|show|hide`,
+`dock mode always|autohide|intellihide`, `dock edge bottom|left|right`, `dock pin|unpin <app id>`.
+
 ## Calendar
 
 Click the clock (or the date). The time, the month (arrows or scroll change it, the month name
@@ -171,7 +193,18 @@ loads after its own rules. Edit `monitors.lua` only to change those defaults.
 
 ![Launcher](screenshots/launcher-v4.webp)
 
-Apps, most used first. A first character switches mode:
+Apps, most used first. Five styles, set in Settings > Launcher (or `qs ipc call launcher style
+bar|dock|center|fullscreen|spotlight`):
+
+- **Attached to bar** (default): grows out of the bar.
+- **Attached to dock**: the dock comes in first, then the launcher grows out of it. It opens
+  centered when the dock is off or a fullscreen window hides it.
+- **Centered**: a card in the middle of the screen.
+- **Fullscreen**: big icons over a frosted screen, with category chips (Internet, Development,
+  Graphics…). Click an empty spot or press Esc to close it.
+- **Spotlight**: only a search field. Results appear as a list as you type.
+
+A first character switches mode:
 
 | Prefix | Mode | Enter | Shift + Enter |
 |---|---|---|---|
@@ -186,6 +219,12 @@ Delete clears the history. Pins are files in `~/.local/share/pikadots/clipboard-
 and kept when the history is cleared. Settings > Launcher sets the history size and "Keep copied
 text when the app closes" (`wl-clip-persist`). `hypr/scripts/clipboard.sh watch` starts both at
 login.
+
+## Tooltips
+
+Hovering any button that shows only an icon names it after half a second, with its keybinding
+when it has one (for example *Open control center · Super + S*). Tray icons show the app's own
+text. Settings > Accessibility turns tooltips off or changes the delay.
 
 ## Overlays
 

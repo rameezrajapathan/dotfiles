@@ -46,6 +46,20 @@ Singleton {
         return "circle";
     }
 
+    readonly property var titles: ({
+        music: "Music", notifications: "Notifications", network: "Network", bluetooth: "Bluetooth",
+        audio: "Volume", display: "Display", drives: "Drives", battery: "Battery", system: "System",
+        capture: "Screenshot and recording", github: "GitHub", account: "Account"
+    })
+
+    function tooltip(key) {
+        const d = key === "notifications" ? (NotificationService.dnd ? "Do Not Disturb" : NotificationService.list.length ? NotificationService.list.length + " new" : "")
+            : key === "battery" ? batteryPercent + "%" + (charging ? ", charging" : "")
+            : detail(key);
+        const extra = { audio: "right-click mutes, scroll changes", bluetooth: "right-click turns on or off", notifications: "right-click toggles Do Not Disturb" }[key];
+        return [titles[key] ?? key, d, extra].filter(Boolean).join(" · ");
+    }
+
     function detail(key) {
         switch (key) {
         case "network": return wifi?.name ?? (netDevice ? "Wired" : "Offline");

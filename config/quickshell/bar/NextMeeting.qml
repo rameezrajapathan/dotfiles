@@ -35,4 +35,10 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: Meetings.join(Meetings.next)
     }
+
+    Tooltip {
+        active: Theme.barVertical
+        text: Meetings.label(Meetings.next)
+        side: Theme.awayFromBar
+    }
 }

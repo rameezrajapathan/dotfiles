@@ -39,6 +39,10 @@ RowLayout {
             cursorShape: Qt.PointingHandCursor
             onClicked: root.cc.openDetail("account")
         }
+
+        Tooltip {
+            text: "Open account"
+        }
     }
 
     ColumnLayout {
@@ -71,6 +75,8 @@ RowLayout {
 
     CCIconButton {
         icon: "lock"
+        tip: "Lock"
+        tipKeys: "Super + L"
         onClicked: {
             root.cc.close();
             Quickshell.execDetached(["loginctl", "lock-session"]);
@@ -78,6 +84,8 @@ RowLayout {
     }
     CCIconButton {
         icon: "settings"
+        tip: "Open settings · Right-click for control center settings"
+        tipKeys: "Super + comma"
         onClicked: {
             root.cc.close();
             Settings.openRequested("");
@@ -90,6 +98,8 @@ RowLayout {
     CCIconButton {
         icon: "power_settings_new"
         tone: "danger"
+        tip: "Power menu"
+        tipKeys: "Super + Escape"
         onClicked: {
             root.cc.close();
             Quickshell.execDetached(["qs", "ipc", "call", "power", "toggle"]);

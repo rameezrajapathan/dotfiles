@@ -37,4 +37,10 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
+
+    Tooltip {
+        text: Weather.ready ? "Weather · " + [Weather.place, Weather.label(Weather.current.code)].filter(s => s).join(", ") : ""
+        keys: "Super + Ctrl + W"
+        side: Theme.awayFromBar
+    }
 }

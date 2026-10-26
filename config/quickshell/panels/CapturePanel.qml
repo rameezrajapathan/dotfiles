@@ -35,6 +35,7 @@ Item {
                 }
                 Pill {
                     icon: "folder_open"
+                    tip: "Open screenshots folder"
                     onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "exec \"$1\" files \"$(xdg-user-dir PICTURES)/Screenshots\"", "sh", Apps.script]))
                 }
             }
@@ -42,11 +43,11 @@ Item {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Tile { icon: "screenshot_region"; label: "Region"; onClicked: root.run(() => Capture.screenshot("region")) }
-                Tile { icon: "web_asset"; label: "Window"; onClicked: root.run(() => Capture.screenshot("active")) }
-                Tile { icon: "screenshot_monitor"; label: "Screen"; onClicked: root.run(() => Capture.screenshot("full")) }
-                Tile { icon: "draw"; label: "Annotate"; onClicked: root.run(() => Capture.annotate()) }
-                Tile { icon: "document_scanner"; label: "Text"; onClicked: root.run(() => Capture.copyText()) }
+                Tile { icon: "screenshot_region"; label: "Region"; tip: "Save a region screenshot"; tipKeys: "Super + Shift + F"; onClicked: root.run(() => Capture.screenshot("region")) }
+                Tile { icon: "web_asset"; label: "Window"; tip: "Save a window screenshot"; onClicked: root.run(() => Capture.screenshot("active")) }
+                Tile { icon: "screenshot_monitor"; label: "Screen"; tip: "Save a full-screen screenshot"; onClicked: root.run(() => Capture.screenshot("full")) }
+                Tile { icon: "draw"; label: "Annotate"; tip: "Annotate a region screenshot"; tipKeys: "Shift + Print"; onClicked: root.run(() => Capture.annotate()) }
+                Tile { icon: "document_scanner"; label: "Text"; tip: "Copy the text in a region"; tipKeys: "Super + Shift + T"; onClicked: root.run(() => Capture.copyText()) }
             }
 
             RowLayout {
@@ -60,6 +61,7 @@ Item {
                 }
                 Pill {
                     icon: "folder_open"
+                    tip: "Open recordings folder"
                     onClicked: root.run(() => Quickshell.execDetached(["sh", "-c", "exec \"$1\" files \"$(xdg-user-dir VIDEOS)/Recordings\"", "sh", Apps.script]))
                 }
             }
@@ -67,8 +69,8 @@ Item {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Tile { icon: "screen_record"; label: "Region"; onClicked: root.run(() => Recorder.record("region")) }
-                Tile { icon: "desktop_windows"; label: "Screen"; onClicked: root.run(() => Recorder.record("full")) }
+                Tile { icon: "screen_record"; label: "Region"; tip: "Record a region"; tipKeys: "Super + Shift + R"; onClicked: root.run(() => Recorder.record("region")) }
+                Tile { icon: "desktop_windows"; label: "Screen"; tip: "Record the full screen"; tipKeys: "Super + Alt + R"; onClicked: root.run(() => Recorder.record("full")) }
             }
 
             Label {
@@ -86,6 +88,8 @@ Item {
         id: tile
         property string icon
         property string label
+        property string tip
+        property string tipKeys
         signal clicked()
 
         Layout.fillWidth: true
@@ -118,6 +122,11 @@ Item {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: tile.clicked()
+        }
+
+        Tooltip {
+            text: tile.tip
+            keys: tile.tipKeys
         }
     }
 }

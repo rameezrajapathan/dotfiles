@@ -230,6 +230,7 @@ PanelWindow {
                     CCIconButton {
                         icon: "arrow_back"
                         tone: "flat"
+                        tip: "Back"
                         onClicked: root.back()
                     }
                     Label {

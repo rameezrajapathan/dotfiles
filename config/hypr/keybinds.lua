@@ -59,6 +59,7 @@ hl.bind(mod .. " + ALT + minus", script("zoom.sh out"), { repeating = true, desc
 hl.bind(mod .. " + ALT + 0", script("zoom.sh reset"), { description = "Reset zoom" })
 hl.bind(mod .. " + E", app("files"), { description = "Open file manager" })
 hl.bind(mod .. " + A", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "Open app launcher" })
+hl.bind(mod .. " + D", hl.dsp.exec_cmd("qs ipc call dock toggle"), { description = "Show or hide the dock" })
 hl.bind(mod .. " + P", hl.dsp.exec_cmd("qs ipc call launcher open '~'"), { description = "Open a project (VS Code / Neovim)" })
 hl.bind(mod .. " + V", hl.dsp.exec_cmd("qs ipc call launcher open +"), { description = "Open clipboard history" })
 hl.bind(mod .. " + Escape", hl.dsp.exec_cmd("qs ipc call power toggle"), { description = "Open power menu" })

@@ -69,4 +69,9 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
+
+    Tooltip {
+        text: "CPU " + root.cpu + "% · Memory " + root.memory + "%"
+        side: Theme.awayFromBar
+    }
 }

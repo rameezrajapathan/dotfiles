@@ -109,4 +109,9 @@ Item {
         onWheel: wheel => Quickshell.execDetached(["hyprctl", "dispatch",
             `hl.dsp.focus({ workspace = "${wheel.angleDelta.y < 0 ? "e+1" : "e-1"}" })`])
     }
+
+    Tooltip {
+        text: "Open overview"
+        side: Theme.awayFromBar
+    }
 }

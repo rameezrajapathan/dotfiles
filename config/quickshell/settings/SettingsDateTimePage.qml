@@ -251,6 +251,7 @@ SettingsPage {
                     }
                     Pill {
                         icon: "close"
+                        tip: "Remove"
                         implicitHeight: 28
                         onClicked: {
                             const l = Settings.datetime.worldClocks.slice();

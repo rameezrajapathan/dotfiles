@@ -62,11 +62,14 @@ Item {
                 Pill {
                     icon: NotificationService.dnd ? "do_not_disturb_on" : "do_not_disturb_off"
                     active: NotificationService.dnd
+                    tip: NotificationService.dnd ? "Turn off Do Not Disturb" : "Turn on Do Not Disturb"
+                    tipKeys: "Super + Shift + N"
                     onClicked: NotificationService.dnd = !NotificationService.dnd
                 }
                 Pill {
                     visible: NotificationService.list.length > 0
                     icon: "clear_all"
+                    tip: "Clear all"
                     onClicked: NotificationService.dismissAll()
                 }
             }
