@@ -49,7 +49,6 @@ Singleton {
 
     function activate(n) {
         const action = n.actions.find(a => a.identifier === "default");
-        Background.notificationClicked(n);
         if (action)
             action.invoke();
         hidePopup(n);

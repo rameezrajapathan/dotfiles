@@ -18,7 +18,7 @@ Singleton {
         { id: "media", label: "Now playing", icon: "music_note", description: "Track and artist" },
         { id: "recording", label: "Recording & privacy", icon: "radio_button_checked", description: "While recording, or while an app uses the mic, camera or screen" },
         { id: "capture", label: "Capture", icon: "screenshot_frame", description: "Screenshots and recording" },
-        { id: "tray", label: "Tray", icon: "widgets", description: "Background apps' icons" },
+        { id: "tray", label: "Tray", icon: "widgets", description: "Tray icons" },
         { id: "system", label: "CPU & memory", icon: "memory", description: "Usage in percent" },
         { id: "network", label: "Network", icon: "wifi", description: "Wi-Fi or wired" },
         { id: "bluetooth", label: "Bluetooth", icon: "bluetooth", description: "Right click turns it on or off" },

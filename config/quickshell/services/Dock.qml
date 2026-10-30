@@ -137,10 +137,6 @@ Singleton {
         if (!t)
             return;
         const name = specialName(t);
-        if (name === "background") {
-            Background.show(t);
-            return;
-        }
         if (name && Special.on(Hyprland.focusedMonitor?.name ?? "") !== name)
             dispatch(`hl.dsp.workspace.toggle_special("${name}")`);
         dispatch(`hl.dsp.focus({ window = "${selector(t)}" })`);
@@ -201,8 +197,6 @@ Singleton {
     function launch(key) {
         const e = entry(key);
         if (!e)
-            return;
-        if (Background.reveal(e))
             return;
         if (e.runInTerminal)
             Apps.terminal(e.command);

@@ -73,7 +73,7 @@ hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("brightnessctl -d '*::kbd_backl
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+ && qs ipc call osd brightness"), { locked = true, repeating = true, description = "Raise display brightness" })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%- && qs ipc call osd brightness"), { locked = true, repeating = true, description = "Lower display brightness" })
 
-hl.bind(mod .. " + Q", require("background").hide_or_close, { description = "Close active window (background apps hide to the tray)" })
+hl.bind(mod .. " + Q", hl.dsp.window.close(), { description = "Close active window" })
 hl.bind(mod .. " + F", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle floating window" })
 hl.bind(mod .. " + CTRL + M", hl.dsp.window.fullscreen({ mode = 1 }), { description = "Toggle maximized window" })
 hl.bind(mod .. " + W", hl.dsp.group.toggle(), { description = "Toggle window group" })

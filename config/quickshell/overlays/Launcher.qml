@@ -234,8 +234,6 @@ PanelWindow {
         counts[e.id] = (counts[e.id] ?? 0) + 1;
         usage = counts;
         usageView.setText(JSON.stringify(counts));
-        if (Background.reveal(e))
-            return;
         if (e.runInTerminal)
             Apps.terminal(e.command);
         else

@@ -212,7 +212,7 @@ SettingsPage {
         SettingsRow {
             icon: "stack"
             title: "Apps on special workspaces"
-            description: "Scratchpads, the drop-down terminal and background apps. Clicking one opens its workspace."
+            description: "Scratchpads and the drop-down terminal. Clicking one opens its workspace."
             Switch {
                 checked: root.dk.showSpecial
                 onToggled: root.dk.showSpecial = !checked
