@@ -1,3 +1,0 @@
-^org\.mozilla\.Thunderbird$
-^thunderbird$
-^chrome-[a-p]+-.+$
