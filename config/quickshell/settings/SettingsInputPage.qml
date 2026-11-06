@@ -66,7 +66,7 @@ SettingsPage {
 
     SettingsSection {
         title: "Mouse"
-        readonly property var keys: ["input.sensitivity", "input.accel_profile", "input.follow_mouse", "input.natural_scroll"]
+        readonly property var keys: ["input.sensitivity", "input.accel_profile", "input.follow_mouse", "input.natural_scroll", "input.swallow_focus_click", "cursor.hide_on_key_press"]
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)
 
@@ -110,11 +110,29 @@ SettingsPage {
                 onToggled: Hypr.set("input.natural_scroll", !checked)
             }
         }
+        SettingsRow {
+            icon: "left_click"
+            title: "Click only focuses"
+            description: "The click that focuses a window isn't passed on to it, so you can't hit a button by accident."
+            Switch {
+                checked: Hypr.value("input.swallow_focus_click") ?? false
+                onToggled: Hypr.set("input.swallow_focus_click", !checked)
+            }
+        }
+        SettingsRow {
+            icon: "visibility_off"
+            title: "Hide pointer while typing"
+            description: "It comes back when you move the mouse."
+            Switch {
+                checked: Hypr.value("cursor.hide_on_key_press") ?? false
+                onToggled: Hypr.set("cursor.hide_on_key_press", !checked)
+            }
+        }
     }
 
     SettingsSection {
         title: "Touchpad"
-        readonly property var keys: ["input.touchpad.natural_scroll", "input.touchpad.tap_to_click", "input.touchpad.disable_while_typing", "input.touchpad.scroll_factor"]
+        readonly property var keys: ["input.touchpad.natural_scroll", "input.touchpad.tap_to_click", "input.touchpad.disable_while_typing", "input.touchpad.scroll_factor", "pikadots.gestures"]
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)
 
@@ -151,6 +169,15 @@ SettingsPage {
                 value: Hypr.value("input.touchpad.scroll_factor") ?? 1
                 suffix: "×"
                 onMoved: v => Hypr.set("input.touchpad.scroll_factor", v)
+            }
+        }
+        SettingsRow {
+            icon: "swipe"
+            title: "Gestures"
+            description: "3 fingers: sideways switches workspaces, up opens the overview, down shows scratchpad 1. Pinch with 4 fingers to zoom. Hold Super: 3 fingers move a window, 4 resize it."
+            Switch {
+                checked: Hypr.value("pikadots.gestures") ?? true
+                onToggled: Hypr.set("pikadots.gestures", !checked)
             }
         }
     }

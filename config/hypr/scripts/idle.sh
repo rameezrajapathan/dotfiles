@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -u
 
+if [[ -z ${INVOCATION_ID:-} ]] && systemctl --user is-enabled -q pikadots-idle.service 2>/dev/null; then
+	exec systemctl --user restart pikadots-idle.service
+fi
+
 settings=~/.config/pikadots/settings.json
 get() {
 	local v

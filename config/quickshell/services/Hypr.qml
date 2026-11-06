@@ -1,7 +1,9 @@
 pragma Singleton
 
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
+import Quickshell.Services.UPower
 import QtQuick
 
 Singleton {
@@ -17,32 +19,80 @@ Singleton {
         "general.gaps_in", "general.gaps_out", "general.border_size", "general.layout", "general.resize_on_border",
         "decoration.rounding", "decoration.rounding_power", "decoration.active_opacity", "decoration.inactive_opacity",
         "decoration.dim_inactive", "decoration.dim_strength", "decoration.blur.enabled", "decoration.blur.size",
-        "decoration.blur.passes", "decoration.blur.vibrancy", "decoration.shadow.enabled", "decoration.shadow.range",
-        "animations.enabled",
+        "decoration.blur.passes", "decoration.blur.vibrancy", "decoration.blur.variant", "decoration.blur.proportional",
+        "decoration.shadow.enabled", "decoration.shadow.range",
+        "decoration.wobble.enabled", "decoration.wobble.intensity", "decoration.motion_blur.enabled",
+        "animations.enabled", "group.groupbar.disable_when_only", "cursor.hide_on_key_press", "input.swallow_focus_click",
+        "misc.animate_mouse_windowdragging", "misc.animate_manual_resizes",
+        "decoration.blur.glass.size", "decoration.blur.glass.refraction", "decoration.blur.glass.roughness",
+        "decoration.blur.acrylic.clarity", "decoration.blur.acrylic.refraction",
+        "decoration.blur.aurora.intensity", "decoration.blur.haze.intensity", "decoration.blur.haze.iridescence",
+        "decoration.blur.fluid_jar.fill_amount", "decoration.blur.fluid_jar.turbulence",
+        "decoration.blur.ripple.strength", "decoration.blur.ripple.radius", "decoration.blur.ripple.duration",
+        "decoration.blur.water.strength", "decoration.blur.water.radius",
         "input.kb_layout", "input.kb_options", "input.repeat_rate", "input.repeat_delay", "input.sensitivity",
         "input.accel_profile", "input.follow_mouse", "input.natural_scroll", "input.touchpad.natural_scroll",
         "input.touchpad.tap_to_click", "input.touchpad.disable_while_typing", "input.touchpad.scroll_factor"
     ]
 
     readonly property var animations: [
-        { leaf: "windows", speed: 3 },
-        { leaf: "workspaces", speed: 5 },
+        { leaf: "windows", speed: 3, curved: true },
+        { leaf: "windowsIn", speed: 3, curved: true, style: "popin 87%" },
+        { leaf: "windowsOut", speed: 1.5, style: "popin 87%" },
+        { leaf: "workspaces", speed: 5, curved: true },
         { leaf: "fade", speed: 3 },
-        { leaf: "specialWorkspace", speed: 2, style: "slidefadevert" }
+        { leaf: "specialWorkspace", speed: 2, curved: true, style: "slidefadevert" }
     ]
+    readonly property var reloadKeys: ["pikadots.gestures", "pikadots.backdropColors"]
+    readonly property var windowStyles: ({ popin: "popin 87%", slide: "slide", gnomed: "gnomed" })
+    readonly property var motionSpeeds: ({
+        "decoration.blur.drops.speed": 3,
+        "decoration.blur.aurora.speed": 1,
+        "decoration.blur.heat_shimmer.speed": 1,
+        "decoration.blur.fluid_jar.speed": 3.7
+    })
+    readonly property bool saving: UPower.onBattery && value("pikadots.pauseOnBattery") !== false
+    onSavingChanged: powerTimer.restart()
     readonly property var defaults: ({
         "pikadots.animationSpeed": 1,
         "pikadots.workspaceStyle": "slide",
+        "pikadots.motion": "smooth",
+        "pikadots.gestures": true,
+        "pikadots.windowStyle": "popin",
+        "pikadots.borderLoop": false,
+        "pikadots.backdropColors": true,
+        "pikadots.pauseOnBattery": true,
         "pikadots.cursorTheme": "Bibata-Modern-Ice",
         "pikadots.cursorSize": 28
     })
 
+    readonly property var animationKeys: ["pikadots.animationSpeed", "pikadots.workspaceStyle", "pikadots.motion", "pikadots.windowStyle", "pikadots.borderLoop"]
+
     property var pending: ({})
 
-    Component.onCompleted: refresh()
+    Component.onCompleted: {
+        refresh();
+        if (saving)
+            powerTimer.restart();
+    }
 
     function value(key) {
+        if (key in motionSpeeds)
+            return Settings.hypr[key] ?? motionSpeeds[key];
         return Settings.hypr[key] ?? values[key] ?? defaults[key];
+    }
+
+    function loopLua(on) {
+        return ["borderangle", "glowangle"].map(leaf => on
+            ? `hl.animation({ leaf = "${leaf}", enabled = true, speed = 60, bezier = "linear", style = "loop" })`
+            : `hl.animation({ leaf = "${leaf}", enabled = false })`);
+    }
+
+    function powerLua() {
+        const speeds = {};
+        for (const k of Object.keys(motionSpeeds))
+            speeds[k] = saving ? 0 : value(k);
+        return [`hl.config(${luaTable(speeds)})`, ...loopLua(!saving && value("pikadots.borderLoop") === true)];
     }
 
     function changed(key) {
@@ -103,10 +153,14 @@ Singleton {
     function animationLua(map) {
         const speed = map["pikadots.animationSpeed"] ?? defaults["pikadots.animationSpeed"];
         const style = map["pikadots.workspaceStyle"] ?? defaults["pikadots.workspaceStyle"];
-        return animations.map(a => {
-            const s = a.leaf === "workspaces" ? style : a.style;
-            return `hl.animation({ leaf = "${a.leaf}", enabled = true, speed = ${Math.max(0.5, a.speed * speed).toFixed(1)}, bezier = "default"${s ? `, style = "${s}"` : ""} })`;
+        const motion = map["pikadots.motion"] ?? defaults["pikadots.motion"];
+        const opening = windowStyles[map["pikadots.windowStyle"] ?? defaults["pikadots.windowStyle"]] ?? "popin 87%";
+        const lines = animations.map(a => {
+            const s = a.leaf === "workspaces" ? style : a.leaf === "windowsIn" || a.leaf === "windowsOut" ? opening : a.style;
+            const curve = a.curved && motion !== "classic" ? `spring = "${motion}"` : `bezier = "default"`;
+            return `hl.animation({ leaf = "${a.leaf}", enabled = true, speed = ${Math.max(0.5, a.speed * speed).toFixed(1)}, ${curve}${s ? `, style = "${s}"` : ""} })`;
         });
+        return lines.concat(loopLua(map["pikadots.borderLoop"] === true));
     }
 
     function writeLua() {
@@ -115,7 +169,9 @@ Singleton {
         const table = luaTable(map);
         if (table)
             lines.push(`hl.config(${table})`);
-        if (map["pikadots.animationSpeed"] !== undefined || map["pikadots.workspaceStyle"] !== undefined)
+        if (map["decoration.blur.proportional"] !== undefined)
+            lines.push(`hl.config({ render = { use_shader_blur_blend = ${map["decoration.blur.proportional"]} } })`);
+        if (animationKeys.some(k => map[k] !== undefined))
             lines.push(...animationLua(map));
         if (map["pikadots.cursorTheme"] !== undefined || map["pikadots.cursorSize"] !== undefined) {
             lines.push(`hl.env("XCURSOR_THEME", ${JSON.stringify(value("pikadots.cursorTheme"))})`);
@@ -143,13 +199,33 @@ Singleton {
             const script = [];
             if (table)
                 script.push(`hl.config(${table})`);
-            if ("pikadots.animationSpeed" in batch || "pikadots.workspaceStyle" in batch)
+            if (root.animationKeys.some(k => k in batch))
                 script.push(...root.animationLua(Settings.hypr));
+            if ("decoration.blur.proportional" in batch)
+                script.push(`hl.config({ render = { use_shader_blur_blend = ${batch["decoration.blur.proportional"]} } })`);
             if (script.length)
                 Quickshell.execDetached(["hyprctl", "eval", script.join("; ")]);
             if ("pikadots.cursorTheme" in batch || "pikadots.cursorSize" in batch)
                 root.applyCursor();
             root.writeLua();
+            if (root.saving && Object.keys(batch).some(k => k in root.motionSpeeds || k === "pikadots.borderLoop"))
+                powerTimer.restart();
+            if (root.reloadKeys.some(k => k in batch))
+                Quickshell.execDetached(["sh", "-c", "sleep 1; hyprctl reload"]);
+        }
+    }
+
+    Timer {
+        id: powerTimer
+        interval: 400
+        onTriggered: Quickshell.execDetached(["hyprctl", "eval", root.powerLua().join("; ")])
+    }
+
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (event.name === "configreloaded" && root.saving)
+                powerTimer.restart();
         }
     }
 

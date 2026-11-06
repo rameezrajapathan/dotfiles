@@ -3,6 +3,12 @@ return {
 	inactive_border = "rgb({{colors.surface_container_highest.default.hex_stripped}})",
 	accent_end = "rgb({{multi.end}})",
 	special_border = "rgb({{colors.tertiary.default.hex_stripped}})",
+	special_border_inactive = "rgba({{colors.tertiary.default.hex_stripped}}66)",
+	backdrop = {
+		aurora1 = "rgba({{colors.primary.default.hex_stripped}}ff)",
+		aurora2 = "rgba({{colors.tertiary.default.hex_stripped}}ff)",
+		fluid = "rgba({{colors.primary_container.default.hex_stripped}}cc)",
+	},
 	group = {
 		active = "{{colors.primary.default.hex_stripped}}",
 		active_text = "{{colors.on_primary.default.hex_stripped}}",

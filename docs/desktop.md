@@ -63,7 +63,11 @@ get a badge when every window is there.
 
 - **Click** an app that isn't open to start it (the icon pulses until its window shows up). Click
   an open app to focus its last window, opening its workspace or special workspace if needed;
-  click again to cycle through its windows. **Middle-click** opens a new window.
+  click again to cycle through its windows; with one window that already has focus, a click
+  minimizes it. **Middle-click** opens a new window.
+- **Minimized** windows (from the dock or any app that asks to minimize) go to the `minimized`
+  special workspace (`hypr/events.lua`). Clicking the app in the dock or picking it in Alt+Tab
+  brings the window back to the workspace it came from.
 - **Hover** for live window previews. Click one to go to that window, ✕ or middle-click closes it.
 - **Right-click** for New window (with its keybinding, if it has one), the app's own actions
   (such as New Private Window), Keep in Dock / Remove from Dock, Close and Dock settings.

@@ -24,7 +24,7 @@ GROUPS = {
     "arrows": ["left", "right", "up", "down"],
     "scroll": ["mouse_down", "mouse_up"],
 }
-SKIP_KEYS = re.compile(r"swipe|lid", re.I)
+SKIP_KEYS = re.compile(r"swipe|pinch|lid", re.I)
 SKIP_SECTIONS = re.compile(r"kitty", re.I)
 
 

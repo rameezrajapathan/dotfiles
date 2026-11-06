@@ -12,7 +12,7 @@ output): cava, btop and superfile themes in their config folders (`~/.config/cav
 on each run), Pywalfox's `~/.cache/wal/colors.json`, the Neovim colorscheme in
 `~/.local/share/nvim/site/colors/`, and `glass.lua` in `~/.local/state/pikadots/`
 (written by `glass.py`, not matugen). The chosen wallpaper is saved in
-`~/.config/hypr/wallpaper.conf`, which git ignores, so each machine keeps its own; `hypr/scripts/hyprpaper.sh` starts hyprpaper with it and `hyprpaper.conf`.
+`~/.config/hypr/wallpaper.conf`, which git ignores, so each machine keeps its own; `hypr/scripts/hyprpaper.sh` starts hyprpaper with it and `hyprpaper.conf`, from the `pikadots-wallpaper` user service.
 
 ## Light, dark and how colorful
 
@@ -256,3 +256,7 @@ one's launcher, desktop entry and mirror are removed, so `code` always opens an 
 The settings it replaced are kept in `~/.local/state/pikadots/vscode-<editor>.json`;
 `vscode-theme.py restore` (also run by `pikadots uninstall`) puts them back, removes the extension
 and the transparent launcher.
+
+The Hyprland template (`matugen/templates/hyprland.lua`) also gives the Aurora backdrop its two colors
+(primary and tertiary) and the Fluid jar its color (primary container); Settings › Effects › Backdrop
+turns that off.

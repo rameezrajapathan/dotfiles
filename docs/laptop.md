@@ -12,7 +12,8 @@
 | 30 min | Suspend |
 
 These are the defaults; change them in Settings > Power (`hypr/scripts/idle.sh` writes the hypridle
-config from your choices at login, and again right after you change a value there). Keep awake (Account tab or the Power page) holds this off.
+config from your choices at login, and again right after you change a value there). hypridle runs
+as the `pikadots-idle` user service, which starts with Hyprland and restarts it if it crashes. Keep awake (Account tab or the Power page) holds this off.
 
 ## Power
 

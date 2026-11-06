@@ -74,13 +74,27 @@ hl.config({
 	},
 })
 
-hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+if not settings_json:match('"pikadots%.gestures"%s*:%s*false') then
+	hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+	hl.gesture({ fingers = 3, direction = "up", action = function() hl.exec_cmd("qs ipc call overview toggle") end })
+	hl.gesture({ fingers = 3, direction = "down", action = "special", workspace_name = "magic" })
+	hl.gesture({ fingers = 4, direction = "pinch", action = "cursor_zoom", zoom_level = 1, mode = "live" })
+	hl.gesture({ fingers = 3, direction = "swipe", mods = "SUPER", action = "move" })
+	hl.gesture({ fingers = 4, direction = "swipe", mods = "SUPER", action = "resize" })
+	hl.gesture({ fingers = 4, direction = "horizontal", action = "scroll_move" })
+end
 
-hl.animation({ leaf = "windows", enabled = true, speed = 3, bezier = "default" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "default" })
+hl.curve("linear", { type = "bezier", points = { { 0, 0 }, { 1, 1 } } })
+hl.curve("smooth", { type = "spring", mass = 1, stiffness = 238.1191, damping = 24.21279333 })
+hl.curve("springy", { type = "spring", mass = 1, stiffness = 260, damping = 22 })
+hl.curve("bouncy", { type = "spring", mass = 1, stiffness = 200, damping = 15 })
+
+hl.animation({ leaf = "windows", enabled = true, speed = 3, spring = "smooth" })
+hl.animation({ leaf = "windowsIn", enabled = true, speed = 3, spring = "smooth", style = "popin 87%" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 5, spring = "smooth" })
 hl.animation({ leaf = "fade", enabled = true, speed = 3, bezier = "default" })
 hl.animation({ leaf = "borderangle", enabled = false })
-hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 2, bezier = "default", style = "slidefadevert" })
+hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 2, spring = "smooth", style = "slidefadevert" })
 
 local borders = { active = colors.active_border, inactive = colors.inactive_border }
 local glass_ok, glass = pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/glass.lua")
@@ -134,6 +148,7 @@ do
 				keep_upper_gap = true,
 				blur = glassy and true or false,
 				middle_click_close = true,
+				disable_when_only = true,
 				col = {
 					active = active,
 					inactive = "rgba(" .. g.inactive .. fill .. ")",
@@ -149,14 +164,36 @@ do
 	})
 end
 
+if colors.backdrop and not settings_json:match('"pikadots%.backdropColors"%s*:%s*false') then
+	hl.config({
+		decoration = {
+			blur = {
+				aurora = { color1 = colors.backdrop.aurora1, color2 = colors.backdrop.aurora2 },
+				fluid_jar = { color = colors.backdrop.fluid },
+			},
+		},
+	})
+end
+
 pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/hypr-settings.lua")
+
+if settings_json:match('"reduceMotion"%s*:%s*true') then
+	hl.config({ decoration = { wobble = { enabled = false }, motion_blur = { enabled = false } } })
+end
 
 local gamemode = io.open((os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/pikadots-gamemode")
 if gamemode then
 	gamemode:close()
 	hl.config({
 		animations = { enabled = false },
-		decoration = { rounding = 0, blur = { enabled = false }, shadow = { enabled = false } },
+		decoration = {
+			rounding = 0,
+			blur = { enabled = false },
+			shadow = { enabled = false },
+			glow = { enabled = false },
+			wobble = { enabled = false },
+			motion_blur = { enabled = false },
+		},
 		general = { gaps_in = 0, gaps_out = 0, border_size = 1 },
 	})
 end

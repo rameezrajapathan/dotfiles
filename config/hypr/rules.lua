@@ -28,10 +28,16 @@ hl.window_rule({
 
 local ok, theme = pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hyprland.lua")
 local special_border = ok and theme.special_border or "rgb(f5c2e7)"
+local special_inactive = ok and theme.special_border_inactive or "rgba(f5c2e766)"
 local glass_ok, glass = pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/glass.lua")
 if glass_ok and type(glass) == "table" and glass.enabled and glass.neutral then
 	special_border = glass.special_border
+	special_inactive = glass.inactive_border
 end
-hl.window_rule({ match = { workspace = "s[true]" }, border_color = special_border })
+hl.window_rule({ match = { workspace = "s[true]", focus = true }, border_color = special_border })
+hl.window_rule({ match = { workspace = "s[true]", focus = false }, border_color = special_inactive })
+
+hl.window_rule({ match = { fullscreen = true }, no_glow = true, no_wobble = true })
+hl.window_rule({ match = { class = "^(steam_app_\\d+|gamescope|.*\\.exe)$" }, no_glow = true, no_wobble = true, no_blur = true, no_shadow = true })
 
 pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/window-rules.lua")

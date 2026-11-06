@@ -66,6 +66,8 @@ add-zsh-hook precmd load_theme_colors
 
 eval "$(zoxide init zsh --cmd cd)"
 
+export PATH="$PATH:$HOME/.dotnet/tools"
+
 if [[ -n $FASTFETCH ]]; then
   unset FASTFETCH
   fastfetch

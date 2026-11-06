@@ -95,8 +95,10 @@ def lua(values, mode):
     inactive = [rgba("ffffff", 0.3 + 0.35 * rim), rgba(edge, 0.06 if light else 0.04), rgba("ffffff", 0.12 + 0.15 * rim)]
     angle = int((values.get("lightAngle", -40) + 135) % 360)
     shadow = "rgba(00000030)" if light else "rgba(00000066)"
-    glow_on = rgba("ffffff", (0.10 + 0.22 * rim) * (1.3 if light else 1))
-    glow_off = rgba("ffffff", (0.05 + 0.1 * rim) * (1.3 if light else 1))
+    boost = 1.3 if light else 1
+    glow = lambda a: f"{{ colors = {{ {rgba('ffffff', a * boost)}, {rgba('ffffff', a * boost * 0.25)} }}, angle = {angle} }}"
+    glow_on = glow(0.10 + 0.22 * rim)
+    glow_off = glow(0.05 + 0.1 * rim)
     return (
         "return {\n"
         "\tenabled = true,\n"

@@ -35,9 +35,12 @@ links=(
 	"pikadots/cmatrix .local/bin/cmatrix"
 	"pikadots/pikadots-backup.service .config/systemd/user/pikadots-backup.service"
 	"pikadots/pikadots-backup.timer .config/systemd/user/pikadots-backup.timer"
+	"pikadots/pikadots-idle.service .config/systemd/user/pikadots-idle.service"
+	"pikadots/pikadots-wallpaper.service .config/systemd/user/pikadots-wallpaper.service"
 	"pikadots/pikadots-settings.desktop .local/share/applications/pikadots-settings.desktop"
 )
 services=(gcr-ssh-agent.socket)
+session_services=(pikadots-idle.service pikadots-wallpaper.service)
 system_services=(NetworkManager.service bluetooth.service power-profiles-daemon.service)
 other_notifiers=(mako.service dunst.service swaync.service)
 keep_packages=(networkmanager networkmanager-openvpn bluez bluez-utils pipewire-pulse wireplumber
@@ -403,6 +406,9 @@ enable_services() {
 	for s in "${services[@]}"; do
 		systemctl --user enable --now "$s" >/dev/null 2>&1 && ok "$s" || bad "couldn't enable $s"
 	done
+	for s in "${session_services[@]}"; do
+		systemctl --user enable "$s" >/dev/null 2>&1 && ok "$s (starts with Hyprland)" || bad "couldn't enable $s"
+	done
 	if [[ -f $HOME/.config/restic/password ]]; then
 		systemctl --user enable --now pikadots-backup.timer >/dev/null 2>&1 && ok "daily backup timer"
 	else
@@ -665,6 +671,7 @@ cmd_uninstall() {
 	confirm "Continue?" || exit 0
 	step "Services"
 	systemctl --user disable --now pikadots-backup.timer >/dev/null 2>&1 && ok "backup timer stopped"
+	systemctl --user disable "${session_services[@]}" >/dev/null 2>&1 && ok "idle and wallpaper services disabled"
 	python3 -I "$pkgdir/hypr/scripts/kde-theme.py" restore >/dev/null 2>&1 &&
 		ok "Qt/KDE theme restored"
 	python3 -I "$pkgdir/hypr/scripts/vscode-theme.py" restore >/dev/null 2>&1 &&
@@ -747,6 +754,15 @@ cmd_health() {
 	done
 	for s in "${services[@]}"; do
 		systemctl --user is-active -q "$s" && ok "$s" || bad "$s not running"
+	done
+	for s in "${session_services[@]}"; do
+		if ! systemctl --user is-enabled -q "$s" 2>/dev/null; then
+			warn "$s not enabled (pikadots repair)"
+		elif [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && ! systemctl --user is-active -q "$s"; then
+			bad "$s not running (journalctl --user -u $s)"
+		else
+			ok "$s"
+		fi
 	done
 	if systemctl --user is-enabled -q pikadots-backup.timer 2>/dev/null; then
 		ok "backup timer (next: $(systemctl --user list-timers pikadots-backup.timer --no-legend | awk '{print $1, $2, $3}'))"

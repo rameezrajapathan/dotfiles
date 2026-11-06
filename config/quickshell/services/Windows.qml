@@ -23,6 +23,10 @@ Singleton {
     }
 
     function focus(t) {
+        if (t.workspace?.name === "special:minimized" && t.wayland) {
+            t.wayland.minimized = false;
+            return;
+        }
         Quickshell.execDetached(["hyprctl", "dispatch", `hl.dsp.focus({ window = "${selector(t)}" })`]);
     }
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=pikadots idle timers (hypridle)
+PartOf=hyprland-session.target
+After=hyprland-session.target
+
+[Service]
+ExecStart=%h/.config/hypr/scripts/idle.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=hyprland-session.target

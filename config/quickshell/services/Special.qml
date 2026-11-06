@@ -17,7 +17,8 @@ Singleton {
     readonly property var known: ({
         magic: { label: "Scratchpad 1", key: "Super + F1", icon: "stack" },
         magic1: { label: "Scratchpad 2", key: "Super + F2", icon: "stack" },
-        dropterm: { label: "Terminal", key: "Super + `", icon: "terminal" }
+        dropterm: { label: "Terminal", key: "Super + `", icon: "terminal" },
+        minimized: { label: "Minimized", key: "", icon: "minimize" }
     })
 
     function on(monitor) {

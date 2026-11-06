@@ -137,6 +137,10 @@ Singleton {
         if (!t)
             return;
         const name = specialName(t);
+        if (name === "minimized" && t.wayland) {
+            t.wayland.minimized = false;
+            return;
+        }
         if (name && Special.on(Hyprland.focusedMonitor?.name ?? "") !== name)
             dispatch(`hl.dsp.workspace.toggle_special("${name}")`);
         dispatch(`hl.dsp.focus({ window = "${selector(t)}" })`);
@@ -163,7 +167,9 @@ Singleton {
             return;
         }
         const focused = list.find(t => t.activated);
-        if (!focused)
+        if (focused && list.length === 1 && focused.wayland && !isSpecial(focused))
+            focused.wayland.minimized = true;
+        else if (!focused)
             focusWindow(recent(list)[0]);
         else if (list.length > 1)
             focusWindow(list[(list.indexOf(focused) + 1) % list.length]);

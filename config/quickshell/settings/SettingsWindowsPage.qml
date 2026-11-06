@@ -108,4 +108,21 @@ SettingsPage {
             }
         }
     }
+
+    SettingsSection {
+        title: "Groups"
+        readonly property var keys: ["group.groupbar.disable_when_only"]
+        canReset: root.changed(keys)
+        onReset: Hypr.reset(keys)
+
+        SettingsRow {
+            icon: "tab"
+            title: "Hide tabs for a single window"
+            description: "A group with one window left shows no tab bar."
+            Switch {
+                checked: Hypr.value("group.groupbar.disable_when_only") ?? true
+                onToggled: Hypr.set("group.groupbar.disable_when_only", !checked)
+            }
+        }
+    }
 }

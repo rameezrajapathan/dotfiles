@@ -76,6 +76,7 @@ SettingsPage {
                 onToggled: {
                     root.a.reduceMotion = !checked;
                     Hypr.set("animations.enabled", !root.a.reduceMotion);
+                    Quickshell.execDetached(["sh", "-c", "sleep 1; hyprctl reload"]);
                     applyTimer.restart();
                 }
             }

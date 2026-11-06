@@ -78,7 +78,15 @@ Worth knowing:
 | Super + F1 / F2 | Scratch workspaces (Shift: move the window there; Alt: without following). While one is open over a workspace, the bar shows its name in a pink chip (click to hide), a toast names it as it opens, and its windows get a border in that color |
 | Super + Ctrl + Arrows or H J K L | Focus another monitor |
 | Super + Shift + Ctrl + Arrows or H J K L | Move the window to another monitor |
-| Three-finger swipe | Switch workspace |
+| Three-finger swipe left / right | Switch workspace |
+| Three-finger swipe up | Overview |
+| Three-finger swipe down | Scratchpad 1 (Super + F1) |
+| Four-finger swipe left / right | Scroll the columns (scrolling layout) |
+| Four-finger pinch | Zoom around the pointer, following your fingers |
+| Super + three-finger swipe | Move the window |
+| Super + four-finger swipe | Resize the window |
+
+Touchpad gestures are set in `hypr/settings.lua`; Settings > Keyboard & mouse > Gestures turns them all off.
 
 ## Zoom
 
