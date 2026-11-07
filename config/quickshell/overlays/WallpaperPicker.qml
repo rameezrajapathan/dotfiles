@@ -231,7 +231,7 @@ PanelWindow {
                 }
                 keyNavigationWraps: true
                 highlightMoveDuration: 150
-                model: root.shown
+                model: root.visible ? root.shown : []
 
                 delegate: Item {
                     id: cell

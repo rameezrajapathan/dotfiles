@@ -13,7 +13,9 @@ pikadots backup       back up now
 pikadots backup-init  set up encrypted daily backups
 pikadots export       save your settings to one file
 pikadots import FILE  apply an exported file on this machine
+pikadots setup        go through the welcome steps again
 pikadots greeter [--reset]  login screen with the wallpaper (Plasma Login Manager)
+pikadots greeter install|remove|preview  the pikadots greeter on greetd
 pikadots splash [--reset]   boot splash (Plymouth) in the wallpaper colors
 pikadots keybinds [status|reset]  reset restores the default keybinds.lua and clears Settings shortcut changes
 pikadots docs-check   compare keybinds.lua with docs/keybindings.md
@@ -101,6 +103,27 @@ asking and using sudo. Run them again after changing the wallpaper; `--reset` un
   copies the KDE colors (when [Qt and KDE apps](theming.md#qt-and-kde-apps) is on) into the
   greeter's `kdeglobals`, keeping the old one for `--reset`. It warns when
   `/etc/plasmalogin.conf` sets its own wallpaper, which would win.
+- **`pikadots greeter install`**: the pikadots greeter, a Quickshell login screen that looks
+  like the lock screen (blurred wallpaper, the big clock, your picture, a password field), with a
+  session picker (Hyprland, Plasma, …), the keyboard layout and suspend, restart and shut down. It
+  installs greetd if needed, copies `config/greeter` to `/usr/share/pikadots-greeter`, your
+  wallpaper, colors, fonts, picture and keyboard layout to `/var/lib/pikadots-greeter`, writes
+  `/etc/greetd/config.toml` (keeping the old one; the greeter starts through `start-hyprland`, as
+  Hyprland 0.57 crashes when greetd starts it directly, with its output sent to the journal so no
+  text shows on the console), adds a greetd drop-in
+  (`/etc/systemd/system/greetd.service.d/pikadots.conf`) that hides the cursor on the login console
+  so the hand-off to your session is plain black, adds GNOME Keyring to `/etc/pam.d/greetd` (keeping
+  the old one) so your keyring unlocks with your login password, and switches the display manager to
+  greetd, remembering the previous one. It shows from the next boot. Run it again after changing
+  the wallpaper. `pikadots repair` (and so `update`) refreshes an installed greeter whose files or
+  greetd command are older than the repo's, and `health` flags one. If a session closes right
+  after login, the greeter says so next time instead of looping silently. Why greetd and not a themed Plasma Login Manager:
+  [ADR 0001](adr/0001-greetd-quickshell-greeter.md).
+- **`pikadots greeter remove`** switches back to the previous display manager, restores
+  `config.toml` and removes both folders. It needs nothing but a shell, so it works from a text
+  console (Ctrl + Alt + F3) if the greeter ever fails to start.
+- **`pikadots greeter preview`** shows the greeter on your screen now, without changing anything;
+  Esc closes it.
 - **`pikadots splash`**: installs a pikadots Plymouth script theme from `config/plymouth` (the
   wallpaper's base color, the distro logo, an accent spinner and a password prompt for encrypted
   disks) and switches to it with `sudo plymouth-set-default-theme -R`, which rebuilds the

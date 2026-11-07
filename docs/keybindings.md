@@ -11,6 +11,8 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 |---|---|
 | Super + A | App launcher |
 | Super + D | Show or hide the dock |
+| Super + H | Show desktop widgets |
+| Super + Shift + H | Edit desktop widgets |
 | Super + P | Projects |
 | Super + V | Clipboard history |
 | Super + T | Terminal with fastfetch |
@@ -83,6 +85,7 @@ Worth knowing:
 | Three-finger swipe down | Scratchpad 1 (Super + F1) |
 | Four-finger swipe left / right | Scroll the columns (scrolling layout) |
 | Four-finger pinch | Zoom around the pointer, following your fingers |
+| Four-finger swipe down | Show desktop widgets |
 | Super + three-finger swipe | Move the window |
 | Super + four-finger swipe | Resize the window |
 

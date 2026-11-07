@@ -8,7 +8,6 @@ quickshell
 qt6-qtshadertools
 hypridle
 hyprlock
-hyprpaper
 hyprpolkitagent
 hyprpicker
 hyprsunset

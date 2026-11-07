@@ -12,7 +12,7 @@ output): cava, btop and superfile themes in their config folders (`~/.config/cav
 on each run), Pywalfox's `~/.cache/wal/colors.json`, the Neovim colorscheme in
 `~/.local/share/nvim/site/colors/`, and `glass.lua` in `~/.local/state/pikadots/`
 (written by `glass.py`, not matugen). The chosen wallpaper is saved in
-`~/.config/hypr/wallpaper.conf`, which git ignores, so each machine keeps its own; `hypr/scripts/hyprpaper.sh` starts hyprpaper with it and `hyprpaper.conf`, from the `pikadots-wallpaper` user service.
+`~/.config/hypr/wallpaper.conf`, which git ignores, so each machine keeps its own. Quickshell draws the wallpaper itself (`quickshell/desktop/Wallpaper.qml`, a background-layer window per screen) and crossfades when that file changes, so no separate wallpaper daemon runs.
 
 ## Light, dark and how colorful
 

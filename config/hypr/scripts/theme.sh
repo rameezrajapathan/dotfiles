@@ -19,9 +19,6 @@ fi
 
 if [[ $# -gt 0 ]]; then
 	img=$(realpath "$1")
-	for monitor in $(hyprctl -j monitors | jq -r '.[].name'); do
-		hyprctl hyprpaper wallpaper "$monitor,$img,cover" >/dev/null
-	done
 	printf 'wallpaper {\n    monitor =\n    path = %s\n    fit_mode = cover\n}\n' "${img/#$HOME/\~}" >"$conf"
 else
 	img=$current

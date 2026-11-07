@@ -36,11 +36,11 @@ links=(
 	"pikadots/pikadots-backup.service .config/systemd/user/pikadots-backup.service"
 	"pikadots/pikadots-backup.timer .config/systemd/user/pikadots-backup.timer"
 	"pikadots/pikadots-idle.service .config/systemd/user/pikadots-idle.service"
-	"pikadots/pikadots-wallpaper.service .config/systemd/user/pikadots-wallpaper.service"
 	"pikadots/pikadots-settings.desktop .local/share/applications/pikadots-settings.desktop"
 )
 services=(gcr-ssh-agent.socket)
-session_services=(pikadots-idle.service pikadots-wallpaper.service)
+session_services=(pikadots-idle.service)
+retired_services=(pikadots-wallpaper.service)
 system_services=(NetworkManager.service bluetooth.service power-profiles-daemon.service)
 other_notifiers=(mako.service dunst.service swaync.service)
 keep_packages=(networkmanager networkmanager-openvpn bluez bluez-utils pipewire-pulse wireplumber
@@ -397,6 +397,11 @@ enable_services() {
 		systemctl is-enabled -q "$s" 2>/dev/null && continue
 		sudo systemctl enable --now "$s" >/dev/null 2>&1 && ok "$s" || bad "couldn't enable $s"
 	done
+	for s in "${retired_services[@]}"; do
+		[[ -L $HOME/.config/systemd/user/$s ]] || continue
+		systemctl --user disable --now "$s" >/dev/null 2>&1
+		rm -f "$HOME/.config/systemd/user/$s" && ok "removed retired $s"
+	done
 	systemctl --user daemon-reload
 	for s in "${other_notifiers[@]}"; do
 		systemctl --user cat "$s" >/dev/null 2>&1 || continue
@@ -644,6 +649,7 @@ cmd_install() {
 	setup_shells
 	step "Services"
 	enable_services
+	greeter_refresh
 	setup_pywalfox
 	setup_zen
 	setup_thunderbird
@@ -671,7 +677,7 @@ cmd_uninstall() {
 	confirm "Continue?" || exit 0
 	step "Services"
 	systemctl --user disable --now pikadots-backup.timer >/dev/null 2>&1 && ok "backup timer stopped"
-	systemctl --user disable "${session_services[@]}" >/dev/null 2>&1 && ok "idle and wallpaper services disabled"
+	systemctl --user disable "${session_services[@]}" >/dev/null 2>&1 && ok "idle service disabled"
 	python3 -I "$pkgdir/hypr/scripts/kde-theme.py" restore >/dev/null 2>&1 &&
 		ok "Qt/KDE theme restored"
 	python3 -I "$pkgdir/hypr/scripts/vscode-theme.py" restore >/dev/null 2>&1 &&
@@ -696,6 +702,10 @@ cmd_uninstall() {
 	if [[ -e $greeter_conf || -d $greeter_dir ]]; then
 		step "Login screen"
 		(cmd_greeter --reset)
+	fi
+	if [[ -d $qs_greeter_share || -d $qs_greeter_state ]]; then
+		step "Pikadots greeter"
+		(greeter_remove)
 	fi
 	if [[ -d $splash_dir ]]; then
 		step "Boot splash"
@@ -878,6 +888,7 @@ cmd_repair() {
 	setup_shells
 	step "Services"
 	enable_services
+	greeter_refresh
 	setup_pywalfox
 	setup_zen
 	setup_thunderbird
@@ -1121,7 +1132,22 @@ check_greeter() {
 		fi
 		;;
 	"") info "no display manager" ;;
-	*) info "login screen: $dm (pikadots greeter supports Plasma Login Manager only)" ;;
+	greetd)
+		if [[ -f $qs_greeter_share/shell.qml ]]; then
+			img=$(wallpaper)
+			copy=$(find "$qs_greeter_state" -maxdepth 1 -name 'wallpaper.*' 2>/dev/null | head -1)
+			if greeter_outdated; then
+				bad "the installed pikadots greeter is outdated and may not log in (pikadots repair updates it)"
+			elif [[ -n $img && -n $copy ]] && ! cmp -s "$img" "$copy"; then
+				warn "login screen shows an older wallpaper (pikadots greeter)"
+			else
+				ok "login screen: the pikadots greeter (greetd)"
+			fi
+		else
+			info "login screen: greetd (pikadots greeter install puts the pikadots greeter on it)"
+		fi
+		;;
+	*) info "login screen: $dm (pikadots greeter install switches it to the pikadots greeter)" ;;
 	esac
 	if command -v plymouth-set-default-theme >/dev/null; then
 		local theme
@@ -1130,10 +1156,228 @@ check_greeter() {
 	fi
 }
 
+qs_greeter_src=$pkgdir/greeter
+qs_greeter_share=/usr/share/pikadots-greeter
+qs_greeter_state=/var/lib/pikadots-greeter
+greetd_conf=/etc/greetd/config.toml
+greetd_dropin=/etc/systemd/system/greetd.service.d/pikadots.conf
+greetd_pam=/etc/pam.d/greetd
+qs_greeter_files=(shell.qml Greeter.qml hyprland.lua)
+
+greeter_command() {
+	local log=
+	command -v systemd-cat >/dev/null && log='systemd-cat -t pikadots-greeter '
+	if command -v start-hyprland >/dev/null; then
+		printf '%sstart-hyprland -- -c %s/hyprland.lua' "$log" "$qs_greeter_share"
+	else
+		printf '%sHyprland -c %s/hyprland.lua' "$log" "$qs_greeter_share"
+	fi
+}
+
+greeter_conf_current() {
+	grep -qF "command = \"$(greeter_command)\"" "$greetd_conf" 2>/dev/null
+}
+
+greeter_dropin_text() {
+	printf '[Service]\nExecStartPre=-/bin/sh -c '"'"'TERM=linux setterm --cursor off --clear all >/dev/tty1 </dev/tty1'"'"'\n'
+}
+
+greeter_dropin_current() {
+	cmp -s <(greeter_dropin_text) "$greetd_dropin" 2>/dev/null
+}
+
+greeter_write_dropin() {
+	sudo install -d "${greetd_dropin%/*}" &&
+		greeter_dropin_text | sudo tee "$greetd_dropin" >/dev/null &&
+		sudo systemctl daemon-reload
+}
+
+greeter_pam_current() {
+	[[ ! -f $greetd_pam ]] || grep -q pam_gnome_keyring "$greetd_pam"
+}
+
+greeter_write_pam() {
+	[[ -f $greetd_pam ]] || return 0
+	[[ -f $greetd_pam.pikadots-orig ]] || sudo cp "$greetd_pam" "$greetd_pam.pikadots-orig" || return 1
+	printf '%s\n' '-auth       optional     pam_gnome_keyring.so' '-session    optional     pam_gnome_keyring.so auto_start' |
+		sudo tee -a "$greetd_pam" >/dev/null
+}
+
+greeter_outdated() {
+	local f
+	for f in "${qs_greeter_files[@]}"; do
+		cmp -s "$qs_greeter_src/$f" "$qs_greeter_share/$f" || return 0
+	done
+	greeter_dropin_current || return 0
+	greeter_pam_current || return 0
+	[[ $(display_manager) != greetd ]] || ! greeter_conf_current
+}
+
+greeter_copy_files() {
+	sudo install -d -m 755 "$qs_greeter_share" &&
+		sudo install -m 644 "${qs_greeter_files[@]/#/$qs_greeter_src/}" "$qs_greeter_share/"
+}
+
+greeter_write_conf() {
+	if [[ -f $greetd_conf && ! -f $greetd_conf.pikadots-orig ]] && ! grep -qF "$qs_greeter_share" "$greetd_conf"; then
+		sudo cp "$greetd_conf" "$greetd_conf.pikadots-orig"
+	fi
+	sudo install -d /etc/greetd
+	sudo tee "$greetd_conf" >/dev/null <<-EOF
+		[terminal]
+		vt = 1
+
+		[default_session]
+		command = "$(greeter_command)"
+		user = "greeter"
+	EOF
+}
+
+greeter_refresh() {
+	[[ -f $qs_greeter_share/shell.qml ]] || return 0
+	if ! greeter_outdated; then
+		ok "pikadots greeter is up to date"
+		return
+	fi
+	if greeter_copy_files && { greeter_dropin_current || greeter_write_dropin; } &&
+		{ greeter_pam_current || greeter_write_pam; } &&
+		{ [[ $(display_manager) != greetd ]] || greeter_conf_current || greeter_write_conf; }; then
+		ok "pikadots greeter updated (shows at the next login)"
+	else
+		bad "couldn't update the pikadots greeter; run pikadots greeter install"
+	fi
+}
+
+greeter_stage() {
+	local out=$1 img ext layout
+	mkdir -p "$out/faces"
+	img=$(wallpaper)
+	if [[ -n $img ]]; then
+		ext=${img##*.}
+		cp "$img" "$out/wallpaper.${ext,,}"
+	fi
+	[[ -f $HOME/.face ]] && cp "$HOME/.face" "$out/faces/$USER"
+	layout=$(hyprctl getoption input:kb_layout -j 2>/dev/null | jq -r '.str // empty' 2>/dev/null)
+	printf '%s\n' "${layout:-us}" >"$out/kb_layout"
+	jq -n \
+		--slurpfile colors <(cat "$HOME/.local/state/theme/quickshell.json" 2>/dev/null || echo '{}') \
+		--slurpfile settings <(cat "$HOME/.config/pikadots/settings.json" 2>/dev/null || echo '{}') \
+		--arg wallpaper "${img:+wallpaper.${ext,,}}" --arg user "$USER" '
+		($colors[0] // {}) as $c | ($settings[0] // {}) as $s |
+		($c | with_entries(select(.key | IN("base", "surface", "overlay", "text", "subtext", "accent", "accentText", "red", "yellow")))) + {
+			font: ($s.appearance.font // "Fira Sans"),
+			displayFont: ($s.appearance.displayFont // "Fira Sans"),
+			iconStyle: ($s.appearance.iconStyle // "Rounded"),
+			roundness: ($s.appearance.roundness // 1),
+			clock24: ($s.bar.clock24 // false),
+			blur: ($s.lock.blur // 0.85),
+			wallpaper: $wallpaper,
+			user: $user,
+			session: "hyprland.desktop"
+		}' >"$out/theme.json"
+}
+
+greeter_copy_theme() {
+	local staged=$1
+	sudo install -d -m 755 "$qs_greeter_state" "$qs_greeter_state/faces" || die "sudo failed"
+	sudo find "$qs_greeter_state" -maxdepth 1 -name 'wallpaper.*' -delete
+	sudo cp -r "$staged/." "$qs_greeter_state/"
+	sudo chmod -R a+rX "$qs_greeter_state"
+	sudo touch "$qs_greeter_state/last"
+	getent passwd greeter >/dev/null && sudo chown greeter "$qs_greeter_state/last"
+}
+
+greeter_preview() {
+	local tmp
+	tmp=$(mktemp -d)
+	trap 'rm -rf "$tmp"' RETURN
+	greeter_stage "$tmp"
+	info "showing the greeter as it would look; press Esc to close it"
+	PIKADOTS_GREETER_DIR=$tmp qs -p "$qs_greeter_src" >/dev/null 2>&1
+}
+
+greeter_install() {
+	local dm tmp
+	dm=$(display_manager)
+	[[ -n $pm ]] || die "needs pacman or dnf"
+	command -v Hyprland >/dev/null || die "Hyprland isn't installed"
+	if [[ $dm == greetd ]] && sudo test -f "$qs_greeter_share/shell.qml"; then
+		ok "the pikadots greeter is already installed; refreshing its wallpaper and colors"
+	fi
+	tmp=$(mktemp -d)
+	trap 'rm -rf "$tmp"' RETURN
+	greeter_stage "$tmp"
+	info "with sudo, this will:"
+	command -v greetd >/dev/null || info "  install greetd"
+	info "  copy the greeter to $qs_greeter_share"
+	info "  copy your wallpaper, colors, fonts and picture to $qs_greeter_state"
+	greeter_dropin_current || info "  add $greetd_dropin, which hides the console cursor behind the login screen"
+	greeter_pam_current || info "  let greetd unlock your keyring at login ($greetd_pam, the current one is kept)"
+	if [[ $dm != greetd ]] || ! greeter_conf_current; then
+		info "  write $greetd_conf (the current one is kept as $greetd_conf.pikadots-orig)"
+		[[ $dm != greetd ]] && info "  switch the login screen from ${dm:-none} to greetd (shows at the next boot)"
+		info "  pikadots greeter remove undoes it, also from a text console (Ctrl + Alt + F3)"
+	fi
+	confirm "Install the pikadots greeter?" || exit 0
+	if ! command -v greetd >/dev/null; then
+		case $pm in
+		pacman) sudo pacman -S --needed --noconfirm greetd ;;
+		dnf) sudo dnf install -y greetd ;;
+		esac || die "couldn't install greetd"
+	fi
+	greeter_copy_files || die "sudo failed"
+	greeter_dropin_current || greeter_write_dropin || die "couldn't write $greetd_dropin"
+	greeter_pam_current || greeter_write_pam || die "couldn't update $greetd_pam"
+	greeter_copy_theme "$tmp"
+	greeter_conf_current || greeter_write_conf || die "couldn't write $greetd_conf"
+	[[ $dm == greetd ]] && { ok "greeter updated (shows at the next login)"; return; }
+	[[ -n $dm ]] && printf '%s\n' "$dm" | sudo tee "$qs_greeter_state/previous" >/dev/null
+	[[ -n $dm ]] && sudo systemctl disable "$dm.service"
+	sudo systemctl enable greetd.service || die "couldn't enable greetd"
+	ok "greetd and the pikadots greeter will show at the next boot"
+	info "if it ever fails to start, log in on a text console (Ctrl + Alt + F3) and run: pikadots greeter remove"
+}
+
+greeter_remove() {
+	local dm previous
+	dm=$(display_manager)
+	previous=$(cat "$qs_greeter_state/previous" 2>/dev/null)
+	[[ -z $previous ]] && systemctl list-unit-files plasmalogin.service >/dev/null 2>&1 && previous=plasmalogin
+	info "with sudo, this will:"
+	[[ $dm == greetd ]] && info "  switch the login screen back to ${previous:-the console (no display manager found)}"
+	[[ -f $greetd_conf.pikadots-orig ]] && info "  put back $greetd_conf"
+	info "  remove $qs_greeter_share and $qs_greeter_state"
+	[[ -f $greetd_dropin ]] && info "  remove $greetd_dropin"
+	[[ -f $greetd_pam.pikadots-orig ]] && info "  put back $greetd_pam"
+	confirm "Remove the pikadots greeter?" || exit 0
+	if [[ $dm == greetd ]]; then
+		sudo systemctl disable greetd.service || die "sudo failed"
+		[[ -n $previous ]] && sudo systemctl enable "$previous.service"
+	fi
+	[[ -f $greetd_conf.pikadots-orig ]] && sudo mv "$greetd_conf.pikadots-orig" "$greetd_conf"
+	sudo rm -rf "$qs_greeter_share" "$qs_greeter_state"
+	[[ -f $greetd_pam.pikadots-orig ]] && sudo mv "$greetd_pam.pikadots-orig" "$greetd_pam"
+	if [[ -f $greetd_dropin ]]; then
+		sudo rm -f "$greetd_dropin"
+		sudo rmdir --ignore-fail-on-non-empty "${greetd_dropin%/*}"
+		sudo systemctl daemon-reload
+	fi
+	ok "pikadots greeter removed (${previous:-no display manager} shows at the next boot)"
+}
+
 cmd_greeter() {
 	printf '%spikadots greeter%s\n' "$bold" "$reset"
 	local dm img ext tmp colors
+	case ${1:-} in
+	install) greeter_install; return ;;
+	remove) greeter_remove; return ;;
+	preview) greeter_preview; return ;;
+	esac
 	dm=$(display_manager)
+	if [[ $dm == greetd && -f $qs_greeter_share/shell.qml ]]; then
+		greeter_install
+		return
+	fi
 	[[ $dm == plasmalogin ]] ||
 		die "only Plasma Login Manager is supported (this machine uses ${dm:-no display manager})"
 	if [[ ${1:-} == --reset ]]; then
@@ -1350,8 +1594,14 @@ pikadots: install, check and maintain these dotfiles (Hyprland + Quickshell on A
   pikadots export [FILE]  save the Settings app's choices, wallpaper and profile picture to one
                         file (default ~/pikadots-settings-DATE.tar.gz) to set up another machine
   pikadots import FILE  apply an exported file (or a settings.json); your current ones are backed up
+  pikadots setup        go through the welcome steps again (wallpaper, bar, dock, widgets,
+                        picture, keys)
   pikadots greeter [--reset]  login screen (Plasma Login Manager) with the wallpaper and its colors;
                         shows what it changes, asks, then uses sudo
+  pikadots greeter install|remove|preview  the pikadots greeter: a Quickshell login screen that
+                        looks like the lock screen, on greetd; install switches to it (run it
+                        again after changing the wallpaper), remove goes back to the previous
+                        login screen, preview shows it now without changing anything
   pikadots splash [--reset]   boot splash (Plymouth) with the distro logo and an accent spinner;
                         shows what it changes, asks, then uses sudo; --reset restores the old one
   pikadots keybinds [status|reset]  status says whether keybinds.lua differs from the repo's
@@ -1372,6 +1622,7 @@ case ${1:-help} in
 	backup-init) cmd_backup_init ;;
 	export) cmd_export "${2:-}" ;;
 	import) cmd_import "${2:-}" ;;
+	setup) qs ipc call setup open >/dev/null || die "the shell isn't running (log in to Hyprland first)" ;;
 	greeter) cmd_greeter "${2:-}" ;;
 	splash) cmd_splash "${2:-}" ;;
 	keybinds) cmd_keybinds "${2:-}" ;;

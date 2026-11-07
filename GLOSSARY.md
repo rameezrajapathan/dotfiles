@@ -36,6 +36,54 @@ _Avoid_: Shortcut, jump list, quick action
 How the Dock shows itself: always visible, auto-hide, or intellihide (hidden only while a window overlaps it).
 _Avoid_: Hide mode, autohide setting
 
+## Desktop
+
+**Desktop Widget**:
+A card placed on the desktop, behind windows, that shows live information or offers a small control, such as the weather, a clock or what's playing.
+_Avoid_: Widget (on its own), desklet, applet, gadget
+
+**Control Center Card**:
+One of the cards stacked inside the Control Center, such as quick tiles, sliders or the calendar.
+_Avoid_: Widget (on its own), module
+
+**Widget Kind**:
+One sort of content, such as weather or a calendar, that can be shown as a Desktop Widget, a Control Center Card, or both.
+_Avoid_: Widget type, applet
+
+**Widget Size**:
+How many grid cells a Desktop Widget covers, wide by tall, from the smallest its Widget Kind allows up to four by four; the widget rearranges its content to suit. Small (2×2), medium (4×2) and large (4×4) are only starting points offered when adding one.
+_Avoid_: Scale, dimensions, fixed size
+
+**Desktop Grid**:
+The invisible cells a Desktop Widget snaps to, always an even number across and down so two-cell widgets tile without a gap.
+_Avoid_: Snap grid, layout grid
+
+**Desktop Layout**:
+Which Desktop Widgets sit where on one monitor, shared by every workspace on that monitor.
+_Avoid_: Widget arrangement, desktop config
+
+**Edit Mode**:
+The state in which Desktop Widgets can be added, moved, resized and removed; outside it they only show and respond.
+_Avoid_: Jiggle mode, arrange mode
+
+**Show Desktop**:
+The gesture or key that brings the Desktop Widgets forward over open windows until it is dismissed.
+_Avoid_: Peek, desktop mode
+
+**Desktop Menu**:
+The menu that opens on a right click on empty desktop, with actions such as changing the wallpaper or adding a Desktop Widget.
+_Avoid_: Context menu (too generic), right-click menu
+
+## Setup
+
+**First-Run Setup**:
+The welcome flow shown the first time someone logs in to a fresh install, where they choose their wallpaper, bar style, Dock and account picture.
+_Avoid_: Onboarding, wizard
+
+**Greeter**:
+The login screen shown before anyone is signed in, styled to match the lock screen.
+_Avoid_: Login manager, display manager (that's the program that runs it)
+
 ## Launcher
 
 **Launcher**:

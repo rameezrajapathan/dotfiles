@@ -2,6 +2,7 @@
 import Quickshell
 import QtQuick
 import qs.bar
+import qs.desktop
 import qs.dock
 import qs.lock
 import qs.overlays
@@ -10,6 +11,11 @@ import qs.settings
 
 ShellRoot {
     Component.onCompleted: [Updates.checked, TimeDate.timezone, Drives.loaded]
+
+    Variants {
+        model: Quickshell.screens
+        DesktopScreen {}
+    }
 
     Variants {
         model: Quickshell.screens
@@ -34,4 +40,6 @@ ShellRoot {
     Lock {}
     PolkitDialog {}
     SettingsApp {}
+    FirstRun {}
+    VpnPassword {}
 }

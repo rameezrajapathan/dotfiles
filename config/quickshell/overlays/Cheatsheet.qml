@@ -189,7 +189,7 @@ PanelWindow {
                             spacing: 16
 
                             Repeater {
-                                model: columnsRow.packed[index]
+                                model: root.visible ? columnsRow.packed[index] : []
 
                                 CheatsheetCard {}
                             }

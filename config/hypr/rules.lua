@@ -16,6 +16,7 @@ hl.window_rule({ match = { class = "steam" }, float = true })
 hl.window_rule({ match = { class = "^org.quickshell$", title = "^Settings$" }, float = true, center = true, size = "1040 720" })
 
 hl.layer_rule({ match = { namespace = "^quickshell.*$" }, blur = true, ignore_alpha = 0.25, no_anim = true })
+hl.layer_rule({ match = { namespace = "^quickshell-desktop$" }, blur = false })
 hl.layer_rule({ match = { namespace = "^launcher$" }, blur = true, ignore_alpha = 0.25 })
 
 hl.window_rule({

@@ -14,6 +14,7 @@ Singleton {
     readonly property JsonObject glass: adapter.glass
     readonly property JsonObject bar: adapter.bar
     readonly property JsonObject dock: adapter.dock
+    readonly property JsonObject desktop: adapter.desktop
     readonly property JsonObject workspaces: adapter.workspaces
     readonly property JsonObject controlCenter: adapter.controlCenter
     property alias hypr: adapter.hypr
@@ -218,6 +219,15 @@ Singleton {
                 property bool glide: true
                 property bool pillLabel: false
                 property real size: 1
+            }
+
+            property JsonObject desktop: JsonObject {
+                property bool enabled: true
+                property var layouts: ({})
+                property string glass: "system"
+                property bool menu: true
+                property string photos: ""
+                property int photoMinutes: 5
             }
 
             property JsonObject dock: JsonObject {

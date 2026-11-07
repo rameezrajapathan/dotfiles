@@ -24,6 +24,8 @@ Scope {
             keywords: "bar pill height weather music spectrum clock 24 hour seconds", component: barPage },
         { key: "dock", group: "Personalize", title: "Dock", icon: "dock_to_bottom",
             keywords: "dock taskbar pinned apps running open windows previews auto hide intellihide magnify indicator", component: dockPage },
+        { key: "desktop", group: "Personalize", title: "Desktop", icon: "widgets",
+            keywords: "desktop widgets clock weather calendar photo frame notes to-do todo right click menu show desktop edit", component: desktopPage },
         { key: "controlcenter", group: "Personalize", title: "Control center", icon: "dashboard_customize",
             keywords: "control center quick settings tiles widgets layout bento columns custom panel", component: controlCenterPage },
         { key: "accessibility", group: "Personalize", title: "Accessibility", icon: "accessibility_new",
@@ -48,6 +50,8 @@ Scope {
             keywords: "keybindings shortcuts keys hotkeys cheatsheet", component: keybindsPage },
         { key: "network", group: "System", title: "Network", icon: "wifi",
             keywords: "network wifi wi-fi ethernet wired vpn internet speed test", component: networkPage },
+        { key: "vpn", group: "System", title: "VPN", icon: "vpn_key",
+            keywords: "vpn openvpn wireguard ssl vpn sophos fortinet company work tunnel servers password certificate dns", component: vpnPage },
         { key: "bluetooth", group: "System", title: "Bluetooth", icon: "bluetooth",
             keywords: "bluetooth devices headphones pair", component: bluetoothPage },
         { key: "sound", group: "System", title: "Sound", icon: "volume_up",
@@ -635,6 +639,8 @@ Scope {
     }
 
     Component { id: appearancePage; SettingsAppearancePage {} }
+    Component { id: desktopPage; SettingsDesktopPage {} }
+    Component { id: vpnPage; SettingsVpnPage {} }
     Component { id: fontsPage; SettingsFontsPage {} }
     Component { id: barPage; SettingsBarPage {} }
     Component { id: dockPage; SettingsDockPage {} }

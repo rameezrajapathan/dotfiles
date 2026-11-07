@@ -63,6 +63,7 @@ hl.config({
 	misc = {
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,
+		background_color = "rgb(000000)",
 		vrr = 1,
 		key_press_enables_dpms = false,
 		mouse_move_enables_dpms = false,
@@ -82,6 +83,7 @@ if not settings_json:match('"pikadots%.gestures"%s*:%s*false') then
 	hl.gesture({ fingers = 3, direction = "swipe", mods = "SUPER", action = "move" })
 	hl.gesture({ fingers = 4, direction = "swipe", mods = "SUPER", action = "resize" })
 	hl.gesture({ fingers = 4, direction = "horizontal", action = "scroll_move" })
+	hl.gesture({ fingers = 4, direction = "down", action = function() hl.exec_cmd("qs ipc call desktop toggle") end })
 end
 
 hl.curve("linear", { type = "bezier", points = { { 0, 0 }, { 1, 1 } } })

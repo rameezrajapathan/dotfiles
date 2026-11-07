@@ -212,26 +212,26 @@ Item {
                 PanelRow {
                     id: vpnRow
                     required property var modelData
-                    readonly property bool switching: modelData.name in VpnService.pending
+                    readonly property bool switching: modelData.uuid in VpnService.pending
+                    readonly property string error: VpnService.errors[modelData.uuid] ?? ""
                     Layout.fillWidth: true
-                    icon: "vpn_key"
+                    icon: error ? "error" : "vpn_key"
                     title: modelData.name
                     highlighted: modelData.active
-                    detail: switching ? (VpnService.pending[modelData.name] ? "connecting…" : "disconnecting…")
-                        : modelData.active ? "connected" : ""
+                    detail: switching ? (VpnService.pending[modelData.uuid] ? "connecting…" : "disconnecting…")
+                        : modelData.active ? "connected" : error
                     onClicked: VpnService.toggle(modelData.name)
 
                     Pill {
-                        visible: !vpnRow.modelData.active && !vpnRow.switching
-                        icon: "delete"
-                        tip: "Remove VPN"
+                        icon: "settings"
+                        tip: "Edit VPN"
                         onClicked: {
                             root.closeRequested();
-                            VpnService.remove(vpnRow.modelData.name);
+                            Settings.openRequested("vpn");
                         }
                     }
                     Switch {
-                        checked: vpnRow.switching ? VpnService.pending[vpnRow.modelData.name] : vpnRow.modelData.active
+                        checked: vpnRow.switching ? VpnService.pending[vpnRow.modelData.uuid] : vpnRow.modelData.active
                         onToggled: VpnService.toggle(vpnRow.modelData.name)
                     }
                 }

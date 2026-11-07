@@ -7,6 +7,7 @@ Rectangle {
     id: root
     property string text
     property string placeholder
+    property bool secret: false
     readonly property alias currentText: input.text
     signal accepted(string text)
     signal edited(string text)
@@ -52,6 +53,7 @@ Rectangle {
         selectionColor: Theme.accent
         selectedTextColor: Theme.accentText
         clip: true
+        echoMode: root.secret ? TextInput.Password : TextInput.Normal
         onTextChanged: root.edited(text)
         onAccepted: {
             root.entered(text);

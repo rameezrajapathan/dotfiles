@@ -734,7 +734,7 @@ PanelWindow {
                 cellWidth: width / root.columns
                 cellHeight: root.mode === "apps" ? (root.columns === 1 ? 60 : root.cell) : root.mode === "emoji" ? 76 : 60
                 clip: true
-                model: root.results
+                model: root.visible ? root.results : []
                 highlightFollowsCurrentItem: true
                 highlightMoveDuration: 160
                 highlight: Item {

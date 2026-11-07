@@ -12,7 +12,8 @@ Start with `pikadots health`, then `pikadots repair`.
 | A display setting left a screen unusable | The reset button (circular arrow) on that screen's card in the Displays tab, shown once a screen has saved settings, or `rm ~/.local/state/pikadots/monitors.lua && hyprctl reload` |
 | Colors not updated | `~/.config/hypr/scripts/theme.sh` |
 | Backup failed | `journalctl --user -u pikadots-backup` |
-| No wallpaper, or the screen never dims or locks | `systemctl --user status pikadots-wallpaper pikadots-idle`; `pikadots repair` enables them |
+| No wallpaper | Quickshell draws it: check `~/.config/hypr/wallpaper.conf` points at an existing image and that `qs` is running |
+| The screen never dims or locks | `systemctl --user status pikadots-idle`; `pikadots repair` enables it |
 | Notifications look plain | Another daemon (mako, dunst, swaync) took over; `pikadots repair` masks it |
 | New font not showing in the bar | Restart the bar (above); a reload isn't enough |
 | Bar shows the old time after changing the time zone | Restart the bar (above), or "Restart shell" in Settings > Date & time |

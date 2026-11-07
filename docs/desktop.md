@@ -79,6 +79,68 @@ get a badge when every window is there.
 Everything else is in Settings > Dock. From a script: `qs ipc call dock toggle|show|hide`,
 `dock mode always|autohide|intellihide`, `dock edge bottom|left|right`, `dock pin|unpin <app id>`.
 
+## Desktop widgets (Super + H)
+
+Cards on the wallpaper, behind your windows. Sixteen kinds:
+
+| Kind | What it shows |
+|---|---|
+| Clock | A dial, or big numbers with your world clocks |
+| Pixel clock | Big block digits like peaclock, seconds when it's wide enough |
+| Word clock | The time spelled out in a grid of letters ("IT IS TWENTY FIVE TO THREE") |
+| Visualizer | The music as bars (cava, while something plays), with a reflection when tall; click to play or pause |
+| Now playing | Cover, title, progress, play/pause and skip |
+| Weather | Now, the next hours and the coming days |
+| Sun & moon | The sun on its arc between sunrise and sunset, daylight length and the moon's phase |
+| Calendar | Today, the month and what's coming up |
+| Next meeting | The next meeting with a Join button, or the day's list |
+| Focus timer | A pomodoro: 25 minutes, a 5 minute break, a 15 minute one every fourth round, with a notification at each change |
+| Notes | A note that saves as you type |
+| To-do | A list to tick off |
+| System | Processor, memory, disk and battery rings |
+| System info | Distro logo, kernel, uptime, packages, shell, WM, CPU and memory, fetch style |
+| Photo frame | A slideshow of a folder of pictures |
+| GitHub | Unread notifications |
+
+Widgets snap to a grid of 120 px cells (an even number across and down) that keeps clear of the
+bar and an always-visible dock. A widget can be any number of cells wide and tall, from 2 × 2
+(2 × 1 for the pixel clock and visualizer) up to 4 × 4, and rearranges itself to fit. Each screen
+has its own layout, shared by all its workspaces. They use the same glass as the panels (Settings >
+Desktop can make them solid). The pointer shows what a spot does: a hand over things you can click,
+a text cursor in notes and the to-do field.
+
+- **Super + H**, or a **four-finger swipe down**, is Show Desktop: the windows dim and blur and
+  the widgets come forward. Click anywhere empty or press Esc to go back.
+- **Super + Shift + H** (or Edit widgets… in the Desktop Menu) starts Edit Mode: drag a widget to
+  move it, drag its corner to resize it (the size shows as you drag, and the outline turns red where
+  it won't fit), − to remove it, Add widget for the catalog (pick a kind and a starting size, see a
+  live preview, then add it). Done or Esc finishes.
+- Outside Edit Mode the widgets work: play/pause and skip, tick off to-dos, type notes, join a
+  meeting, run the focus timer. Clicking the weather, calendar, music or system opens its panel.
+  Middle-click a photo frame for the next picture.
+- Notes are Markdown files in `~/.local/state/pikadots/notes`, the to-do list is
+  `~/.local/state/pikadots/todo.json`. The layouts are `desktop.layouts` in `settings.json`.
+
+The widgets live in `quickshell/desktop/`, the catalog and grid in `quickshell/services/Desktop.qml`.
+From a script: `qs ipc call desktop toggle|edit|add|menu|starter|clear|dump`, `desktop load <file>`
+(a JSON list like the one `dump` prints), `desktop place <kind> <small|medium|large>` (`clock`,
+`pixelclock`, `wordclock`, `visualizer`, `media`, `weather`, `sun`, `calendar`, `meeting`, `focus`,
+`notes`, `todo`, `system`, `fetch`, `photos`, `github`).
+
+## Desktop menu
+
+A right click on the empty desktop: Change wallpaper…, Edit widgets…, Add a widget…, Show desktop,
+Open terminal, Display settings and Pikadots settings. Arrow keys and Enter work too.
+`qs ipc call desktop menu` opens it in the middle of the screen. Settings > Desktop turns it off.
+
+## First-run setup
+
+The first time you log in to a fresh install, a welcome walks through the wallpaper (and the
+colors with it), the bar style, the dock (on or off, edge, hiding), starter widgets, your picture
+and six keys worth knowing. Every step can be skipped, and Esc skips the rest. It shows once
+(`~/.local/state/pikadots/setup-done`); an install that already has a `settings.json` counts as
+set up. `pikadots setup` goes through it again.
+
 ## Calendar
 
 Click the clock (or the date). The time, the month (arrows or scroll change it, the month name
