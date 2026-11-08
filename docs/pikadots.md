@@ -15,7 +15,7 @@ pikadots export       save your settings to one file
 pikadots import FILE  apply an exported file on this machine
 pikadots setup        go through the welcome steps again
 pikadots greeter [--reset]  login screen with the wallpaper (Plasma Login Manager)
-pikadots greeter install|remove|preview  the pikadots greeter on greetd
+pikadots greeter install|remove|preview|sync  the pikadots greeter on greetd
 pikadots splash [--reset]   boot splash (Plymouth) in the wallpaper colors
 pikadots keybinds [status|reset]  reset restores the default keybinds.lua and clears Settings shortcut changes
 pikadots docs-check   compare keybinds.lua with docs/keybindings.md
@@ -142,7 +142,12 @@ asking and using sudo. Run them again after changing the wallpaper; `--reset` un
   with `FONTCONFIG_FILE` pointing at it and `PIKADOTS_GREETER_DIR=/var/lib/pikadots-greeter`, so it
   finds them without the fonts in your home folder. The greetd user is read from the old
   `config.toml` or the greetd package (`greeter`, `greetd` or `_greetd`). It shows from the next
-  boot. Run it again after changing the wallpaper. `pikadots install` and `repair` (and so
+  boot. `/var/lib/pikadots-greeter` belongs to you (only `last`, which the greeter writes, belongs
+  to the greetd user), so a wallpaper change updates the greeter without sudo: `theme.sh` runs
+  `pikadots greeter sync --later`, which waits 2 seconds (`PIKADOTS_GREETER_DELAY`), skips the
+  update if another wallpaper change came in meanwhile, and copies the wallpaper, colors, fonts,
+  picture and keyboard layout when they differ. Greeters installed before this need
+  `pikadots greeter` once to hand the folder over. `pikadots install` and `repair` (and so
   `update`) refresh an installed greeter whose files, fonts or greetd command are older than the
   repo's, copying the wallpaper, colors and fonts again; `health` flags one. If a session closes right
   after login, the greeter says so next time instead of looping silently. Why greetd and not a themed Plasma Login Manager:
@@ -153,6 +158,7 @@ asking and using sudo. Run them again after changing the wallpaper; `--reset` un
   there's none, it says that the next boot ends at a text console. `pikadots uninstall` offers it
   too. It needs nothing but a shell, so it works from a text
   console (Ctrl + Alt + F3) if the greeter ever fails to start.
+- **`pikadots greeter sync`** does that copy now.
 - **`pikadots greeter preview`** shows the greeter on your screen now, without changing anything;
   Esc closes it.
 - **`pikadots splash`**: installs a pikadots Plymouth script theme from `config/plymouth` (the

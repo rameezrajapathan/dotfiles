@@ -1089,7 +1089,7 @@ cmd_export() {
 	local out=${1:-$HOME/pikadots-settings-$(date +%F).tar.gz} tmp img f
 	[[ -f $HOME/.config/pikadots/settings.json ]] || die "no settings yet (~/.config/pikadots/settings.json)"
 	tmp=$(mktemp -d)
-	trap 'rm -rf "$tmp"' RETURN
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
 	for f in "${settings_files[@]}" .face; do
 		[[ -f $HOME/$f ]] || continue
 		mkdir -p "$tmp/$(dirname "$f")"
@@ -1111,7 +1111,7 @@ cmd_import() {
 	local file=${1:-} tmp backup f img
 	[[ -f $file ]] || die "usage: pikadots import FILE (from pikadots export, or a settings.json)"
 	tmp=$(mktemp -d)
-	trap 'rm -rf "$tmp"' RETURN
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
 	if jq -e .appearance "$file" >/dev/null 2>&1; then
 		mkdir -p "$tmp/.config/pikadots"
 		cp "$file" "$tmp/.config/pikadots/settings.json"
@@ -1383,7 +1383,7 @@ greeter_refresh() {
 	fi
 	local tmp
 	tmp=$(mktemp -d)
-	trap 'rm -rf "$tmp"' RETURN
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
 	greeter_stage "$tmp"
 	if greeter_copy_files && { greeter_dropin_current || greeter_write_dropin; } &&
 		{ greeter_pam_current || greeter_write_pam; } &&
@@ -1460,15 +1460,48 @@ greeter_copy_theme() {
 	sudo rm -rf "$qs_greeter_state/fonts"
 	sudo cp -r "$staged/." "$qs_greeter_state/" || return 1
 	sudo chmod -R a+rX "$qs_greeter_state"
+	sudo chown -R "$USER" "$qs_greeter_state"
 	sudo touch "$qs_greeter_state/last"
 	getent passwd "$user" >/dev/null && sudo chown "$user" "$qs_greeter_state/last"
 	return 0
 }
 
+greeter_sync() {
+	if [[ ${1:-} == --later ]]; then
+		local token="$BASHPID $(date +%s%N)"
+		mkdir -p "$state"
+		printf '%s\n' "$token" >"$state/greeter-sync"
+		sleep "${PIKADOTS_GREETER_DELAY:-2}"
+		[[ $(cat "$state/greeter-sync" 2>/dev/null) == "$token" ]] || return 0
+		rm -f "$state/greeter-sync"
+	fi
+	[[ -f $qs_greeter_share/shell.qml ]] || { [[ -n ${1:-} ]] || info "the pikadots greeter isn't installed"; return 0; }
+	if [[ ! -O $qs_greeter_state ]]; then
+		[[ -n ${1:-} ]] || warn "run pikadots greeter once so wallpaper changes can update the login screen without sudo"
+		return 0
+	fi
+	local tmp f
+	tmp=$(mktemp -d)
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
+	greeter_stage "$tmp"
+	if cmp -s "$tmp/theme.json" "$qs_greeter_state/theme.json" && cmp -s "$tmp/kb_layout" "$qs_greeter_state/kb_layout" &&
+		cmp -s "$tmp/faces/$USER" "$qs_greeter_state/faces/$USER" 2>/dev/null; then
+		f=$(find "$tmp" -maxdepth 1 -name 'wallpaper.*' | head -1)
+		if [[ -z $f ]] || cmp -s "$f" "$qs_greeter_state/${f##*/}"; then
+			[[ -n ${1:-} ]] || ok "login screen already matches the wallpaper"
+			return 0
+		fi
+	fi
+	find "$qs_greeter_state" -maxdepth 1 -name 'wallpaper.*' -delete
+	rm -rf "$qs_greeter_state/fonts"
+	cp -r "$tmp/." "$qs_greeter_state/" && chmod -R a+rX "$qs_greeter_state" 2>/dev/null
+	[[ -n ${1:-} ]] || ok "login screen updated with the wallpaper, colors and fonts"
+}
+
 greeter_preview() {
 	local tmp
 	tmp=$(mktemp -d)
-	trap 'rm -rf "$tmp"' RETURN
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
 	greeter_stage "$tmp"
 	info "showing the greeter as it would look; press Esc to close it"
 	PIKADOTS_GREETER_DIR=$tmp FONTCONFIG_FILE=$tmp/fonts.conf qs -p "$qs_greeter_src" >/dev/null 2>&1
@@ -1484,7 +1517,7 @@ greeter_install() {
 		ok "the pikadots greeter is already installed; refreshing its wallpaper and colors"
 	fi
 	tmp=$(mktemp -d)
-	trap 'rm -rf "$tmp"' RETURN
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
 	greeter_stage "$tmp"
 	info "with sudo, this will:"
 	has greetd || info "  install greetd"
@@ -1571,6 +1604,7 @@ cmd_greeter() {
 	install) greeter_install ;;
 	remove) greeter_remove ;;
 	preview) greeter_preview ;;
+	sync) greeter_sync "${2:-}" ;;
 	--reset) plm_theme_reset ;;
 	"")
 		if [[ $(display_manager) == greetd && -f $qs_greeter_share/shell.qml ]]; then
@@ -1579,7 +1613,7 @@ cmd_greeter() {
 			plm_theme_apply
 		fi
 		;;
-	*) die "usage: pikadots greeter [install|remove|preview|--reset]" ;;
+	*) die "usage: pikadots greeter [install|remove|preview|sync|--reset]" ;;
 	esac
 }
 
@@ -1611,7 +1645,7 @@ plm_theme_apply() {
 	[[ -n $img ]] || die "no wallpaper set"
 	ext=${img##*.}
 	tmp=$(mktemp -d)
-	trap 'rm -rf "$tmp"' RETURN
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
 	cat >"$tmp/pikadots.conf" <<-EOF
 		[Greeter]
 		WallpaperPluginId=org.kde.image
@@ -1710,7 +1744,7 @@ cmd_splash() {
 		need_plugin=1
 	fi
 	tmp=$(mktemp -d)
-	trap 'rm -rf "$tmp"' RETURN
+	trap 'rm -rf "$tmp"; trap - RETURN' RETURN
 	magick -background none -density 600 "$logo" -resize 160x160 -fill "$text" -colorize 100 "$tmp/logo.png" &&
 		magick -size 72x72 xc:none -fill none -strokewidth 6 -stroke "$surface" -draw 'circle 36,36 36,6' \
 			-stroke "$accent" -draw 'arc 6,6 66,66 -90,30' -depth 8 "$tmp/spinner.png" || die "couldn't draw the splash images"
@@ -1812,10 +1846,11 @@ CachyOS or Fedora).
                         picture, keys)
   pikadots greeter [--reset]  login screen (Plasma Login Manager) with the wallpaper and its colors;
                         shows what it changes, asks, then uses sudo
-  pikadots greeter install|remove|preview  the pikadots greeter: a Quickshell login screen that
-                        looks like the lock screen, on greetd; install switches to it (run it
-                        again after changing the wallpaper), remove goes back to the previous
-                        login screen, preview shows it now without changing anything
+  pikadots greeter install|remove|preview|sync  the pikadots greeter: a Quickshell login screen
+                        that looks like the lock screen, on greetd; install switches to it,
+                        remove goes back to the previous login screen, preview shows it now
+                        without changing anything, sync copies the wallpaper, colors and fonts
+                        to it without sudo (done by itself a few seconds after a wallpaper change)
   pikadots splash [--reset]   boot splash (Plymouth) with the distro logo and an accent spinner;
                         shows what it changes, asks, then uses sudo; --reset restores the old one
   pikadots keybinds [status|reset]  status says whether keybinds.lua differs from the repo's
@@ -1837,7 +1872,7 @@ case ${1:-help} in
 	export) cmd_export "${2:-}" ;;
 	import) cmd_import "${2:-}" ;;
 	setup) qs ipc call setup open >/dev/null || die "the shell isn't running (log in to Hyprland first)" ;;
-	greeter) cmd_greeter "${2:-}" ;;
+	greeter) cmd_greeter "${2:-}" "${3:-}" ;;
 	splash) cmd_splash "${2:-}" ;;
 	keybinds) cmd_keybinds "${2:-}" ;;
 	docs-check) cmd_docs_check ;;

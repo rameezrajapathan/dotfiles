@@ -71,6 +71,7 @@ if has asusctl; then
 	[[ -n $accent ]] && asusctl aura effect static -c "$accent" >/dev/null 2>&1 || true
 fi
 setsid -f python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 9>&- || true
+has pikadots && { setsid -f pikadots greeter sync --later >/dev/null 2>&1 9>&- || true; }
 [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || exit 0
 hyprctl reload >/dev/null
 if $glass_only; then
