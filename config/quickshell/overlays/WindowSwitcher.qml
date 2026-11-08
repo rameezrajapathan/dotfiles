@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -8,12 +7,13 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
 
-    Exclusive { panel: root }
+    layerNamespace: "quickshell-switcher"
+    backdropOpacity: 0
+    hideWhenFaded: false
 
-    property bool open: false
     property int current: 0
     property var items: []
 
@@ -79,20 +79,6 @@ PanelWindow {
         function cancel(): void {
             root.close();
         }
-    }
-
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-switcher"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: false
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: root.close()
     }
 
     Item {

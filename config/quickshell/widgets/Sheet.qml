@@ -13,14 +13,13 @@ Item {
     property real ear: 14
     property color color: Theme.baseTranslucent
     property string kind: ""
-    property var anchorIds: {
-        switch (kind) {
-        case "settings": return ["avatar"];
-        case "calendar": return ["clock", "date"];
-        case "weather": return ["weather"];
-        }
-        return [];
-    }
+    readonly property var kinds: ({
+        settings: { anchorIds: ["avatar"], action: "cc:" },
+        calendar: { anchorIds: ["clock", "date"], action: "calendar" },
+        weather: { anchorIds: ["weather"], action: "weather" }
+    })
+    readonly property var kindInfo: kinds[kind] ?? null
+    property var anchorIds: kindInfo?.anchorIds ?? []
     default property alias content: inner.data
     signal closed()
     signal dismiss()
@@ -56,7 +55,7 @@ Item {
         motionAnim.to = open ? 1 : 0;
         motionAnim.duration = open ? PanelMotion.openDuration(motion) : PanelMotion.closeDuration();
         motionAnim.easing.type = open ? style.easing : Easing.OutCubic;
-        motionAnim.easing.overshoot = style.overshoot ?? 1.70158;
+        motionAnim.easing.overshoot = PanelMotion.overshootOf(style);
         motionAnim.start();
     }
 
@@ -241,12 +240,10 @@ Item {
         bareShape: root.covering ? root.anchor.index : -1
         settingsActive: root.kind === "settings"
         onAction: name => {
-            if (root.kind === "settings" && name === "cc:"
-                    || root.kind === "calendar" && name === "calendar"
-                    || root.kind === "weather" && name === "weather")
+            if (name === root.kindInfo?.action)
                 root.dismiss();
             else
-                Toggles.barAction(name);
+                Panels.action(name);
         }
     }
 

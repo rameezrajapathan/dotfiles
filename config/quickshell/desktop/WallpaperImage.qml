@@ -4,7 +4,7 @@ import qs.services
 
 Item {
     id: root
-    readonly property string source: Glass.wallpaper
+    readonly property string source: Wallpaper.url
     readonly property real dpr: QsWindow.window?.screen?.devicePixelRatio ?? 1
     readonly property size pixels: Qt.size(Math.ceil(width * dpr), Math.ceil(height * dpr))
     property Image shown: null

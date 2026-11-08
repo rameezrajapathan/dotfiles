@@ -8,20 +8,19 @@ import QtQuick
 Singleton {
     id: root
 
-    readonly property JsonObject cfg: Settings.desktop
-    readonly property bool enabled: cfg.enabled
+    readonly property JsonObject config: Settings.desktop
+    readonly property bool enabled: config.enabled
     readonly property int cell: 120
     readonly property int gutter: 10
     readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/pikadots"
     readonly property string notesDir: stateDir + "/notes"
-    readonly property string photoFolder: cfg.photos || Quickshell.env("HOME") + "/Pictures"
+    readonly property string photoFolder: config.photos || Quickshell.env("HOME") + "/Pictures"
 
     property bool showing: false
     property bool editing: false
     property string catalogScreen: ""
     readonly property bool raised: enabled && (showing || editing)
     property var menu: null
-    property int added: 0
 
     readonly property string focusedScreen: Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name ?? ""
 
@@ -34,22 +33,22 @@ Singleton {
     readonly property int maxSpan: 4
 
     readonly property var kinds: [
-        { id: "clock", title: "Clock", icon: "schedule", about: "The time, on a dial or in big numbers, with your world clocks." },
-        { id: "pixelclock", title: "Pixel clock", icon: "grid_view", about: "Big block digits, like peaclock in a terminal.", min: { w: 2, h: 1 } },
-        { id: "wordclock", title: "Word clock", icon: "text_fields", about: "The time spelled out in a grid of letters." },
-        { id: "visualizer", title: "Visualizer", icon: "graphic_eq", about: "The music as bars that dance (cava).", min: { w: 2, h: 1 } },
-        { id: "media", title: "Now playing", icon: "music_note", card: "media", about: "What's playing, with play, pause and skip." },
-        { id: "weather", title: "Weather", icon: "partly_cloudy_day", card: "weather", about: "Now, the next hours and the coming days." },
-        { id: "sun", title: "Sun & moon", icon: "wb_twilight", about: "Where the sun is between sunrise and sunset, and the moon's phase." },
-        { id: "calendar", title: "Calendar", icon: "calendar_month", card: "calendar", about: "Today's date, the month and what's coming up." },
-        { id: "meeting", title: "Next meeting", icon: "event", about: "Your next meeting with a join button, or the day's list." },
-        { id: "focus", title: "Focus timer", icon: "timer", about: "A pomodoro: 25 minutes of focus, then a break." },
-        { id: "notes", title: "Notes", icon: "sticky_note_2", about: "A note that saves as you type." },
-        { id: "todo", title: "To-do", icon: "checklist", about: "A short list to tick off." },
-        { id: "system", title: "System", icon: "memory", card: "system", about: "Processor, memory, disk and battery." },
-        { id: "fetch", title: "System info", icon: "terminal", about: "Your distro, kernel, uptime and packages, fetch style." },
-        { id: "photos", title: "Photo frame", icon: "photo_library", about: "A slideshow of a folder of pictures." },
-        { id: "github", title: "GitHub", icon: "code", about: "Unread GitHub notifications." }
+        { id: "clock", content: "ClockWidget.qml", title: "Clock", icon: "schedule", about: "The time, on a dial or in big numbers, with your world clocks." },
+        { id: "pixelclock", content: "PixelClockWidget.qml", title: "Pixel clock", icon: "grid_view", about: "Big block digits, like peaclock in a terminal.", min: { w: 2, h: 1 } },
+        { id: "wordclock", content: "WordClockWidget.qml", title: "Word clock", icon: "text_fields", about: "The time spelled out in a grid of letters." },
+        { id: "visualizer", content: "VisualizerWidget.qml", title: "Visualizer", icon: "graphic_eq", about: "The music as bars that dance (cava).", min: { w: 2, h: 1 } },
+        { id: "media", content: "MediaWidget.qml", title: "Now playing", icon: "music_note", card: "media", about: "What's playing, with play, pause and skip." },
+        { id: "weather", content: "WeatherWidget.qml", title: "Weather", icon: "partly_cloudy_day", card: "weather", about: "Now, the next hours and the coming days." },
+        { id: "sun", content: "SunWidget.qml", title: "Sun & moon", icon: "wb_twilight", about: "Where the sun is between sunrise and sunset, and the moon's phase." },
+        { id: "calendar", content: "CalendarWidget.qml", title: "Calendar", icon: "calendar_month", card: "calendar", about: "Today's date, the month and what's coming up." },
+        { id: "meeting", content: "MeetingWidget.qml", title: "Next meeting", icon: "event", about: "Your next meeting with a join button, or the day's list." },
+        { id: "focus", content: "FocusWidget.qml", title: "Focus timer", icon: "timer", about: "A pomodoro: 25 minutes of focus, then a break." },
+        { id: "notes", content: "NotesWidget.qml", title: "Notes", icon: "sticky_note_2", about: "A note that saves as you type." },
+        { id: "todo", content: "TodoWidget.qml", title: "To-do", icon: "checklist", about: "A short list to tick off." },
+        { id: "system", content: "SystemWidget.qml", title: "System", icon: "memory", card: "system", about: "Processor, memory, disk and battery." },
+        { id: "fetch", content: "FetchWidget.qml", title: "System info", icon: "terminal", about: "Your distro, kernel, uptime and packages, fetch style." },
+        { id: "photos", content: "PhotoWidget.qml", title: "Photo frame", icon: "photo_library", about: "A slideshow of a folder of pictures." },
+        { id: "github", content: "GitHubWidget.qml", title: "GitHub", icon: "code", about: "Unread GitHub notifications." }
     ]
 
     readonly property var starter: [
@@ -100,7 +99,7 @@ Singleton {
         const inset = { top: 16, bottom: 16, left: 16, right: 16 };
         inset[Theme.barPosition] += Theme.barHeight + 8;
         if (Dock.enabled && Dock.onScreen(name) && Dock.mode === "always")
-            inset[Dock.edge] += Dock.gap + Dock.depth + 8;
+            inset[Dock.edge] += Dock.edgeMargin + Dock.depth + 8;
         const w = s.width - inset.left - inset.right;
         const h = s.height - inset.top - inset.bottom;
         let cols = Math.max(0, Math.floor(w / cell));
@@ -116,18 +115,18 @@ Singleton {
     }
 
     function layout(name) {
-        const all = cfg.layouts ?? {};
+        const all = config.layouts ?? {};
         const list = all[name];
         return list && typeof list.length === "number" ? Array.from(list).filter(e => e && kind(e.kind)) : [];
     }
 
     function save(name, list) {
-        const all = Object.assign({}, cfg.layouts ?? {});
+        const all = Object.assign({}, config.layouts ?? {});
         all[name] = list.map(e => {
             const d = dims(e);
             return { id: e.id, kind: e.kind, w: d.w, h: d.h, col: e.col, row: e.row };
         });
-        cfg.layouts = all;
+        config.layouts = all;
     }
 
     function clamp(entry, a) {
@@ -174,7 +173,6 @@ Singleton {
             return false;
         list.push({ id: newId(), kind: kindId, w: d.w, h: d.h, col: spot.col, row: spot.row });
         save(name, list);
-        added++;
         return true;
     }
 
@@ -250,96 +248,15 @@ Singleton {
         edit(false);
     }
 
-    readonly property var focusLengths: ({ focus: 25, short: 5, long: 15 })
-    property string focusMode: "focus"
-    property int focusLeft: focusLengths.focus * 60
-    property bool focusRunning: false
-    property int focusRounds: 0
-    readonly property int focusTotal: focusLengths[focusMode] * 60
-
-    function focusToggle() {
-        focusRunning = !focusRunning;
-    }
-
-    function focusReset() {
-        focusRunning = false;
-        focusLeft = focusTotal;
-    }
-
-    function focusSkip() {
-        if (focusMode === "focus") {
-            focusRounds++;
-            focusMode = focusRounds % 4 === 0 ? "long" : "short";
-        } else {
-            focusMode = "focus";
-        }
-        focusLeft = focusTotal;
-    }
-
-    Timer {
-        interval: 1000
-        repeat: true
-        running: root.focusRunning
-        onTriggered: {
-            if (root.focusLeft > 1) {
-                root.focusLeft--;
-                return;
-            }
-            const was = root.focusMode;
-            root.focusSkip();
-            Quickshell.execDetached(["notify-send", "-a", "Focus timer", "-i", "alarm",
-                was === "focus" ? "Time for a break" : "Back to focus",
-                was === "focus" ? root.focusLengths[root.focusMode] + " minutes. Stand up, stretch, look away from the screen." : "25 minutes of focus start now."]);
-        }
-    }
-
-    property alias todos: todoAdapter.items
-
-    function addTodo(text) {
-        const t = text.trim();
-        if (t)
-            todos = todos.concat([{ text: t, done: false }]);
-    }
-
-    function toggleTodo(i) {
-        todos = todos.map((t, j) => j === i ? { text: t.text, done: !t.done } : t);
-    }
-
-    function removeTodo(i) {
-        todos = todos.filter((t, j) => j !== i);
-    }
-
-    function clearDone() {
-        todos = todos.filter(t => !t.done);
-    }
-
-    FileView {
-        path: root.stateDir + "/todo.json"
-        printErrors: false
-        blockWrites: true
-        onAdapterUpdated: writeAdapter()
-
-        JsonAdapter {
-            id: todoAdapter
-            property var items: []
-        }
-    }
-
     Component.onCompleted: Quickshell.execDetached(["mkdir", "-p", notesDir])
 
-    Process {
+    JsonPoll {
         id: loader
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const list = JSON.parse(text);
-                    if (Array.isArray(list))
-                        root.save(root.focusedScreen, list.filter(e => e && root.kind(e.kind)));
-                } catch (e) {
-                    console.warn("desktop load: " + e);
-                }
-            }
+        onLoaded: json => {
+            if (Array.isArray(json))
+                root.save(root.focusedScreen, json.filter(e => e && root.kind(e.kind)));
         }
+        onFailed: error => console.warn("desktop load: " + error)
     }
 
     IpcHandler {

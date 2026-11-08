@@ -8,7 +8,7 @@ Item {
     property bool open: false
     property string screenName: ""
     property string picked: "clock"
-    property string size: "small"
+    property string sizeClass: "small"
     property string message: ""
 
     readonly property var kind: Desktop.kind(picked)
@@ -186,7 +186,7 @@ Item {
                         DesktopWidget {
                             readonly property real fit: Math.min(1, stage.width / Math.max(1, width), stage.height / Math.max(1, height))
                             preview: true
-                            entry: ({ id: "preview", kind: root.picked, size: root.size, col: 0, row: 0 })
+                            entry: ({ id: "preview", kind: root.picked, size: root.sizeClass, col: 0, row: 0 })
                             readonly property var px: Desktop.pixels(cells.w, cells.h)
                             screenName: root.screenName
                             area: ({ x: (stage.width - px.w) / 2 - Desktop.gutter, y: (stage.height - px.h) / 2 - Desktop.gutter, cols: 99, rows: 99 })
@@ -204,7 +204,7 @@ Item {
                             Rectangle {
                                 id: chip
                                 required property string modelData
-                                readonly property bool on: root.size === modelData
+                                readonly property bool on: root.sizeClass === modelData
                                 implicitWidth: chipLabel.implicitWidth + 32
                                 implicitHeight: 38
                                 radius: height / 2
@@ -222,7 +222,7 @@ Item {
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
-                                        root.size = chip.modelData;
+                                        root.sizeClass = chip.modelData;
                                         root.message = "";
                                     }
                                 }

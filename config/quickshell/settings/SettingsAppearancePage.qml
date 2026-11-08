@@ -216,18 +216,14 @@ SettingsPage {
             }
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "gradient"
             title: "Gradient accents"
             description: Theme.multiColor ? "Accent fills blend from one wallpaper color into the next."
                 : "Accent fills blend into a deeper shade of the same color."
-            Switch {
-                checked: Settings.appearance.gradient
-                onToggled: {
-                    Settings.appearance.gradient = !Settings.appearance.gradient;
-                    Settings.retheme();
-                }
-            }
+            target: Settings.appearance
+            key: "gradient"
+            onSwitched: Settings.retheme()
         }
 
         SettingsRow {
@@ -300,17 +296,13 @@ SettingsPage {
             }
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "widgets"
             title: "Qt and KDE apps"
             description: "Dolphin, Kate and other Qt apps use these colors and icons. Plasma keeps its own."
-            Switch {
-                checked: Settings.appearance.qtTheme
-                onToggled: {
-                    Settings.appearance.qtTheme = !checked;
-                    Settings.applyQtTheme();
-                }
-            }
+            target: Settings.appearance
+            key: "qtTheme"
+            onSwitched: Settings.applyQtTheme()
         }
     }
 

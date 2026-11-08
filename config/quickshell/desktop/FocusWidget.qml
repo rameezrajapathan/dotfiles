@@ -4,46 +4,15 @@ import QtQuick.Shapes
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property bool wide: width > height * 1.4
     readonly property real ring: Math.min(wide ? height - 36 : width - 40, wide ? width * 0.45 : height - 96)
-    readonly property real fraction: Desktop.focusTotal > 0 ? Desktop.focusLeft / Desktop.focusTotal : 0
-    readonly property color tint: Desktop.focusMode === "focus" ? Theme.accent : Theme.green
-    readonly property string label: Desktop.focusMode === "focus" ? "Focus" : Desktop.focusMode === "long" ? "Long break" : "Break"
-    readonly property string clockText: Math.floor(Desktop.focusLeft / 60) + ":" + String(Desktop.focusLeft % 60).padStart(2, "0")
-
-    component Button: Rectangle {
-        id: button
-        property string icon
-        property bool big: false
-        property string tip
-        signal clicked()
-        implicitWidth: big ? 46 : 36
-        implicitHeight: implicitWidth
-        radius: width / 2
-        color: big ? root.tint : mouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.surface, 0.5)
-        Icon {
-            anchors.centerIn: parent
-            name: button.icon
-            filled: true
-            size: button.big ? 26 : 20
-            color: button.big ? Theme.accentText : Theme.text
-        }
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: button.clicked()
-        }
-        Tooltip {
-            text: button.tip
-        }
-    }
+    readonly property real fraction: FocusTimer.fraction
+    readonly property color tint: FocusTimer.mode === "focus" ? Theme.accent : Theme.green
+    readonly property string label: FocusTimer.mode === "focus" ? "Focus" : FocusTimer.mode === "long" ? "Long break" : "Break"
+    readonly property string clockText: TimeDate.clock(FocusTimer.left)
 
     GridLayout {
         anchors.centerIn: parent
@@ -110,9 +79,19 @@ Item {
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: 8
-                Button { icon: "restart_alt"; tip: "Start over"; onClicked: Desktop.focusReset() }
-                Button { big: true; icon: Desktop.focusRunning ? "pause" : "play_arrow"; tip: Desktop.focusRunning ? "Pause" : "Start"; onClicked: Desktop.focusToggle() }
-                Button { icon: "skip_next"; tip: Desktop.focusMode === "focus" ? "Skip to the break" : "Skip the break"; onClicked: Desktop.focusSkip() }
+                IconButton { icon: "restart_alt"; filled: true; tip: "Start over"; onClicked: FocusTimer.reset() }
+                IconButton {
+                    implicitWidth: 46
+                    implicitHeight: 46
+                    tone: "accent"
+                    fill: root.tint
+                    icon: FocusTimer.running ? "pause" : "play_arrow"
+                    iconSize: 26
+                    filled: true
+                    tip: FocusTimer.running ? "Pause" : "Start"
+                    onClicked: FocusTimer.toggle()
+                }
+                IconButton { icon: "skip_next"; filled: true; tip: FocusTimer.mode === "focus" ? "Skip to the break" : "Skip the break"; onClicked: FocusTimer.skip() }
             }
             Row {
                 Layout.alignment: Qt.AlignHCenter
@@ -125,7 +104,7 @@ Item {
                         width: 10
                         height: 10
                         radius: 5
-                        color: index < Desktop.focusRounds % 4 ? Theme.accent : Qt.alpha(Theme.text, 0.15)
+                        color: index < FocusTimer.rounds % 4 ? Theme.accent : Qt.alpha(Theme.text, 0.15)
                     }
                 }
             }

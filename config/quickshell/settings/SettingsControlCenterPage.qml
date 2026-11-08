@@ -15,7 +15,7 @@ SettingsPage {
         SettingsRow {
             icon: "dashboard_customize"
             title: "Layout"
-            description: CCStyles.style === "custom" ? "Custom: your own widgets and columns."
+            description: CCStyles.style === "custom" ? "Custom: your own cards and columns."
                 : CCStyles.presets.find(p => p.id === CCStyles.style)?.description ?? ""
             below: true
 
@@ -30,63 +30,19 @@ SettingsPage {
                         columns: Settings.controlCenter.custom ?? CCStyles.current
                     }])
 
-                    Rectangle {
+                    SettingsStyleCard {
                         id: card
                         required property var modelData
-                        readonly property bool selected: CCStyles.style === modelData.id
+                        selected: CCStyles.style === modelData.id
+                        icon: modelData.icon
+                        label: modelData.label
+                        onClicked: CCStyles.apply(card.modelData.id)
 
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        implicitHeight: cardColumn.implicitHeight + 16
-                        radius: Theme.round(14, width, height)
-                        color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
-                        border.width: selected ? 2 : 1
-                        border.color: Theme.gradientAccent && (selected) ? "transparent" : selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
-                        GradientBorder {
-                            active: selected
+                        CCPreview {
+                            Layout.fillWidth: true
+                            implicitHeight: 110
+                            columns: card.modelData.columns
                         }
-                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
-
-                        ColumnLayout {
-                            id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
-                            spacing: 8
-
-                            CCPreview {
-                                Layout.fillWidth: true
-                                implicitHeight: 110
-                                columns: card.modelData.columns
-                            }
-                            RowLayout {
-                                Layout.leftMargin: 4
-                                Layout.rightMargin: 4
-                                spacing: 6
-                                Icon {
-                                    name: card.modelData.icon
-                                    size: 17
-                                    filled: card.selected
-                                    color: Theme.accent
-                                }
-                                Label {
-                                    Layout.fillWidth: true
-                                    text: card.modelData.label
-                                    font.weight: Font.DemiBold
-                                    elide: Text.ElideRight
-                                }
-                                CheckBadge {
-                                    visible: card.selected
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            id: cardMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: CCStyles.apply(card.modelData.id)
-                        }
-                        GlassRim {}
                     }
                 }
             }
@@ -94,8 +50,8 @@ SettingsPage {
     }
 
     SettingsSection {
-        title: "Widgets"
-        subtitle: CCStyles.style === "custom" ? "Click a column, then add widgets to it. Hover a widget to move or remove it."
+        title: "Cards"
+        subtitle: CCStyles.style === "custom" ? "Click a column, then add cards to it. Hover a card to move or remove it."
             : "Changing anything here makes your own Custom layout, starting from this one."
 
         Item {
@@ -111,7 +67,7 @@ SettingsPage {
 
     SettingsSection {
         title: "Quick tiles"
-        subtitle: "Shown by both tile widgets, in this order. Tiles this machine can't use (Bluetooth without an adapter) hide."
+        subtitle: "Shown by both quick tile cards, in this order. Tiles this machine can't use (Bluetooth without an adapter) hide."
 
         Item {
             Layout.fillWidth: true

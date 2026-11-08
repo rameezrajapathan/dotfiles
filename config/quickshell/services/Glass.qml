@@ -47,11 +47,6 @@ Singleton {
     readonly property bool panelShadows: shadows || flat
     readonly property color panelShadow: flat ? (light ? Qt.rgba(0, 0, 0, 0.12) : Qt.rgba(0, 0, 0, 0.4)) : shadowColor
 
-    readonly property string wallpaper: {
-        const match = /^\s*path\s*=\s*(.+?)\s*$/m.exec(wallpaperConf.text() ?? "");
-        return match ? "file://" + match[1].replace(/^~(?=\/)/, Quickshell.env("HOME")) : "";
-    }
-
     function forMode(a) {
         return light && active ? 1 - (1 - a) * 0.55 : a;
     }
@@ -103,20 +98,12 @@ Singleton {
     Timer {
         id: applyTimer
         interval: 300
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/theme.sh", "--glass"])
+        onTriggered: Wallpaper.applyGlass()
     }
 
     FileView {
         id: presetFile
         path: Quickshell.shellDir + "/services/glass-presets.json"
-        blockLoading: true
-        watchChanges: true
-        onFileChanged: reload()
-    }
-
-    FileView {
-        id: wallpaperConf
-        path: Quickshell.env("HOME") + "/.config/hypr/wallpaper.conf"
         blockLoading: true
         watchChanges: true
         onFileChanged: reload()

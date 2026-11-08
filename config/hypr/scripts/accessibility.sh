@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-settings=~/.config/pikadots/settings.json
-scale=$(jq -r '.accessibility.textScale // 1' "$settings" 2>/dev/null || echo 1)
-reduce=$(jq -r '.accessibility.reduceMotion // false' "$settings" 2>/dev/null || echo false)
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+
+scale=$(setting .accessibility.textScale 1)
+reduce=$(setting .accessibility.reduceMotion false)
 
 gsettings set org.gnome.desktop.interface text-scaling-factor "$scale"
 gsettings set org.gnome.desktop.interface enable-animations "$([[ $reduce == true ]] && echo false || echo true)"

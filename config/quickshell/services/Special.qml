@@ -4,8 +4,6 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
-import qs.bar
-import qs.overlays
 
 Singleton {
     id: root
@@ -30,8 +28,7 @@ Singleton {
     }
 
     function hide(name) {
-        if (name)
-            Quickshell.execDetached(["hyprctl", "dispatch", `hl.dsp.workspace.toggle_special("${name}")`]);
+        Windows.toggleSpecial(name);
     }
 
     function set(monitor, name) {
@@ -51,23 +48,20 @@ Singleton {
                 return;
             const parts = event.data.split(",");
             const monitor = parts.pop();
-            const name = parts.slice(1).join(",").replace(/^special:/, "");
+            const name = Windows.specialOf(parts.slice(1).join(","));
             root.set(monitor, name);
         }
     }
 
-    Process {
+    JsonPoll {
         running: true
         command: ["hyprctl", "-j", "monitors"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const s = {};
-                    for (const m of JSON.parse(text))
-                        s[m.name] = (m.specialWorkspace?.name ?? "").replace(/^special:/, "");
-                    root.shown = s;
-                } catch (e) {}
-            }
+        onLoaded: json => {
+            const s = {};
+            for (const m of json)
+                s[m.name] = Windows.specialOf(m.specialWorkspace?.name);
+            root.shown = s;
         }
+        onFailed: error => console.warn("special workspaces: " + error)
     }
 }

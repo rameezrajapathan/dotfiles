@@ -1,19 +1,21 @@
 import Qt.labs.folderlistmodel
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
 
+    layerNamespace: "quickshell-setup"
+    backdropOpacity: 0.5
+    fadeDuration: Theme.ms(260)
+    closeOnBackdrop: false
+
     readonly property string mark: Quickshell.env("HOME") + "/.local/state/pikadots/setup-done"
-    readonly property string wallpapers: Quickshell.env("HOME") + "/Pictures/Wallpapers"
     readonly property var steps: [
         { id: "welcome", title: "Welcome" },
         { id: "wallpaper", title: "Wallpaper" },
@@ -34,7 +36,6 @@ PanelWindow {
         { desc: "Show keybindings", fallback: "Super + Shift + /", icon: "keyboard_command_key", text: "Every shortcut, searchable" }
     ]
 
-    property bool open: false
     property int step: 0
     property bool starter: true
     property string wallpaper: ""
@@ -84,29 +85,6 @@ PanelWindow {
             if (root.open)
                 root.next();
         }
-    }
-
-    Exclusive { panel: root }
-
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-setup"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: false
-
-    Rectangle {
-        anchors.fill: parent
-        color: "black"
-        opacity: root.open ? 0.5 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.ms(260) } }
-        onOpacityChanged: if (opacity === 0 && !root.open) root.visible = false
-    }
-
-    MouseArea {
-        anchors.fill: parent
     }
 
     Rectangle {
@@ -342,7 +320,7 @@ PanelWindow {
                 cellHeight: Math.round(cellWidth * 0.62)
                 boundsBehavior: Flickable.StopAtBounds
                 model: FolderListModel {
-                    folder: root.visible ? "file://" + root.wallpapers : ""
+                    folder: root.visible ? "file://" + Wallpaper.folder : ""
                     nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
                     showDirs: false
                 }
@@ -370,7 +348,7 @@ PanelWindow {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 root.wallpaper = cell.filePath;
-                                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/theme.sh", cell.filePath]);
+                                Wallpaper.apply(cell.filePath);
                             }
                         }
                     }
@@ -378,7 +356,7 @@ PanelWindow {
                 Label {
                     anchors.centerIn: parent
                     visible: grid.count === 0
-                    text: "No wallpapers in ~/Pictures/Wallpapers yet. You can add some later with Super + Shift + W."
+                    text: "No wallpapers in " + Wallpaper.folder.replace(Wallpaper.home, "~") + " yet. You can add some later with Super + Shift + W."
                     color: Theme.overlay
                 }
             }

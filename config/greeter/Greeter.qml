@@ -1,6 +1,8 @@
 import Quickshell
 import Quickshell.Io
+import Quickshell.Networking
 import Quickshell.Services.Greetd
+import Quickshell.Services.UPower
 import Quickshell.Wayland
 import Quickshell.Widgets
 import QtQuick
@@ -13,29 +15,28 @@ PanelWindow {
     required property string dir
     required property var users
     required property var sessions
+    required property string hostName
     property bool leaving: false
     signal leave()
     property var launchCommand: null
 
     readonly property bool main: modelData === Quickshell.screens[0]
-    readonly property string iconFont: "Material Symbols " + theme.iconStyle
 
     property int userIndex: 0
     property int sessionIndex: 0
-    property string password: ""
-    property string message: ""
-    property bool failed: false
-    property bool busy: false
-    property bool usersOpen: false
-    property bool sessionsOpen: false
     property string layout: ""
+    property string menu: ""
 
     readonly property var user: users[userIndex] ?? { name: theme.user || "", full: theme.user || "" }
     readonly property var session: sessions[sessionIndex] ?? null
+    readonly property string face: user.name ? "file://" + dir + "/faces/" + user.name : ""
 
-    function round(r) {
-        return r * Math.max(0, Math.min(2, theme.roundness));
-    }
+    readonly property var battery: UPower.displayDevice
+    readonly property bool charging: battery.state === UPowerDeviceState.Charging || battery.state === UPowerDeviceState.FullyCharged
+    readonly property int batteryPercent: Math.round(battery.percentage * 100)
+    readonly property var connectedDevices: Networking.devices.values.filter(d => d.connected)
+    readonly property var netDevice: connectedDevices.find(d => d.type === DeviceType.Wired) ?? connectedDevices[0] ?? null
+    readonly property var wifi: netDevice?.type === DeviceType.Wifi ? netDevice.networks.values.find(n => n.connected) ?? null : null
 
     onUsersChanged: {
         const i = users.findIndex(u => u.name === theme.user);
@@ -47,28 +48,54 @@ PanelWindow {
     }
 
     function submit() {
-        if (busy || !user.name)
+        if (greeterAuth.checking || !user.name)
             return;
-        failed = false;
-        message = "";
+        greeterAuth.failed = false;
+        greeterAuth.message = "";
         if (!Greetd.available) {
-            message = "Preview: greetd isn't running, so nothing happens";
-            failed = true;
+            greeterAuth.message = "Preview: greetd isn't running, so nothing happens";
+            greeterAuth.failed = true;
             return;
         }
-        busy = true;
+        greeterAuth.checking = true;
         Greetd.createSession(user.name);
     }
 
     function fail(text) {
-        busy = false;
-        failed = true;
-        message = text || "That password didn't work";
-        password = "";
-        input.text = "";
-        shake.restart();
+        greeterAuth.checking = false;
+        greeterAuth.failed = true;
+        greeterAuth.message = text || "That password didn't work";
+        greeterAuth.password = "";
+        greeterAuth.rejected();
         if (Greetd.state !== GreetdState.Inactive)
             Greetd.cancelSession();
+    }
+
+    function openMenu(name, anchor) {
+        if (menu === name) {
+            menu = "";
+            return;
+        }
+        const p = anchor.mapToItem(root.contentItem, 0, 0);
+        const m = name === "users" ? userMenu : sessionMenu;
+        m.x = Math.max(16, Math.min(root.width - m.width - 16, p.x + anchor.width / 2 - m.width / 2));
+        m.y = name === "users" ? p.y + anchor.height + 12 : p.y - m.height - 12;
+        menu = name;
+    }
+
+    function closeMenu() {
+        menu = "";
+        surface.wake();
+    }
+
+    QtObject {
+        id: greeterAuth
+        property string password: ""
+        property bool checking: false
+        property bool failed: false
+        property string message: ""
+        signal rejected()
+        function submit() { root.submit(); }
     }
 
     Connections {
@@ -76,11 +103,11 @@ PanelWindow {
         enabled: root.main
         function onAuthMessage(text, error, responseRequired, echoResponse) {
             if (error) {
-                root.message = text;
-                root.failed = true;
+                greeterAuth.message = text;
+                greeterAuth.failed = true;
             }
             if (responseRequired)
-                Greetd.respond(root.password);
+                Greetd.respond(greeterAuth.password);
         }
         function onAuthFailure(text) {
             root.fail(text);
@@ -116,8 +143,8 @@ PanelWindow {
             const [u, s, at] = text().split("\n");
             const since = Date.now() / 1000 - parseInt(at);
             if (since >= 0 && since < 20) {
-                root.message = "Your last session closed right after it started. Pick another session, or press Ctrl + Alt + F3 for a text console";
-                root.failed = true;
+                greeterAuth.message = "Your last session closed right after it started. Pick another session, or press Ctrl + Alt + F3 for a text console";
+                greeterAuth.failed = true;
             }
             const ui = root.users.findIndex(x => x.name === u);
             if (ui >= 0)
@@ -136,405 +163,148 @@ PanelWindow {
     WlrLayershell.keyboardFocus: main ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     color: theme.base
 
-    component Glyph: Text {
-        property string name
-        property bool filled: false
-        property int size: 20
-        text: name
-        color: root.theme.text
-        font.family: root.iconFont
-        font.pixelSize: size
-        font.variableAxes: ({ "FILL": filled ? 1 : 0, "wght": 400, "opsz": Math.min(48, Math.max(20, size)) })
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-    }
+    component Menu: Rectangle {
+        id: menuBox
+        required property var theme
+        property var labels: []
+        property int current: -1
+        signal picked(int index)
 
-    component Chip: Rectangle {
-        id: chip
-        property string icon
-        property string label
-        property string tip
-        signal clicked()
-        implicitWidth: row.implicitWidth + (label ? 28 : 0) + (label ? 0 : 20)
-        implicitHeight: 44
-        radius: root.round(22)
-        color: mouse.containsMouse ? Qt.alpha(root.theme.surface, 0.85) : Qt.alpha(root.theme.base, 0.5)
+        width: 260
+        height: menuList.implicitHeight + 12
+        radius: theme.round(16)
+        color: Qt.alpha(theme.base, 0.92)
         border.width: 1
-        border.color: Qt.alpha(root.theme.text, 0.1)
-        Row {
-            id: row
-            anchors.centerIn: parent
-            spacing: 8
-            Glyph { name: chip.icon; size: 20; anchors.verticalCenter: parent.verticalCenter }
-            Text {
-                visible: chip.label !== ""
-                text: chip.label
-                color: root.theme.text
-                font.family: root.theme.font
-                font.pixelSize: 14
-                anchors.verticalCenter: parent.verticalCenter
+        border.color: Qt.alpha(theme.text, 0.1)
+
+        Column {
+            id: menuList
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 6 }
+            Repeater {
+                model: menuBox.labels
+                Rectangle {
+                    required property string modelData
+                    required property int index
+                    width: menuList.width
+                    height: 40
+                    radius: menuBox.theme.round(10)
+                    color: index === menuBox.current ? Qt.alpha(menuBox.theme.accent, 0.25)
+                        : rowMouse.containsMouse ? Qt.alpha(menuBox.theme.surface, 0.8) : "transparent"
+                    Text {
+                        anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
+                        text: parent.modelData
+                        color: menuBox.theme.text
+                        font.family: menuBox.theme.font
+                        font.pixelSize: 14
+                    }
+                    MouseArea {
+                        id: rowMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: menuBox.picked(parent.index)
+                    }
+                }
             }
         }
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: chip.clicked()
-        }
     }
 
-    Image {
-        id: wall
+    LockSurface {
+        id: surface
         anchors.fill: parent
-        source: root.theme.wallpaper ? "file://" + root.dir + "/" + root.theme.wallpaper : ""
-        fillMode: Image.PreserveAspectCrop
-        asynchronous: true
-        visible: false
-    }
-    MultiEffect {
-        anchors.fill: parent
-        source: wall
-        visible: wall.status === Image.Ready
-        blurEnabled: true
-        blurMax: 64
+        theme: root.theme
+        auth: greeterAuth
+        leaving: root.leaving
+        primary: root.main
+        wallpaper: root.theme.wallpaper
         blur: root.theme.blur
-        brightness: -0.08
-    }
-    Rectangle {
-        anchors.fill: parent
-        gradient: Gradient {
-            GradientStop { position: 0; color: Qt.alpha(root.theme.base, 0.1) }
-            GradientStop { position: 1; color: Qt.alpha(root.theme.base, 0.55) }
-        }
-    }
+        restSeconds: root.theme.restSeconds
+        use24h: root.theme.clock24
+        userName: root.user.full || root.user.name
+        face: root.face
+        hostName: root.hostName
+        busyText: "Signing in…"
+        showPower: root.theme.showPower
 
-    SystemClock {
-        id: clock
-        precision: SystemClock.Seconds
+        networkIcon: !root.netDevice ? "wifi_off" : root.wifi ? root.theme.wifiIcon(root.wifi.signalStrength) : "lan"
+        networkConnected: root.netDevice !== null
+        hasBattery: root.battery.isLaptopBattery
+        batteryIcon: root.charging ? "battery_android_frame_bolt"
+            : root.batteryPercent <= 10 ? "battery_android_frame_alert"
+            : root.batteryPercent >= 95 ? "battery_android_frame_full"
+            : "battery_android_frame_" + Math.max(1, Math.min(6, Math.round(root.batteryPercent / 100 * 6)))
+        batteryPercent: root.batteryPercent
+        charging: root.charging
+
+        onCancelled: {
+            if (!Greetd.available)
+                Qt.quit();
+        }
+
+        belowClock: Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 10
+
+            LockButton {
+                id: sessionButton
+                theme: root.theme
+                icon: "desktop_windows"
+                text: root.session?.name ?? "No sessions found"
+                label: "Session"
+                onActivated: root.openMenu("sessions", sessionButton)
+            }
+            LockButton {
+                visible: root.layout !== ""
+                theme: root.theme
+                icon: "keyboard"
+                text: root.layout.toUpperCase()
+                label: "Keyboard layout"
+            }
+        }
+
+        userPicker: LockIcon {
+            id: userChevron
+            visible: root.users.length > 1
+            theme: root.theme
+            name: "expand_more"
+            MouseArea {
+                anchors.fill: parent
+                anchors.margins: -8
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.openMenu("users", userChevron)
+            }
+        }
     }
 
     MouseArea {
         anchors.fill: parent
-        onClicked: {
-            root.usersOpen = false;
-            root.sessionsOpen = false;
-            input.forceActiveFocus();
+        visible: root.menu !== ""
+        onClicked: root.closeMenu()
+    }
+
+    Menu {
+        id: userMenu
+        visible: root.menu === "users"
+        theme: root.theme
+        labels: root.users.map(u => u.full + (u.full !== u.name ? "  (" + u.name + ")" : ""))
+        current: root.userIndex
+        onPicked: index => {
+            root.userIndex = index;
+            greeterAuth.password = "";
+            root.closeMenu();
         }
     }
 
-    Column {
-        anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: parent.height * 0.1 }
-        layer.enabled: true
-        layer.effect: MultiEffect { shadowEnabled: true; shadowOpacity: 0.4; shadowBlur: 1; shadowVerticalOffset: 4 }
-
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: Qt.formatDateTime(clock.date, "dddd, d MMMM")
-            color: root.theme.text
-            opacity: 0.85
-            font.family: root.theme.displayFont
-            font.weight: Font.Medium
-            font.pixelSize: 24
+    Menu {
+        id: sessionMenu
+        visible: root.menu === "sessions"
+        theme: root.theme
+        labels: root.sessions.map(s => s.name)
+        current: root.sessionIndex
+        onPicked: index => {
+            root.sessionIndex = index;
+            root.closeMenu();
         }
-        Row {
-            id: time
-            anchors.horizontalCenter: parent.horizontalCenter
-            readonly property var parts: Qt.formatDateTime(clock.date, root.theme.clock24 ? "HH:mm" : "h:mm AP").split(" ")[0].split(":")
-            Text {
-                id: hours
-                text: time.parts[0]
-                color: root.theme.text
-                font.family: root.theme.displayFont
-                font.weight: Font.Light
-                font.pixelSize: 170
-                font.features: { "tnum": 1 }
-            }
-            Text {
-                text: ":"
-                color: root.theme.accent
-                font.family: root.theme.displayFont
-                font.weight: Font.Light
-                font.pixelSize: 170
-                anchors.baseline: hours.baseline
-                opacity: clock.date.getSeconds() % 2 === 0 ? 1 : 0.35
-                Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.InOutSine } }
-            }
-            Text {
-                text: time.parts[1]
-                color: root.theme.text
-                font.family: root.theme.displayFont
-                font.weight: Font.Light
-                font.pixelSize: 170
-                font.features: { "tnum": 1 }
-            }
-            Text {
-                visible: !root.theme.clock24
-                text: Qt.formatDateTime(clock.date, "AP")
-                color: root.theme.accent
-                font.family: root.theme.displayFont
-                font.weight: Font.Medium
-                font.pixelSize: 28
-                anchors.baseline: hours.baseline
-                leftPadding: 10
-            }
-        }
-    }
-
-    Column {
-        id: login
-        visible: root.main
-        anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: parent.height * 0.14 }
-        spacing: 14
-
-        ClippingRectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 108
-            height: 108
-            radius: 54
-            color: root.theme.accent
-            border.width: 3
-            border.color: Qt.alpha(root.theme.text, 0.2)
-            Text {
-                anchors.centerIn: parent
-                visible: face.status !== Image.Ready
-                text: (root.user.full || "?").charAt(0).toUpperCase()
-                color: root.theme.accentText
-                font.family: root.theme.displayFont
-                font.pixelSize: 46
-                font.weight: Font.Bold
-            }
-            Image {
-                id: face
-                anchors.fill: parent
-                source: root.user.name ? "file://" + root.dir + "/faces/" + root.user.name : ""
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-            }
-        }
-
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 6
-            Text {
-                text: root.user.full || root.user.name
-                color: root.theme.text
-                font.family: root.theme.displayFont
-                font.pixelSize: 22
-                font.weight: Font.DemiBold
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Glyph {
-                visible: root.users.length > 1
-                name: "expand_more"
-                anchors.verticalCenter: parent.verticalCenter
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -8
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.usersOpen = !root.usersOpen
-                }
-            }
-        }
-
-        Rectangle {
-            id: field
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 340
-            height: 52
-            radius: root.round(26)
-            color: Qt.alpha(root.theme.base, 0.55)
-            border.width: 1
-            border.color: root.failed ? root.theme.red : input.activeFocus ? Qt.alpha(root.theme.accent, 0.8) : Qt.alpha(root.theme.text, 0.12)
-
-            SequentialAnimation {
-                id: shake
-                NumberAnimation { target: field; property: "anchors.horizontalCenterOffset"; to: -12; duration: 50 }
-                NumberAnimation { target: field; property: "anchors.horizontalCenterOffset"; to: 12; duration: 70 }
-                NumberAnimation { target: field; property: "anchors.horizontalCenterOffset"; to: -8; duration: 70 }
-                NumberAnimation { target: field; property: "anchors.horizontalCenterOffset"; to: 0; duration: 60 }
-            }
-
-            Text {
-                anchors.centerIn: parent
-                visible: input.text === ""
-                text: root.busy ? "Signing in…" : "Password"
-                color: Qt.alpha(root.theme.text, 0.5)
-                font.family: root.theme.font
-                font.pixelSize: 15
-            }
-            Row {
-                anchors.centerIn: parent
-                spacing: 7
-                Repeater {
-                    model: Math.min(input.text.length, 20)
-                    Rectangle { width: 9; height: 9; radius: 4.5; color: root.theme.text }
-                }
-            }
-            Rectangle {
-                anchors { right: parent.right; rightMargin: 6; verticalCenter: parent.verticalCenter }
-                width: 40
-                height: 40
-                radius: root.round(20)
-                color: root.theme.accent
-                opacity: input.text !== "" && !root.busy ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 180 } }
-                Glyph { anchors.centerIn: parent; name: "arrow_forward"; color: root.theme.accentText }
-                MouseArea {
-                    anchors.fill: parent
-                    visible: parent.opacity > 0.5
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.submit()
-                }
-            }
-            TextInput {
-                id: input
-                width: 0
-                height: 0
-                opacity: 0
-                focus: root.main
-                echoMode: TextInput.Password
-                readOnly: root.busy
-                onTextChanged: {
-                    root.password = text;
-                    if (text !== "")
-                        root.failed = false;
-                }
-                onAccepted: root.submit()
-                Keys.onEscapePressed: {
-                    if (text === "" && !Greetd.available)
-                        Qt.quit();
-                    text = "";
-                }
-                Component.onCompleted: if (root.main) forceActiveFocus()
-            }
-        }
-
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 420
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            text: root.message || " "
-            color: root.failed ? root.theme.red : root.theme.subtext
-            font.family: root.theme.displayFont
-            font.weight: Font.Medium
-            font.pixelSize: 14
-        }
-    }
-
-    Rectangle {
-        visible: root.main && root.usersOpen
-        anchors { horizontalCenter: parent.horizontalCenter; bottom: login.top; bottomMargin: -150 }
-        width: 260
-        height: userList.implicitHeight + 12
-        radius: root.round(16)
-        color: Qt.alpha(root.theme.base, 0.92)
-        border.width: 1
-        border.color: Qt.alpha(root.theme.text, 0.1)
-        Column {
-            id: userList
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 6 }
-            Repeater {
-                model: root.users
-                Rectangle {
-                    required property var modelData
-                    required property int index
-                    width: userList.width
-                    height: 40
-                    radius: root.round(10)
-                    color: index === root.userIndex ? Qt.alpha(root.theme.accent, 0.25) : um.containsMouse ? Qt.alpha(root.theme.surface, 0.8) : "transparent"
-                    Text {
-                        anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
-                        text: modelData.full + (modelData.full !== modelData.name ? "  (" + modelData.name + ")" : "")
-                        color: root.theme.text
-                        font.family: root.theme.font
-                        font.pixelSize: 14
-                    }
-                    MouseArea {
-                        id: um
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.userIndex = index;
-                            root.usersOpen = false;
-                            input.text = "";
-                            input.forceActiveFocus();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Row {
-        visible: root.main
-        anchors { left: parent.left; bottom: parent.bottom; margins: 28 }
-        spacing: 10
-        Chip {
-            icon: "desktop_windows"
-            label: root.session?.name ?? "No sessions found"
-            onClicked: root.sessionsOpen = !root.sessionsOpen
-        }
-        Chip {
-            visible: root.layout !== ""
-            icon: "keyboard"
-            label: root.layout.toUpperCase()
-        }
-    }
-
-    Rectangle {
-        visible: root.main && root.sessionsOpen
-        anchors { left: parent.left; bottom: parent.bottom; leftMargin: 28; bottomMargin: 82 }
-        width: 260
-        height: sessionList.implicitHeight + 12
-        radius: root.round(16)
-        color: Qt.alpha(root.theme.base, 0.92)
-        border.width: 1
-        border.color: Qt.alpha(root.theme.text, 0.1)
-        Column {
-            id: sessionList
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 6 }
-            Repeater {
-                model: root.sessions
-                Rectangle {
-                    required property var modelData
-                    required property int index
-                    width: sessionList.width
-                    height: 40
-                    radius: root.round(10)
-                    color: index === root.sessionIndex ? Qt.alpha(root.theme.accent, 0.25) : sm.containsMouse ? Qt.alpha(root.theme.surface, 0.8) : "transparent"
-                    Text {
-                        anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
-                        text: modelData.name
-                        color: root.theme.text
-                        font.family: root.theme.font
-                        font.pixelSize: 14
-                    }
-                    MouseArea {
-                        id: sm
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.sessionIndex = index;
-                            root.sessionsOpen = false;
-                            input.forceActiveFocus();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Row {
-        visible: root.main
-        anchors { right: parent.right; bottom: parent.bottom; margins: 28 }
-        spacing: 10
-        Chip { icon: "bedtime"; onClicked: Quickshell.execDetached(["systemctl", "suspend"]) }
-        Chip { icon: "restart_alt"; onClicked: Quickshell.execDetached(["systemctl", "reboot"]) }
-        Chip { icon: "power_settings_new"; onClicked: Quickshell.execDetached(["systemctl", "poweroff"]) }
     }
 
     Item {
@@ -551,7 +321,7 @@ PanelWindow {
         Image {
             id: sharp
             anchors.fill: parent
-            source: wall.source
+            source: root.theme.wallpaper
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             opacity: 0
@@ -568,7 +338,7 @@ PanelWindow {
         }
 
         Column {
-            id: greeting
+            id: welcome
             visible: root.main
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
@@ -582,25 +352,25 @@ PanelWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 120
                 height: 120
-                radius: 60
-                color: root.theme.accent
+                radius: root.theme.round(width / 2, width, height)
+                color: root.theme.surface
                 border.width: 3
                 border.color: Qt.alpha(root.theme.text, 0.25)
-                Text {
-                    anchors.centerIn: parent
-                    visible: splashFace.status !== Image.Ready
-                    text: (root.user.full || "?").charAt(0).toUpperCase()
-                    color: root.theme.accentText
-                    font.family: root.theme.displayFont
-                    font.pixelSize: 52
-                    font.weight: Font.Bold
-                }
                 Image {
                     id: splashFace
                     anchors.fill: parent
-                    source: face.source
+                    source: root.face
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
+                }
+                LockIcon {
+                    anchors.centerIn: parent
+                    visible: splashFace.status !== Image.Ready
+                    theme: root.theme
+                    name: "person"
+                    filled: true
+                    size: 78
+                    color: root.theme.subtext
                 }
             }
             Text {
@@ -636,8 +406,8 @@ PanelWindow {
             SequentialAnimation {
                 PauseAnimation { duration: 60 }
                 ParallelAnimation {
-                    NumberAnimation { target: greeting; property: "opacity"; to: 1; duration: 260; easing.type: Easing.OutCubic }
-                    NumberAnimation { target: greeting; property: "anchors.verticalCenterOffset"; to: 0; duration: 320; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: welcome; property: "opacity"; to: 1; duration: 260; easing.type: Easing.OutCubic }
+                    NumberAnimation { target: welcome; property: "anchors.verticalCenterOffset"; to: 0; duration: 320; easing.type: Easing.OutCubic }
                 }
                 PauseAnimation { duration: 160 }
                 NumberAnimation { target: fade; property: "opacity"; to: 1; duration: 220; easing.type: Easing.InQuad }

@@ -1,6 +1,6 @@
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
 
-local theme = "/var/lib/pikadots-greeter"
+local theme = os.getenv("PIKADOTS_GREETER_DIR") or "/var/lib/pikadots-greeter"
 local layout = "us"
 do
 	local f = io.open(theme .. "/kb_layout")

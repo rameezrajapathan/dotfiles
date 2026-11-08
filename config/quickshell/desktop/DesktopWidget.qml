@@ -83,34 +83,27 @@ Item {
         }
     }
 
+    readonly property string contentUrl: Desktop.kind(entry.kind)?.content ? Qt.resolvedUrl(Desktop.kind(entry.kind).content) : ""
+
+    function loadContent() {
+        body.setSource(contentUrl, { sizeClass: sizeClass, live: live });
+    }
+
+    onContentUrlChanged: loadContent()
+    Component.onCompleted: loadContent()
+
     Loader {
         id: body
         anchors.fill: parent
         enabled: !root.editable
         clip: true
-        sourceComponent: ({
-            clock: clock, pixelclock: pixelclock, wordclock: wordclock, visualizer: visualizer, sun: sun,
-            focus: focus, fetch: fetch, weather: weather, calendar: calendar, media: media, system: system,
-            meeting: meeting, photos: photos, notes: notes, todo: todo, github: github
-        })[root.entry.kind] ?? null
+        onLoaded: {
+            item.sizeClass = Qt.binding(() => root.sizeClass);
+            item.live = Qt.binding(() => root.live);
+            if ("widgetId" in item)
+                item.widgetId = Qt.binding(() => root.preview ? "" : root.entry.id);
+        }
     }
-
-    Component { id: clock; ClockWidget { size: root.sizeClass; live: root.live } }
-    Component { id: pixelclock; PixelClockWidget { size: root.sizeClass; live: root.live } }
-    Component { id: wordclock; WordClockWidget { size: root.sizeClass; live: root.live } }
-    Component { id: visualizer; VisualizerWidget { size: root.sizeClass; live: root.live } }
-    Component { id: sun; SunWidget { size: root.sizeClass; live: root.live } }
-    Component { id: focus; FocusWidget { size: root.sizeClass; live: root.live } }
-    Component { id: fetch; FetchWidget { size: root.sizeClass; live: root.live } }
-    Component { id: weather; WeatherWidget { size: root.sizeClass; live: root.live } }
-    Component { id: calendar; CalendarWidget { size: root.sizeClass; live: root.live } }
-    Component { id: media; MediaWidget { size: root.sizeClass; live: root.live } }
-    Component { id: system; SystemWidget { size: root.sizeClass; live: root.live } }
-    Component { id: meeting; MeetingWidget { size: root.sizeClass; live: root.live } }
-    Component { id: photos; PhotoWidget { size: root.sizeClass; live: root.live } }
-    Component { id: notes; NotesWidget { size: root.sizeClass; live: root.live; widgetId: root.preview ? "" : root.entry.id } }
-    Component { id: todo; TodoWidget { size: root.sizeClass; live: root.live } }
-    Component { id: github; GitHubWidget { size: root.sizeClass; live: root.live } }
 
     MouseArea {
         anchors.fill: parent
@@ -148,61 +141,33 @@ Item {
     onHomeXChanged: if (!dragging) x = Qt.binding(() => homeX)
     onHomeYChanged: if (!dragging) y = Qt.binding(() => homeY)
 
-    component Handle: Rectangle {
-        id: handle
-        property string icon
-        property string tip
-        signal clicked()
-        width: 30
-        height: 30
-        radius: 15
-        color: mouse.containsMouse ? Qt.lighter(Theme.surface, 1.2) : Theme.surface
-        border.width: 1
-        border.color: Qt.alpha(Theme.text, 0.15)
-        visible: root.editable && !root.dragging && !root.resizing
-        Icon {
-            anchors.centerIn: parent
-            name: handle.icon
-            size: 18
-            color: Theme.text
-        }
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: handle.clicked()
-        }
-        Tooltip {
-            text: handle.tip
-        }
-    }
-
-    Handle {
+    IconButton {
         x: -10
         y: -10
+        width: 30
+        height: 30
+        visible: root.editable && !root.dragging && !root.resizing
+        tone: "solid"
         icon: "remove"
+        iconSize: 18
         tip: "Remove"
         onClicked: Desktop.remove(root.screenName, root.entry.id)
     }
 
-    Rectangle {
+    Item {
         id: grip
         visible: root.editable && !root.dragging
         x: root.width - width + 10
         y: root.height - height + 10
         width: 30
         height: 30
-        radius: 15
-        color: gripMouse.containsMouse || root.resizing ? Theme.accent : Theme.surface
-        border.width: 1
-        border.color: Qt.alpha(Theme.text, 0.15)
-        Icon {
-            anchors.centerIn: parent
-            name: "open_in_full"
-            size: 16
+        IconButton {
+            anchors.fill: parent
             rotation: 90
-            color: gripMouse.containsMouse || root.resizing ? Theme.accentText : Theme.text
+            tone: "solid"
+            active: gripMouse.containsMouse || root.resizing
+            icon: "open_in_full"
+            iconSize: 16
         }
         MouseArea {
             id: gripMouse

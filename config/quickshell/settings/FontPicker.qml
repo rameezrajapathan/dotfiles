@@ -25,66 +25,44 @@ ColumnLayout {
         });
     }
     readonly property var shown: {
-        const words = search.text.toLowerCase().split(/\s+/).filter(w => w);
+        const words = search.currentText.toLowerCase().split(/\s+/).filter(w => w);
         return families.filter(f => words.every(w => f.toLowerCase().includes(w)));
     }
 
     spacing: 8
 
-    Rectangle {
-        Layout.fillWidth: true
+    PickerHeader {
         implicitHeight: 56
-        radius: Theme.round(12, width, height)
-        color: headerMouse.containsMouse ? Qt.alpha(Theme.overlay, 0.25) : Qt.alpha(Theme.base, 0.6)
-        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+        leftInset: 14
+        expanded: root.expanded
+        onClicked: {
+            root.expanded = !root.expanded;
+            if (root.expanded) {
+                search.clear();
+                search.focusInput();
+            }
+        }
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: Theme.pad(14, 12, parent.width, parent.height)
-            anchors.rightMargin: Theme.pad(12, 12, parent.width, parent.height)
-            spacing: 10
-
-            ColumnLayout {
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 0
+            Text {
                 Layout.fillWidth: true
-                spacing: 0
-                Text {
-                    Layout.fillWidth: true
-                    text: root.current
-                    color: Theme.text
-                    font.family: root.current
-                    font.pixelSize: Theme.fontSize + 3
-                    elide: Text.ElideRight
-                }
-                Text {
-                    Layout.fillWidth: true
-                    text: root.sample
-                    color: Theme.subtext
-                    font.family: root.current
-                    font.pixelSize: Theme.fontSize - 1
-                    elide: Text.ElideRight
-                }
+                text: root.current
+                color: Theme.text
+                font.family: root.current
+                font.pixelSize: Theme.fontSize + 3
+                elide: Text.ElideRight
             }
-            Icon {
-                name: "expand_more"
-                rotation: root.expanded ? 180 : 0
-                Behavior on rotation { NumberAnimation { duration: Theme.ms(200); easing.type: Easing.OutQuint } }
+            Text {
+                Layout.fillWidth: true
+                text: root.sample
+                color: Theme.subtext
+                font.family: root.current
+                font.pixelSize: Theme.fontSize - 1
+                elide: Text.ElideRight
             }
         }
-
-        MouseArea {
-            id: headerMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                root.expanded = !root.expanded;
-                if (root.expanded) {
-                    search.text = "";
-                    search.forceActiveFocus();
-                }
-            }
-        }
-        GlassRim {}
     }
 
     Rectangle {
@@ -101,40 +79,18 @@ ColumnLayout {
             anchors.margins: Theme.pad(8, 12, parent.width, parent.height)
             spacing: 6
 
-            Rectangle {
+            SettingsTextField {
+                id: search
                 Layout.fillWidth: true
                 implicitHeight: 36
-                radius: Theme.round(10, width, height)
-                color: Qt.alpha(Theme.surface, 0.8)
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: Theme.pad(10, 10, parent.width, parent.height)
-                    anchors.rightMargin: Theme.pad(10, 10, parent.width, parent.height)
-                    spacing: 8
-                    Icon { name: "search"; size: 18; color: Theme.subtext }
-                    TextInput {
-                        id: search
-                        Layout.fillWidth: true
-                        color: Theme.text
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize
-                        selectionColor: Theme.accent
-                        selectedTextColor: Theme.accentText
-                        clip: true
-                        Keys.onEscapePressed: root.expanded = false
-                        Keys.onReturnPressed: if (root.shown.length) root.picked(root.shown[list.currentIndex >= 0 ? list.currentIndex : 0])
-                        Keys.onDownPressed: list.incrementCurrentIndex()
-                        Keys.onUpPressed: list.decrementCurrentIndex()
-
-                        Label {
-                            visible: !search.text
-                            text: root.families.length + " fonts — type to filter"
-                            color: Theme.overlay
-                        }
-                    }
-                }
-                GlassRim {}
+                icon: "search"
+                search: true
+                inset: 10
+                fill: Qt.alpha(Theme.surface, 0.8)
+                placeholder: root.families.length + " fonts — type to filter"
+                onEscaped: root.expanded = false
+                onAccepted: if (root.shown.length) root.picked(root.shown[list.currentIndex >= 0 ? list.currentIndex : 0])
+                onStepped: delta => delta > 0 ? list.incrementCurrentIndex() : list.decrementCurrentIndex()
             }
 
             ListView {

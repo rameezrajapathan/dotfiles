@@ -179,7 +179,7 @@ CCCard {
             spacing: 8
 
             Label {
-                text: Media.time(root.player?.position ?? 0)
+                text: TimeDate.clock(root.player?.position ?? 0)
                 color: Theme.subtext
                 font.pixelSize: Theme.fontSize - 3
                 font.features: { "tnum": 1 }
@@ -192,7 +192,7 @@ CCCard {
                 onMoved: v => root.player.position = v * root.player.length
             }
             Label {
-                text: Media.time(root.player?.length ?? 0)
+                text: TimeDate.clock(root.player?.length ?? 0)
                 color: Theme.subtext
                 font.pixelSize: Theme.fontSize - 3
                 font.features: { "tnum": 1 }

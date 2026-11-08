@@ -25,23 +25,19 @@ SettingsPage {
                 onMoved: v => root.lk.blur = v / 100
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "music_note"
             title: "Now playing"
             description: "Shows the current track with controls."
-            Switch {
-                checked: root.lk.showMedia
-                onToggled: root.lk.showMedia = !checked
-            }
+            target: root.lk
+            key: "showMedia"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "power_settings_new"
             title: "Power buttons"
             description: "Sleep, restart and shut down without unlocking."
-            Switch {
-                checked: root.lk.showPower
-                onToggled: root.lk.showPower = !checked
-            }
+            target: root.lk
+            key: "showPower"
         }
         SettingsRow {
             icon: "hotel"

@@ -16,14 +16,7 @@ PanelWindow {
     property int month: today.getMonth()
 
     readonly property int weekStart: Settings.datetime.weekStart
-    readonly property var days: {
-        const first = new Date(year, month, 1);
-        const offset = (first.getDay() - weekStart + 7) % 7;
-        const cells = [];
-        for (let i = 0; i < 42; i++)
-            cells.push(new Date(year, month, 1 - offset + i));
-        return cells;
-    }
+    readonly property var days: TimeDate.monthCells(year, month, weekStart, true)
 
     property bool open: false
 
@@ -52,6 +45,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "quickshell-calendar"
+    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     color: "transparent"
     visible: false
 
@@ -71,6 +65,11 @@ PanelWindow {
         MouseArea {
             anchors.fill: parent
             onWheel: wheel => root.shift(wheel.angleDelta.y > 0 ? -1 : 1)
+        }
+
+        Item {
+            focus: root.open
+            Keys.onEscapePressed: root.open = false
         }
 
         ColumnLayout {
@@ -139,7 +138,7 @@ PanelWindow {
                     font.pixelSize: Theme.fontSize - 3
                 }
                 Repeater {
-                    model: [0, 1, 2, 3, 4, 5, 6].map(i => ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"][(i + root.weekStart) % 7])
+                    model: TimeDate.dayNames(Locale.ShortFormat, root.weekStart)
 
                     Label {
                         required property string modelData
@@ -161,7 +160,7 @@ PanelWindow {
                         readonly property int day: Settings.datetime.weekNumbers ? index - Math.floor(index / 8) - 1 : index
                         Layout.fillWidth: !weekCell
                         sourceComponent: weekCell ? weekNumber : dayCell
-                        property var dayDate: root.days[weekCell ? day + 1 + (8 - root.weekStart) % 7 : day]
+                        property var dayDate: root.days[weekCell ? day + 1 + (8 - root.weekStart) % 7 : day].date
                         property int dayIndex: day
                     }
                 }
@@ -221,10 +220,11 @@ PanelWindow {
             Component {
                 id: dayCell
                     Rectangle {
-                        readonly property var modelData: parent.dayDate
+                        readonly property var cell: root.days[parent.dayIndex]
+                        readonly property var modelData: cell.date
                         readonly property int index: parent.dayIndex
-                        readonly property bool isToday: modelData.toDateString() === root.today.toDateString()
-                        readonly property bool inMonth: modelData.getMonth() === root.month
+                        readonly property bool isToday: cell.today
+                        readonly property bool inMonth: cell.inMonth
 
                         Layout.fillWidth: true
                         implicitHeight: 30
@@ -239,7 +239,7 @@ PanelWindow {
                             font.bold: parent.isToday
                             color: parent.isToday ? Theme.selectedText
                                 : !parent.inMonth ? Theme.surface
-                                : modelData.getDay() % 6 === 0 ? Theme.subtext
+                                : parent.cell.weekend ? Theme.subtext
                                 : Theme.text
                         }
                     }

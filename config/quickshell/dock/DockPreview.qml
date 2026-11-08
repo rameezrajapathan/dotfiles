@@ -13,7 +13,7 @@ Item {
     onKeyChanged: if (key) current = key
 
     readonly property bool vertical: dock.vertical
-    readonly property var group: current ? Dock.groups.map[current] ?? null : null
+    readonly property var group: current ? Dock.group(current) : null
     readonly property var windows: group?.windows ?? []
     readonly property var entry: current && current !== "launcher" ? Dock.entry(current) : null
     readonly property string title: current === "launcher" ? "Apps" : entry?.name ?? group?.appId ?? ""
@@ -49,7 +49,7 @@ Item {
 
     Rectangle {
         id: card
-        readonly property real fromEdge: Dock.gap + Math.max(root.dock.depth, (root.p?.size ?? 0) + 2 * Dock.pad) + 10
+        readonly property real fromEdge: Dock.edgeMargin + Math.max(root.dock.depth, (root.p?.size ?? 0) + 2 * Dock.padding) + 10
         readonly property real alongSize: root.vertical ? height : width
         readonly property real alongPos: Math.max(8, Math.min(root.dock.length - alongSize - 8, root.centerAlong - alongSize / 2))
         readonly property rect r: root.dock.rect(alongPos, alongSize, fromEdge - (1 - root.shownAmount) * 8, root.vertical ? width : height)
@@ -98,7 +98,7 @@ Item {
                         required property var modelData
                         required property int index
                         readonly property var size: root.sizes[index] ?? { w: 160, h: 100 }
-                        readonly property string special: Dock.specialName(modelData)
+                        readonly property string special: Windows.specialName(modelData)
                         width: size.w * root.fit
                         height: size.h * root.fit + 22
 
@@ -154,11 +154,11 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: event => {
                                 if (event.button === Qt.MiddleButton) {
-                                    Dock.closeWindow(thumb.modelData);
+                                    Windows.close(thumb.modelData);
                                     return;
                                 }
                                 root.dock.closePreview();
-                                Dock.focusWindow(thumb.modelData);
+                                Windows.focus(thumb.modelData);
                             }
                         }
 
@@ -183,7 +183,7 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: Dock.closeWindow(thumb.modelData)
+                                onClicked: Windows.close(thumb.modelData)
                             }
 
                             Tooltip {

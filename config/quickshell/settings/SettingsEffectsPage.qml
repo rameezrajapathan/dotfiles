@@ -21,14 +21,11 @@ SettingsPage {
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "blur_on"
             title: "Blur behind windows"
             description: "Also used by the bar and panels."
-            Switch {
-                checked: Hypr.value("decoration.blur.enabled") ?? false
-                onToggled: Hypr.set("decoration.blur.enabled", !checked)
-            }
+            hypr: "decoration.blur.enabled"
         }
         SettingsRow {
             visible: Hypr.value("decoration.blur.enabled") ?? false
@@ -63,15 +60,12 @@ SettingsPage {
                 onMoved: v => Hypr.set("decoration.blur.vibrancy", v / 100)
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Hypr.value("decoration.blur.enabled") ?? false
             icon: "gradient"
             title: "Follow transparency"
             description: "See-through parts blur more, solid parts blur less."
-            Switch {
-                checked: Hypr.value("decoration.blur.proportional") ?? false
-                onToggled: Hypr.set("decoration.blur.proportional", !checked)
-            }
+            hypr: "decoration.blur.proportional"
         }
     }
 
@@ -153,55 +147,42 @@ SettingsPage {
                 Repeater {
                     model: backdrop.styles
 
-                    Rectangle {
+                    SettingsStyleCard {
                         id: tile
                         required property var modelData
-                        readonly property bool selected: backdrop.variant === modelData.value
+                        selected: backdrop.variant === modelData.value
+                        inset: 0
+                        contentSpacing: 0
+                        onClicked: Hypr.set("decoration.blur.variant", tile.modelData.value)
 
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        implicitHeight: 64
-                        radius: Theme.round(14, width, height)
-                        color: selected ? Qt.alpha(Theme.accent, 0.16) : tileMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
-                        border.width: selected ? 2 : 1
-                        border.color: Theme.gradientAccent && selected ? "transparent" : selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
-                        GradientBorder {
-                            active: tile.selected
-                        }
-                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+                        Item {
+                            Layout.fillWidth: true
+                            implicitHeight: 64
 
-                        ColumnLayout {
-                            anchors.centerIn: parent
-                            spacing: 4
+                            ColumnLayout {
+                                anchors.centerIn: parent
+                                spacing: 4
+                                Icon {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    name: tile.modelData.icon
+                                    size: 20
+                                    filled: tile.selected
+                                    color: tile.selected ? Theme.accent : Theme.subtext
+                                }
+                                Label {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: tile.modelData.label
+                                    font.weight: tile.selected ? Font.DemiBold : Font.Normal
+                                }
+                            }
                             Icon {
-                                Layout.alignment: Qt.AlignHCenter
-                                name: tile.modelData.icon
-                                size: 20
-                                filled: tile.selected
-                                color: tile.selected ? Theme.accent : Theme.subtext
-                            }
-                            Label {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: tile.modelData.label
-                                font.weight: tile.selected ? Font.DemiBold : Font.Normal
+                                visible: tile.modelData.motion === true
+                                anchors { top: parent.top; right: parent.right; margins: 6 }
+                                name: "animation"
+                                size: 13
+                                color: Theme.subtext
                             }
                         }
-                        Icon {
-                            visible: tile.modelData.motion === true
-                            anchors { top: parent.top; right: parent.right; margins: 6 }
-                            name: "animation"
-                            size: 13
-                            color: Theme.subtext
-                        }
-
-                        MouseArea {
-                            id: tileMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Hypr.set("decoration.blur.variant", tile.modelData.value)
-                        }
-                        GlassRim {}
                     }
                 }
             }
@@ -229,24 +210,20 @@ SettingsPage {
             }
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             visible: backdrop.variant === 9 || backdrop.variant === 5
             icon: "wallpaper"
             title: "Colors from the wallpaper"
             description: "Off uses Hyprland's own green and violet aurora and pink fluid."
-            Switch {
-                checked: Hypr.value("pikadots.backdropColors") !== false
-                onToggled: Hypr.set("pikadots.backdropColors", !checked)
-            }
+            hypr: "pikadots.backdropColors"
+            fallback: true
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "battery_saver"
             title: "Pause on battery"
             description: "Freezes animated styles and the turning border while unplugged."
-            Switch {
-                checked: Hypr.value("pikadots.pauseOnBattery") !== false
-                onToggled: Hypr.set("pikadots.pauseOnBattery", !checked)
-            }
+            hypr: "pikadots.pauseOnBattery"
+            fallback: true
         }
     }
 
@@ -276,13 +253,10 @@ SettingsPage {
                 onMoved: v => Hypr.set("decoration.inactive_opacity", v / 100)
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "brightness_4"
             title: "Dim other windows"
-            Switch {
-                checked: Hypr.value("decoration.dim_inactive") ?? false
-                onToggled: Hypr.set("decoration.dim_inactive", !checked)
-            }
+            hypr: "decoration.dim_inactive"
         }
         SettingsRow {
             visible: Hypr.value("decoration.dim_inactive") ?? false
@@ -303,13 +277,10 @@ SettingsPage {
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "shadow"
             title: "Window shadows"
-            Switch {
-                checked: Hypr.value("decoration.shadow.enabled") ?? false
-                onToggled: Hypr.set("decoration.shadow.enabled", !checked)
-            }
+            hypr: "decoration.shadow.enabled"
         }
         SettingsRow {
             visible: Hypr.value("decoration.shadow.enabled") ?? false
@@ -361,63 +332,19 @@ SettingsPage {
                 Repeater {
                     model: PanelMotion.styles
 
-                    Rectangle {
+                    SettingsStyleCard {
                         id: card
                         required property var modelData
-                        readonly property bool selected: PanelMotion.style === modelData.id
+                        selected: PanelMotion.style === modelData.id
+                        icon: modelData.icon
+                        label: modelData.label
+                        onClicked: Settings.appearance.panelAnimation = card.modelData.id
 
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        implicitHeight: cardColumn.implicitHeight + 16
-                        radius: Theme.round(14, width, height)
-                        color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
-                        border.width: selected ? 2 : 1
-                        border.color: Theme.gradientAccent && (selected) ? "transparent" : selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
-                        GradientBorder {
-                            active: selected
+                        PanelMotionPreview {
+                            Layout.fillWidth: true
+                            style: card.modelData.id
+                            running: root.shown && !Theme.reduceMotion
                         }
-                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
-
-                        ColumnLayout {
-                            id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
-                            spacing: 8
-
-                            PanelMotionPreview {
-                                Layout.fillWidth: true
-                                style: card.modelData.id
-                                running: root.shown && !Theme.reduceMotion
-                            }
-                            RowLayout {
-                                Layout.leftMargin: 4
-                                Layout.rightMargin: 4
-                                spacing: 6
-                                Icon {
-                                    name: card.modelData.icon
-                                    size: 17
-                                    filled: card.selected
-                                    color: Theme.accent
-                                }
-                                Label {
-                                    Layout.fillWidth: true
-                                    text: card.modelData.label
-                                    font.weight: Font.DemiBold
-                                    elide: Text.ElideRight
-                                }
-                                CheckBadge {
-                                    visible: card.selected
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            id: cardMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Settings.appearance.panelAnimation = card.modelData.id
-                        }
-                        GlassRim {}
                     }
                 }
             }
@@ -452,13 +379,11 @@ SettingsPage {
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "animation"
             title: "Animations"
-            Switch {
-                checked: Hypr.value("animations.enabled") ?? true
-                onToggled: Hypr.set("animations.enabled", !checked)
-            }
+            hypr: "animations.enabled"
+            fallback: true
         }
         SettingsRow {
             visible: Hypr.value("animations.enabled") ?? true
@@ -519,38 +444,27 @@ SettingsPage {
                 onPicked: v => Hypr.set("pikadots.windowStyle", v)
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Hypr.value("animations.enabled") ?? true
             icon: "rotate_right"
             title: "Turning border"
             description: "The gradient border and glow slowly circle the focused window. Best with gradient accents or Glass."
-            Switch {
-                checked: Hypr.value("pikadots.borderLoop") === true
-                onToggled: Hypr.set("pikadots.borderLoop", !checked)
-            }
+            hypr: "pikadots.borderLoop"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Hypr.value("animations.enabled") ?? true
             icon: "drag_pan"
             title: "Animate dragging and resizing"
             description: "Windows glide after the pointer instead of sticking to it."
-            Switch {
-                checked: Hypr.value("misc.animate_mouse_windowdragging") ?? false
-                onToggled: {
-                    Hypr.set("misc.animate_mouse_windowdragging", !checked);
-                    Hypr.set("misc.animate_manual_resizes", !checked);
-                }
-            }
+            hypr: "misc.animate_mouse_windowdragging"
+            onSwitched: value => Hypr.set("misc.animate_manual_resizes", value)
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Hypr.value("animations.enabled") ?? true
             icon: "waves"
             title: "Wobbly windows"
             description: "Windows flex like jelly while you drag or resize them."
-            Switch {
-                checked: Hypr.value("decoration.wobble.enabled") ?? false
-                onToggled: Hypr.set("decoration.wobble.enabled", !checked)
-            }
+            hypr: "decoration.wobble.enabled"
         }
         SettingsRow {
             visible: (Hypr.value("animations.enabled") ?? true) && (Hypr.value("decoration.wobble.enabled") ?? false)
@@ -563,15 +477,12 @@ SettingsPage {
                 onMoved: v => Hypr.set("decoration.wobble.intensity", v / 100)
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Hypr.value("animations.enabled") ?? true
             icon: "motion_blur"
             title: "Motion blur"
             description: "Smears windows slightly while they move or resize."
-            Switch {
-                checked: Hypr.value("decoration.motion_blur.enabled") ?? false
-                onToggled: Hypr.set("decoration.motion_blur.enabled", !checked)
-            }
+            hypr: "decoration.motion_blur.enabled"
         }
     }
 }

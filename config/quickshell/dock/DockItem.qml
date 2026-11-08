@@ -11,18 +11,18 @@ Item {
     readonly property var info: Dock.items.find(i => i.key === key) ?? null
     readonly property var p: dock.layout.pos[key] ?? null
     readonly property string kind: info?.kind ?? "app"
-    readonly property var group: Dock.groups.map[key] ?? null
+    readonly property var group: Dock.group(key)
     readonly property var windows: group?.windows ?? []
     readonly property var entry: kind === "app" ? Dock.entry(key) : null
     readonly property bool running: windows.length > 0
     readonly property bool focused: windows.some(t => t.activated)
-    readonly property string special: running && windows.every(t => Dock.isSpecial(t)) ? Dock.specialName(windows[0]) : ""
+    readonly property string special: running && windows.every(t => Windows.isSpecial(t)) ? Windows.specialName(windows[0]) : ""
     readonly property bool dragging: dock.dragKey === key
     readonly property bool removing: dock.removingKey === key
-    readonly property bool launching: Dock.launching[key] !== undefined && !running
+    readonly property bool launching: Dock.isLaunching(key) && !running
     readonly property real size: p?.size ?? dock.iconSize
     readonly property real thickness: kind === "divider" ? dock.iconSize * 0.62 : size
-    readonly property real lift: dragging ? Math.max(0, dock.dragOut - size / 2 - Dock.gap - Dock.pad) : 0
+    readonly property real lift: dragging ? Math.max(0, dock.dragOut - size / 2 - Dock.edgeMargin - Dock.padding) : 0
 
     property real along: dragging ? dock.dragAlong - size / 2 : (p?.along ?? 0)
     Behavior on along {
@@ -30,7 +30,7 @@ Item {
         NumberAnimation { duration: Theme.ms(180); easing.type: Easing.OutCubic }
     }
 
-    readonly property rect r: dock.rect(along, size, Dock.gap + (kind === "divider" ? (dock.depth - thickness) / 2 : Dock.pad) - dock.slide + lift, thickness)
+    readonly property rect r: dock.rect(along, size, Dock.edgeMargin + (kind === "divider" ? (dock.depth - thickness) / 2 : Dock.padding) - dock.slide + lift, thickness)
     x: r.x
     y: r.y
     width: r.width
@@ -52,7 +52,7 @@ Item {
         visible: item.kind === "app" && item.running
         target: icon
         edge: item.dock.edge
-        count: Dock.cfg.indicatorCount ? Math.min(3, item.windows.length) : 1
+        count: Dock.indicatorCount ? Math.min(3, item.windows.length) : 1
         active: item.focused
     }
 
@@ -65,7 +65,7 @@ Item {
         opacity: pulse
 
         SequentialAnimation on pulse {
-            running: item.launching && Dock.cfg.launchPulse && !Theme.reduceMotion
+            running: item.launching && Dock.launchPulse && !Theme.reduceMotion
             loops: Animation.Infinite
             onRunningChanged: if (!running) icon.pulse = 1
             NumberAnimation { to: 0.45; duration: 520; easing.type: Easing.InOutSine }

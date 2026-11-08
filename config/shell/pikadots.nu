@@ -13,6 +13,7 @@ if ($theme | path join lazygit.yml | path exists) {
     $env.LG_CONFIG_FILE = ($env.HOME | path join .config/lazygit/config.yml) + "," + ($theme | path join lazygit.yml)
 }
 
+alias ls = eza --icons=auto
 alias ll = eza -lah --icons=auto --git
 alias la = eza -a --icons=auto
 alias lt = eza --tree --icons=auto

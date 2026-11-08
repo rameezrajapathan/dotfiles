@@ -3,10 +3,8 @@ import QtQuick
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property var grid: [
         "ITLISASAMPM",

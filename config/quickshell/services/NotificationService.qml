@@ -31,7 +31,6 @@ Singleton {
         property bool dnd: false
     }
 
-    signal panelToggleRequested()
     property var times: ({})
 
     function hidePopup(n) {
@@ -55,17 +54,23 @@ Singleton {
     }
 
     function ago(n) {
-        const t = times[n.id];
-        if (!t)
+        return TimeDate.ago(times[n.id]);
+    }
+
+    function iconFor(n) {
+        const themed = n.image.startsWith("image://icon/") ? n.image.slice(13) : "";
+        if (n.image && !themed)
+            return n.image;
+        const icon = themed || n.appIcon;
+        if (!icon)
             return "";
-        const mins = Math.floor((clock.date - t) / 60000);
-        return mins < 1 ? "now" : mins < 60 ? mins + "m ago" : Math.floor(mins / 60) + "h ago";
+        return icon.startsWith("/") ? "file://" + icon : Quickshell.hasThemeIcon(icon) ? Quickshell.iconPath(icon) : "";
     }
 
     IpcHandler {
         target: "notifications"
         function toggle(): void {
-            root.panelToggleRequested();
+            Panels.toggle("controlcenter", "notifications");
         }
     }
 

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-import json
 import math
 import os
 import shutil
 import subprocess
 import sys
 
-HOME = os.path.expanduser("~")
-SETTINGS = os.path.join(HOME, ".config/pikadots/settings.json")
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from pikadots_common import HOME, load_json, settings_section
+
 COLORS = os.path.join(HOME, ".local/state/theme/quickshell.json")
 CACHE = os.path.join(HOME, ".local/state/pikadots/folder-color")
 ICON_DIRS = [os.path.join(HOME, ".icons"), os.path.join(HOME, ".local/share/icons"), "/usr/local/share/icons", "/usr/share/icons"]
@@ -65,13 +66,6 @@ def nearest(accent, available):
         return min(turn, 360 - turn) + 120 * abs(min(chroma, 0.15) - c)
     return min((n for n in PALETTE if n in available and n != "grey"), key=distance)
 
-def load(path):
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, ValueError):
-        return {}
-
 def theme_dirs():
     found = []
     for name in THEMES:
@@ -102,8 +96,8 @@ def main():
     args = sys.argv[1:]
     dry = "--dry-run" in args
     force = "--force" in args
-    settings = load(SETTINGS).get("appearance", {})
-    accent = next((a for a in args if a.startswith("#")), None) or load(COLORS).get("accent")
+    appearance = settings_section("appearance")
+    accent = next((a for a in args if a.startswith("#")), None) or load_json(COLORS).get("accent")
     if not accent:
         sys.exit("folders: no accent color yet; run theme.sh")
     themes = theme_dirs()
@@ -117,9 +111,9 @@ def main():
             writable = os.access(os.path.realpath(os.path.join(path, "48x48/places")), os.W_OK)
             print(f"{name} {path} {state} {'user' if writable else 'pkexec'}")
         return
-    if not settings.get("folderAccent", False):
+    if not appearance.get("folderAccent", False):
         return
-    if not str(settings.get("iconTheme") or "Papirus").startswith("Papirus"):
+    if not str(appearance.get("iconTheme") or "Papirus").startswith("Papirus"):
         return
     tool = shutil.which("papirus-folders")
     if not tool:

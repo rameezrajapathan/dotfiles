@@ -29,11 +29,6 @@ PanelWindow {
         open = !open;
     }
 
-    function ago(date) {
-        const min = Math.round((clock.date.getTime() - date.getTime()) / 60000);
-        return min < 1 ? "just now" : min < 60 ? min + " min ago" : Math.round(min / 60) + " h ago";
-    }
-
     function speed(kmh) {
         return Weather.fahrenheit ? Math.round(kmh * 0.621) + " mph" : Math.round(kmh) + " km/h";
     }
@@ -389,7 +384,7 @@ PanelWindow {
                 Layout.topMargin: 8
                 horizontalAlignment: Text.AlignRight
                 text: Weather.error !== "" ? Weather.error + " · press refresh"
-                    : Weather.ready ? "updated " + root.ago(Weather.updated) + " · open-meteo" : "getting the weather…"
+                    : Weather.ready ? "updated " + TimeDate.ago(Weather.updated) + " · open-meteo" : "getting the weather…"
                 color: Weather.error !== "" ? Theme.red : Theme.overlay
                 font.pixelSize: Theme.fontSize - 3
             }

@@ -5,10 +5,8 @@ import QtQuick.Shapes
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     SystemClock {
         id: clock
@@ -25,7 +23,6 @@ Item {
     readonly property real progress: !today ? 0.5 : day ? (now - rise) / (set - rise)
         : now > set ? Math.min(1, (now - set) / Math.max(1, (tomorrow ? tomorrow.sunrise.getTime() : set + 12 * 3600000) - set))
         : 0
-    readonly property string fmt: Settings.bar.clock24 ? "HH:mm" : "h:mm AP"
 
     readonly property real synodic: 29.530588853
     readonly property real moonAge: {
@@ -59,6 +56,7 @@ Item {
         Connections {
             target: Theme
             function onTextChanged() { requestPaint(); }
+            function onYellowChanged() { requestPaint(); }
         }
         onPaint: {
             const ctx = getContext("2d");
@@ -71,7 +69,7 @@ Item {
             ctx.fill();
             const k = Math.cos(2 * Math.PI * phase);
             const side = phase < 0.5 ? 1 : -1;
-            ctx.fillStyle = "#f4ecd8";
+            ctx.fillStyle = Qt.hsla(Theme.yellow.hslHue, 0.55, 0.9, 1);
             ctx.beginPath();
             ctx.moveTo(cx, cy - r);
             for (let i = 0; i <= 32; i++) {
@@ -179,13 +177,13 @@ Item {
         ColumnLayout {
             spacing: 0
             Label { text: "SUNRISE"; color: Theme.overlay; font.pixelSize: Theme.fontSize - 3; font.weight: Font.DemiBold; font.letterSpacing: 0.6 }
-            Label { text: root.today ? Qt.formatTime(root.today.sunrise, root.fmt) : "–"; font.weight: Font.Bold }
+            Label { text: root.today ? TimeDate.formatTime(root.today.sunrise) : "–"; font.weight: Font.Bold }
         }
         Item { Layout.fillWidth: true }
         ColumnLayout {
             spacing: 0
             Label { Layout.alignment: Qt.AlignRight; text: "SUNSET"; color: Theme.overlay; font.pixelSize: Theme.fontSize - 3; font.weight: Font.DemiBold; font.letterSpacing: 0.6 }
-            Label { Layout.alignment: Qt.AlignRight; text: root.today ? Qt.formatTime(root.today.sunset, root.fmt) : "–"; font.weight: Font.Bold }
+            Label { Layout.alignment: Qt.AlignRight; text: root.today ? TimeDate.formatTime(root.today.sunset) : "–"; font.weight: Font.Bold }
         }
     }
 

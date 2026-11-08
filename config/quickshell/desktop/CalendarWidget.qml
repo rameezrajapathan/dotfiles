@@ -4,33 +4,19 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
     }
 
-    readonly property int weekStart: Settings.datetime.weekStart
-    readonly property var days: {
-        const today = clock.date;
-        const first = new Date(today.getFullYear(), today.getMonth(), 1);
-        const lead = (first.getDay() - weekStart + 7) % 7;
-        const count = Math.ceil((lead + new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()) / 7) * 7;
-        const out = [];
-        for (let i = 0; i < count; i++) {
-            const d = new Date(today.getFullYear(), today.getMonth(), 1 - lead + i);
-            out.push({ day: d.getDate(), inMonth: d.getMonth() === today.getMonth(), today: d.toDateString() === today.toDateString(), weekend: d.getDay() === 0 || d.getDay() === 6 });
-        }
-        return out;
-    }
+    readonly property var days: TimeDate.monthCells(clock.date.getFullYear(), clock.date.getMonth())
     readonly property var upcoming: Meetings.meetings.filter(m => m.end > Meetings.now).slice(0, 4)
 
     function timeOf(m) {
-        return m.start <= Meetings.now ? "Now" : Qt.formatTime(new Date(m.start * 1000), Settings.bar.clock24 ? "HH:mm" : "h:mm AP");
+        return m.start <= Meetings.now ? "Now" : TimeDate.formatTime(new Date(m.start * 1000));
     }
 
     MouseArea {
@@ -38,7 +24,7 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             Desktop.showing = false;
-            Toggles.calendarRequested();
+            Panels.toggle("calendar");
         }
     }
 
@@ -78,13 +64,13 @@ Item {
         columnSpacing: 0
 
         Repeater {
-            model: 7
+            model: TimeDate.dayNames()
             Label {
-                required property int index
+                required property string modelData
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 horizontalAlignment: Text.AlignHCenter
-                text: Qt.locale().dayName((index + root.weekStart) % 7, Locale.NarrowFormat)
+                text: modelData
                 color: Theme.overlay
                 font.pixelSize: Theme.fontSize - 3
                 font.weight: Font.DemiBold
@@ -108,7 +94,7 @@ Item {
                 Label {
                     anchors.centerIn: parent
                     text: modelData.day
-                    color: modelData.today ? "white" : !modelData.inMonth ? Qt.alpha(Theme.overlay, 0.5) : modelData.weekend ? Theme.subtext : Theme.text
+                    color: modelData.today ? Theme.accentText : !modelData.inMonth ? Qt.alpha(Theme.overlay, 0.5) : modelData.weekend ? Theme.subtext : Theme.text
                     font.pixelSize: Theme.fontSize - 2
                     font.weight: modelData.today ? Font.Bold : Font.Normal
                 }
@@ -117,12 +103,12 @@ Item {
     }
 
     Today {
-        visible: root.size === "small"
+        visible: root.sizeClass === "small"
         anchors { fill: parent; margins: 20 }
     }
 
     RowLayout {
-        visible: root.size === "medium"
+        visible: root.sizeClass === "medium"
         anchors { fill: parent; margins: 18 }
         spacing: 16
         Today {
@@ -138,7 +124,7 @@ Item {
     }
 
     ColumnLayout {
-        visible: root.size === "large"
+        visible: root.sizeClass === "large"
         anchors { fill: parent; margins: 20 }
         spacing: 10
 

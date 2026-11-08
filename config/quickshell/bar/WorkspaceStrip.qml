@@ -25,7 +25,7 @@ Item {
                 (map[id] = map[id] ?? []).push(t);
         }
         for (const id in map)
-            map[id].sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 99) - (b.lastIpcObject?.focusHistoryID ?? 99));
+            map[id] = Windows.byRecent(map[id]);
         return map;
     }
     readonly property var urgent: Hyprland.workspaces.values.filter(w => w.urgent).map(w => w.id)
@@ -187,7 +187,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: mouse => {
                         if (mouse.button === Qt.RightButton || ws.active)
-                            Quickshell.execDetached(["qs", "ipc", "call", "overview", "toggle"]);
+                            Panels.toggle("overview");
                         else
                             Windows.focusWorkspace(ws.wsId);
                     }
@@ -208,7 +208,6 @@ Item {
         anchors.margins: -4
         z: -1
         acceptedButtons: Qt.NoButton
-        onWheel: wheel => Quickshell.execDetached(["hyprctl", "dispatch",
-            `hl.dsp.focus({ workspace = "${wheel.angleDelta.y < 0 ? "e+1" : "e-1"}" })`])
+        onWheel: wheel => Windows.stepWorkspace(wheel.angleDelta.y < 0 ? 1 : -1)
     }
 }

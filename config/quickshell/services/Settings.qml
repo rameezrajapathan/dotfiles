@@ -3,8 +3,6 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import qs.bar
-import qs.settings
 
 Singleton {
     id: root
@@ -36,7 +34,7 @@ Singleton {
     function retheme() {
         saveTimer.stop();
         file.writeAdapter();
-        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/theme.sh"]);
+        Wallpaper.retheme();
     }
 
     function applyFonts() {

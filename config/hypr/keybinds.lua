@@ -45,7 +45,7 @@ hl.bind("ALT + Alt_L", hl.dsp.exec_cmd("qs ipc call switcher commit"), { release
 hl.bind(mod .. " + Return", app("terminal"), { description = "Open terminal" })
 hl.bind(mod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle"), { description = "Show notifications" })
 hl.bind(mod .. " + SHIFT + N", hl.dsp.exec_cmd("qs ipc call quicksettings dnd"), { description = "Toggle Do Not Disturb" })
-hl.bind(mod .. " + S", hl.dsp.exec_cmd("qs ipc call controlcenter toggle ''"), { description = "Open settings (control center)" })
+hl.bind(mod .. " + S", hl.dsp.exec_cmd("qs ipc call controlcenter toggle ''"), { description = "Open the control center" })
 hl.bind(mod .. " + CTRL + W", hl.dsp.exec_cmd("qs ipc call weather toggle"), { description = "Show the weather" })
 hl.bind(mod .. " + comma", hl.dsp.exec_cmd("qs ipc call settings open ''"), { description = "Open the Settings app" })
 hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("qs ipc call quicksettings pickColor"), { description = "Pick a color from the screen (copies hex)" })
@@ -176,3 +176,5 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("qs ipc call media previous"), { locked
 
 hl.bind("switch:on:Lid Switch", script("lid.sh close"), { locked = true, description = "Laptop lid closed" })
 hl.bind("switch:off:Lid Switch", script("lid.sh open"), { locked = true, description = "Laptop lid opened" })
+
+hl.bind = hl_bind

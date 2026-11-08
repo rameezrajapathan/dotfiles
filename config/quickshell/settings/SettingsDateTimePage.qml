@@ -175,22 +175,18 @@ SettingsPage {
     SettingsSection {
         title: "Formats"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "schedule"
             title: "24-hour time"
             description: Qt.formatTime(clock.date, Settings.bar.clock24 ? "HH:mm" : "h:mm AP")
-            Switch {
-                checked: Settings.bar.clock24
-                onToggled: Settings.bar.clock24 = !checked
-            }
+            target: Settings.bar
+            key: "clock24"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "timer"
             title: "Seconds in the bar"
-            Switch {
-                checked: Settings.bar.seconds
-                onToggled: Settings.bar.seconds = !checked
-            }
+            target: Settings.bar
+            key: "seconds"
         }
         SettingsRow {
             icon: "calendar_today"
@@ -217,14 +213,12 @@ SettingsPage {
                 onPicked: v => Settings.datetime.weekStart = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "numbers"
             title: "Week numbers"
             description: "In the calendar."
-            Switch {
-                checked: Settings.datetime.weekNumbers
-                onToggled: Settings.datetime.weekNumbers = !checked
-            }
+            target: Settings.datetime
+            key: "weekNumbers"
         }
     }
 

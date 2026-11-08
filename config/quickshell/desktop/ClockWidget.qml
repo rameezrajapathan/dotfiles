@@ -4,17 +4,15 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
-    readonly property bool clock24: Settings.bar.clock24
-    readonly property var zones: (Settings.datetime.worldClocks ?? []).slice(0, size === "large" ? 4 : 3)
+    readonly property bool clock24: TimeDate.use24h
+    readonly property var zones: (Settings.datetime.worldClocks ?? []).slice(0, sizeClass === "large" ? 4 : 3)
 
     SystemClock {
         id: clock
-        precision: root.size === "medium" ? SystemClock.Minutes : SystemClock.Seconds
+        precision: root.sizeClass === "medium" ? SystemClock.Minutes : SystemClock.Seconds
         enabled: root.live
     }
 
@@ -98,13 +96,13 @@ Item {
     }
 
     Dial {
-        visible: root.size === "small"
+        visible: root.sizeClass === "small"
         anchors.centerIn: parent
         diameter: Math.min(root.width, root.height) - 28
     }
 
     ColumnLayout {
-        visible: root.size === "medium"
+        visible: root.sizeClass === "medium"
         anchors { fill: parent; margins: 22 }
         spacing: 0
 
@@ -151,7 +149,7 @@ Item {
     }
 
     ColumnLayout {
-        visible: root.size === "large"
+        visible: root.sizeClass === "large"
         anchors { fill: parent; margins: 24 }
         spacing: 12
 

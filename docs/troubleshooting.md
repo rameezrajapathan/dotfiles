@@ -27,9 +27,10 @@ Start with `pikadots health`, then `pikadots repair`.
 | btop (or another terminal app) closes right away, "No UTF-8 locale detected" | The session locale isn't UTF-8: `localectl set-locale LANG=en_US.UTF-8` (your language with `.UTF-8`; `locale -a` lists them), then log out and back in |
 | A terminal app ignores its window rule | Open it from the launcher entry the rule made (Settings > Window rules > Terminal app), not a plain terminal: only that one has the rule's class |
 | Screen stuck zoomed in | Super + Alt + 0 |
-| Annotate or Edit does nothing | `sudo pacman -S satty` (also in `packages.txt`) |
+| Annotate or Edit does nothing | `sudo pacman -S satty` or `sudo dnf install satty` (also in `packages.txt` and `packages-fedora.txt`) |
 
 Programs start from `config/hypr/autostart.lua`, not systemd. Your startup apps are in
 `~/.local/state/pikadots/autostart.lua`, started by `hypr/scripts/startup-apps.sh`. Only the
-backup timer (`pikadots-backup.timer`) and the SSH agent (`gcr-ssh-agent.socket`) are systemd
-user units.
+idle timers (`pikadots-idle.service`, which runs `hypr/scripts/idle.sh` with the Hyprland session;
+`journalctl --user -u pikadots-idle` shows its log), the backup timer (`pikadots-backup.timer`)
+and the SSH agent (`gcr-ssh-agent.socket`) are systemd user units.

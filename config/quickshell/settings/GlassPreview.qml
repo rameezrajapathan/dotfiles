@@ -13,7 +13,7 @@ ClippingRectangle {
     Image {
         id: wall
         anchors.fill: parent
-        source: Glass.wallpaper
+        source: Wallpaper.url
         sourceSize.width: 960
         fillMode: Image.PreserveAspectCrop
         asynchronous: true

@@ -1,19 +1,23 @@
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Services.Polkit
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import qs.bar
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
+
+    layerNamespace: "quickshell-polkit"
+    exclusive: false
+    hideWhenFaded: false
+    closeOnBackdrop: false
+    open: (agent?.isActive ?? false) && flow !== null
+    visible: open
 
     readonly property var agent: agentLoader.item
     readonly property var flow: agent?.flow ?? null
-    readonly property bool open: (agent?.isActive ?? false) && flow !== null
     property int attempts: 0
     property bool busy: false
 
@@ -72,26 +76,7 @@ PanelWindow {
         }
     }
 
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-polkit"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: open
-
     onOpenChanged: if (open) input.forceActiveFocus()
-
-    Rectangle {
-        anchors.fill: parent
-        color: "black"
-        opacity: 0.35
-    }
-
-    MouseArea {
-        anchors.fill: parent
-    }
 
     Rectangle {
         id: card

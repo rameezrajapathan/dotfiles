@@ -14,7 +14,7 @@ Item {
     property real shadowSpread: 22
     property point shadowOffset: Qt.point(0, 8)
     property bool tracking: false
-    property string backdropSource: Glass.wallpaper
+    property string backdropSource: Wallpaper.url
     property Item backdropItem: null
     property bool fill: backdropItem !== null
     readonly property bool shaderReady: effect.status !== ShaderEffect.Error

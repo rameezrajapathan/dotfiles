@@ -67,18 +67,16 @@ SettingsPage {
     SettingsSection {
         title: "Motion"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "animation"
             title: "Reduce motion"
             description: "Panels, windows and apps switch without sliding or fading. Turns off Effects > Animations too."
-            Switch {
-                checked: root.a.reduceMotion
-                onToggled: {
-                    root.a.reduceMotion = !checked;
-                    Hypr.set("animations.enabled", !root.a.reduceMotion);
-                    Quickshell.execDetached(["sh", "-c", "sleep 1; hyprctl reload"]);
-                    applyTimer.restart();
-                }
+            target: root.a
+            key: "reduceMotion"
+            onSwitched: {
+                Hypr.set("animations.enabled", !root.a.reduceMotion);
+                Quickshell.execDetached(["sh", "-c", "sleep 1; hyprctl reload"]);
+                applyTimer.restart();
             }
         }
     }
@@ -86,14 +84,12 @@ SettingsPage {
     SettingsSection {
         title: "Tooltips"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "tooltip"
             title: "Show tooltips"
             description: "Names icon-only buttons, with their shortcut, when you hover them."
-            Switch {
-                checked: root.a.tooltips
-                onToggled: root.a.tooltips = !checked
-            }
+            target: root.a
+            key: "tooltips"
         }
         SettingsRow {
             visible: root.a.tooltips

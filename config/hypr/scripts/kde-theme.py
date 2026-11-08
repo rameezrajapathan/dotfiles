@@ -5,10 +5,12 @@ import subprocess
 import sys
 import tempfile
 
-HOME = os.path.expanduser("~")
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from pikadots_common import HOME, settings_section
+
 KDEGLOBALS = os.path.join(HOME, ".config/kdeglobals")
 COLORS = os.path.join(HOME, ".local/state/theme/kde.json")
-SETTINGS = os.path.join(HOME, ".config/pikadots/settings.json")
 BACKUP = os.path.join(HOME, ".local/state/pikadots/kdeglobals-plasma.json")
 SCHEME = os.path.join(HOME, ".local/share/color-schemes/Pikadots.colors")
 ICONS = os.path.join(HOME, ".config/hypr/scripts/icons.sh")
@@ -116,11 +118,7 @@ def cursor_snapshot():
     return {k: get_key(sections, "Mouse", k) for k in CURSOR_KEYS}
 
 def cursor_settings():
-    try:
-        with open(SETTINGS, encoding="utf-8") as f:
-            hypr = json.load(f).get("hypr", {})
-    except (OSError, ValueError, AttributeError):
-        hypr = {}
+    hypr = settings_section("hypr")
     return str(hypr.get("pikadots.cursorTheme") or "Bibata-Modern-Ice"), str(hypr.get("pikadots.cursorSize") or 28)
 
 def set_cursor(values):
@@ -200,12 +198,7 @@ def qt_font(family, size=10):
     return f"{family},{size},-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 
 def load_settings():
-    try:
-        with open(SETTINGS, encoding="utf-8") as f:
-            data = json.load(f)
-    except (OSError, ValueError):
-        data = {}
-    return dict(data.get("appearance", {}), **{"a11y": data.get("accessibility", {})})
+    return dict(settings_section("appearance"), **{"a11y": settings_section("accessibility")})
 
 def notify():
     run = lambda *a: subprocess.run(["gdbus", "emit", "--session", *a], capture_output=True)

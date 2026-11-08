@@ -119,7 +119,7 @@ Item {
                     Label {
                         Layout.preferredWidth: timeWidth.width
                         horizontalAlignment: Text.AlignHCenter
-                        text: Media.time(root.player?.position ?? 0)
+                        text: TimeDate.clock(root.player?.position ?? 0)
                         color: Theme.subtext
                         font.pixelSize: Theme.fontSize - 2
                         font.features: { "tnum": 1 }
@@ -134,7 +134,7 @@ Item {
                     Label {
                         Layout.preferredWidth: timeWidth.width
                         horizontalAlignment: Text.AlignHCenter
-                        text: Media.time(root.player?.length ?? 0)
+                        text: TimeDate.clock(root.player?.length ?? 0)
                         color: Theme.subtext
                         font.pixelSize: Theme.fontSize - 2
                         font.features: { "tnum": 1 }
@@ -143,7 +143,7 @@ Item {
                         id: timeWidth
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize - 2
-                        text: Media.time(root.player?.length ?? 0).replace(/[0-9]/g, "0")
+                        text: TimeDate.clock(root.player?.length ?? 0).replace(/[0-9]/g, "0")
                     }
                 }
 

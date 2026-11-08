@@ -41,28 +41,13 @@ Singleton {
         }
     }
 
-    Process {
-        id: reader
+    JsonPoll {
+        interval: 5 * 60 * 1000
         command: [Quickshell.env("HOME") + "/.local/bin/pikadots-meetings"]
         stderr: StdioCollector {
             onStreamFinished: if (text.trim() !== "") console.warn(text.trim())
         }
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.meetings = JSON.parse(text);
-                } catch (e) {
-                    root.meetings = [];
-                }
-            }
-        }
-    }
-
-    Timer {
-        interval: 5 * 60 * 1000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: reader.running = true
+        onLoaded: json => root.meetings = json
+        onFailed: root.meetings = []
     }
 }

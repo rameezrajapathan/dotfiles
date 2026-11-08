@@ -1,3 +1,4 @@
 *.bak
 config/hypr/wallpaper.conf
 .vscode/settings.json
+__pycache__/

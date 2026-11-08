@@ -1,0 +1,1 @@
+../quickshell/lock/LockIcon.qml

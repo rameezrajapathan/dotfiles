@@ -10,7 +10,7 @@ import qs.services
 import qs.settings
 
 ShellRoot {
-    Component.onCompleted: [Updates.checked, TimeDate.timezone, Drives.loaded]
+    readonly property var servicesStartedAtLaunch: [Updates, TimeDate, Drives]
 
     Variants {
         model: Quickshell.screens

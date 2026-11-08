@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
 
 dir="$(xdg-user-dir PICTURES)/Screenshots"
 geom= output=
@@ -18,12 +19,12 @@ full) output=$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name') ;;
 esac
 
 missing() {
-	notify-send -a Screenshot -u critical "$1 isn't installed" "$(command -v dnf >/dev/null && echo "sudo dnf install" || echo "sudo pacman -S") $2"
+	notify-send -a Screenshot -u critical "$1 isn't installed" "$(install_hint "${@:2}")"
 	exit 1
 }
 
 edit() {
-	command -v satty >/dev/null || missing satty satty
+	has satty || missing satty satty
 	mkdir -p "$dir"
 	satty --filename "$1" --output-filename "$dir/$(date +%Y%m%d-%H%M%S).png" \
 		--copy-command wl-copy --early-exit --initial-tool arrow
@@ -31,7 +32,7 @@ edit() {
 
 notify() {
 	local file=$1 title=$2 body=$3
-	if command -v satty >/dev/null; then
+	if has satty; then
 		if [[ $(notify-send -a Screenshot -i "$file" -A edit=Edit "$title" "$body") == edit ]]; then
 			edit "$file"
 		fi
@@ -52,7 +53,7 @@ edit)
 	edit "$last"
 	;;
 text)
-	command -v tesseract >/dev/null || missing tesseract "tesseract tesseract-$(command -v dnf >/dev/null && echo langpack || echo data)-eng"
+	has tesseract || missing tesseract tesseract tesseract-data-eng
 	text=$(grim ${geom:+-g "$geom"} ${output:+-o "$output"} - | tesseract stdin stdout 2>/dev/null | sed -e 's/[[:space:]]*$//' -e '/./,$!d')
 	if [[ -z $text ]]; then
 		notify-send -a Screenshot "No text found" "Try a larger or sharper area."
@@ -63,7 +64,7 @@ text)
 	;;
 *)
 	grim ${geom:+-g "$geom"} ${output:+-o "$output"} - | tee "$last" | wl-copy
-	if command -v satty >/dev/null; then
+	if has satty; then
 		notify "$last" "Screenshot copied" "Edit to draw on it or save it"
 	else
 		notify "$last" "Screenshot copied" "Super + Shift + F also saves one"

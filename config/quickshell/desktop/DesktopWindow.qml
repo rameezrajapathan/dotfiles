@@ -78,37 +78,10 @@ PanelWindow {
         sourceComponent: WallpaperImage {}
     }
 
-    component ToolButton: Rectangle {
-        id: tb
-        property string icon
-        property string text
-        property bool accent: false
-        signal clicked()
-        implicitWidth: tbRow.implicitWidth + 28
-        implicitHeight: 38
-        radius: height / 2
-        color: accent ? (tbMouse.containsMouse ? Qt.lighter(Theme.accent, 1.08) : Theme.accent)
-            : tbMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.surface, 0.5)
-        Row {
-            id: tbRow
-            anchors.centerIn: parent
-            spacing: 6
-            Icon { name: tb.icon; size: 18; color: tb.accent ? Theme.accentText : Theme.text; anchors.verticalCenter: parent.verticalCenter }
-            Label { text: tb.text; color: tb.accent ? Theme.accentText : Theme.text; font.weight: Font.DemiBold; anchors.verticalCenter: parent.verticalCenter }
-        }
-        MouseArea {
-            id: tbMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: tb.clicked()
-        }
-    }
-
     Rectangle {
         id: dim
         anchors.fill: parent
-        color: "black"
+        color: Theme.base
         opacity: root.raisedLayer && Desktop.raised ? (Desktop.editing ? 0.42 : 0.32) : 0
         Behavior on opacity { NumberAnimation { duration: Theme.ms(220); easing.type: Easing.OutCubic } }
     }
@@ -151,9 +124,9 @@ PanelWindow {
             width: Desktop.cell - 2 * Desktop.gutter
             height: width
             radius: Theme.round(20, width, height)
-            color: Qt.alpha("white", 0.035)
+            color: Qt.alpha(Theme.text, 0.035)
             border.width: 1
-            border.color: Qt.alpha("white", 0.07)
+            border.color: Qt.alpha(Theme.text, 0.07)
         }
     }
 
@@ -202,20 +175,20 @@ PanelWindow {
             Layout.alignment: Qt.AlignHCenter
             name: "widgets"
             size: 56
-            color: "white"
+            color: Theme.text
             opacity: 0.8
         }
         Label {
             Layout.alignment: Qt.AlignHCenter
             text: "No widgets on this screen yet"
-            color: "white"
+            color: Theme.text
             font.pixelSize: Theme.fontSize + 4
             font.weight: Font.DemiBold
         }
         Label {
             Layout.alignment: Qt.AlignHCenter
             text: "Add one from the catalog, or start with a few favorites."
-            color: Qt.alpha("white", 0.75)
+            color: Qt.alpha(Theme.text, 0.75)
         }
     }
 
@@ -237,19 +210,22 @@ PanelWindow {
             anchors.centerIn: parent
             spacing: 6
 
-            ToolButton {
+            IconButton {
                 icon: "add"
+                iconSize: 18
                 text: "Add widget"
                 onClicked: Desktop.openCatalog(root.screenName)
             }
-            ToolButton {
+            IconButton {
                 visible: root.entries.length === 0
+                iconSize: 18
                 icon: "auto_awesome"
                 text: "Starter widgets"
                 onClicked: Desktop.addStarter(root.screenName)
             }
-            ToolButton {
-                accent: true
+            IconButton {
+                tone: "accent"
+                iconSize: 18
                 icon: "check"
                 text: "Done"
                 onClicked: Desktop.edit(false)
@@ -261,7 +237,7 @@ PanelWindow {
         visible: root.raisedLayer && Desktop.editing && root.entries.length > 0 && !root.catalogHere
         anchors { horizontalCenter: parent.horizontalCenter; top: toolbar.bottom; topMargin: 10 }
         text: "Drag to move  ·  drag the corner to resize  ·  Esc when you're done"
-        color: Qt.alpha("white", 0.8)
+        color: Qt.alpha(Theme.text, 0.8)
         font.pixelSize: Theme.fontSize - 1
     }
 
@@ -280,7 +256,7 @@ PanelWindow {
         visible: root.raisedLayer && Desktop.showing && !Desktop.editing && root.focusedHere
         anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 28 }
         text: root.entries.length ? "Click anywhere or press Esc to go back" : "No widgets yet. Right click to add some."
-        color: Qt.alpha("white", 0.75)
+        color: Qt.alpha(Theme.text, 0.75)
         font.pixelSize: Theme.fontSize - 1
     }
 }

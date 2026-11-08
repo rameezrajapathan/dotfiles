@@ -142,7 +142,8 @@ SettingsPage {
                     implicitWidth: 280
                     secret: true
                     placeholder: vpn.modelData.passwordSaved ? "••••••••" : "Password"
-                    onEntered: t => {
+                    commitOnBlur: false
+                    onAccepted: t => {
                         if (t) {
                             VpnService.setPassword(vpn.uuid, t);
                             pass.clear();

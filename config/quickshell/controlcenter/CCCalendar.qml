@@ -21,23 +21,7 @@ CCCard {
 
     readonly property date month: new Date(clock.date.getFullYear(), clock.date.getMonth() + offset, 1)
     readonly property int weekStart: Settings.datetime.weekStart
-    readonly property var days: {
-        const first = month;
-        const lead = (first.getDay() - weekStart + 7) % 7;
-        const start = new Date(first.getFullYear(), first.getMonth(), 1 - lead);
-        const count = Math.ceil((lead + new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate()) / 7) * 7;
-        const out = [];
-        for (let i = 0; i < count; i++) {
-            const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-            out.push({
-                day: d.getDate(),
-                inMonth: d.getMonth() === first.getMonth(),
-                today: d.toDateString() === clock.date.toDateString(),
-                weekend: d.getDay() === 0 || d.getDay() === 6
-            });
-        }
-        return out;
-    }
+    readonly property var days: TimeDate.monthCells(month.getFullYear(), month.getMonth(), weekStart)
 
     ColumnLayout {
         id: column
@@ -56,7 +40,7 @@ CCCard {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         root.cc.close();
-                        Toggles.calendarRequested();
+                        Panels.toggle("calendar");
                     }
                 }
             }
@@ -71,13 +55,13 @@ CCCard {
             columnSpacing: 2
 
             Repeater {
-                model: 7
+                model: TimeDate.dayNames(Locale.NarrowFormat, root.weekStart)
                 Label {
-                    required property int index
+                    required property string modelData
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     horizontalAlignment: Text.AlignHCenter
-                    text: Qt.locale().dayName((index + root.weekStart) % 7, Locale.NarrowFormat)
+                    text: modelData
                     color: Theme.overlay
                     font.pixelSize: Theme.fontSize - 2
                 }

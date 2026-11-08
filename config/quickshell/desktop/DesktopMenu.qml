@@ -12,14 +12,14 @@ Item {
     property int current: -1
 
     readonly property var actions: [
-        { icon: "wallpaper", label: "Change wallpaper…", keys: "Super + Shift + W", run: () => Quickshell.execDetached(["qs", "ipc", "call", "wallpaper", "toggle"]) },
+        { icon: "wallpaper", label: "Change wallpaper…", keys: Keybinds.keysFor("Pick wallpaper", "Super + Shift + W"), run: () => Quickshell.execDetached(["qs", "ipc", "call", "wallpaper", "toggle"]) },
         { icon: "widgets", label: "Edit widgets…", run: () => Desktop.edit(true) },
         { icon: "add_box", label: "Add a widget…", run: () => Desktop.openCatalog(root.screenName) },
-        { icon: Desktop.showing ? "close_fullscreen" : "desktop_windows", label: Desktop.showing ? "Back to windows" : "Show desktop", keys: "Super + H", run: () => { Desktop.showing = !Desktop.showing; } },
+        { icon: Desktop.showing ? "close_fullscreen" : "desktop_windows", label: Desktop.showing ? "Back to windows" : "Show desktop", keys: Keybinds.keysFor("Show desktop widgets", "Super + H"), run: () => { Desktop.showing = !Desktop.showing; } },
         { separator: true },
-        { icon: "terminal", label: "Open terminal", keys: "Super + Return", run: () => Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/app.sh", "terminal"]) },
+        { icon: "terminal", label: "Open terminal", keys: Keybinds.keysFor("Open terminal", "Super + Return"), run: () => Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/app.sh", "terminal"]) },
         { icon: "monitor", label: "Display settings", run: () => Settings.openRequested("displays") },
-        { icon: "settings", label: "Pikadots settings", keys: "Super + ,", run: () => Settings.openRequested("") }
+        { icon: "settings", label: "Pikadots settings", keys: Keybinds.keysFor("Open the Settings app", "Super + ,"), run: () => Settings.openRequested("") }
     ]
 
     function run(a) {

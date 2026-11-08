@@ -2,13 +2,11 @@ pragma Singleton
 
 import Quickshell
 import QtQuick
-import qs.bar
-import qs.controlcenter
 
 Singleton {
     id: root
 
-    readonly property var widgets: [
+    readonly property var cards: [
         { id: "header", label: "Profile & power", icon: "account_circle", description: "Picture, name, uptime, lock, settings and power" },
         { id: "tiles", label: "Quick tiles", icon: "grid_view", description: "Large toggles in two columns" },
         { id: "tilesSmall", label: "Quick tiles (small)", icon: "apps", description: "Square toggles in three columns" },
@@ -25,8 +23,8 @@ Singleton {
         { id: "tray", label: "Tray", icon: "widgets", description: "Tray icons" }
     ]
 
-    function widget(id) {
-        return widgets.find(w => w.id === id) ?? { id, label: id, icon: "help", description: "" };
+    function card(id) {
+        return cards.find(c => c.id === id) ?? { id, label: id, icon: "help", description: "" };
     }
 
     readonly property var tiles: [

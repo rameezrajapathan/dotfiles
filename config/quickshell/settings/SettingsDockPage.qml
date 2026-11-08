@@ -14,20 +14,26 @@ SettingsPage {
         .filter(e => !e.noDisplay && !Dock.pinned.includes(e.id))
         .map(e => ({ id: e.id, name: e.name, icon: e.icon }))
         .sort((a, b) => a.name.localeCompare(b.name))
-    readonly property var swatches: ["", "#ffffff", "#89b4fa", "#a6e3a1", "#f9e2af", "#fab387", "#f38ba8", "#cba6f7"]
-    readonly property var swatchNames: ({ "": "Follow the theme", "#ffffff": "White", "#89b4fa": "Blue", "#a6e3a1": "Green", "#f9e2af": "Yellow", "#fab387": "Orange", "#f38ba8": "Red", "#cba6f7": "Purple" })
+    readonly property var swatches: [
+        { value: "", name: "Follow the theme" },
+        { value: "#ffffff", name: "White" },
+        { value: "#89b4fa", name: "Blue" },
+        { value: "#a6e3a1", name: "Green" },
+        { value: "#f9e2af", name: "Yellow" },
+        { value: "#fab387", name: "Orange" },
+        { value: "#f38ba8", name: "Red" },
+        { value: "#cba6f7", name: "Purple" }
+    ]
 
     SettingsSection {
         title: "Visibility"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "dock_to_bottom"
             title: "Show the dock"
             description: "Super + D hides it or brings it back for now."
-            Switch {
-                checked: root.dk.enabled
-                onToggled: root.dk.enabled = !checked
-            }
+            target: root.dk
+            key: "enabled"
         }
         SettingsRow {
             icon: "visibility"
@@ -48,7 +54,7 @@ SettingsPage {
         SettingsRow {
             icon: "monitor"
             title: "Screens"
-            description: "Every screen shows all of your open apps."
+            description: "Every screen shows all of your running apps."
             SettingsSegmented {
                 options: [
                     { value: "all", label: "All screens" },
@@ -107,14 +113,12 @@ SettingsPage {
                 onMoved: v => root.dk.iconSize = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "zoom_in"
             title: "Magnify on hover"
             description: "Icons near the pointer grow."
-            Switch {
-                checked: root.dk.magnify
-                onToggled: root.dk.magnify = !checked
-            }
+            target: root.dk
+            key: "magnify"
         }
         SettingsRow {
             visible: root.dk.magnify
@@ -130,7 +134,7 @@ SettingsPage {
         SettingsRow {
             icon: "fiber_manual_record"
             title: "Running indicator"
-            description: "How an open app is marked."
+            description: "How a running app is marked."
             SettingsSegmented {
                 options: [
                     { value: "dot", label: "Dot" },
@@ -143,15 +147,13 @@ SettingsPage {
                 onPicked: v => root.dk.indicator = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Dock.indicator === "dot" || Dock.indicator === "line"
             icon: "more_horiz"
             title: "One mark per window"
             description: "Up to three."
-            Switch {
-                checked: root.dk.indicatorCount
-                onToggled: root.dk.indicatorCount = !checked
-            }
+            target: root.dk
+            key: "indicatorCount"
         }
         SettingsRow {
             visible: Dock.indicator !== "none"
@@ -166,17 +168,17 @@ SettingsPage {
 
                     Rectangle {
                         id: swatch
-                        required property string modelData
-                        readonly property bool selected: (root.dk.indicatorColor ?? "") === modelData
+                        required property var modelData
+                        readonly property bool selected: (root.dk.indicatorColor ?? "") === modelData.value
                         width: 26
                         height: 26
                         radius: 13
-                        color: modelData || Dock.indicatorColor
+                        color: modelData.value || Dock.indicatorColor
                         border.width: selected ? 2 : 1
                         border.color: selected ? Theme.text : Qt.alpha(Theme.text, 0.2)
 
                         Icon {
-                            visible: swatch.modelData === ""
+                            visible: swatch.modelData.value === ""
                             anchors.centerIn: parent
                             name: "auto_awesome"
                             size: 14
@@ -186,10 +188,10 @@ SettingsPage {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: root.dk.indicatorColor = swatch.modelData
+                            onClicked: root.dk.indicatorColor = swatch.modelData.value
                         }
                         Tooltip {
-                            text: root.swatchNames[swatch.modelData] ?? swatch.modelData
+                            text: swatch.modelData.name
                         }
                     }
                 }
@@ -200,23 +202,19 @@ SettingsPage {
     SettingsSection {
         title: "Behaviour"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "apps"
-            title: "Open apps that aren't pinned"
+            title: "Running apps that aren't pinned"
             description: "Shown after a divider, in the order you opened them."
-            Switch {
-                checked: root.dk.showRunning
-                onToggled: root.dk.showRunning = !checked
-            }
+            target: root.dk
+            key: "showRunning"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "stack"
             title: "Apps on special workspaces"
             description: "Scratchpads and the drop-down terminal. Clicking one opens its workspace."
-            Switch {
-                checked: root.dk.showSpecial
-                onToggled: root.dk.showSpecial = !checked
-            }
+            target: root.dk
+            key: "showSpecial"
         }
         SettingsRow {
             icon: "preview"
@@ -228,23 +226,19 @@ SettingsPage {
                 onPicked: v => root.dk.previewDelay = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "motion_play"
             title: "Pulse while opening"
             description: "Until the app's first window shows up."
-            Switch {
-                checked: root.dk.launchPulse
-                onToggled: root.dk.launchPulse = !checked
-            }
+            target: root.dk
+            key: "launchPulse"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "grid_view"
             title: "Launcher button"
             description: "At the start of the dock. Opens the app launcher."
-            Switch {
-                checked: root.dk.launcherButton
-                onToggled: root.dk.launcherButton = !checked
-            }
+            target: root.dk
+            key: "launcherButton"
         }
     }
 
@@ -294,7 +288,7 @@ SettingsPage {
             visible: Dock.pinned.length === 0
             Layout.fillWidth: true
             Layout.margins: Theme.pad(18, 16)
-            text: "Nothing pinned. Add an app below, or right-click an open app in the dock."
+            text: "Nothing pinned. Add an app below, or right-click a running app in the dock."
             color: Theme.subtext
         }
 

@@ -3,10 +3,8 @@ import QtQuick
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property var glyphs: ({
         "0": ["111", "101", "101", "101", "111"],
@@ -28,7 +26,7 @@ Item {
         enabled: root.live
     }
 
-    readonly property string hh: String(Settings.bar.clock24 ? clock.date.getHours() : clock.date.getHours() % 12 || 12).padStart(2, "0")
+    readonly property string hh: String(TimeDate.use24h ? clock.date.getHours() : clock.date.getHours() % 12 || 12).padStart(2, "0")
     readonly property string mm: Qt.formatTime(clock.date, "mm")
     readonly property string ss: Qt.formatTime(clock.date, "ss")
     readonly property bool tall: height > width * 0.75
@@ -93,7 +91,7 @@ Item {
     Label {
         visible: root.showDate
         anchors { horizontalCenter: parent.horizontalCenter; top: matrix.bottom; topMargin: 12 }
-        text: Qt.formatDate(clock.date, "dddd d MMMM") + (Settings.bar.clock24 ? "" : "  ·  " + Qt.formatTime(clock.date, "AP"))
+        text: Qt.formatDate(clock.date, "dddd d MMMM") + (TimeDate.use24h ? "" : "  ·  " + Qt.formatTime(clock.date, "AP"))
         color: Theme.subtext
         font.weight: Font.DemiBold
         font.letterSpacing: 0.5

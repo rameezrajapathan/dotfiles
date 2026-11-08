@@ -4,12 +4,10 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
-    readonly property var items: Desktop.todos ?? []
+    readonly property var items: Todos.items ?? []
     readonly property int remaining: items.filter(t => !t.done).length
 
     ColumnLayout {
@@ -36,7 +34,7 @@ Item {
                 font.pixelSize: Theme.fontSize - 2
             }
             Label {
-                visible: root.size !== "small" && root.items.some(t => t.done)
+                visible: root.sizeClass !== "small" && root.items.some(t => t.done)
                 text: "Clear done"
                 color: clearMouse.containsMouse ? Theme.text : Theme.overlay
                 font.pixelSize: Theme.fontSize - 2
@@ -45,7 +43,7 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Desktop.clearDone()
+                    onClicked: Todos.clearDone()
                 }
             }
         }
@@ -88,7 +86,7 @@ Item {
                         anchors.fill: parent
                         anchors.margins: -6
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Desktop.toggleTodo(row.index)
+                        onClicked: Todos.toggle(row.index)
                     }
                 }
                 Label {
@@ -112,7 +110,7 @@ Item {
                         anchors.fill: parent
                         anchors.margins: -4
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Desktop.removeTodo(row.index)
+                        onClicked: Todos.remove(row.index)
                     }
                 }
             }
@@ -153,7 +151,7 @@ Item {
                 clip: true
                 selectByMouse: true
                 onAccepted: {
-                    Desktop.addTodo(text);
+                    Todos.add(text);
                     text = "";
                 }
                 Keys.onEscapePressed: focus = false

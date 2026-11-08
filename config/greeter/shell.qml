@@ -10,32 +10,17 @@ ShellRoot {
     property var users: []
     property bool leaving: false
 
-    FileView {
-        id: themeFile
-        path: root.dir + "/theme.json"
-        printErrors: false
+    property string hostName: ""
 
-        JsonAdapter {
-            id: themeData
-            property string base: "#1e1e2e"
-            property string surface: "#313244"
-            property string overlay: "#6c7086"
-            property string text: "#cdd6f4"
-            property string subtext: "#a6adc8"
-            property string accent: "#89b4fa"
-            property string accentText: "#1e1e2e"
-            property string red: "#f38ba8"
-            property string yellow: "#f9e2af"
-            property string font: "Fira Sans"
-            property string displayFont: "Fira Sans"
-            property string iconStyle: "Rounded"
-            property bool clock24: false
-            property real blur: 0.85
-            property real roundness: 1
-            property string wallpaper: ""
-            property string user: ""
-            property string session: "hyprland.desktop"
-        }
+    GreeterTheme {
+        id: greeterTheme
+        dir: root.dir
+    }
+
+    FileView {
+        path: "/etc/hostname"
+        printErrors: false
+        onLoaded: root.hostName = text().trim()
     }
 
     FileView {
@@ -67,7 +52,8 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
         Greeter {
-            theme: themeData
+            theme: greeterTheme
+            hostName: root.hostName
             dir: root.dir
             users: root.users
             sessions: root.sessions

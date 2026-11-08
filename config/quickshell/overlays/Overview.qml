@@ -8,12 +8,12 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
 
-    Exclusive { panel: root }
+    layerNamespace: "quickshell-overview"
+    hideWhenFaded: false
 
-    property bool open: false
     property int current: 0
     readonly property var monitor: Hyprland.focusedMonitor?.lastIpcObject ?? null
     readonly property real monitorWidth: monitor ? monitor.width / monitor.scale : 1920
@@ -99,27 +99,6 @@ PanelWindow {
         function cancel(): void {
             root.close();
         }
-    }
-
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-overview"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: false
-
-    Rectangle {
-        anchors.fill: parent
-        color: "black"
-        opacity: root.open ? 0.3 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.ms(180) } }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: root.close()
     }
 
     Item {

@@ -33,132 +33,119 @@ SettingsPage {
             Repeater {
                 model: root.styles
 
-                Rectangle {
+                SettingsStyleCard {
                     id: styleCard
                     required property var modelData
-                    readonly property bool selected: root.style === modelData.id
+                    selected: root.style === modelData.id
                     width: 168
                     height: 150
-                    radius: Theme.round(14, width, height)
-                    color: selected ? Qt.alpha(Theme.accent, 0.16) : styleMouse.containsMouse ? Qt.alpha(Theme.overlay, 0.25) : Qt.alpha(Theme.base, 0.6)
-                    border.width: selected ? 2 : 0
-                    border.color: Theme.gradientAccent ? "transparent" : Theme.accent
-                    GlassRim {}
+                    inset: 10
+                    tip: modelData.description
+                    onClicked: root.l.style = styleCard.modelData.id
 
-                    Rectangle {
-                        id: screenBox
-                        x: 10
-                        y: 10
-                        width: parent.width - 20
-                        height: 88
-                        radius: Theme.round(8, width, height)
-                        color: Qt.alpha(Theme.overlay, 0.28)
-                        clip: true
-
+                    Item {
+                        Layout.fillWidth: true
+                        implicitHeight: 130
                         Rectangle {
-                            visible: styleCard.modelData.id === "fullscreen"
-                            anchors.fill: parent
-                            color: Qt.alpha(Theme.base, 0.7)
-                        }
+                            id: screenBox
+                            width: parent.width
+                            height: 88
+                            radius: Theme.round(8, width, height)
+                            color: Qt.alpha(Theme.overlay, 0.28)
+                            clip: true
 
-                        Rectangle {
-                            x: parent.width * 0.3
-                            y: 3
-                            width: parent.width * 0.4
-                            height: 7
-                            radius: 3.5
-                            color: Theme.text
-                            opacity: 0.55
-                        }
+                            Rectangle {
+                                visible: styleCard.modelData.id === "fullscreen"
+                                anchors.fill: parent
+                                color: Qt.alpha(Theme.base, 0.7)
+                            }
 
-                        Rectangle {
-                            visible: Dock.enabled || styleCard.modelData.id === "dock"
-                            x: parent.width * 0.36
-                            y: parent.height - 12
-                            width: parent.width * 0.28
-                            height: 8
-                            radius: 4
-                            color: Theme.text
-                            opacity: 0.55
-                        }
+                            Rectangle {
+                                x: parent.width * 0.3
+                                y: 3
+                                width: parent.width * 0.4
+                                height: 7
+                                radius: 3.5
+                                color: Theme.text
+                                opacity: 0.55
+                            }
 
-                        Rectangle {
-                            readonly property var r: styleCard.modelData.r
-                            readonly property bool full: styleCard.modelData.id === "fullscreen"
-                            x: full ? parent.width * 0.12 : parent.width * r[0]
-                            y: full ? parent.height * 0.18 : parent.height * r[1]
-                            width: full ? parent.width * 0.76 : parent.width * r[2]
-                            height: full ? parent.height * 0.62 : parent.height * r[3]
-                            radius: full ? 0 : Theme.round(5, width, height)
-                            color: full ? "transparent" : Theme.accent
-                            opacity: full ? 1 : 0.85
+                            Rectangle {
+                                visible: Dock.enabled || styleCard.modelData.id === "dock"
+                                x: parent.width * 0.36
+                                y: parent.height - 12
+                                width: parent.width * 0.28
+                                height: 8
+                                radius: 4
+                                color: Theme.text
+                                opacity: 0.55
+                            }
 
-                            Grid {
-                                visible: parent.full
-                                anchors.centerIn: parent
-                                columns: 6
-                                spacing: 7
+                            Rectangle {
+                                readonly property var r: styleCard.modelData.r
+                                readonly property bool full: styleCard.modelData.id === "fullscreen"
+                                x: full ? parent.width * 0.12 : parent.width * r[0]
+                                y: full ? parent.height * 0.18 : parent.height * r[1]
+                                width: full ? parent.width * 0.76 : parent.width * r[2]
+                                height: full ? parent.height * 0.62 : parent.height * r[3]
+                                radius: full ? 0 : Theme.round(5, width, height)
+                                color: full ? "transparent" : Theme.accent
+                                opacity: full ? 1 : 0.85
+
+                                Grid {
+                                    visible: parent.full
+                                    anchors.centerIn: parent
+                                    columns: 6
+                                    spacing: 7
+                                    Repeater {
+                                        model: 18
+                                        Rectangle {
+                                            width: 9
+                                            height: 9
+                                            radius: 3
+                                            color: Theme.accent
+                                        }
+                                    }
+                                }
+                            }
+
+                            Column {
+                                visible: styleCard.modelData.id === "spotlight"
+                                x: parent.width * 0.24
+                                y: parent.height * 0.34
+                                spacing: 3
                                 Repeater {
-                                    model: 18
+                                    model: 3
                                     Rectangle {
-                                        width: 9
-                                        height: 9
-                                        radius: 3
-                                        color: Theme.accent
+                                        width: screenBox.width * 0.52 * (1 - index * 0.15)
+                                        height: 4
+                                        radius: 2
+                                        color: Theme.text
+                                        opacity: 0.35
                                     }
                                 }
                             }
                         }
-
                         Column {
-                            visible: styleCard.modelData.id === "spotlight"
-                            x: parent.width * 0.24
-                            y: parent.height * 0.34
-                            spacing: 3
-                            Repeater {
-                                model: 3
-                                Rectangle {
-                                    width: screenBox.width * 0.52 * (1 - index * 0.15)
-                                    height: 4
-                                    radius: 2
-                                    color: Theme.text
-                                    opacity: 0.35
-                                }
+                            x: 2
+                            y: screenBox.height + 8
+                            width: parent.width - 4
+                            spacing: 1
+
+                            Label {
+                                width: parent.width
+                                text: styleCard.modelData.label
+                                font.weight: Font.DemiBold
+                                elide: Text.ElideRight
+                            }
+                            Label {
+                                width: parent.width
+                                text: styleCard.modelData.description
+                                color: Theme.subtext
+                                font.pixelSize: Theme.fontSize - 3
+                                elide: Text.ElideRight
                             }
                         }
-                    }
-
-                    Column {
-                        x: 12
-                        y: screenBox.y + screenBox.height + 8
-                        width: parent.width - 24
-                        spacing: 1
-
-                        Label {
-                            width: parent.width
-                            text: styleCard.modelData.label
-                            font.weight: Font.DemiBold
-                            elide: Text.ElideRight
-                        }
-                        Label {
-                            width: parent.width
-                            text: styleCard.modelData.description
-                            color: Theme.subtext
-                            font.pixelSize: Theme.fontSize - 3
-                            elide: Text.ElideRight
-                        }
-                    }
-
-                    MouseArea {
-                        id: styleMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.l.style = styleCard.modelData.id
-                    }
-
-                    Tooltip {
-                        text: styleCard.modelData.description
                     }
                 }
             }
@@ -200,14 +187,12 @@ SettingsPage {
                 onMoved: v => root.l.cellSize = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "trending_up"
             title: "Most used first"
             description: "Otherwise apps are in alphabetical order."
-            Switch {
-                checked: root.l.mostUsedFirst
-                onToggled: root.l.mostUsedFirst = !checked
-            }
+            target: root.l
+            key: "mostUsedFirst"
         }
         SettingsRow {
             icon: "history"
@@ -234,15 +219,13 @@ SettingsPage {
                 { key: "projects", prefix: "~", icon: "folder_code", title: "Projects", description: "Git folders you've visited (zoxide), opened in the editor." },
                 { key: "clipboard", prefix: "+", icon: "content_paste", title: "Clipboard history", description: "Text and images you copied." }
             ]
-            SettingsRow {
+            SettingsSwitchRow {
                 required property var modelData
                 icon: modelData.icon
                 title: modelData.prefix + "  " + modelData.title
                 description: modelData.description
-                Switch {
-                    checked: root.l[modelData.key]
-                    onToggled: root.l[modelData.key] = !checked
-                }
+                target: root.l
+                key: modelData.key
             }
         }
     }
@@ -277,20 +260,16 @@ SettingsPage {
                 }
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "content_paste_go"
             title: "Keep copied text when the app closes"
             description: root.hasPersist ? "Otherwise what you copied is gone once its window closes."
                 : "Needs wl-clip-persist (on Arch: sudo pacman -S wl-clip-persist)."
             enabled: root.hasPersist
             opacity: enabled ? 1 : 0.5
-            Switch {
-                checked: root.l.clipboardPersist
-                onToggled: {
-                    root.l.clipboardPersist = !checked;
-                    watchTimer.restart();
-                }
-            }
+            target: root.l
+            key: "clipboardPersist"
+            onSwitched: watchTimer.restart()
         }
         SettingsRow {
             icon: "delete_sweep"

@@ -77,26 +77,20 @@ SettingsPage {
             }
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "lock_clock"
             title: "Lock before sleeping"
             description: "Also when the lid closes or the laptop suspends from the power menu."
-            Switch {
-                checked: Settings.idle.lockBeforeSleep
-                onToggled: {
-                    Settings.idle.lockBeforeSleep = !checked;
-                    restartTimer.restart();
-                }
-            }
+            target: Settings.idle
+            key: "lockBeforeSleep"
+            onSwitched: restartTimer.restart()
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "coffee"
             title: "Keep awake"
             description: "Pause all of the above for now (also in the control center)."
-            Switch {
-                checked: Toggles.keepAwake
-                onToggled: Toggles.keepAwake = !checked
-            }
+            target: Toggles
+            key: "keepAwake"
         }
     }
 }

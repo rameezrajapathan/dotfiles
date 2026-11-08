@@ -19,23 +19,19 @@ SettingsPage {
         title: "Do Not Disturb"
         subtitle: NotificationService.scheduledQuiet ? "Quiet hours are on right now." : ""
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "do_not_disturb_on"
             title: "Do Not Disturb"
             description: "Notifications still go to the list; only critical ones pop up."
-            Switch {
-                checked: NotificationService.dnd
-                onToggled: NotificationService.dnd = !checked
-            }
+            target: NotificationService
+            key: "dnd"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "schedule"
             title: "Quiet hours"
             description: "Every day between two times."
-            Switch {
-                checked: root.n.schedule
-                onToggled: root.n.schedule = !checked
-            }
+            target: root.n
+            key: "schedule"
         }
         SettingsRow {
             visible: root.n.schedule
@@ -96,14 +92,12 @@ SettingsPage {
                 onMoved: v => root.n.timeout = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "apps"
             title: "Let apps choose how long"
             description: "Use an app's own timeout when it sets one."
-            Switch {
-                checked: root.n.appTimeout
-                onToggled: root.n.appTimeout = !checked
-            }
+            target: root.n
+            key: "appTimeout"
         }
         SettingsRow {
             icon: "stacks"

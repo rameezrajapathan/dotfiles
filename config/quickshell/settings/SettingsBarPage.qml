@@ -51,72 +51,28 @@ SettingsPage {
                         description: Settings.bar.custom || BarStyles.current === "custom" ? "Your own setup" : "Change anything below"
                     }])
 
-                    Rectangle {
+                    SettingsStyleCard {
                         id: card
                         required property var modelData
-                        readonly property bool selected: BarStyles.current === modelData.id
                         readonly property var config: modelData.id !== "custom" ? modelData
                             : selected ? BarStyles.snapshot()
                             : Settings.bar.custom ?? BarStyles.snapshot()
+                        selected: BarStyles.current === modelData.id
+                        icon: modelData.icon
+                        label: modelData.label
+                        onClicked: BarStyles.apply(card.modelData.id)
 
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        implicitHeight: cardColumn.implicitHeight + 16
-                        radius: Theme.round(14, width, height)
-                        color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
-                        border.width: selected ? 2 : 1
-                        border.color: Theme.gradientAccent && (selected) ? "transparent" : selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
-                        GradientBorder {
-                            active: selected
-                        }
-                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
-
-                        ColumnLayout {
-                            id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
-                            spacing: 8
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                implicitHeight: 58
-                                radius: Theme.round(9, width, height)
-                                color: "transparent"
-                                clip: true
-                                BarPreview {
-                                    anchors.fill: parent
-                                    config: card.config
-                                }
-                            }
-                            RowLayout {
-                                Layout.leftMargin: 4
-                                Layout.rightMargin: 4
-                                spacing: 6
-                                Icon {
-                                    name: card.modelData.icon
-                                    size: 17
-                                    filled: card.selected
-                                    color: Theme.accent
-                                }
-                                Label {
-                                    Layout.fillWidth: true
-                                    text: card.modelData.label
-                                    font.weight: Font.DemiBold
-                                    elide: Text.ElideRight
-                                }
-                                CheckBadge {
-                                    visible: card.selected
-                                }
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: 58
+                            radius: Theme.round(9, width, height)
+                            color: "transparent"
+                            clip: true
+                            BarPreview {
+                                anchors.fill: parent
+                                config: card.config
                             }
                         }
-
-                        MouseArea {
-                            id: cardMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: BarStyles.apply(card.modelData.id)
-                        }
-                        GlassRim {}
                     }
                 }
             }
@@ -165,14 +121,12 @@ SettingsPage {
                 onMoved: v => Settings.bar.gap = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "rounded_corner"
             title: "Attached to the edge"
             description: "The bar grows out of the screen's edge, with curved corners where it meets it."
-            Switch {
-                checked: Settings.bar.attached
-                onToggled: Settings.bar.attached = !checked
-            }
+            target: Settings.bar
+            key: "attached"
         }
         SettingsRow {
             visible: Settings.bar.layout !== "pill" && !Settings.bar.attached
@@ -187,15 +141,13 @@ SettingsPage {
                 onMoved: v => Settings.bar.sideGap = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: !Settings.bar.attached
             icon: "border_style"
             title: "Outline"
             description: "A thin line around the bar's shapes."
-            Switch {
-                checked: Settings.bar.border
-                onToggled: Settings.bar.border = !checked
-            }
+            target: Settings.bar
+            key: "border"
         }
     }
 
@@ -233,84 +185,40 @@ SettingsPage {
                 Repeater {
                     model: WorkspaceStyles.styles
 
-                    Rectangle {
+                    SettingsStyleCard {
                         id: wsCard
                         required property var modelData
-                        readonly property bool selected: Settings.workspaces.style === modelData.id
+                        selected: Settings.workspaces.style === modelData.id
+                        icon: modelData.icon
+                        label: modelData.label
+                        onClicked: Settings.workspaces.style = wsCard.modelData.id
 
-                        Layout.fillWidth: true
-                        Layout.preferredWidth: 1
-                        implicitHeight: wsCardColumn.implicitHeight + 16
-                        radius: Theme.round(14, width, height)
-                        color: selected ? Qt.alpha(Theme.accent, 0.16) : wsCardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
-                        border.width: selected ? 2 : 1
-                        border.color: Theme.gradientAccent && (selected) ? "transparent" : selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
-                        GradientBorder {
-                            active: selected
-                        }
-                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
-
-                        ColumnLayout {
-                            id: wsCardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(8, 14, parent.width, parent.height) }
-                            spacing: 8
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: 50
+                            radius: Theme.round(9, width, height)
+                            color: Qt.alpha(Theme.base, 0.5)
+                            clip: true
 
                             Rectangle {
-                                Layout.fillWidth: true
-                                implicitHeight: 50
-                                radius: Theme.round(9, width, height)
-                                color: Qt.alpha(Theme.base, 0.5)
-                                clip: true
+                                anchors.centerIn: parent
+                                width: preview.width + 2 * Theme.pillInset + 4
+                                height: Theme.pillHeight
+                                scale: Math.min(1, (parent.width - 12) / width, (parent.height - 6) / height)
+                                radius: Theme.pillRadius
+                                color: Theme.baseTranslucent
 
-                                Rectangle {
+                                Workspaces {
+                                    id: preview
                                     anchors.centerIn: parent
-                                    width: preview.width + 2 * Theme.pillInset + 4
-                                    height: Theme.pillHeight
-                                    scale: Math.min(1, (parent.width - 12) / width, (parent.height - 6) / height)
-                                    radius: Theme.pillRadius
-                                    color: Theme.baseTranslucent
-
-                                    Workspaces {
-                                        id: preview
-                                        anchors.centerIn: parent
-                                        style: wsCard.modelData.id
-                                        vertical: false
-                                        showSpecial: false
-                                        enabled: false
-                                    }
-                                }
-                                GlassRim {}
-                            }
-                            RowLayout {
-                                Layout.leftMargin: 4
-                                Layout.rightMargin: 4
-                                spacing: 6
-                                Icon {
-                                    name: wsCard.modelData.icon
-                                    size: 17
-                                    filled: wsCard.selected
-                                    color: Theme.accent
-                                }
-                                Label {
-                                    Layout.fillWidth: true
-                                    text: wsCard.modelData.label
-                                    font.weight: Font.DemiBold
-                                    elide: Text.ElideRight
-                                }
-                                CheckBadge {
-                                    visible: wsCard.selected
+                                    style: wsCard.modelData.id
+                                    vertical: false
+                                    showSpecial: false
+                                    enabled: false
                                 }
                             }
+                            GlassRim {}
                         }
-
-                        MouseArea {
-                            id: wsCardMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Settings.workspaces.style = wsCard.modelData.id
-                        }
-                        GlassRim {}
                     }
                 }
             }
@@ -355,35 +263,29 @@ SettingsPage {
                 onMoved: v => Settings.workspaces.count = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Settings.workspaces.style !== "focus"
             icon: "brightness_6"
             title: "Mark workspaces in use"
             description: "Empty ones look dimmer, or as rings."
-            Switch {
-                checked: Settings.workspaces.markOccupied
-                onToggled: Settings.workspaces.markOccupied = !checked
-            }
+            target: Settings.workspaces
+            key: "markOccupied"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: root.wsInfo.glide === true
             icon: "animation"
             title: "Gliding highlight"
             description: "The current workspace's highlight slides over when you switch."
-            Switch {
-                checked: Settings.workspaces.glide
-                onToggled: Settings.workspaces.glide = !checked
-            }
+            target: Settings.workspaces
+            key: "glide"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             visible: Settings.workspaces.style === "pills"
             icon: "pin"
             title: "Number in the pill"
             description: "Writes the current workspace's number inside its pill."
-            Switch {
-                checked: Settings.workspaces.pillLabel
-                onToggled: Settings.workspaces.pillLabel = !checked
-            }
+            target: Settings.workspaces
+            key: "pillLabel"
         }
         SettingsRow {
             visible: Settings.workspaces.style !== "focus"
@@ -405,28 +307,20 @@ SettingsPage {
 
         SettingsRow {
             icon: "schedule"
-            title: "24-hour time"
-            Switch {
-                checked: Settings.bar.clock24
-                onToggled: Settings.bar.clock24 = !checked
+            title: "Time format"
+            description: "24-hour time and seconds are set in Date & time."
+            Pill {
+                text: "Change"
+                implicitHeight: 30
+                onClicked: Settings.openRequested("datetime")
             }
         }
-        SettingsRow {
-            icon: "timer"
-            title: "Show seconds"
-            Switch {
-                checked: Settings.bar.seconds
-                onToggled: Settings.bar.seconds = !checked
-            }
-        }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "graphic_eq"
             title: "Music spectrum"
             description: "Replaces the clock with moving bars while music plays."
-            Switch {
-                checked: Settings.bar.musicBars
-                onToggled: Settings.bar.musicBars = !checked
-            }
+            target: Settings.bar
+            key: "musicBars"
         }
     }
 }

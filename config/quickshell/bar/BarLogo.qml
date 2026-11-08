@@ -1,11 +1,11 @@
 import Quickshell
-import Quickshell.Io
 import QtQuick
+import qs.services
 
 Image {
     id: root
 
-    property var release: ({})
+    readonly property var release: SysStats.osRelease
     property int attempt: 0
 
     readonly property var candidates: {
@@ -29,17 +29,4 @@ Image {
     sourceSize.height: 20
     onCandidatesChanged: attempt = 0
     onStatusChanged: if (status === Image.Error && attempt < candidates.length - 1) attempt++
-
-    FileView {
-        path: "/etc/os-release"
-        onLoaded: {
-            const fields = {};
-            for (const line of text().split("\n")) {
-                const m = line.match(/^(\w+)=["']?(.*?)["']?$/);
-                if (m)
-                    fields[m[1]] = m[2];
-            }
-            root.release = fields;
-        }
-    }
 }

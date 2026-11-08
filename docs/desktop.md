@@ -33,9 +33,14 @@ with curved corners). The workspaces item has eight styles, from a single rollin
 pills or app icons ([settings.md](settings.md#workspaces)).
 
 While a special workspace is open over a workspace (the scratchpads on Super + F1 / F2, the
-drop-down terminal, hidden background apps), the workspaces item shows its name in a chip in the
-special color (click to hide it), and a short toast names it as it opens with the key that hides
-it (`bar/SpecialChip.qml`, `overlays/SpecialToast.qml`). Its windows get a border in that color.
+drop-down terminal, the `minimized` workspace that holds minimized windows), the workspaces item
+shows its name in a chip in the special color (click to hide it), and a short toast names it as it
+opens with the key that hides it (`bar/SpecialChip.qml`, `overlays/SpecialToast.qml`; the names
+and keys are in `services/Special.qml`). The `minimized` one shows as **Minimized** and has no key:
+its chip hides it again. Its windows get a border in that color.
+
+From a script: `qs ipc call bar position top|bottom|left|right` moves the bar, `bar cycle` moves
+it to the next edge, `bar workspaces <style>` (or `next`) changes the workspaces item.
 
 The ten ready-made styles (shown with music paused; while something plays, the clock turns into a
 live spectrum and Now playing shows the track):
@@ -58,7 +63,7 @@ live spectrum and Now playing shows the track):
 A strip of app icons on its own screen edge (bottom by default; left or right, never the bar's
 edge). Pinned apps come first in your order, then a divider and the apps you have open that
 aren't pinned, in the order you opened them. One icon per app, however many windows it has;
-apps on special workspaces (scratchpads, the drop-down terminal, background apps) count too and
+apps on special workspaces (scratchpads, the drop-down terminal, minimized windows) count too and
 get a badge when every window is there.
 
 - **Click** an app that isn't open to start it (the icon pulses until its window shows up). Click
@@ -139,7 +144,8 @@ The first time you log in to a fresh install, a welcome walks through the wallpa
 colors with it), the bar style, the dock (on or off, edge, hiding), starter widgets, your picture
 and six keys worth knowing. Every step can be skipped, and Esc skips the rest. It shows once
 (`~/.local/state/pikadots/setup-done`); an install that already has a `settings.json` counts as
-set up. `pikadots setup` goes through it again.
+set up. `pikadots setup` (or `qs ipc call setup open`) goes through it again; `qs ipc call setup
+next` moves to the next step while it's open.
 
 ## Calendar
 
@@ -181,7 +187,10 @@ the buttons next to the sliders. A back arrow, Esc, Backspace or Alt + Left retu
 widgets; Esc again or a click outside closes. Super + S opens it; `qs ipc call controlcenter
 toggle <page>` opens a details page directly: `account`, `music`, `notifications`, `network`,
 `bluetooth`, `audio`, `display`, `drives`, `battery`, `system`, `capture` or `github` (`""` for
-the widgets).
+the widgets). `qs ipc call quicksettings toggle` opens it on the widgets, `quicksettings pickColor`
+picks a color from the screen and copies its hex (Super + Shift + C), and `quicksettings dnd`,
+`keepAwake`, `nightLight` and `gameMode` flip those tiles. `qs ipc call account refresh` reloads
+the profile picture after changing `~/.face` from outside the shell.
 
 The details pages:
 
@@ -200,8 +209,7 @@ The details pages:
 | Capture | Screenshot or record a region, window or screen; annotate a region (satty) or copy the text in it (tesseract). Screenshot notifications have an Edit button that opens satty |
 | GitHub | Notifications; only after `gh auth login` |
 
-The Tray widget has the tray and hidden background apps (click opens the app, right click shows
-its menu). The wallpaper picker is Super + Shift + W (or the Shortcuts widget) and the launcher
+The Tray widget has the tray (click opens the app, right click shows its menu). The wallpaper picker is Super + Shift + W (or the Shortcuts widget) and the launcher
 Super + A.
 
 ## Motion
@@ -210,7 +218,8 @@ Panels that come out of the bar (control center, calendar, weather, launcher, wa
 power menu, overview, Alt + Tab) share one animation, picked on Settings › Effects: **Slide**
 (out from under the item, the default), **Morph** (the bar's pill stretches into the panel),
 **Spring** (Morph with a soft overshoot), **Liquid** (widens, then pours out), **Reveal**
-(uncovered from the bar's side) or **Fade**, at 50–200% speed. Closing is a quick ease-out in every style. `PanelMotion.qml`
+(uncovered from the bar's side) or **Fade**, at 50–200% speed (the Settings slider; a hand-edited
+`appearance.panelSpeed` in `settings.json` goes down to 0.25). Closing is a quick ease-out in every style. `PanelMotion.qml`
 holds the curves and shapes; `Sheet.qml` applies them.
 
 Selection highlights (launcher, Alt + Tab,
@@ -260,7 +269,9 @@ loads after its own rules. Edit `monitors.lua` only to change those defaults.
 ![Launcher](screenshots/launcher-v4.webp)
 
 Apps, most used first. Five styles, set in Settings > Launcher (or `qs ipc call launcher style
-bar|dock|center|fullscreen|spotlight`):
+bar|dock|center|fullscreen|spotlight`). `qs ipc call launcher toggleStyle <style>` opens it once in
+another style without changing the setting, `launcher open <text>` opens it with a search typed in,
+and `launcher forget` clears the most-used order:
 
 - **Attached to bar** (default): grows out of the bar.
 - **Attached to dock**: the dock comes in first, then the launcher grows out of it. It opens
@@ -302,14 +313,18 @@ text. Settings > Accessibility turns tooltips off or changes the delay.
 - **Password prompts** for system changes (pkexec, the Date & time page, updates) are the shell's own
   polkit agent (`quickshell/overlays/PolkitDialog.qml`): Enter authenticates, Esc cancels. If another agent
   already holds the session, it retries a few times, then starts hyprpolkitagent instead.
-- **Alt + Tab**: live window previews; release Alt to switch.
+- **Alt + Tab**: live window previews; release Alt to switch. The keybindings drive it with
+  `qs ipc call switcher next|prev|commit|cancel`.
 - **Overview** (Super + Tab): every workspace in a row with live previews. Like Alt + Tab: hold
   Super, Tab / Shift + Tab or Left / Right moves, releasing Super or Enter switches, 1–9 jumps
   straight to that workspace, Esc cancels. Clicking the current workspace in the bar opens it too.
+  The keybindings drive it with `qs ipc call overview next|prev|commit|cancel`; `overview toggle`
+  opens it without holding a key.
 - **Drop-down terminal** (Super + \`): stays running while hidden.
 - **Wallpaper picker** (Super + Shift + W): a strip of `~/Pictures/Wallpapers`; picking one
   recolors everything ([theming.md](theming.md)).
-- **Cheatsheet** (Super + ?): every shortcut, read live from Hyprland.
+- **Cheatsheet** (Super + ?): every shortcut, read live from Hyprland. `qs ipc call keybinds
+  clear` drops every shortcut changed in Settings > Keybindings (`pikadots keybinds reset` uses it).
 - **On-screen indicator** for volume, microphone mute, screen brightness and keyboard backlight
   when those keys are used.
 

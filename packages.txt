@@ -25,6 +25,7 @@ fuzzel
 fastfetch
 starship
 cava
+cmatrix
 btop
 grim
 slurp
@@ -32,6 +33,7 @@ wl-clipboard
 cliphist
 wl-clip-persist
 wf-recorder
+playerctl
 satty
 tesseract
 tesseract-data-eng

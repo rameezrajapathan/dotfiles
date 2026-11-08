@@ -16,7 +16,7 @@ PanelWindow {
     readonly property bool fullscreen: monitor?.activeWorkspace?.hasFullscreen ?? false
     readonly property int iconSize: Dock.iconSize
     readonly property int depth: Dock.depth
-    readonly property int maxDepth: Math.ceil(iconSize * Dock.magnifyScale) + 2 * Dock.pad
+    readonly property int maxDepth: Math.ceil(iconSize * Dock.magnifyScale) + 2 * Dock.padding
     readonly property int room: Math.max(vertical ? 300 : 230, menu.open ? menu.needed + 24 : 0)
     readonly property real length: vertical ? height : width
     readonly property Item canvas: stage
@@ -29,7 +29,7 @@ PanelWindow {
     readonly property point pointer: canvasHover.point.position
     property bool hovered: false
     readonly property real growth: (Dock.magnifyScale - 1) * iconSize * 1.5
-    readonly property rect hoverZone: rect(rest.start - growth, rest.len + 2 * growth, 0, Dock.gap + maxDepth)
+    readonly property rect hoverZone: rect(rest.start - growth, rest.len + 2 * growth, 0, Dock.edgeMargin + maxDepth)
     function updateHover() {
         hovered = canvasHover.hovered && !stripActive && contains(hoverZone, pointer);
     }
@@ -46,13 +46,13 @@ PanelWindow {
         const special = Special.on(monitor.name);
         const sw = screen.width;
         const sh = screen.height;
-        const reach = Dock.gap + depth;
+        const reach = Dock.edgeMargin + depth;
         const r = edge === "bottom" ? Qt.rect((sw - rest.len) / 2, sh - reach, rest.len, reach)
             : edge === "left" ? Qt.rect(0, (sh - rest.len) / 2, reach, rest.len)
             : Qt.rect(sw - reach, (sh - rest.len) / 2, reach, rest.len);
         return Hyprland.toplevels.values.some(t => {
             const ws = t.workspace;
-            if (!ws || !(ws === monitor.activeWorkspace || (special && ws.name === "special:" + special)))
+            if (!ws || !(ws === monitor.activeWorkspace || (special && ws.name === Windows.specialWorkspace(special))))
                 return false;
             const o = t.lastIpcObject;
             if (!o?.at || !o?.size)
@@ -68,7 +68,7 @@ PanelWindow {
 
     property real progress: shown ? 1 : 0
     Behavior on progress { NumberAnimation { duration: Theme.ms(260); easing.type: Easing.OutCubic } }
-    readonly property real slide: (1 - progress) * (Dock.gap + maxDepth + 16)
+    readonly property real slide: (1 - progress) * (Dock.edgeMargin + maxDepth + 16)
     readonly property bool moving: progress > 0 && progress < 1 || magAmount > 0 && magAmount < 1 || dragKey !== ""
 
     visible: Dock.enabled && Dock.onScreen(modelData?.name ?? "")
@@ -78,10 +78,10 @@ PanelWindow {
         left: edge !== "right"
         right: edge !== "left"
     }
-    implicitHeight: vertical ? 0 : Dock.gap + maxDepth + room
-    implicitWidth: vertical ? Dock.gap + maxDepth + room : 0
+    implicitHeight: vertical ? 0 : Dock.edgeMargin + maxDepth + room
+    implicitWidth: vertical ? Dock.edgeMargin + maxDepth + room : 0
     exclusionMode: Dock.mode === "always" ? ExclusionMode.Normal : ExclusionMode.Ignore
-    exclusiveZone: Dock.mode === "always" && shown ? Dock.gap + depth : 0
+    exclusiveZone: Dock.mode === "always" && shown ? Dock.edgeMargin + depth : 0
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "quickshell-dock"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -125,10 +125,10 @@ PanelWindow {
             centers[it.key] = a + s / 2;
             a += s + Dock.spacing;
         }
-        const len = items.length ? 2 * Dock.pad + a - Dock.spacing : 0;
+        const len = items.length ? 2 * Dock.padding + a - Dock.spacing : 0;
         const start = (length - len) / 2;
         for (const k in centers)
-            centers[k] += start + Dock.pad;
+            centers[k] += start + Dock.padding;
         return { centers: centers, len: len, start: start };
     }
 
@@ -139,7 +139,7 @@ PanelWindow {
     property string dragKey: ""
     property real dragAlong: 0
     property real dragOut: 0
-    readonly property bool dragRemoving: dragKey !== "" && Dock.isPinned(dragKey) && dragOut > Dock.gap + maxDepth + 40
+    readonly property bool dragRemoving: dragKey !== "" && Dock.isPinned(dragKey) && dragOut > Dock.edgeMargin + maxDepth + 40
     readonly property var visiblePins: Dock.pinned.filter(k => k !== dragKey && rest.centers[k] !== undefined)
     readonly property int dropIndex: dragKey === "" ? -1 : visiblePins.filter(k => rest.centers[k] < dragAlong).length
     readonly property bool dropInPins: {
@@ -180,15 +180,15 @@ PanelWindow {
             pos[it.key] = { along: a, size: s, scale: sc };
             a += s + Dock.spacing;
         }
-        const len = order.length ? 2 * Dock.pad + a - Dock.spacing : 0;
+        const len = order.length ? 2 * Dock.padding + a - Dock.spacing : 0;
         const start = (length - len) / 2;
         for (const k in pos)
-            pos[k].along += start + Dock.pad;
+            pos[k].along += start + Dock.padding;
         return { pos: pos, len: len, start: start };
     }
 
     readonly property rect zoneRect: shown
-        ? rect(layout.start, layout.len, 0, Dock.gap + (hovered ? maxDepth : depth))
+        ? rect(layout.start, layout.len, 0, Dock.edgeMargin + (hovered ? maxDepth : depth))
         : stripActive ? rect(rest.start, rest.len, 0, 2) : Qt.rect(0, 0, 0, 0)
 
     property string hoverKey: ""
@@ -216,7 +216,7 @@ PanelWindow {
 
     Timer {
         id: previewTimer
-        interval: Math.max(0, Dock.cfg.previewDelay)
+        interval: Dock.previewDelay
         onTriggered: if (root.hoverKey && root.dragKey === "" && !menu.open) root.previewKey = root.hoverKey
     }
 
@@ -260,7 +260,7 @@ PanelWindow {
         if (dragRemoving) {
             removingKey = key;
             removeTimer.restart();
-        } else if (dragOut < Dock.gap + maxDepth + 24 && dropInPins && Dock.canPin(key)) {
+        } else if (dragOut < Dock.edgeMargin + maxDepth + 24 && dropInPins && Dock.canPin(key)) {
             const without = Dock.pinned.filter(k => k !== key);
             const before = visiblePins[dropIndex];
             Dock.pin(key, before === undefined ? without.length : without.indexOf(before));
@@ -335,9 +335,9 @@ PanelWindow {
         const sh = screen?.height ?? 0;
         const shift = Dock.mode === "always" && Theme.barPosition === (vertical ? "top" : "left") ? Theme.barHeight : 0;
         const start = shift + rest.start;
-        const r = edge === "bottom" ? { x: start, y: sh - Dock.gap - depth, width: rest.len, height: depth }
-            : edge === "left" ? { x: Dock.gap, y: start, width: depth, height: rest.len }
-            : { x: sw - Dock.gap - depth, y: start, width: depth, height: rest.len };
+        const r = edge === "bottom" ? { x: start, y: sh - Dock.edgeMargin - depth, width: rest.len, height: depth }
+            : edge === "left" ? { x: Dock.edgeMargin, y: start, width: depth, height: rest.len }
+            : { x: sw - Dock.edgeMargin - depth, y: start, width: depth, height: rest.len };
         return Object.assign(r, { edge: edge, shown: shown && progress === 1, available: visible && hasItems && !fullscreen });
     }
     onPlaceChanged: Qt.callLater(() => Dock.setPlace(modelData?.name ?? "", place))
@@ -388,7 +388,7 @@ PanelWindow {
 
         Rectangle {
             id: body
-            readonly property rect r: root.rect(root.layout.start, root.layout.len, Dock.gap - root.slide, root.depth)
+            readonly property rect r: root.rect(root.layout.start, root.layout.len, Dock.edgeMargin - root.slide, root.depth)
             x: r.x
             y: r.y
             width: r.width

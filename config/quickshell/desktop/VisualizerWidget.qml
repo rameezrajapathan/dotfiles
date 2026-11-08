@@ -3,10 +3,8 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property bool playing: Cava.active && Cava.levels.length > 0
     readonly property bool reflect: height > 150

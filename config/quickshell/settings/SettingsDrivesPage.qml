@@ -20,26 +20,22 @@ SettingsPage {
             Settings.drives.openFiles = false;
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "usb"
             title: "Open it right away"
             description: "Mounts it and shows a notification with Open and Eject. Off: the notification asks first."
-            Switch {
-                checked: Settings.drives.automount
-                onToggled: Settings.drives.automount = !checked
-            }
+            target: Settings.drives
+            key: "automount"
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "folder_open"
             title: "Show it in the file manager"
             description: "Opens a window on the drive as soon as it's mounted."
             enabled: Settings.drives.automount
             opacity: enabled ? 1 : 0.5
-            Switch {
-                checked: Settings.drives.openFiles
-                onToggled: Settings.drives.openFiles = !checked
-            }
+            target: Settings.drives
+            key: "openFiles"
         }
     }
 }

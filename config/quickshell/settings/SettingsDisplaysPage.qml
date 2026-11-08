@@ -20,15 +20,13 @@ SettingsPage {
     SettingsSection {
         title: "Night light"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "nightlight"
             title: "Night light"
             description: Toggles.nightSchedule === "off" ? "Warmer colors that are easier on the eyes at night."
                 : "Switching it here holds until the schedule's next change."
-            Switch {
-                checked: Toggles.nightLight
-                onToggled: Toggles.nightLight = !checked
-            }
+            target: Toggles
+            key: "nightLight"
         }
         SettingsRow {
             icon: "schedule"

@@ -1,7 +1,5 @@
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Wayland
 import Qt.labs.folderlistmodel
 import QtQuick
 import QtQuick.Effects
@@ -9,15 +7,14 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
 
-    Exclusive { panel: root }
+    layerNamespace: "quickshell-wallpaper"
+    backdropOpacity: 0
+    hideWhenFaded: false
 
-    readonly property string folder: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-    readonly property string config: Quickshell.env("HOME") + "/.config/hypr/wallpaper.conf"
     property string current: ""
-    property bool open: false
 
     readonly property var shown: {
         const words = search.text.toLowerCase().split(/\s+/).filter(w => w);
@@ -35,31 +32,21 @@ PanelWindow {
         return file.replace(/\.[^.]+$/, "").replace(/[-_.]+/g, " ").trim();
     }
 
-    function toggle() {
-        if (!open) {
-            search.text = "";
-            reader.running = true;
-            visible = true;
-        }
-        open = !open;
+    onOpening: {
+        search.text = "";
+        current = Wallpaper.path;
+        Qt.callLater(showCurrent);
+    }
+
+    function showCurrent() {
+        const i = shown.findIndex(w => w.path === current);
+        if (i >= 0)
+            list.positionViewAtIndex(list.currentIndex = i, ListView.Center);
     }
 
     function apply(path) {
         current = path;
-        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/theme.sh", path]);
-    }
-
-    Process {
-        id: reader
-        command: ["sed", "-n", "s/^\\s*path\\s*=\\s*//p", root.config]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                root.current = text.trim().replace(/^~/, Quickshell.env("HOME"));
-                const i = root.shown.findIndex(w => w.path === root.current);
-                if (i >= 0)
-                    list.positionViewAtIndex(list.currentIndex = i, ListView.Center);
-            }
-        }
+        Wallpaper.apply(path);
     }
 
     IpcHandler {
@@ -71,23 +58,9 @@ PanelWindow {
 
     FolderListModel {
         id: files
-        folder: "file://" + root.folder
+        folder: "file://" + Wallpaper.folder
         nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
         showDirs: false
-    }
-
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-wallpaper"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: false
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: root.open = false
     }
 
     Sheet {
@@ -180,14 +153,14 @@ PanelWindow {
                     tip: "Open wallpaper folder"
                     onClicked: {
                         root.open = false;
-                        Apps.files(root.folder);
+                        Apps.files(Wallpaper.folder);
                     }
                 }
             }
 
             Label {
                 visible: files.count === 0
-                text: "No images in " + root.folder
+                text: "No images in " + Wallpaper.folder
                 color: Theme.overlay
             }
 

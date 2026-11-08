@@ -12,16 +12,6 @@ CCCard {
     readonly property var list: NotificationService.list
     implicitHeight: column.implicitHeight + 24
 
-    function iconFor(n) {
-        const themed = n.image.startsWith("image://icon/") ? n.image.slice(13) : "";
-        if (n.image && !themed)
-            return n.image;
-        const icon = themed || n.appIcon;
-        if (!icon)
-            return "";
-        return icon.startsWith("/") ? "file://" + icon : Quickshell.hasThemeIcon(icon) ? Quickshell.iconPath(icon) : "";
-    }
-
     ColumnLayout {
         id: column
         anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(12, 22) }
@@ -85,7 +75,7 @@ CCCard {
             Rectangle {
                 id: row
                 required property var modelData
-                readonly property string iconSource: root.iconFor(modelData)
+                readonly property string iconSource: NotificationService.iconFor(modelData)
 
                 Layout.fillWidth: true
                 implicitHeight: rowLayout.implicitHeight + 20

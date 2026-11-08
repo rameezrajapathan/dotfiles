@@ -44,39 +44,16 @@ PanelWindow {
     }
 
     Connections {
-        target: NotificationService
-        function onPanelToggleRequested() {
-            if (Hyprland.focusedMonitor?.name === bar.screen.name)
-                controlCenter.toggle("notifications");
-        }
-    }
-    Connections {
-        target: Toggles
-        function onPanelToggleRequested() {
-            if (Hyprland.focusedMonitor?.name === bar.screen.name)
-                controlCenter.toggle("");
-        }
-        function onControlCenterRequested(tab) {
-            if (Hyprland.focusedMonitor?.name === bar.screen.name)
-                controlCenter.toggle(tab);
-        }
-        function onCalendarRequested() {
-            if (Hyprland.focusedMonitor?.name === bar.screen.name)
+        target: Panels
+        function onToggleRequested(panel, tab) {
+            if (Hyprland.focusedMonitor?.name !== bar.screen.name)
+                return;
+            if (panel === "calendar")
                 calendarPanel.toggle();
-        }
-    }
-    Connections {
-        target: Weather
-        function onPanelToggleRequested() {
-            if (Hyprland.focusedMonitor?.name === bar.screen.name)
+            else if (panel === "weather")
                 weatherPanel.toggle();
-        }
-    }
-    Connections {
-        target: Media
-        function onPanelToggleRequested() {
-            if (Hyprland.focusedMonitor?.name === bar.screen.name)
-                controlCenter.toggle("music");
+            else
+                controlCenter.toggle(tab);
         }
     }
 
@@ -101,7 +78,7 @@ PanelWindow {
             else if (name === "weather")
                 weatherPanel.toggle();
             else
-                Toggles.barAction(name);
+                Panels.action(name);
         }
     }
 }

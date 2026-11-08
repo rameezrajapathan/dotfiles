@@ -6,7 +6,7 @@ import qs.widgets
 SettingsPage {
     id: root
     title: "Updates"
-    subtitle: Updates.checking ? "Checking…" : Updates.checked ? "Last checked " + Updates.ago(Updates.checked) + "." : "Not checked yet."
+    subtitle: Updates.checking ? "Checking…" : Updates.checked ? "Last checked " + TimeDate.ago(Updates.checked * 1000) + "." : "Not checked yet."
 
     readonly property var repo: Updates.pikadots
     readonly property var sys: Updates.system
@@ -194,23 +194,19 @@ SettingsPage {
                 onPicked: v => Settings.updates.checkHours = v
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "notifications"
             title: "Notify me"
             description: "When pikadots or many packages have updates."
-            Switch {
-                checked: Settings.updates.notify
-                onToggled: Settings.updates.notify = !checked
-            }
+            target: Settings.updates
+            key: "notify"
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "inventory_2"
             title: "Include system packages"
             description: "System packages (pacman and AUR, or dnf) and Flatpak. Off: only pikadots."
-            Switch {
-                checked: Settings.updates.system
-                onToggled: Settings.updates.system = !checked
-            }
+            target: Settings.updates
+            key: "system"
         }
     }
 }

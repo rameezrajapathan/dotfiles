@@ -21,9 +21,9 @@ Item {
         columns: root.vertical ? 1 : -1
         spacing: 3
         x: root.edge === "bottom" ? (parent.width - width) / 2
-            : root.edge === "left" ? -(Dock.pad + width) / 2 - 1
-            : parent.width + (Dock.pad - width) / 2 + 1
-        y: root.edge === "bottom" ? parent.height + (Dock.pad - height) / 2 + 1 : (parent.height - height) / 2
+            : root.edge === "left" ? -(Dock.padding + width) / 2 - 1
+            : parent.width + (Dock.padding - width) / 2 + 1
+        y: root.edge === "bottom" ? parent.height + (Dock.padding - height) / 2 + 1 : (parent.height - height) / 2
 
         Repeater {
             model: root.count

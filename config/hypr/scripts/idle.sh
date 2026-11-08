@@ -5,22 +5,16 @@ if [[ -z ${INVOCATION_ID:-} ]] && systemctl --user is-enabled -q pikadots-idle.s
 	exec systemctl --user restart pikadots-idle.service
 fi
 
-settings=~/.config/pikadots/settings.json
-get() {
-	local v
-	v=$(jq -r ".idle.$1 // empty" "$settings" 2>/dev/null)
-	echo "${v:-$2}"
-}
-dim=$(get dimMinutes 5)
-lock=$(get lockMinutes 10)
-off=$(get screenOffMinutes 11)
-sleep_after=$(get suspendMinutes 30)
-lock_on_sleep=$(get lockBeforeSleep true)
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+dim=$(setting .idle.dimMinutes 5)
+lock=$(setting .idle.lockMinutes 10)
+off=$(setting .idle.screenOffMinutes 11)
+sleep_after=$(setting .idle.suspendMinutes 30)
+lock_on_sleep=$(setting .idle.lockBeforeSleep true)
 
 conf=${XDG_RUNTIME_DIR:-/tmp}/hypridle.conf
 {
 	echo "general {"
-	echo "    # The Quickshell lock screen, hyprlock as the fallback (scripts/lock.sh)"
 	echo "    lock_cmd = ~/.config/hypr/scripts/lock.sh"
 	[[ $lock_on_sleep == true ]] && echo "    before_sleep_cmd = loginctl lock-session"
 	echo "    after_sleep_cmd = hyprctl dispatch dpms on"

@@ -4,8 +4,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.UPower
 import QtQuick
-import qs.bar
-import qs.widgets
 
 Singleton {
     id: root
@@ -70,21 +68,6 @@ Singleton {
         precision: SystemClock.Minutes
     }
 
-    signal panelToggleRequested()
-    signal controlCenterRequested(string tab)
-    signal calendarRequested()
-
-    function barAction(name) {
-        if (name.startsWith("cc:"))
-            controlCenterRequested(name.slice(3));
-        else if (name === "calendar")
-            calendarRequested();
-        else if (name === "weather")
-            Weather.panelToggleRequested();
-        else
-            Quickshell.execDetached(["qs", "ipc", "call", name, "toggle"]);
-    }
-
     function pickColor() {
         Quickshell.execDetached(["sh", "-c",
             "sleep 0.3; c=$(hyprpicker -a -f hex) && [ -n \"$c\" ] && notify-send -a 'Color picker' \"$c\" 'Copied to the clipboard'"]);
@@ -115,7 +98,7 @@ Singleton {
     IpcHandler {
         target: "controlcenter"
         function toggle(tab: string): void {
-            root.controlCenterRequested(tab);
+            Panels.toggle("controlcenter", tab);
         }
     }
 
@@ -141,14 +124,14 @@ Singleton {
     IpcHandler {
         target: "calendar"
         function toggle(): void {
-            root.calendarRequested();
+            Panels.toggle("calendar");
         }
     }
 
     IpcHandler {
         target: "quicksettings"
         function toggle(): void {
-            root.panelToggleRequested();
+            Panels.toggle("controlcenter", "");
         }
         function pickColor(): void {
             root.pickColor();

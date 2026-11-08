@@ -17,6 +17,51 @@ Singleton {
     property bool busy: false
     property int shellOffset: -new Date().getTimezoneOffset()
     readonly property bool shellStale: offsets[timezone] !== undefined && offsets[timezone] !== shellOffset
+    readonly property bool use24h: Settings.bar.clock24
+    readonly property int weekStart: Settings.datetime.weekStart
+    readonly property date now: systemClock.date
+
+    function ago(when) {
+        const t = typeof when === "number" ? when : when?.getTime?.() ?? 0;
+        if (!t)
+            return "";
+        const m = Math.floor((systemClock.date.getTime() - t) / 60000);
+        return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.floor(m / 60) + " h ago" : Math.floor(m / 1440) + " d ago";
+    }
+
+    function clock(seconds) {
+        const s = Math.max(0, Math.floor(seconds));
+        return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+    }
+
+    function formatTime(date) {
+        return Qt.formatTime(date, use24h ? "HH:mm" : "h:mm AP");
+    }
+
+    function monthCells(year, month, weekStart, fullGrid) {
+        const start = weekStart ?? root.weekStart;
+        const first = new Date(year, month, 1);
+        const lead = (first.getDay() - start + 7) % 7;
+        const count = fullGrid ? 42 : Math.ceil((lead + new Date(year, month + 1, 0).getDate()) / 7) * 7;
+        const today = systemClock.date.toDateString();
+        const out = [];
+        for (let i = 0; i < count; i++) {
+            const d = new Date(year, month, 1 - lead + i);
+            out.push({
+                date: d,
+                day: d.getDate(),
+                inMonth: d.getMonth() === first.getMonth(),
+                today: d.toDateString() === today,
+                weekend: d.getDay() === 0 || d.getDay() === 6
+            });
+        }
+        return out;
+    }
+
+    function dayNames(format, weekStart) {
+        const start = weekStart ?? root.weekStart;
+        return [0, 1, 2, 3, 4, 5, 6].map(i => Qt.locale().dayName((i + start) % 7, format ?? Locale.NarrowFormat));
+    }
 
     function refresh() {
         shellOffset = -new Date().getTimezoneOffset();
@@ -48,7 +93,7 @@ Singleton {
         if (off === undefined)
             return "";
         const d = new Date(date.getTime() + (off + date.getTimezoneOffset()) * 60000);
-        return Qt.formatTime(d, Settings.bar.clock24 ? "HH:mm" : "h:mm AP");
+        return formatTime(d);
     }
     function difference(zone) {
         const off = offsets[zone], here = offsets[timezone];
@@ -65,6 +110,11 @@ Singleton {
     }
 
     Component.onCompleted: refresh()
+
+    SystemClock {
+        id: systemClock
+        precision: SystemClock.Minutes
+    }
 
     Timer {
         interval: 600000

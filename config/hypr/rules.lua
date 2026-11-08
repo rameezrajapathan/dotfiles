@@ -28,8 +28,11 @@ hl.window_rule({
 })
 
 local ok, theme = pcall(dofile, os.getenv("HOME") .. "/.local/state/theme/hyprland.lua")
-local special_border = ok and theme.special_border or "rgb(f5c2e7)"
-local special_inactive = ok and theme.special_border_inactive or "rgba(f5c2e766)"
+if not ok or type(theme) ~= "table" then
+	theme = {}
+end
+local special_border = theme.special_border or theme.active_border or "rgb(f5c2e7)"
+local special_inactive = theme.special_border_inactive or theme.inactive_border or "rgba(f5c2e766)"
 local glass_ok, glass = pcall(dofile, os.getenv("HOME") .. "/.local/state/pikadots/glass.lua")
 if glass_ok and type(glass) == "table" and glass.enabled and glass.neutral then
 	special_border = glass.special_border

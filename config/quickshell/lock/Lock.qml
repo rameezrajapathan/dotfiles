@@ -12,9 +12,7 @@ Scope {
     property bool checking: false
     property bool failed: false
     property string message: ""
-    property bool capsLock: false
     property bool unlocking: false
-    readonly property string wallpaper: wallpaperPath(wallpaperConf.text())
     readonly property string marker: (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/quickshell-locked"
 
     signal rejected()
@@ -32,7 +30,7 @@ Scope {
         message = "";
         checking = false;
         unlocking = false;
-        wallpaperConf.reload();
+        Wallpaper.reload();
         sessionLock.locked = true;
         Quickshell.execDetached(["touch", marker]);
         confirmTimer.restart();
@@ -57,18 +55,6 @@ Scope {
         rejected();
     }
 
-    function checkCapsLock() {
-        if (!caps.running)
-            caps.running = true;
-    }
-
-    function wallpaperPath(conf) {
-        const match = /^\s*path\s*=\s*(.+?)\s*$/m.exec(conf ?? "");
-        if (!match)
-            return "";
-        return "file://" + match[1].replace(/^~(?=\/)/, Quickshell.env("HOME"));
-    }
-
     Component.onCompleted: restore.running = true
 
     IpcHandler {
@@ -77,29 +63,10 @@ Scope {
         function isLocked(): bool { return root.isLocked(); }
     }
 
-    FileView {
-        id: wallpaperConf
-        path: Quickshell.env("HOME") + "/.config/hypr/wallpaper.conf"
-    }
-
     Process {
         id: restore
         command: ["test", "-e", root.marker]
         onExited: code => { if (code === 0) root.lock(); }
-    }
-
-    Process {
-        id: caps
-        command: ["hyprctl", "devices", "-j"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const keyboards = JSON.parse(text).keyboards ?? [];
-                    const main = keyboards.find(k => k.main) ?? keyboards[0];
-                    root.capsLock = main?.capsLock ?? false;
-                } catch (e) {}
-            }
-        }
     }
 
     PamContext {

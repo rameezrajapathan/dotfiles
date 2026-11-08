@@ -2,14 +2,33 @@ pragma Singleton
 
 import Quickshell
 import QtQuick
-import qs.widgets
 
 Singleton {
     signal opened(var panel)
+    signal toggleRequested(string panel, string tab)
 
+    readonly property var barPanels: ["controlcenter", "calendar", "weather"]
     property var covered: ({})
     property var covers: ({})
     property int nextKey: 0
+
+    function ipc(target, method, args) {
+        Quickshell.execDetached(["qs", "ipc", "call", target, method].concat(args ?? []));
+    }
+
+    function toggle(panel, tab) {
+        if (barPanels.includes(panel))
+            toggleRequested(panel, tab ?? "");
+        else
+            ipc(panel, "toggle");
+    }
+
+    function action(name) {
+        if (name.startsWith("cc:"))
+            toggle("controlcenter", name.slice(3));
+        else
+            toggle(name);
+    }
 
     function newKey() {
         return ++nextKey;

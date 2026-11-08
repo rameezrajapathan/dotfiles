@@ -2,7 +2,6 @@ pragma Singleton
 
 import Quickshell
 import QtQuick
-import qs.bar
 
 Singleton {
     readonly property var styles: [

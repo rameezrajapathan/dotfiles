@@ -3,13 +3,17 @@ import glob
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
 import zipfile
 
-HOME = os.path.expanduser("~")
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from pikadots_common import HOME, settings_section
+
 THEME = os.path.join(HOME, ".local/state/theme/vscode-theme.json")
 STATE = os.path.join(HOME, ".local/state/pikadots")
 
@@ -121,11 +125,7 @@ def write_setting(text, key, value):
     return text.replace("{", "{\n%s%s," % (indent, new), 1)
 
 def mono_font():
-    try:
-        with open(os.path.join(HOME, ".config/pikadots/settings.json")) as f:
-            return json.load(f).get("appearance", {}).get("monoFont")
-    except (OSError, ValueError):
-        return None
+    return settings_section("appearance").get("monoFont")
 
 def settings_keys():
     keys = {
@@ -289,8 +289,8 @@ GLASS_CSS = (
     "  backdrop-filter: blur(24px) saturate(1.4);\n  box-shadow: none !important;\n}\n"
 )
 
-PRELUDE = """// %s (made by hypr/scripts/vscode-theme.py from %s)
-import { createRequire as pikadotsRequire, registerHooks as pikadotsHooks } from "node:module";
+PRELUDE = """import { createRequire as pikadotsRequire, registerHooks as pikadotsHooks } from "node:module";
+const pikadotsMark = %s;
 {
   const electron = pikadotsRequire(import.meta.url)("electron");
   const Base = electron.BrowserWindow;
@@ -335,6 +335,12 @@ def write_if_changed(path, text, mode=0o644):
         f.write(text)
     os.chmod(path, mode)
 
+def shell_mark(mark):
+    return "pikadots_mark=%s" % shlex.quote(mark)
+
+def desktop_mark(desktop, mark):
+    return desktop.replace("[Desktop Entry]\n", "[Desktop Entry]\nX-Pikadots-Mark=%s\n" % mark, 1)
+
 def ours(path):
     try:
         with open(path) as f:
@@ -361,9 +367,9 @@ def glass_oss():
     if launcher.startswith("#!"):
         shebang, launcher = launcher.split("\n", 1)
         shebang += "\n"
-    prelude = PRELUDE % (MARK, SYSTEM_LAUNCHER, json.dumps(GLASS_CSS))
+    prelude = PRELUDE % (json.dumps(MARK + " from " + SYSTEM_LAUNCHER), json.dumps(GLASS_CSS))
     write_if_changed(GLASS_LAUNCHER, shebang + prelude + launcher)
-    script = script.replace("#!/bin/bash\n", "#!/bin/bash\n# %s\n" % MARK, 1)
+    script = script.replace("#!/bin/bash\n", "#!/bin/bash\n%s\n" % shell_mark(MARK), 1)
     write_if_changed(GLASS_SCRIPT, script.replace(SYSTEM_LAUNCHER, GLASS_LAUNCHER), 0o755)
     other = os.path.exists(os.path.join(VSCODE_ROOT, "code"))
     if other and os.path.islink(GLASS_CODE) and os.readlink(GLASS_CODE) == "code-oss":
@@ -374,7 +380,7 @@ def glass_oss():
         with open(SYSTEM_DESKTOP) as f:
             desktop = f.read()
         desktop = re.sub(r"^Exec=code-oss", "Exec=" + GLASS_SCRIPT, desktop, flags=re.M)
-        write_if_changed(GLASS_DESKTOP, desktop.replace("[Desktop Entry]\n", "[Desktop Entry]\n# %s\n" % MARK, 1))
+        write_if_changed(GLASS_DESKTOP, desktop_mark(desktop, MARK))
     except OSError:
         pass
 
@@ -392,7 +398,7 @@ VSCODE_ENTRY = os.path.join(VSCODE_MIRROR, "resources/app/pikadots.mjs")
 VS_MARK = "pikadots: transparent VS Code"
 
 VSCODE_SCRIPT = """#!/bin/bash
-# %s
+%s
 
 set -euo pipefail
 
@@ -440,7 +446,7 @@ def mirror_vscode():
     link_tree(app, mirror_app, ("package.json", "pikadots.mjs"))
     package["main"] = "./pikadots.mjs"
     write_if_changed(os.path.join(mirror_app, "package.json"), json.dumps(package, indent=2))
-    prelude = PRELUDE % (VS_MARK, main, json.dumps(GLASS_CSS))
+    prelude = PRELUDE % (json.dumps(VS_MARK + " from " + main), json.dumps(GLASS_CSS))
     write_if_changed(VSCODE_ENTRY, prelude + "await import(%s);\n" % json.dumps("file://" + main))
     src, dst = os.path.join(VSCODE_ROOT, "code"), os.path.join(VSCODE_MIRROR, "code")
     a = os.stat(src)
@@ -468,7 +474,7 @@ def glass_vscode():
         print(f"VS Code stays opaque: {e}", file=sys.stderr)
         return
     script = os.path.join(HOME, ".config/hypr/scripts/vscode-theme.py")
-    write_if_changed(GLASS_CODE, VSCODE_SCRIPT % (VS_MARK, VSCODE_MIRROR, VSCODE_ROOT, script, VSCODE_ROOT), 0o755)
+    write_if_changed(GLASS_CODE, VSCODE_SCRIPT % (shell_mark(VS_MARK), VSCODE_MIRROR, VSCODE_ROOT, script, VSCODE_ROOT), 0o755)
     for name in VSCODE_DESKTOPS:
         try:
             with open(os.path.join("/usr/share/applications", name)) as f:
@@ -476,7 +482,7 @@ def glass_vscode():
         except OSError:
             continue
         desktop = re.sub(r"^Exec=code(?= |$)", "Exec=" + GLASS_CODE, desktop, flags=re.M)
-        desktop = desktop.replace("[Desktop Entry]\n", "[Desktop Entry]\n# %s\n" % VS_MARK, 1)
+        desktop = desktop_mark(desktop, VS_MARK)
         write_if_changed(os.path.join(HOME, ".local/share/applications", name), desktop)
 
 def unglass_vscode():

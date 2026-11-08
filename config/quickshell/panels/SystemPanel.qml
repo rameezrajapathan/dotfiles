@@ -13,13 +13,7 @@ Item {
 
     implicitHeight: content.implicitHeight + 40
 
-    property var info: ({})
     property var backup: null
-
-    function ago(seconds) {
-        const m = Math.floor((Date.now() / 1000 - seconds) / 60);
-        return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.floor(m / 60) + " h ago" : Math.floor(m / 1440) + " d ago";
-    }
 
     FileView {
         path: Quickshell.env("HOME") + "/.local/state/pikadots/backup.json"
@@ -49,72 +43,11 @@ Item {
             }
         }
     }
-    property var lastCpu: null
-    property real cpu: 0
-
-    function gib(bytes) {
-        return (bytes / 1073741824).toFixed(1);
+    SysStatsWatch {
+        active: root.shown
     }
 
-    function parse(text) {
-        const next = { fans: [], procs: [] };
-        for (const line of text.split("\n")) {
-            const f = line.trim().split(/\s+/);
-            switch (f[0]) {
-            case "cpu": {
-                const busy = Number(f[1]), idle = Number(f[2]);
-                if (lastCpu) {
-                    const db = busy - lastCpu.busy, di = idle - lastCpu.idle;
-                    cpu = db + di > 0 ? db / (db + di) : 0;
-                }
-                lastCpu = { busy: busy, idle: idle };
-                break;
-            }
-            case "mem":
-                next.mem = { total: Number(f[1]) * 1024, used: (Number(f[1]) - Number(f[2])) * 1024 };
-                break;
-            case "disk":
-                next.disk = { used: Number(f[1]), total: Number(f[2]) };
-                break;
-            case "cputemp":
-                next.cpuTemp = Number(f[1]);
-                break;
-            case "fan":
-                next.fans.push({ name: f[1].replace("_fan", ""), rpm: Number(f[2]) });
-                break;
-            case "gpustate":
-                next.gpuState = f[1];
-                break;
-            case "gpu":
-                next.gpu = { util: Number(f[1]) / 100, memUsed: Number(f[2]), memTotal: Number(f[3]), temp: Number(f[4]), watts: Number(f[5]), name: f.slice(6).join(" ") };
-                break;
-            case "proc":
-                next.procs.push({ cpu: Number(f[1]), mem: Number(f[2]), name: f.slice(3).join(" ") });
-                break;
-            }
-        }
-        info = next;
-    }
-
-    onShownChanged: if (shown) {
-        reader.running = true;
-        snapshotReader.running = true;
-    }
-
-    Process {
-        id: reader
-        command: [Quickshell.env("HOME") + "/.config/hypr/scripts/sysinfo.sh"]
-        stdout: StdioCollector {
-            onStreamFinished: root.parse(text)
-        }
-    }
-
-    Timer {
-        interval: 2000
-        repeat: true
-        running: root.shown
-        onTriggered: reader.running = true
-    }
+    onShownChanged: if (shown) snapshotReader.running = true
 
     Item {
         anchors.fill: parent
@@ -146,34 +79,34 @@ Item {
                 Layout.fillWidth: true
                 Layout.topMargin: 4
                 Layout.bottomMargin: 4
-                columns: root.info.gpuState !== undefined ? 4 : 3
+                columns: SysStats.gpuState !== "" ? 4 : 3
                 columnSpacing: 8
 
                 Meter {
                     label: "CPU"
                     slot: 0
-                    value: root.cpu
-                    detail: root.info.cpuTemp ? root.info.cpuTemp + "°C" : ""
+                    value: SysStats.cpu
+                    detail: SysStats.cpuTemp ? SysStats.cpuTemp + "°C" : ""
                 }
                 Meter {
                     label: "Memory"
                     slot: 1
-                    value: root.info.mem ? root.info.mem.used / root.info.mem.total : 0
-                    detail: root.info.mem ? root.gib(root.info.mem.used) + " / " + root.gib(root.info.mem.total) + " GiB" : ""
+                    value: SysStats.mem
+                    detail: SysStats.memTotal > 0 ? SysStats.gib(SysStats.memUsed) + " / " + SysStats.gib(SysStats.memTotal) + " GiB" : ""
                 }
                 Meter {
                     label: "GPU"
                     slot: 0
-                    visible: root.info.gpuState !== undefined
-                    value: root.info.gpu?.util ?? 0
-                    dimmed: !root.info.gpu
-                    detail: root.info.gpu ? root.info.gpu.temp + "°C · " + Math.round(root.info.gpu.watts) + " W" : "sleeping"
+                    visible: SysStats.gpuState !== ""
+                    value: SysStats.gpu?.util ?? 0
+                    dimmed: !SysStats.gpu
+                    detail: SysStats.gpu ? SysStats.gpu.temp + "°C · " + Math.round(SysStats.gpu.watts) + " W" : "sleeping"
                 }
                 Meter {
                     label: "Disk /"
                     slot: 2
-                    value: root.info.disk ? root.info.disk.used / root.info.disk.total : 0
-                    detail: root.info.disk ? root.gib(root.info.disk.used) + " / " + root.gib(root.info.disk.total) + " GiB" : ""
+                    value: SysStats.disk
+                    detail: SysStats.diskTotal > 0 ? SysStats.gib(SysStats.diskUsed) + " / " + SysStats.gib(SysStats.diskTotal) + " GiB" : ""
                 }
             }
 
@@ -190,7 +123,7 @@ Item {
                 Label {
                     Layout.fillWidth: true
                     text: !root.backup ? "No backup yet"
-                        : root.backup.ok ? "Backup " + root.ago(root.backup.time) + "  ·  " + root.backup.snapshots + " snapshots"
+                        : root.backup.ok ? "Backup " + TimeDate.ago(root.backup.time * 1000) + "  ·  " + root.backup.snapshots + " snapshots"
                         : "Backup failed: " + root.backup.message
                     color: root.backup && !root.backup.ok ? Theme.red : Theme.text
                     elide: Text.ElideRight
@@ -215,7 +148,7 @@ Item {
                 Label {
                     Layout.fillWidth: true
                     text: !root.snapshots?.count ? "No system snapshots"
-                        : "Snapshot " + root.ago(root.snapshots.latest) + "  ·  " + root.snapshots.count
+                        : "Snapshot " + TimeDate.ago(root.snapshots.latest * 1000) + "  ·  " + root.snapshots.count
                             + (root.snapshots.source === "grub-btrfs" ? " in the boot menu" : " snapshots")
                     color: Theme.text
                     elide: Text.ElideRight
@@ -224,7 +157,7 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true
-                visible: (root.info.fans?.length ?? 0) > 0
+                visible: (SysStats.fans?.length ?? 0) > 0
                 spacing: 14
 
                 Icon {
@@ -233,7 +166,7 @@ Item {
                     color: Theme.subtext
                 }
                 Repeater {
-                    model: root.info.fans ?? []
+                    model: SysStats.fans ?? []
 
                     Label {
                         required property var modelData
@@ -251,7 +184,7 @@ Item {
                 font.pixelSize: Theme.fontSize - 2
             }
             Repeater {
-                model: root.info.procs ?? []
+                model: SysStats.procs ?? []
 
                 RowLayout {
                     required property var modelData

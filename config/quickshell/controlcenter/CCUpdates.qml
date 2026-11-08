@@ -34,7 +34,7 @@ CCCard {
             Label {
                 Layout.fillWidth: true
                 text: Updates.behind > 0 ? "pikadots: " + Updates.behind + (Updates.behind === 1 ? " new change" : " new changes")
-                    : Updates.checked > 0 ? "Checked " + Updates.ago(Updates.checked) : "Not checked yet"
+                    : Updates.checked > 0 ? "Checked " + TimeDate.ago(Updates.checked * 1000) : "Not checked yet"
                 color: Theme.subtext
                 font.pixelSize: Theme.fontSize - 2
                 elide: Text.ElideRight

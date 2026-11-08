@@ -98,7 +98,7 @@ ColumnLayout {
                     Label {
                         Layout.leftMargin: 6
                         Layout.bottomMargin: 2
-                        text: root.columns.length === 1 ? "Widgets" : "Column " + (column.index + 1)
+                        text: root.columns.length === 1 ? "Cards" : "Column " + (column.index + 1)
                         color: Theme.accent
                         font.bold: true
                         font.pixelSize: Theme.fontSize - 1
@@ -119,7 +119,7 @@ ColumnLayout {
                             id: item
                             required property string modelData
                             required property int index
-                            readonly property var info: CCStyles.widget(modelData)
+                            readonly property var info: CCStyles.card(modelData)
 
                             Layout.fillWidth: true
                             implicitHeight: 34
@@ -206,7 +206,7 @@ ColumnLayout {
         spacing: 6
 
         Repeater {
-            model: CCStyles.widgets.filter(w => !root.used.includes(w.id))
+            model: CCStyles.cards.filter(c => !root.used.includes(c.id))
 
             CCAddChip {
                 required property var modelData

@@ -3,23 +3,17 @@ import json
 import os
 import sys
 
-HOME = os.path.expanduser("~")
-SETTINGS = os.path.join(HOME, ".config/pikadots/settings.json")
+sys.dont_write_bytecode = True
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from pikadots_common import HOME, load_json, settings_section
+
 PRESETS = os.path.join(HOME, ".config/quickshell/services/glass-presets.json")
 LUA = os.path.join(HOME, ".local/state/pikadots/glass.lua")
 
 
-def load(path, fallback):
-    try:
-        with open(path) as f:
-            return json.load(f)
-    except (OSError, ValueError):
-        return fallback
-
-
 def resolve():
-    presets = load(PRESETS, {})
-    glass = load(SETTINGS, {}).get("glass", {})
+    presets = load_json(PRESETS)
+    glass = settings_section("glass")
     name = glass.get("preset", "frosted")
     if name == "custom":
         custom = glass.get("custom", {}) or {}

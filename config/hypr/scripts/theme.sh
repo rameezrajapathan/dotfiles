@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
 
-conf=~/.config/hypr/wallpaper.conf
 state=~/.local/state/theme
 mkdir -p "$state"
 
 exec 9>"$state/.lock"
 flock 9
 
-current=$(sed -n 's/^\s*path\s*=\s*//p' "$conf")
-current=${current/#\~/$HOME}
+current=$(wallpaper_path)
 
 glass_only=false
 if [[ ${1:-} == --glass ]]; then
@@ -19,7 +18,7 @@ fi
 
 if [[ $# -gt 0 ]]; then
 	img=$(realpath "$1")
-	printf 'wallpaper {\n    monitor =\n    path = %s\n    fit_mode = cover\n}\n' "${img/#$HOME/\~}" >"$conf"
+	wallpaper_save "$img"
 else
 	img=$current
 fi
@@ -31,10 +30,9 @@ if [[ ! -s $small || $(cat "$state/wallpaper-small.src" 2>/dev/null) != "$stamp"
 	printf '%s' "$stamp" >"$state/wallpaper-small.src"
 fi
 
-settings=~/.config/pikadots/settings.json
-THEME_MODE=$(jq -r '.appearance.themeMode // "auto"' "$settings" 2>/dev/null || echo auto)
-THEME_SCHEME=$(jq -r '.appearance.scheme // "auto"' "$settings" 2>/dev/null || echo auto)
-glass_neutral=$(jq -r 'if ((.glass.preset // "frosted") != "off") and ((.glass.color // false) | not) then "yes" else "no" end' "$settings" 2>/dev/null || echo no)
+THEME_MODE=$(setting .appearance.themeMode auto)
+THEME_SCHEME=$(setting .appearance.scheme auto)
+glass_neutral=$(setting 'if ((.glass.preset // "frosted") != "off") and ((.glass.color // false) | not) then "yes" else "no" end' no)
 [[ $glass_neutral == yes && ! -e ${XDG_RUNTIME_DIR:-/tmp}/pikadots-gamemode ]] && THEME_SCHEME=monochrome
 export THEME_MODE THEME_SCHEME
 palette=$(python3 -I ~/.config/hypr/scripts/theme-palette.py "$small")
@@ -55,24 +53,25 @@ mv "$state/starship.toml.tmp" "$state/starship.toml"
 pkill -USR1 -x kitty || true
 pkill -USR1 -x cava || true
 pkill -USR2 -x btop || true
-if command -v nvim >/dev/null; then
+if has nvim; then
 	for sock in "${XDG_RUNTIME_DIR:-/tmp}"/nvim.*.0; do
 		[[ -S $sock ]] || continue
 		timeout 1 nvim --server "$sock" --remote-expr \
 			"execute('if get(g:, \"colors_name\", \"\") ==# \"pikadots\" | colorscheme pikadots | endif')" >/dev/null 2>&1 || true
 	done
 fi
-if command -v pywalfox >/dev/null; then
+if has pywalfox; then
 	for tmp in /tmp "${XDG_RUNTIME_DIR:-/tmp}"/pywalfox/*/; do
 		{ TMPDIR=$tmp pywalfox "$mode" && TMPDIR=$tmp pywalfox update; } >/dev/null 2>&1 || true
 	done
 fi
-if command -v asusctl >/dev/null; then
+if has asusctl; then
 	accent=$(jq -r '.accent // empty' "$state/quickshell.json" | tr -d '#')
 	[[ $scheme == scheme-monochrome ]] && accent=ffffff
 	[[ -n $accent ]] && asusctl aura effect static -c "$accent" >/dev/null 2>&1 || true
 fi
 setsid -f python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 9>&- || true
+[[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || exit 0
 hyprctl reload >/dev/null
 if $glass_only; then
 	python3 -I ~/.config/hypr/scripts/vscode-theme.py || true

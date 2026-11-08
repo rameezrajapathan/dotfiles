@@ -26,7 +26,7 @@ ColumnLayout {
 
     Label {
         visible: root.tiles.length === 0
-        text: "No tiles: the tiles widgets stay empty."
+        text: "No tiles: the tile cards stay empty."
         color: Theme.overlay
         font.pixelSize: Theme.fontSize - 1
     }

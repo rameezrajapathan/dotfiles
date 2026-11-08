@@ -33,7 +33,7 @@ Rectangle {
             to: 1
             duration: PanelMotion.openDuration(root.style)
             easing.type: root.info.easing
-            easing.overshoot: root.info.overshoot ?? 1.70158
+            easing.overshoot: PanelMotion.overshootOf(root.info)
         }
         PauseAnimation { duration: 1100 }
         NumberAnimation { to: 0; duration: PanelMotion.closeDuration(); easing.type: Easing.OutCubic }

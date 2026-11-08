@@ -4,10 +4,8 @@ import qs.panels
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property var now: Weather.current
     readonly property var today: Weather.daily[0] ?? null
@@ -19,7 +17,7 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             Desktop.showing = false;
-            Weather.panelToggleRequested();
+            Panels.toggle("weather");
         }
     }
 
@@ -80,12 +78,12 @@ Item {
     }
 
     Now {
-        visible: Weather.ready && root.size === "small"
+        visible: Weather.ready && root.sizeClass === "small"
         anchors { fill: parent; margins: 20 }
     }
 
     RowLayout {
-        visible: Weather.ready && root.size === "medium"
+        visible: Weather.ready && root.sizeClass === "medium"
         anchors { fill: parent; margins: 20 }
         spacing: 12
 
@@ -102,7 +100,7 @@ Item {
     }
 
     ColumnLayout {
-        visible: Weather.ready && root.size === "large"
+        visible: Weather.ready && root.sizeClass === "large"
         anchors { fill: parent; margins: 20 }
         spacing: 10
 

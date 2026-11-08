@@ -14,7 +14,7 @@ CCCard {
     clickable: true
     onClicked: {
         cc.close();
-        Weather.panelToggleRequested();
+        Panels.toggle("weather");
     }
     implicitHeight: column.implicitHeight + 32
     readonly property bool shown: cc?.open ?? false

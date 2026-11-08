@@ -3,12 +3,9 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import qs.panels
 
 Singleton {
     id: root
-
-    signal panelToggleRequested()
 
     readonly property string place: settings.name
     readonly property string region: [settings.region, settings.country].filter(s => s).join(", ")
@@ -247,7 +244,7 @@ Singleton {
 
     IpcHandler {
         target: "weather"
-        function toggle(): void { root.panelToggleRequested(); }
+        function toggle(): void { Panels.toggle("weather"); }
         function refresh(): void { root.refresh(); }
     }
 

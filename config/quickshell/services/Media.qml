@@ -4,17 +4,14 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import QtQuick
-import qs.panels
 
 Singleton {
     id: root
 
-    signal panelToggleRequested()
-
     IpcHandler {
         target: "media"
         function toggle(): void {
-            root.panelToggleRequested();
+            Panels.toggle("controlcenter", "music");
         }
         function playPause(): void {
             if (root.active?.canTogglePlaying)
@@ -45,10 +42,5 @@ Singleton {
             ?? DesktopEntries.heuristicLookup(player?.identity ?? "");
         const icon = entry?.icon ?? "";
         return Quickshell.iconPath(Quickshell.hasThemeIcon(icon) ? icon : "audio-x-generic");
-    }
-
-    function time(seconds) {
-        const s = Math.max(0, Math.floor(seconds));
-        return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
     }
 }

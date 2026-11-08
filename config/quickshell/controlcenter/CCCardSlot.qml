@@ -4,20 +4,20 @@ import qs.services
 
 Loader {
     id: root
-    required property string widgetId
+    required property string cardId
     property var cc
     property int columns: 1
 
     readonly property bool wanted: item ? (item.wanted ?? true) : false
     visible: wanted
     Layout.fillWidth: true
-    Layout.fillHeight: widgetId === "notifications" && columns > 1
+    Layout.fillHeight: cardId === "notifications" && columns > 1
 
     sourceComponent: ({
         header: header, tiles: tiles, tilesSmall: tilesSmall, sliders: sliders, media: media,
         mediaLarge: mediaLarge, notifications: notifications, status: status, system: system,
         calendar: calendar, weather: weather, updates: updates, actions: actions, tray: tray
-    })[widgetId] ?? null
+    })[cardId] ?? null
 
     Component { id: header; CCHeader { cc: root.cc } }
     Component { id: tiles; CCTiles { cc: root.cc } }

@@ -7,29 +7,27 @@ import qs.widgets
 SettingsPage {
     id: root
     title: "Desktop"
-    subtitle: "Widgets that live on your wallpaper, and the menu you get from a right click on it."
+    subtitle: "Desktop widgets that live on your wallpaper, and the menu you get from a right click on it."
 
     readonly property var dt: Settings.desktop
     readonly property string screenName: Desktop.focusedScreen
     readonly property int count: Desktop.layout(screenName).length
 
     SettingsSection {
-        title: "Widgets"
+        title: "Desktop widgets"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "widgets"
-            title: "Show widgets on the desktop"
+            title: "Show desktop widgets"
             description: "They sit behind your windows. Super + H brings them forward, or swipe down with four fingers."
-            Switch {
-                checked: root.dt.enabled
-                onToggled: root.dt.enabled = !checked
-            }
+            target: root.dt
+            key: "enabled"
         }
         SettingsRow {
             visible: root.dt.enabled
             icon: "edit"
-            title: "Arrange widgets"
-            description: root.count === 0 ? "This screen has none yet." : root.count === 1 ? "One widget on this screen." : root.count + " widgets on this screen."
+            title: "Arrange desktop widgets"
+            description: root.count === 0 ? "This screen has none yet." : root.count === 1 ? "One desktop widget on this screen." : root.count + " desktop widgets on this screen."
             RowLayout {
                 spacing: 8
                 Pill {
@@ -67,14 +65,12 @@ SettingsPage {
     SettingsSection {
         title: "Desktop menu"
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "right_click"
             title: "Right-click menu"
             description: "Change the wallpaper, edit widgets, open a terminal or settings from the empty desktop."
-            Switch {
-                checked: root.dt.menu
-                onToggled: root.dt.menu = !checked
-            }
+            target: root.dt
+            key: "menu"
         }
     }
 

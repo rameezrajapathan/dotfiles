@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.services
-import qs.settings
+import qs.widgets
 
 ColumnLayout {
     id: root
@@ -34,50 +34,26 @@ ColumnLayout {
 
     spacing: 6
 
-    Rectangle {
-        Layout.fillWidth: true
-        implicitHeight: 46
-        radius: Theme.round(12, width, height)
-        color: headerMouse.containsMouse ? Qt.alpha(Theme.overlay, 0.25) : Qt.alpha(Theme.base, 0.6)
-        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+    PickerHeader {
+        expanded: root.expanded
+        onClicked: root.expanded = !root.expanded
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: Theme.pad(10, 12, parent.width, parent.height)
-            anchors.rightMargin: Theme.pad(12, 12, parent.width, parent.height)
-            spacing: 10
-
-            AppIcon {
-                visible: root.chosen !== null
-                icon: root.chosen?.icon ?? ""
-            }
-            Label {
-                Layout.fillWidth: true
-                text: root.chosen?.name ?? (root.current ? root.current.replace(/\.desktop$/, "") : root.placeholder)
-                color: root.chosen || root.current ? Theme.text : Theme.subtext
-                elide: Text.ElideRight
-            }
-            Label {
-                visible: root.options.length > 1
-                text: root.options.length + " apps"
-                color: Theme.subtext
-                font.pixelSize: Theme.fontSize - 2
-            }
-            Icon {
-                name: "expand_more"
-                rotation: root.expanded ? 180 : 0
-                Behavior on rotation { NumberAnimation { duration: Theme.ms(200); easing.type: Easing.OutQuint } }
-            }
+        AppIcon {
+            visible: root.chosen !== null
+            icon: root.chosen?.icon ?? ""
         }
-
-        MouseArea {
-            id: headerMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: root.expanded = !root.expanded
+        Label {
+            Layout.fillWidth: true
+            text: root.chosen?.name ?? (root.current ? root.current.replace(/\.desktop$/, "") : root.placeholder)
+            color: root.chosen || root.current ? Theme.text : Theme.subtext
+            elide: Text.ElideRight
         }
-        GlassRim {}
+        Label {
+            visible: root.options.length > 1
+            text: root.options.length + " apps"
+            color: Theme.subtext
+            font.pixelSize: Theme.fontSize - 2
+        }
     }
 
     Rectangle {
@@ -95,7 +71,8 @@ ColumnLayout {
             anchors { top: parent.top; left: parent.left; right: parent.right; margins: Theme.pad(6, 12, parent.width, parent.height) }
             placeholder: "Search " + root.options.length + " apps…"
             onEdited: t => root.query = t
-            onEntered: t => {
+            commitOnBlur: false
+            onAccepted: t => {
                 if (t.trim() && root.shown.length) {
                     root.picked(root.shown[0].id);
                     root.expanded = false;

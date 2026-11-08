@@ -3,14 +3,12 @@ pragma Singleton
 import Quickshell
 import Quickshell.Hyprland
 import QtQuick
-import qs.overlays
 
 Singleton {
     id: root
 
-    readonly property var windows: Hyprland.toplevels.values
-        .filter(t => (t.workspace?.id ?? -1) > 0 && t.lastIpcObject?.at !== undefined)
-        .sort((a, b) => (a.lastIpcObject.focusHistoryID ?? 99) - (b.lastIpcObject.focusHistoryID ?? 99))
+    readonly property var windows: byRecent(Hyprland.toplevels.values
+        .filter(t => (t.workspace?.id ?? -1) > 0 && t.lastIpcObject?.at !== undefined))
 
     function refresh() {
         Hyprland.refreshToplevels();
@@ -18,24 +16,75 @@ Singleton {
         Hyprland.refreshWorkspaces();
     }
 
+    function dispatch(dsp) {
+        Quickshell.execDetached(["hyprctl", "dispatch", dsp]);
+    }
+
     function selector(t) {
         return "address:0x" + t.address.replace(/^0x/, "");
     }
 
+    function appId(t) {
+        return t?.wayland?.appId ?? t?.lastIpcObject?.class ?? "";
+    }
+
+    function recency(t) {
+        return t?.lastIpcObject?.focusHistoryID ?? 99;
+    }
+
+    function byRecent(list) {
+        return list.slice().sort((a, b) => recency(a) - recency(b));
+    }
+
+    function specialWorkspace(name) {
+        return "special:" + name;
+    }
+
+    function specialOf(workspaceName) {
+        return (workspaceName ?? "").startsWith("special:") ? workspaceName.slice(8) : "";
+    }
+
+    function isSpecial(t) {
+        return specialName(t) !== "";
+    }
+
+    function specialName(t) {
+        return specialOf(t?.workspace?.name);
+    }
+
+    function toggleSpecial(name) {
+        if (name)
+            dispatch(`hl.dsp.workspace.toggle_special("${name}")`);
+    }
+
     function focus(t) {
-        if (t.workspace?.name === "special:minimized" && t.wayland) {
+        if (!t)
+            return;
+        const name = specialName(t);
+        if (name === "minimized" && t.wayland) {
             t.wayland.minimized = false;
             return;
         }
-        Quickshell.execDetached(["hyprctl", "dispatch", `hl.dsp.focus({ window = "${selector(t)}" })`]);
+        if (name && Special.on(Hyprland.focusedMonitor?.name ?? "") !== name)
+            toggleSpecial(name);
+        dispatch(`hl.dsp.focus({ window = "${selector(t)}" })`);
+    }
+
+    function close(t) {
+        if (t)
+            dispatch(`hl.dsp.window.close({ window = "${selector(t)}" })`);
     }
 
     function focusWorkspace(id) {
-        Quickshell.execDetached(["hyprctl", "dispatch", `hl.dsp.focus({ workspace = "${id}" })`]);
+        dispatch(`hl.dsp.focus({ workspace = "${id}" })`);
     }
 
-    function appId(t) {
-        return t.wayland?.appId ?? t.lastIpcObject?.class ?? "";
+    function stepWorkspace(delta) {
+        focusWorkspace(delta > 0 ? "e+1" : "e-1");
+    }
+
+    function submap(name) {
+        dispatch(`hl.dsp.submap("${name}")`);
     }
 
     function icon(t) {

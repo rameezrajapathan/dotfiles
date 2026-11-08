@@ -3,10 +3,8 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property var next: Meetings.next
     readonly property var today: {
@@ -17,13 +15,13 @@ Item {
 
     function when(m) {
         if (m.start <= Meetings.now)
-            return "Now · until " + Qt.formatTime(new Date(m.end * 1000), Settings.bar.clock24 ? "HH:mm" : "h:mm AP");
+            return "Now · until " + TimeDate.formatTime(new Date(m.end * 1000));
         const mins = Math.round((m.start - Meetings.now) / 60);
-        return mins < 60 ? "In " + mins + " min" : Qt.formatTime(new Date(m.start * 1000), Settings.bar.clock24 ? "HH:mm" : "h:mm AP");
+        return mins < 60 ? "In " + mins + " min" : TimeDate.formatTime(new Date(m.start * 1000));
     }
 
     ColumnLayout {
-        visible: root.size !== "large"
+        visible: root.sizeClass !== "large"
         anchors { fill: parent; margins: 20 }
         spacing: 4
 
@@ -48,10 +46,10 @@ Item {
             Layout.topMargin: 4
             text: root.next ? root.next.title : "No meetings soon"
             color: root.next ? Theme.text : Theme.overlay
-            font.pixelSize: root.size === "small" ? Theme.fontSize + 3 : Theme.fontSize + 6
+            font.pixelSize: root.sizeClass === "small" ? Theme.fontSize + 3 : Theme.fontSize + 6
             font.weight: Font.Bold
             wrapMode: Text.WordWrap
-            maximumLineCount: root.size === "small" ? 3 : 2
+            maximumLineCount: root.sizeClass === "small" ? 3 : 2
             elide: Text.ElideRight
         }
         Label {
@@ -60,7 +58,7 @@ Item {
             color: Theme.subtext
         }
         Label {
-            visible: root.next !== null && root.size === "medium" && (root.next?.location ?? "") !== ""
+            visible: root.next !== null && root.sizeClass === "medium" && (root.next?.location ?? "") !== ""
             Layout.fillWidth: true
             text: root.next?.location ?? ""
             color: Theme.overlay
@@ -70,7 +68,7 @@ Item {
         Item { Layout.fillHeight: true }
         Rectangle {
             visible: root.next !== null && (root.next?.join ?? "") !== ""
-            Layout.fillWidth: root.size === "small"
+            Layout.fillWidth: root.sizeClass === "small"
             implicitWidth: joinRow.implicitWidth + 28
             implicitHeight: 36
             radius: height / 2
@@ -93,7 +91,7 @@ Item {
     }
 
     ColumnLayout {
-        visible: root.size === "large"
+        visible: root.sizeClass === "large"
         anchors { fill: parent; margins: 20 }
         spacing: 10
 

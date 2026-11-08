@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import qs.bar
@@ -12,19 +11,9 @@ RowLayout {
 
     spacing: 10
 
-    property string uptime: ""
+    readonly property string uptime: "up " + SysStats.uptimeText(false)
     readonly property bool shown: cc?.open ?? false
-    onShownChanged: if (shown) uptimeView.reload()
-
-    FileView {
-        id: uptimeView
-        path: "/proc/uptime"
-        onLoaded: {
-            const s = Math.floor(Number(text().split(" ")[0]));
-            const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
-            root.uptime = "up " + (d > 0 ? d + " d " : "") + (d > 0 || h > 0 ? h + " h " : "") + m + " min";
-        }
-    }
+    onShownChanged: if (shown) SysStats.refreshUptime()
 
     Item {
         implicitWidth: 46

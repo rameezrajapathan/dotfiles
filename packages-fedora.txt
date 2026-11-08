@@ -26,12 +26,14 @@ fuzzel
 fastfetch
 starship
 cava
+cmatrix
 btop
 grim
 slurp
 wl-clipboard
 cliphist
 wf-recorder
+playerctl
 satty
 tesseract
 tesseract-langpack-eng

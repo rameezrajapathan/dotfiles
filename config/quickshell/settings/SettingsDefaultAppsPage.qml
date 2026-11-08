@@ -1,5 +1,3 @@
-import Quickshell
-import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import qs.services
@@ -10,35 +8,7 @@ SettingsPage {
     title: "Default apps"
     subtitle: "Which app opens what. Keybinds and panels use these too."
 
-    readonly property string script: Quickshell.env("HOME") + "/.config/hypr/scripts/default-apps.py"
-    property var apps: ({})
-
-    onShownChanged: if (shown) reader.running = true
-
-    function pick(kind, id) {
-        const next = Object.assign({}, apps);
-        next[kind] = Object.assign({}, next[kind], { current: id });
-        apps = next;
-        setter.command = ["python3", "-I", script, "set", kind, id];
-        setter.running = true;
-    }
-
-    Process {
-        id: reader
-        command: ["python3", "-I", root.script, "list"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.apps = JSON.parse(text);
-                } catch (e) {}
-            }
-        }
-    }
-
-    Process {
-        id: setter
-        onExited: reader.running = true
-    }
+    onShownChanged: if (shown) DefaultApps.load()
 
     SettingsSection {
         title: "Essentials"
@@ -56,9 +26,9 @@ SettingsPage {
                 title: modelData.title
                 below: true
                 AppPicker {
-                    options: root.apps[modelData.kind]?.options ?? []
-                    current: root.apps[modelData.kind]?.current ?? ""
-                    onPicked: id => root.pick(modelData.kind, id)
+                    options: DefaultApps.apps[modelData.kind]?.options ?? []
+                    current: DefaultApps.apps[modelData.kind]?.current ?? ""
+                    onPicked: id => DefaultApps.set(modelData.kind, id)
                 }
             }
         }
@@ -79,9 +49,9 @@ SettingsPage {
                 title: modelData.title
                 below: true
                 AppPicker {
-                    options: root.apps[modelData.kind]?.options ?? []
-                    current: root.apps[modelData.kind]?.current ?? ""
-                    onPicked: id => root.pick(modelData.kind, id)
+                    options: DefaultApps.apps[modelData.kind]?.options ?? []
+                    current: DefaultApps.apps[modelData.kind]?.current ?? ""
+                    onPicked: id => DefaultApps.set(modelData.kind, id)
                 }
             }
         }

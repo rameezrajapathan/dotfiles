@@ -34,8 +34,8 @@ PanelWindow {
 
     function available(key) {
         switch (key) {
-        case "bluetooth": return StatusInfo.btAdapter !== null;
-        case "battery": return StatusInfo.battery.isLaptopBattery;
+        case "bluetooth":
+        case "battery": return CCTileMap.available(key);
         case "github": return GitHub.signedIn;
         case "drives": return Drives.volumes.length > 0;
         }
@@ -104,21 +104,8 @@ PanelWindow {
         sheetHeight: Math.min(root.maxHeight, root.detail
             ? Math.max(root.detailMinHeight, (detailLoader.item?.implicitHeight ?? 0) + 52)
             : overview.implicitHeight + 2 * root.padding)
-        readonly property var motionInfo: PanelMotion.info(motion)
-        Behavior on sheetWidth {
-            NumberAnimation {
-                duration: PanelMotion.openDuration(card.motion)
-                easing.type: card.motionInfo.easing
-                easing.overshoot: card.motionInfo.overshoot ?? 1.70158
-            }
-        }
-        Behavior on sheetHeight {
-            NumberAnimation {
-                duration: PanelMotion.openDuration(card.motion)
-                easing.type: card.motionInfo.easing
-                easing.overshoot: card.motionInfo.overshoot ?? 1.70158
-            }
-        }
+        Behavior on sheetWidth { SheetResize { motion: card.motion } }
+        Behavior on sheetHeight { SheetResize { motion: card.motion } }
         color: Theme.denseTranslucent
         onClosed: {
             root.visible = false;
@@ -190,9 +177,9 @@ PanelWindow {
                             Repeater {
                                 model: column.modelData
 
-                                CCWidget {
+                                CCCardSlot {
                                     required property string modelData
-                                    widgetId: modelData
+                                    cardId: modelData
                                     cc: root
                                     columns: root.columns.length
                                 }

@@ -12,8 +12,7 @@ Singleton {
     readonly property int unread: items.filter(n => n.unread).length
 
     function refresh() {
-        if (!fetcher.running)
-            fetcher.running = true;
+        fetcher.poll();
     }
 
     function open(n) {
@@ -39,34 +38,20 @@ Singleton {
             .replace(/\/pulls\/(\d+)$/, "/pull/$1");
     }
 
-    Process {
+    JsonPoll {
         id: fetcher
-        command: ["gh", "api", "notifications?all=false&per_page=30"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.items = JSON.parse(text).map(n => ({
-                        id: n.id,
-                        title: n.subject.title,
-                        type: n.subject.type,
-                        repo: n.repository.full_name,
-                        reason: n.reason.replace(/_/g, " "),
-                        url: root.webUrl(n.subject, n.repository.full_name),
-                        unread: n.unread
-                    }));
-                } catch (e) {
-                    root.items = [];
-                }
-            }
-        }
-        onExited: code => root.signedIn = code === 0
-    }
-
-    Timer {
         interval: 5 * 60 * 1000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.refresh()
+        command: ["gh", "api", "notifications?all=false&per_page=30"]
+        onLoaded: json => root.items = Array.isArray(json) ? json.map(n => ({
+            id: n.id,
+            title: n.subject.title,
+            type: n.subject.type,
+            repo: n.repository.full_name,
+            reason: n.reason.replace(/_/g, " "),
+            url: root.webUrl(n.subject, n.repository.full_name),
+            unread: n.unread
+        })) : []
+        onFailed: root.items = []
+        onExited: code => root.signedIn = code === 0
     }
 }

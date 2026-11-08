@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
 
-settings=~/.config/pikadots/settings.json
 state=~/.local/state/pikadots
-family=$(jq -r '.appearance.iconTheme // empty' "$settings" 2>/dev/null || true)
-family=${family:-Papirus}
+family=$(setting .appearance.iconTheme Papirus)
 
 exists() {
 	[[ -f ~/.local/share/icons/$1/index.theme || -f ~/.icons/$1/index.theme || -f /usr/share/icons/$1/index.theme ]]
@@ -40,12 +39,7 @@ python3 -I ~/.config/hypr/scripts/kde-theme.py || true
 setsid -f python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 || true
 
 if [[ ${1:-} == --restart-shell ]]; then
-	pkill -u "$USER" -x 'qs|quickshell' >/dev/null 2>&1 || true
-	for _ in $(seq 20); do
-		pgrep -u "$USER" -x 'qs|quickshell' >/dev/null || break
-		sleep 0.1
-	done
-	pkill -9 -u "$USER" -x 'qs|quickshell' >/dev/null 2>&1 || true
+	kill_shell
 	setsid -f ~/.config/hypr/scripts/shell.sh >/dev/null 2>&1
 	for _ in $(seq 20); do
 		sleep 0.5

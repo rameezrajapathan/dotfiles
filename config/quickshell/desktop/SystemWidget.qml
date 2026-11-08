@@ -3,23 +3,12 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
-    property bool watching: false
-    function updateWatch() {
-        const want = live && visible;
-        if (want !== watching) {
-            watching = want;
-            SysStats.watch(want);
-        }
+    SysStatsWatch {
+        active: root.live && root.visible
     }
-    onLiveChanged: updateWatch()
-    onVisibleChanged: updateWatch()
-    Component.onCompleted: updateWatch()
-    Component.onDestruction: if (watching) SysStats.watch(false)
 
     readonly property var stats: [
         { label: "CPU", value: SysStats.cpu, detail: Math.round(SysStats.cpu * 100) + "%" },
@@ -39,14 +28,14 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             Desktop.showing = false;
-            Toggles.controlCenterRequested("system");
+            Panels.toggle("controlcenter", "system");
         }
     }
 
     GridLayout {
-        anchors { fill: parent; margins: root.size === "large" ? 22 : 16 }
-        columns: root.size === "small" ? 2 : root.size === "medium" ? root.stats.length : 1
-        rowSpacing: root.size === "large" ? 14 : 6
+        anchors { fill: parent; margins: root.sizeClass === "large" ? 22 : 16 }
+        columns: root.sizeClass === "small" ? 2 : root.sizeClass === "medium" ? root.stats.length : 1
+        rowSpacing: root.sizeClass === "large" ? 14 : 6
         columnSpacing: 8
 
         Repeater {
@@ -56,7 +45,7 @@ Item {
                 id: gauge
                 required property var modelData
                 required property int index
-                readonly property bool wide: root.size === "large"
+                readonly property bool wide: root.sizeClass === "large"
                 Layout.fillWidth: true
                 Layout.fillHeight: !wide
                 Layout.preferredWidth: 1
@@ -66,7 +55,7 @@ Item {
 
                 RingGauge {
                     Layout.alignment: Qt.AlignCenter
-                    size: gauge.wide ? 64 : root.size === "small" ? Math.min(gauge.width, 66) : Math.min(gauge.width, 84)
+                    size: gauge.wide ? 64 : root.sizeClass === "small" ? Math.min(gauge.width, 66) : Math.min(gauge.width, 84)
                     value: gauge.modelData.value
                     tint: root.tint(gauge.modelData, gauge.index)
                 }
@@ -84,7 +73,7 @@ Item {
                         font.letterSpacing: 0.6
                     }
                     Label {
-                        visible: gauge.wide || root.size === "medium"
+                        visible: gauge.wide || root.sizeClass === "medium"
                         Layout.fillWidth: true
                         horizontalAlignment: gauge.wide ? Text.AlignLeft : Text.AlignHCenter
                         text: gauge.modelData.detail

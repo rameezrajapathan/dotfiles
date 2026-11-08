@@ -52,12 +52,6 @@ Singleton {
         Apps.terminal(["sh", "-c", steps.join(" && ") + afterRun]);
     }
 
-    function ago(seconds) {
-        const s = Date.now() / 1000 - seconds;
-        return s < 90 ? "just now" : s < 3600 ? Math.round(s / 60) + " min ago"
-            : s < 86400 ? Math.round(s / 3600) + " h ago" : Math.round(s / 86400) + " days ago";
-    }
-
     IpcHandler {
         target: "updates"
         function check(): void {

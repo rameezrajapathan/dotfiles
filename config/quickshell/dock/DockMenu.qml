@@ -11,7 +11,7 @@ Item {
     property bool open: false
 
     readonly property bool vertical: dock.vertical
-    readonly property var group: key ? Dock.groups.map[key] ?? null : null
+    readonly property var group: key ? Dock.group(key) : null
     readonly property var windows: group?.windows ?? []
     readonly property var entry: key && key !== "launcher" ? Dock.entry(key) : null
     readonly property string title: key === "launcher" ? "Apps" : entry?.name ?? group?.appId ?? ""
@@ -74,7 +74,7 @@ Item {
 
     Rectangle {
         id: card
-        readonly property real fromEdge: Dock.gap + root.dock.depth + 10
+        readonly property real fromEdge: Dock.edgeMargin + root.dock.depth + 10
         readonly property real alongSize: root.vertical ? height : width
         readonly property real centerAlong: root.p ? root.p.along + root.p.size / 2 : 0
         readonly property real alongPos: Math.max(8, Math.min(root.dock.length - alongSize - 8, centerAlong - alongSize / 2))

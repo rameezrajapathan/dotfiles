@@ -13,7 +13,6 @@ PanelWindow {
 
     readonly property int segments: 20
     property string kind: "volume"
-    property real brightness: 0
     property real keyboard: 0
     property bool open: false
 
@@ -24,7 +23,7 @@ PanelWindow {
         : false
     readonly property real value: kind === "volume" ? (sink?.audio?.volume ?? 0)
         : kind === "mic" ? (source?.audio?.volume ?? 0)
-        : kind === "brightness" ? brightness
+        : kind === "brightness" ? Math.max(0, Brightness.value)
         : keyboard
     readonly property string icon: {
         switch (kind) {
@@ -42,7 +41,7 @@ PanelWindow {
     function show(what) {
         kind = what;
         if (what === "brightness")
-            brightnessReader.running = true;
+            Brightness.refresh();
         else if (what === "keyboard")
             keyboardReader.running = true;
         visible = true;
@@ -52,17 +51,6 @@ PanelWindow {
 
     PwObjectTracker { objects: [root.sink, root.source] }
 
-    Process {
-        id: brightnessReader
-        command: ["brightnessctl", "-m", "-c", "backlight"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const f = text.trim().split(",");
-                if (f.length >= 5)
-                    root.brightness = Number(f[2]) / Number(f[4]);
-            }
-        }
-    }
     Process {
         id: keyboardReader
         command: ["brightnessctl", "-m", "-d", "*::kbd_backlight"]

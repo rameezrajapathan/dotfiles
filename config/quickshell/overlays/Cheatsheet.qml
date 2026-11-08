@@ -1,17 +1,17 @@
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
 
-    Exclusive { panel: root }
+    layerNamespace: "quickshell-cheatsheet"
+    backdropOpacity: 0
+    hideWhenFaded: false
 
     readonly property int columns: 3
 
@@ -24,18 +24,10 @@ PanelWindow {
             .filter(c => c.rows.length > 0);
     }
 
-    function toggle() {
-        if (open) {
-            open = false;
-            return;
-        }
+    onOpening: {
         search.text = "";
         Keybinds.refresh();
-        visible = true;
-        open = true;
     }
-
-    property bool open: false
 
     IpcHandler {
         target: "cheatsheet"
@@ -43,15 +35,6 @@ PanelWindow {
             root.toggle();
         }
     }
-
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-cheatsheet"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: false
 
     Rectangle {
         anchors.fill: parent

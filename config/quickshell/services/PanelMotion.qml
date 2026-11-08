@@ -2,7 +2,6 @@ pragma Singleton
 
 import Quickshell
 import QtQuick
-import qs.widgets
 
 Singleton {
     id: root
@@ -21,6 +20,10 @@ Singleton {
         { id: "fade", label: "Fade", icon: "gradient", ms: 240, easing: Easing.OutCubic,
             description: "A quick fade with a slight grow. The calmest." }
     ]
+    readonly property real defaultOvershoot: 1.70158
+    function overshootOf(info) {
+        return info?.overshoot ?? defaultOvershoot;
+    }
     readonly property int closeMs: 240
 
     readonly property string style: Settings.appearance.panelAnimation

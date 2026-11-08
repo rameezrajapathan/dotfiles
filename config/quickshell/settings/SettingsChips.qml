@@ -16,7 +16,7 @@ Flow {
         Rectangle {
             id: chip
             required property var modelData
-            readonly property bool selected: root.current === modelData.value
+            readonly property bool selected: modelData.checked ?? root.current === modelData.value
 
             implicitWidth: label.implicitWidth + 26
             implicitHeight: 30

@@ -5,10 +5,8 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
     property string widgetId: ""
     property bool loaded: false
 
@@ -78,7 +76,7 @@ Item {
                 selectionColor: Qt.alpha(Theme.accent, 0.4)
                 selectedTextColor: Theme.text
                 font.family: Theme.font
-                font.pixelSize: Theme.fontSize + (root.size === "small" ? 0 : 1)
+                font.pixelSize: Theme.fontSize + (root.sizeClass === "small" ? 0 : 1)
                 selectByMouse: true
                 persistentSelection: true
                 onCursorRectangleChanged: flick.ensureVisible(cursorRectangle)

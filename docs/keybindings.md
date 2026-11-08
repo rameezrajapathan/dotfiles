@@ -39,7 +39,7 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 |---|---|
 | Alt + Tab | Switch windows (hold Alt; Shift goes back) |
 | Super + Tab | Overview: hold Super, Tab / Shift + Tab or Left / Right move, release Super or Enter switches, 1–9 jumps there, Esc cancels |
-| Super + Q | Close (Thunderbird and Chrome apps hide instead) |
+| Super + Q | Close |
 | Super + F | Floating |
 | Super + Ctrl + M | Maximize |
 | Super + M | Fullscreen |

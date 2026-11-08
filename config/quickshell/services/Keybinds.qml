@@ -4,8 +4,6 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import QtQuick
-import qs.bar
-import qs.lock
 
 Singleton {
     id: root
@@ -70,7 +68,12 @@ Singleton {
     }
 
     function record(on) {
-        Quickshell.execDetached(["hyprctl", "dispatch", `hl.dsp.submap("${on ? "pikadots-record" : "reset"}")`]);
+        Windows.submap(on ? "pikadots-record" : "reset");
+    }
+
+    function keysFor(desc, fallback) {
+        const b = entries.find(e => e.desc === desc) ?? binds.find(e => e.desc === desc);
+        return b ? b.keys.join(" + ") : fallback ?? "";
     }
 
     function keyName(key) {
@@ -148,6 +151,8 @@ Singleton {
             group: groups.find(g => g.pattern.test(r.desc)).title
         }));
     }
+
+    Component.onCompleted: reader.running = true
 
     FileView {
         id: luaFile

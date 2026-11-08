@@ -3,10 +3,8 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property var unread: GitHub.items.filter(n => n.unread)
     onLiveChanged: if (live && GitHub.signedIn) GitHub.refresh()
@@ -43,7 +41,7 @@ Item {
         }
 
         ColumnLayout {
-            visible: GitHub.signedIn && root.size === "small"
+            visible: GitHub.signedIn && root.sizeClass === "small"
             Layout.fillHeight: true
             spacing: 0
             Item { Layout.fillHeight: true }
@@ -61,18 +59,18 @@ Item {
         }
 
         Label {
-            visible: GitHub.signedIn && root.size !== "small" && root.unread.length === 0
+            visible: GitHub.signedIn && root.sizeClass !== "small" && root.unread.length === 0
             text: "You're all caught up"
             color: Theme.overlay
         }
 
         Repeater {
-            model: GitHub.signedIn && root.size !== "small" ? root.unread.slice(0, root.size === "large" ? 7 : 3) : []
+            model: GitHub.signedIn && root.sizeClass !== "small" ? root.unread.slice(0, root.sizeClass === "large" ? 7 : 3) : []
             Rectangle {
                 id: row
                 required property var modelData
                 Layout.fillWidth: true
-                implicitHeight: root.size === "large" ? 50 : 40
+                implicitHeight: root.sizeClass === "large" ? 50 : 40
                 radius: Theme.round(12, width, height)
                 color: mouse.containsMouse ? Qt.alpha(Theme.surface, 0.7) : "transparent"
                 RowLayout {
@@ -92,7 +90,7 @@ Item {
                             elide: Text.ElideRight
                         }
                         Label {
-                            visible: root.size === "large"
+                            visible: root.sizeClass === "large"
                             Layout.fillWidth: true
                             text: row.modelData.repo
                             color: Theme.subtext

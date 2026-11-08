@@ -1,33 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
 
 pins=~/.local/share/pikadots/clipboard-pins
-settings=~/.config/pikadots/settings.json
-
-setting() {
-	jq -r ".launcher.$1 // empty" "$settings" 2>/dev/null || true
-}
 
 case ${1:-} in
 watch)
-	max=$(setting clipboardSize)
-	persist=$(setting clipboardPersist)
+	max=$(setting .launcher.clipboardSize 750)
+	persist=$(setting .launcher.clipboardPersist true)
 	pkill -f '^wl-paste --watch cliphist' || true
 	pkill -x wl-clip-persist || true
-	setsid -f wl-paste --watch cliphist -max-items "${max:-750}" store >/dev/null 2>&1
-	if [[ $persist != false ]] && command -v wl-clip-persist >/dev/null; then
+	setsid -f wl-paste --watch cliphist -max-items "$max" store >/dev/null 2>&1
+	if [[ $persist != false ]] && has wl-clip-persist; then
 		setsid -f wl-clip-persist --clipboard regular >/dev/null 2>&1
 	fi
 	;;
 pins)
 	mkdir -p "$pins"
-	for f in $(ls -1t "$pins"); do
+	while IFS= read -r -d '' f; do
+		f=${f#* }
 		if [[ $f != *.txt ]]; then
-			printf '%s\t[[ image ]]\n' "$pins/$f"
+			printf '%s\t[[ image ]]\n' "$f"
 		else
-			printf '%s\t%s\n' "$pins/$f" "$(head -c 400 "$pins/$f" | tr '\n\t' '  ')"
+			printf '%s\t%s\n' "$f" "$(head -c 400 "$f" | tr '\n\t' '  ')"
 		fi
-	done
+	done < <(find "$pins" -mindepth 1 -maxdepth 1 ! -name '.*' -printf '%T@ %p\0' | sort -zrn)
 	;;
 pin)
 	mkdir -p "$pins"

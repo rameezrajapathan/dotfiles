@@ -1,17 +1,16 @@
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import qs.lock
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
 
-    Exclusive { panel: root }
+    layerNamespace: "quickshell-power"
+    hideWhenFaded: false
 
     readonly property var actions: [
         { key: "L", label: "Lock", icon: "lock", command: ["loginctl", "lock-session"] },
@@ -21,19 +20,12 @@ PanelWindow {
         { key: "P", label: "Shut down", icon: "power_settings_new", command: ["systemctl", "poweroff"], danger: true }
     ]
 
-    property bool open: false
     property int current: 0
-    property string uptime: ""
+    readonly property string uptime: "up " + SysStats.uptimeText(false)
 
-    function toggle() {
-        if (open) {
-            open = false;
-            return;
-        }
+    onOpening: {
         current = 0;
-        uptimeView.reload();
-        visible = true;
-        open = true;
+        SysStats.refreshUptime();
     }
 
     function run(action) {
@@ -41,42 +33,11 @@ PanelWindow {
         Quickshell.execDetached(action.command);
     }
 
-    FileView {
-        id: uptimeView
-        path: "/proc/uptime"
-        onLoaded: {
-            const mins = Math.floor(parseFloat(text().split(" ")[0]) / 60);
-            const d = Math.floor(mins / 1440), h = Math.floor(mins / 60) % 24, m = mins % 60;
-            root.uptime = "up " + (d > 0 ? d + " d " : "") + (d > 0 || h > 0 ? h + " h " : "") + m + " min";
-        }
-    }
-
     IpcHandler {
         target: "power"
         function toggle(): void {
             root.toggle();
         }
-    }
-
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-power"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: false
-
-    Rectangle {
-        anchors.fill: parent
-        color: "black"
-        opacity: root.open ? 0.3 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.ms(180) } }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: root.open = false
     }
 
     Sheet {

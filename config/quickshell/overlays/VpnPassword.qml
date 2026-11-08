@@ -1,54 +1,33 @@
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-PanelWindow {
+OverlayWindow {
     id: root
 
+    layerNamespace: "quickshell-vpn-password"
+
     readonly property var request: VpnService.request
-    readonly property bool open: request !== null
     property bool remember: true
 
-    onRequestChanged: if (request) {
-        remember = request.remember;
-        field.text = "";
-        visible = true;
-        field.forceActiveFocus();
+    onRequestChanged: {
+        if (request) {
+            remember = request.remember;
+            field.text = "";
+            visible = true;
+            field.forceActiveFocus();
+        }
+        open = request !== null;
     }
+    onOpenChanged: if (!open && request) VpnService.cancelRequest()
 
     function submit() {
         if (field.text === "" || VpnService.requestBusy)
             return;
         VpnService.connect(request.uuid, field.text, remember);
         field.text = "";
-    }
-
-    Exclusive { panel: root }
-
-    screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    anchors { top: true; bottom: true; left: true; right: true }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "quickshell-vpn-password"
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-    color: "transparent"
-    visible: false
-
-    Rectangle {
-        anchors.fill: parent
-        color: "black"
-        opacity: root.open ? 0.35 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.ms(180) } }
-        onOpacityChanged: if (opacity === 0 && !root.open) root.visible = false
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: VpnService.cancelRequest()
     }
 
     Rectangle {

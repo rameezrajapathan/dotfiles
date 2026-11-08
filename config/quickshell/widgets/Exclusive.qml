@@ -7,10 +7,11 @@ Item {
     readonly property bool panelOpen: panel.open
 
     visible: false
-    onPanelOpenChanged: if (panelOpen) Panels.opened(panel)
+    onPanelOpenChanged: if (enabled && panelOpen) Panels.opened(panel)
 
     Connections {
         target: Panels
+        enabled: root.enabled
         function onOpened(other) {
             if (other !== root.panel && root.panel.open)
                 root.panel.open = false;

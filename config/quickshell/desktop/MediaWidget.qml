@@ -4,10 +4,8 @@ import QtQuick.Layouts
 import qs.services
 import qs.widgets
 
-Item {
+DesktopWidgetContent {
     id: root
-    property string size: "small"
-    property bool live: true
 
     readonly property var player: Media.active
     readonly property bool playing: player?.isPlaying ?? false
@@ -17,13 +15,8 @@ Item {
     Timer {
         interval: 1000
         repeat: true
-        running: root.live && root.playing && root.size !== "small"
+        running: root.live && root.playing && root.sizeClass !== "small"
         onTriggered: root.player.positionChanged()
-    }
-
-    function fmt(s) {
-        s = Math.max(0, Math.floor(s));
-        return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
     }
 
     ColumnLayout {
@@ -66,49 +59,38 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
             Desktop.showing = false;
-            Media.panelToggleRequested();
+            Panels.toggle("controlcenter", "music");
         }
-        }
-    }
-
-    component Button: Rectangle {
-        id: button
-        property string icon
-        property bool big: false
-        signal clicked()
-        implicitWidth: big ? 48 : 38
-        implicitHeight: implicitWidth
-        radius: width / 2
-        color: big ? Theme.selectedFill : mouse.containsMouse ? Qt.alpha(Theme.surface, 0.8) : "transparent"
-        Icon {
-            anchors.centerIn: parent
-            name: button.icon
-            filled: true
-            size: button.big ? 28 : 24
-            color: button.big ? Theme.selectedText : Theme.text
-        }
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: button.clicked()
         }
     }
 
     component Controls: RowLayout {
         spacing: 6
-        Button {
+        IconButton {
+            implicitWidth: 38
+            implicitHeight: 38
+            tone: "flat"
+            iconSize: 24
+            filled: true
             icon: "skip_previous"
             visible: root.player?.canGoPrevious ?? false
             onClicked: root.player.previous()
         }
-        Button {
-            big: true
+        IconButton {
+            implicitWidth: 48
+            implicitHeight: 48
+            tone: "selected"
+            iconSize: 28
+            filled: true
             icon: root.playing ? "pause" : "play_arrow"
             onClicked: root.player.togglePlaying()
         }
-        Button {
+        IconButton {
+            implicitWidth: 38
+            implicitHeight: 38
+            tone: "flat"
+            iconSize: 24
+            filled: true
             icon: "skip_next"
             visible: root.player?.canGoNext ?? false
             onClicked: root.player.next()
@@ -152,14 +134,14 @@ Item {
         }
         RowLayout {
             Layout.fillWidth: true
-            Label { text: root.fmt(root.player?.position ?? 0); color: Theme.overlay; font.pixelSize: Theme.fontSize - 3 }
+            Label { text: TimeDate.clock(root.player?.position ?? 0); color: Theme.overlay; font.pixelSize: Theme.fontSize - 3 }
             Item { Layout.fillWidth: true }
-            Label { text: root.fmt(root.player?.length ?? 0); color: Theme.overlay; font.pixelSize: Theme.fontSize - 3 }
+            Label { text: TimeDate.clock(root.player?.length ?? 0); color: Theme.overlay; font.pixelSize: Theme.fontSize - 3 }
         }
     }
 
     Item {
-        visible: root.player !== null && root.size === "small"
+        visible: root.player !== null && root.sizeClass === "small"
         anchors { fill: parent; margins: 14 }
         Cover {
             anchors.fill: parent
@@ -170,7 +152,7 @@ Item {
             radius: Theme.round(16, width, height)
             gradient: Gradient {
                 GradientStop { position: 0; color: "transparent" }
-                GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0.6) }
+                GradientStop { position: 1; color: Qt.alpha(Theme.base, 0.6) }
             }
         }
         RowLayout {
@@ -179,12 +161,16 @@ Item {
             Label {
                 Layout.fillWidth: true
                 text: root.player?.trackTitle ?? ""
-                color: "white"
+                color: Theme.text
                 font.weight: Font.Bold
                 elide: Text.ElideRight
             }
-            Button {
-                big: true
+            IconButton {
+                implicitWidth: 48
+                implicitHeight: 48
+                tone: "selected"
+                iconSize: 28
+                filled: true
                 icon: root.playing ? "pause" : "play_arrow"
                 onClicked: root.player.togglePlaying()
             }
@@ -192,7 +178,7 @@ Item {
     }
 
     RowLayout {
-        visible: root.player !== null && root.size === "medium"
+        visible: root.player !== null && root.sizeClass === "medium"
         anchors { fill: parent; margins: 16 }
         spacing: 16
         Cover {
@@ -211,7 +197,7 @@ Item {
     }
 
     ColumnLayout {
-        visible: root.player !== null && root.size === "large"
+        visible: root.player !== null && root.sizeClass === "large"
         anchors { fill: parent; margins: 20 }
         spacing: 10
         Cover {

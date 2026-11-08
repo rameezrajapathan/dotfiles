@@ -105,9 +105,8 @@ Item {
         anchors.margins: -4
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onClicked: Quickshell.execDetached(["qs", "ipc", "call", "overview", "toggle"])
-        onWheel: wheel => Quickshell.execDetached(["hyprctl", "dispatch",
-            `hl.dsp.focus({ workspace = "${wheel.angleDelta.y < 0 ? "e+1" : "e-1"}" })`])
+        onClicked: Panels.toggle("overview")
+        onWheel: wheel => Windows.stepWorkspace(wheel.angleDelta.y < 0 ? 1 : -1)
     }
 
     Tooltip {

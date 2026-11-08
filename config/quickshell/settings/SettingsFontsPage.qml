@@ -35,119 +35,91 @@ SettingsPage {
                 Repeater {
                     model: FontThemes.themes
 
-                    Rectangle {
+                    SettingsStyleCard {
                         id: card
                         required property var modelData
-                        readonly property bool selected: FontThemes.current === modelData.id
-
-                        Layout.fillWidth: true
+                        selected: FontThemes.current === modelData.id
                         Layout.fillHeight: true
-                        Layout.preferredWidth: 1
-                        implicitHeight: cardColumn.implicitHeight + 24
-                        radius: Theme.round(14, width, height)
-                        color: selected ? Qt.alpha(Theme.accent, 0.16) : cardMouse.containsMouse ? Qt.alpha(Theme.surface, 0.9) : Qt.alpha(Theme.base, 0.45)
-                        border.width: selected ? 2 : 1
-                        border.color: Theme.gradientAccent && (selected) ? "transparent" : selected ? Theme.accent : Qt.alpha(Theme.overlay, 0.25)
-                        GradientBorder {
-                            active: selected
-                        }
-                        Behavior on color { ColorAnimation { duration: Theme.ms(120) } }
+                        inset: 12
+                        contentSpacing: 4
+                        onClicked: FontThemes.apply(card.modelData)
 
-                        ColumnLayout {
-                            id: cardColumn
-                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(12, 14, parent.width, parent.height) }
-                            spacing: 4
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Text {
-                                    text: "Aa"
-                                    color: Theme.accent
-                                    font.family: card.modelData.displayFont
-                                    font.pixelSize: 30
-                                    font.weight: Font.DemiBold
-                                }
-                                Item { Layout.fillWidth: true }
-                                CheckBadge {
-                                    visible: card.selected
-                                    Layout.alignment: Qt.AlignTop
-                                }
-                            }
+                        RowLayout {
+                            Layout.fillWidth: true
                             Text {
-                                Layout.fillWidth: true
-                                text: card.modelData.label
-                                color: Theme.text
+                                text: "Aa"
+                                color: Theme.accent
                                 font.family: card.modelData.displayFont
-                                font.pixelSize: 17
-                                font.weight: Font.Bold
-                                elide: Text.ElideRight
+                                font.pixelSize: 30
+                                font.weight: Font.DemiBold
                             }
-                            Text {
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: Math.ceil(fontMetricsVibe.height * 2)
-                                text: card.modelData.vibe
-                                color: Theme.subtext
+                            Item { Layout.fillWidth: true }
+                            CheckBadge {
+                                visible: card.selected
+                                Layout.alignment: Qt.AlignTop
+                            }
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: card.modelData.label
+                            color: Theme.text
+                            font.family: card.modelData.displayFont
+                            font.pixelSize: 17
+                            font.weight: Font.Bold
+                            elide: Text.ElideRight
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: Math.ceil(fontMetricsVibe.height * 2)
+                            text: card.modelData.vibe
+                            color: Theme.subtext
+                            font.family: card.modelData.font
+                            font.pixelSize: 13
+                            wrapMode: Text.Wrap
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
+                            verticalAlignment: Text.AlignTop
+
+                            FontMetrics {
+                                id: fontMetricsVibe
                                 font.family: card.modelData.font
                                 font.pixelSize: 13
-                                wrapMode: Text.Wrap
-                                maximumLineCount: 2
-                                elide: Text.ElideRight
-                                verticalAlignment: Text.AlignTop
-
-                                FontMetrics {
-                                    id: fontMetricsVibe
-                                    font.family: card.modelData.font
-                                    font.pixelSize: 13
-                                }
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                Layout.topMargin: 4
-                                text: "~/code $ ls -la"
-                                color: Qt.alpha(Theme.text, 0.7)
-                                font.family: card.modelData.monoFont
-                                font.pixelSize: 12
-                                elide: Text.ElideRight
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: [card.modelData.font, card.modelData.displayFont, card.modelData.monoFont]
-                                    .filter((f, i, a) => a.indexOf(f) === i).join(" · ")
-                                Layout.preferredHeight: 28
-                                color: Theme.overlay
-                                font.family: Theme.font
-                                font.pixelSize: 10
-                                wrapMode: Text.Wrap
-                                maximumLineCount: 2
-                                elide: Text.ElideRight
-                                verticalAlignment: Text.AlignTop
                             }
                         }
-
-                        MouseArea {
-                            id: cardMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: FontThemes.apply(card.modelData)
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.topMargin: 4
+                            text: "~/code $ ls -la"
+                            color: Qt.alpha(Theme.text, 0.7)
+                            font.family: card.modelData.monoFont
+                            font.pixelSize: 12
+                            elide: Text.ElideRight
                         }
-                        GlassRim {}
+                        Text {
+                            Layout.fillWidth: true
+                            text: [card.modelData.font, card.modelData.displayFont, card.modelData.monoFont]
+                                .filter((f, i, a) => a.indexOf(f) === i).join(" · ")
+                            Layout.preferredHeight: 28
+                            color: Theme.overlay
+                            font.family: Theme.font
+                            font.pixelSize: 10
+                            wrapMode: Text.Wrap
+                            maximumLineCount: 2
+                            elide: Text.ElideRight
+                            verticalAlignment: Text.AlignTop
+                        }
                     }
                 }
             }
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "apps"
             title: "Use in apps"
             description: "GTK, Qt and KDE apps use the interface and terminal fonts too."
-            Switch {
-                checked: Settings.appearance.appFonts
-                onToggled: {
-                    Settings.appearance.appFonts = !checked;
-                    Settings.applyFonts();
-                }
-            }
+            target: Settings.appearance
+            key: "appFonts"
+            onSwitched: Settings.applyFonts()
         }
     }
 
@@ -293,18 +265,14 @@ SettingsPage {
             }
         }
 
-        SettingsRow {
+        SettingsSwitchRow {
             visible: folderTool.found && Settings.appearance.iconTheme.startsWith("Papirus")
             icon: "folder"
             title: "Folder color follows accent"
             description: "Recolors Papirus folders to the closest papirus-folders color when the wallpaper changes. Asks for your password when the color changes."
-            Switch {
-                checked: Settings.appearance.folderAccent
-                onToggled: {
-                    Settings.appearance.folderAccent = !checked;
-                    Settings.applyFolderColor();
-                }
-            }
+            target: Settings.appearance
+            key: "folderAccent"
+            onSwitched: Settings.applyFolderColor()
         }
     }
 }

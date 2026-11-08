@@ -13,16 +13,7 @@ Rectangle {
     readonly property bool critical: notification.urgency === NotificationUrgency.Critical
     readonly property color tint: critical ? Theme.red : Theme.accent
     readonly property var actions: notification.actions.filter(a => a.identifier !== "default")
-    readonly property string iconSource: {
-        const n = notification;
-        const themed = n.image.startsWith("image://icon/") ? n.image.slice(13) : "";
-        if (n.image && !themed)
-            return n.image;
-        const icon = themed || n.appIcon;
-        if (!icon)
-            return "";
-        return icon.startsWith("/") ? "file://" + icon : Quickshell.hasThemeIcon(icon) ? Quickshell.iconPath(icon) : "";
-    }
+    readonly property string iconSource: NotificationService.iconFor(notification)
     readonly property bool expires: popup && !critical && notification.expireTimeout !== 0
     property real remaining: 1
     readonly property int inset: Theme.pad(14, 18)

@@ -240,31 +240,12 @@ SettingsPage {
         }
     }
 
-    property string capturing
-    Process {
-        id: capture
-        command: ["sh", "-c", "printf '{\"clients\":%s,\"monitors\":%s}' \"$(hyprctl -j clients)\" \"$(hyprctl -j monitors)\""]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const index = root.indexOf(root.capturing);
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    return;
-                }
-                const c = data.clients.filter(c => c.class === root.capturing)
-                    .sort((a, b) => a.focusHistoryID - b.focusHistoryID)[0];
-                const m = c && data.monitors.find(m => m.id === c.monitor);
-                if (index < 0 || !c || !m)
-                    return;
-                root.update(index, {
-                    float: true, position: "exact",
-                    x: c.at[0] - m.x, y: c.at[1] - m.y,
-                    size: c.size[0] + " " + c.size[1]
-                });
-            }
-        }
+    function captureGeometry(cls) {
+        WindowGeometry.capture(cls, g => {
+            const index = root.indexOf(cls);
+            if (index >= 0)
+                root.update(index, { float: true, position: "exact", x: g.x, y: g.y, size: g.width + " " + g.height });
+        });
     }
 
     function hasWindow(cls) {
@@ -335,22 +316,14 @@ SettingsPage {
                 icon: "tune"
                 title: "Opens"
                 below: true
-                Flow {
-                    spacing: 6
-                    Repeater {
-                        model: [
-                            { key: "float", label: "Floating", show: true },
-                            { key: "pin", label: "On every workspace", show: rule.r.float },
-                            { key: "fullscreen", label: "Fullscreen", show: true },
-                            { key: "noBlur", label: "No blur", show: true }
-                        ].filter(o => o.show)
-                        ToggleChip {
-                            required property var modelData
-                            text: modelData.label
-                            checked: rule.r[modelData.key] === true
-                            onClicked: root.update(rule.index, { [modelData.key]: !checked })
-                        }
-                    }
+                SettingsChips {
+                    options: [
+                        { value: "float", label: "Floating", show: true },
+                        { value: "pin", label: "On every workspace", show: rule.r.float },
+                        { value: "fullscreen", label: "Fullscreen", show: true },
+                        { value: "noBlur", label: "No blur", show: true }
+                    ].filter(o => o.show).map(o => Object.assign(o, { checked: rule.r[o.value] === true }))
+                    onPicked: v => root.update(rule.index, { [v]: rule.r[v] !== true })
                 }
             }
 
@@ -409,26 +382,16 @@ SettingsPage {
 
                     ColumnLayout {
                         spacing: 8
-                        Flow {
+                        SettingsChips {
                             Layout.fillWidth: true
-                            spacing: 6
-                            ToggleChip {
-                                text: "Auto"
-                                checked: rule.position === ""
-                                onClicked: root.update(rule.index, { position: "", center: false })
-                            }
-                            ToggleChip {
-                                text: "Exact"
-                                checked: rule.position === "exact"
-                                onClicked: root.update(rule.index, { position: "exact", center: false })
-                            }
-                            ToggleChip {
-                                visible: root.hasWindow(rule.r.cls)
-                                text: "Use the open window"
-                                onClicked: {
-                                    root.capturing = rule.r.cls;
-                                    capture.running = true;
-                                }
+                            options: [{ value: "", label: "Auto" }, { value: "exact", label: "Exact" }]
+                                .concat(root.hasWindow(rule.r.cls) ? [{ value: "capture", label: "Use the open window", checked: false }] : [])
+                            current: rule.position
+                            onPicked: v => {
+                                if (v === "capture")
+                                    root.captureGeometry(rule.r.cls);
+                                else
+                                    root.update(rule.index, { position: v, center: false });
                             }
                         }
                         RowLayout {
@@ -487,11 +450,10 @@ SettingsPage {
                         current: rule.r.workspace
                         onPicked: v => root.update(rule.index, { workspace: v })
                     }
-                    ToggleChip {
+                    SettingsChips {
                         visible: rule.r.workspace !== ""
-                        text: "Stay where I am"
-                        checked: rule.r.silent
-                        onClicked: root.update(rule.index, { silent: !checked })
+                        options: [{ value: "silent", label: "Stay where I am", checked: rule.r.silent === true }]
+                        onPicked: root.update(rule.index, { silent: !rule.r.silent })
                     }
                 }
             }
@@ -535,7 +497,8 @@ SettingsPage {
                     id: commandField
                     implicitWidth: 200
                     placeholder: "cava"
-                    onEntered: t => root.addCommand(t)
+                    commitOnBlur: false
+                    onAccepted: t => root.addCommand(t)
                 }
                 Pill {
                     icon: "add"
@@ -551,34 +514,6 @@ SettingsPage {
             icon: "error"
             title: "Couldn't add it"
             description: root.message
-        }
-    }
-
-    component ToggleChip: Rectangle {
-        id: chip
-        property alias text: label.text
-        property bool checked: false
-        signal clicked()
-
-        implicitWidth: label.implicitWidth + 26
-        implicitHeight: 30
-        radius: Theme.round(height / 2, width, height)
-        color: checked ? Theme.selectedFill : mouse.containsMouse ? Qt.alpha(Theme.overlay, 0.35) : Qt.alpha(Theme.base, 0.6)
-        border.width: checked ? 0 : 1
-        border.color: Qt.alpha(Theme.overlay, 0.3)
-
-        Label {
-            id: label
-            anchors.centerIn: parent
-            color: chip.checked ? Theme.selectedText : Theme.text
-            font.pixelSize: Theme.fontSize - 1
-        }
-        MouseArea {
-            id: mouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: chip.clicked()
         }
     }
 }

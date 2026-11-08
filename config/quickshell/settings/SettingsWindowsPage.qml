@@ -81,13 +81,10 @@ SettingsPage {
                 onMoved: v => Hypr.set("general.border_size", v)
             }
         }
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "drag_pan"
             title: "Resize by dragging borders"
-            Switch {
-                checked: Hypr.value("general.resize_on_border") ?? false
-                onToggled: Hypr.set("general.resize_on_border", !checked)
-            }
+            hypr: "general.resize_on_border"
         }
     }
 
@@ -115,14 +112,12 @@ SettingsPage {
         canReset: root.changed(keys)
         onReset: Hypr.reset(keys)
 
-        SettingsRow {
+        SettingsSwitchRow {
             icon: "tab"
             title: "Hide tabs for a single window"
             description: "A group with one window left shows no tab bar."
-            Switch {
-                checked: Hypr.value("group.groupbar.disable_when_only") ?? true
-                onToggled: Hypr.set("group.groupbar.disable_when_only", !checked)
-            }
+            hypr: "group.groupbar.disable_when_only"
+            fallback: true
         }
     }
 }

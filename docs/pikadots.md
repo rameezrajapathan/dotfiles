@@ -5,7 +5,7 @@
 ```
 pikadots install      packages, links into $HOME, services, colors
 pikadots link         only link the files in config/ into $HOME
-pikadots uninstall    undo install, then optionally remove packages
+pikadots uninstall    undo install (as far as it safely can), then optionally remove packages
 pikadots health       check everything (alias: check, doctor)
 pikadots repair       fix what health finds (alias: fix)
 pikadots update       pull the repo, then repair if anything changed
@@ -35,16 +35,23 @@ pikadots help         this list
    isn't kept after its app closes.
 2. Links the files in `config/` into `$HOME` (`config/hypr` → `~/.config/hypr`; the full list is the
    `links` table at the top of `config/pikadots/pikadots`). Files in the way are moved to
-   `~/.local/state/pikadots/backups/<date>/`. `pikadots link` does only this step.
+   `~/.local/state/pikadots/backups/<date>/`. The shell files in `config/shell` are in the table
+   too; the fish and nushell ones are linked only when that shell is installed. `pikadots link`
+   does only this step.
 3. Asks for your git name and email, saved to `~/.config/git/user`. `config/git` is linked as a
    whole, so the file sits in the repo folder, but `config/git/.gitignore` keeps it out of git.
    Sets up the starship prompt, wallpaper colors for `eza`, the `ls`/`ll`/`la`/`lt` aliases,
    zoxide (`cd`) and mise for bash, zsh, fish and nushell, whichever you use: zsh through
-   `~/.zshrc`, bash with one line added to `~/.bashrc`, fish in `~/.config/fish/conf.d`, and
-   nushell in `~/.local/share/nushell/vendor/autoload`. Other shells are left alone.
+   `~/.zshrc`, bash with one line added to `~/.bashrc` (sourcing `~/.config/pikadots/pikadots.bash`),
+   fish in `~/.config/fish/conf.d`, and nushell in `~/.local/share/nushell/vendor/autoload` (plus
+   generated `pikadots-starship.nu`, `pikadots-zoxide.nu` and `pikadots-mise.nu` there). Other
+   shells are left alone.
 4. Enables NetworkManager, Bluetooth, power-profiles-daemon and the SSH agent, masks other
-   notification daemons (mako, dunst, swaync) so the shell shows notifications, and enables the
-   daily backup timer if a restic password already exists.
+   notification daemons (mako, dunst, swaync) so the shell shows notifications, enables
+   `pikadots-idle.service` (the idle timers, started with the Hyprland session) and the daily
+   backup timer if a restic password already exists. It retires the old
+   `pikadots-wallpaper.service` (the shell draws the wallpaper now): disabled and its link removed.
+   If the pikadots greeter is installed, it is refreshed (see [below](#login-screen-and-boot-splash)).
 5. Sets up the apps that follow the wallpaper: the Pywalfox helper for Firefox and Zen, each Zen
    and [Thunderbird](theming.md#thunderbird) profile's `user.js` and `userChrome.css`, the
    [mpv](theming.md#mpv) font file and the VS Code theme. Sets default apps that aren't
@@ -79,13 +86,28 @@ for you in a terminal ([settings.md](settings.md#updates)).
 
 ## uninstall
 
-Asks first. Stops the backup timer, puts Plasma's own colors, icons and fonts back into
-`~/.config/kdeglobals` and its cursor into `~/.config/kcminputrc` (see [Qt and KDE apps](theming.md#qt-and-kde-apps)) and restores the VS Code
-settings ([theming.md](theming.md#vs-code-and-code---oss)). Then it removes the links and copies
-back the files from the oldest folder in `~/.local/state/pikadots/backups/` (the one from the
-first install) with `cp -an`, so it never overwrites a file that's there now. If the login screen
-or boot splash was themed, it offers `greeter --reset` and `splash --reset` (each asks before using
-sudo). Backups, the keyring and your git identity stay.
+Asks first. Stops the backup timer and disables `pikadots-idle.service`, puts Plasma's own colors,
+icons and fonts back into `~/.config/kdeglobals` and its cursor into `~/.config/kcminputrc` (see
+[Qt and KDE apps](theming.md#qt-and-kde-apps)), restores the VS Code settings
+([theming.md](theming.md#vs-code-and-code---oss)) and unmasks the notification daemons it masked.
+It removes the Pywalfox helper manifests it wrote, the `@import` line it put at the top of each Zen
+and Thunderbird profile's `userChrome.css`, the `user.js` prefs it added, and the default apps it
+set (terminal list, file manager, text editor) if they're still the ones it picked.
+
+If the login screen, the pikadots greeter or the boot splash is in place, it offers
+`greeter --reset`, `greeter remove` and `splash --reset` (each asks before using sudo). Then it
+removes the links and copies back the files from the oldest folder in
+`~/.local/state/pikadots/backups/` (the one from the first install) with `cp -an`, so it never
+overwrites a file that's there now. If you keep the pikadots greeter, `~/.local/bin/pikadots`
+stays linked so `pikadots greeter remove` keeps working from a text console; it runs from the
+repo folder, so keep that until then, and remove the link afterwards. Backups, the keyring and
+your git identity stay.
+
+Some things it can't safely undo, so it leaves them: notifier masks, `user.js` prefs and default
+apps set by a pikadots older than this (it didn't record them; `systemctl --user unmask
+mako.service`, and the `user_pref` lines at the end of `user.js`, undo them by hand), and the
+values Zen and Thunderbird already copied from `user.js` into `prefs.js` (they're harmless; reset
+them in `about:config` if you like).
 
 Then it offers to remove the packages pikadots installed: **y** removes them, **e** opens the list
 in `$EDITOR` to choose, anything else keeps them. Essentials (`networkmanager`, `networkmanager-openvpn`,
@@ -114,13 +136,22 @@ asking and using sudo. Run them again after changing the wallpaper; `--reset` un
   (`/etc/systemd/system/greetd.service.d/pikadots.conf`) that hides the cursor on the login console
   so the hand-off to your session is plain black, adds GNOME Keyring to `/etc/pam.d/greetd` (keeping
   the old one) so your keyring unlocks with your login password, and switches the display manager to
-  greetd, remembering the previous one. It shows from the next boot. Run it again after changing
-  the wallpaper. `pikadots repair` (and so `update`) refreshes an installed greeter whose files or
-  greetd command are older than the repo's, and `health` flags one. If a session closes right
+  greetd, remembering the previous one (also when that was greetd itself). The fonts the theme
+  uses (Settings > Fonts & icons, plus Material Symbols in the icon style) are copied to
+  `/var/lib/pikadots-greeter/fonts` with a `fonts.conf` next to them; greetd starts the greeter
+  with `FONTCONFIG_FILE` pointing at it and `PIKADOTS_GREETER_DIR=/var/lib/pikadots-greeter`, so it
+  finds them without the fonts in your home folder. The greetd user is read from the old
+  `config.toml` or the greetd package (`greeter`, `greetd` or `_greetd`). It shows from the next
+  boot. Run it again after changing the wallpaper. `pikadots install` and `repair` (and so
+  `update`) refresh an installed greeter whose files, fonts or greetd command are older than the
+  repo's, copying the wallpaper, colors and fonts again; `health` flags one. If a session closes right
   after login, the greeter says so next time instead of looping silently. Why greetd and not a themed Plasma Login Manager:
   [ADR 0001](adr/0001-greetd-quickshell-greeter.md).
 - **`pikadots greeter remove`** switches back to the previous display manager, restores
-  `config.toml` and removes both folders. It needs nothing but a shell, so it works from a text
+  `config.toml` and removes both folders. With no previous one recorded, it picks an installed
+  Plasma Login Manager, SDDM, GDM, LightDM or ly, or keeps greetd with its old `config.toml`; if
+  there's none, it says that the next boot ends at a text console. `pikadots uninstall` offers it
+  too. It needs nothing but a shell, so it works from a text
   console (Ctrl + Alt + F3) if the greeter ever fails to start.
 - **`pikadots greeter preview`** shows the greeter on your screen now, without changing anything;
   Esc closes it.
@@ -132,8 +163,9 @@ asking and using sudo. Run them again after changing the wallpaper; `--reset` un
 
 To go back, run `pikadots greeter --reset` or `pikadots splash --reset`:
 
-- **greeter --reset** removes the drop-in and the copied wallpaper and puts back the login
-  screen's old colors, so it looks exactly as before.
+- **greeter --reset** (Plasma Login Manager theming) removes the drop-in and the copied wallpaper
+  and puts back the login screen's old colors, so it looks exactly as before. It works whichever
+  display manager is active, and never touches the pikadots greeter (that's `greeter remove`).
 - **splash --reset** switches back to the recorded theme, rebuilds the initramfs and removes the
   pikadots theme. If nothing was recorded, it falls back to the distribution default
   (`plymouth-set-default-theme --reset`).

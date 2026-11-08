@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import QtQuick
@@ -10,24 +9,9 @@ Repeater {
     id: root
     required property var bar
 
-    property var menuOnly: []
-
     model: SystemTray.items
-    onCountChanged: ayatana.running = true
-    Component.onCompleted: ayatana.running = true
-
-    property Process ayatana: Process {
-        command: ["sh", "-c", `
-            busctl --user --json=short get-property org.kde.StatusNotifierWatcher /StatusNotifierWatcher \
-                org.kde.StatusNotifierWatcher RegisteredStatusNotifierItems |
-            grep -o '"[^"]*/org/ayatana/[^"]*"' | tr -d '"' |
-            while read -r item; do
-                busctl --user get-property "\${item%%/*}" "/\${item#*/}" org.kde.StatusNotifierItem Id | cut -d'"' -f2
-            done`]
-        stdout: StdioCollector {
-            onStreamFinished: root.menuOnly = text.split("\n").filter(s => s)
-        }
-    }
+    onCountChanged: TrayItems.refresh()
+    Component.onCompleted: TrayItems.refresh()
 
     IconImage {
         id: icon
@@ -52,7 +36,7 @@ Repeater {
                 const item = icon.modelData;
                 if (mouse.button === Qt.MiddleButton) {
                     item.secondaryActivate();
-                } else if (mouse.button === Qt.RightButton || item.onlyMenu || root.menuOnly.includes(item.id)) {
+                } else if (mouse.button === Qt.RightButton || TrayItems.isMenuOnly(item)) {
                     if (item.hasMenu) {
                         const edge = Theme.barPosition;
                         const p = icon.mapToItem(null, edge === "left" ? icon.width + 10 : edge === "right" ? -10 : 0,
