@@ -1703,6 +1703,12 @@ cmd_splash() {
 	accent=$(jq -r .accent "$palette") surface=$(jq -r .surface "$palette")
 	logo=$(splash_logo) || die "no distribution logo found"
 	has magick || die "imagemagick isn't installed"
+	local plugins need_plugin=
+	plugins=$(plymouth --get-splash-plugin-path 2>/dev/null)
+	if [[ ! -f ${plugins:-/usr/lib/plymouth/}script.so ]]; then
+		[[ $pm == dnf ]] || die "plymouth's script plugin is missing"
+		need_plugin=1
+	fi
 	tmp=$(mktemp -d)
 	trap 'rm -rf "$tmp"' RETURN
 	magick -background none -density 600 "$logo" -resize 160x160 -fill "$text" -colorize 100 "$tmp/logo.png" &&
@@ -1713,11 +1719,15 @@ cmd_splash() {
 		-e "s/@ACCENT@/$(rgb "$accent")/g" "$pkgdir/plymouth/pikadots.script" >"$tmp/pikadots.script"
 
 	info "with sudo, this will:"
+	[[ -n $need_plugin ]] && info "  install plymouth-plugin-script (Fedora doesn't include plymouth's script plugin by default)"
 	info "  install a pikadots theme in $splash_dir: the ${logo##*/} logo over $base, spinner in $accent"
 	info "  switch the boot splash from $current to pikadots and rebuild the initramfs (takes a minute)"
 	[[ $current == pikadots ]] || info "  remember $current, so pikadots splash --reset can bring it back"
-	grep -qw splash /proc/cmdline || warn "the kernel command line has no 'splash', so the splash may not show"
+	grep -qwE 'splash|rhgb' /proc/cmdline || warn "the kernel command line has no 'splash' (or 'rhgb'), so the splash may not show"
 	confirm "Install the boot splash?" || exit 0
+	if [[ -n $need_plugin ]]; then
+		sudo dnf install -y plymouth-plugin-script >/dev/null || die "couldn't install plymouth-plugin-script"
+	fi
 
 	if [[ $current != pikadots ]]; then
 		mkdir -p "$state"

@@ -158,7 +158,8 @@ asking and using sudo. Run them again after changing the wallpaper; `--reset` un
 - **`pikadots splash`**: installs a pikadots Plymouth script theme from `config/plymouth` (the
   wallpaper's base color, the distro logo, an accent spinner and a password prompt for encrypted
   disks) and switches to it with `sudo plymouth-set-default-theme -R`, which rebuilds the
-  initramfs. The kernel command line needs `splash`. The previous theme is saved in
+  initramfs. On Fedora it first installs `plymouth-plugin-script`, which Fedora doesn't ship by
+  default. The kernel command line needs `splash` (`rhgb` on Fedora). The previous theme is saved in
   `~/.local/state/pikadots/splash-previous` (and a copy inside the theme folder) for `--reset`.
 
 To go back, run `pikadots greeter --reset` or `pikadots splash --reset`:
