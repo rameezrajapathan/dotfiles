@@ -13,7 +13,7 @@ OverlayWindow {
     hideWhenFaded: false
 
     readonly property var actions: [
-        { key: "L", label: "Lock", icon: "lock", command: ["loginctl", "lock-session"] },
+        { key: "L", label: "Lock", icon: "lock", command: [Quickshell.env("HOME") + "/.config/hypr/scripts/lock.sh"] },
         { key: "E", label: "Log out", icon: "logout", command: ["hyprctl", "dispatch", "hl.dsp.exit()"] },
         { key: "S", label: "Suspend", icon: "bedtime", command: ["systemctl", "suspend"] },
         { key: "R", label: "Restart", icon: "restart_alt", command: ["systemctl", "reboot"] },

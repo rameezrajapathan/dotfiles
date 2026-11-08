@@ -68,7 +68,7 @@ RowLayout {
         tipKeys: "Super + L"
         onClicked: {
             root.cc.close();
-            Quickshell.execDetached(["loginctl", "lock-session"]);
+            Quickshell.execDetached([Quickshell.env("HOME") + "/.config/hypr/scripts/lock.sh"]);
         }
     }
     CCIconButton {

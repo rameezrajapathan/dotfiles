@@ -17,7 +17,7 @@ Item {
     onShownChanged: if (shown) User.refresh()
 
     readonly property var actions: [
-        { icon: "lock", title: "Lock", command: ["loginctl", "lock-session"] },
+        { icon: "lock", title: "Lock", command: [Quickshell.env("HOME") + "/.config/hypr/scripts/lock.sh"] },
         { icon: "logout", title: "Log out", command: ["hyprctl", "dispatch", "hl.dsp.exit()"] },
         { icon: "power_settings_new", title: "Power menu", command: ["qs", "ipc", "call", "power", "toggle"] }
     ]
