@@ -261,6 +261,7 @@ Singleton {
                 property bool attached: false
                 property var custom: null
                 property bool musicBars: true
+                property var hiddenTray: []
                 property bool clock24: false
                 property bool seconds: false
             }

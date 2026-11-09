@@ -12,5 +12,5 @@ Flow {
     leftPadding: 6
     rightPadding: 6
 
-    Tray { bar: root.cc }
+    Tray { bar: root.cc; all: true }
 }

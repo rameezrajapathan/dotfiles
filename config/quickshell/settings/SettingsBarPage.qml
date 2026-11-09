@@ -1,3 +1,4 @@
+import Quickshell.Services.SystemTray
 import QtQuick
 import QtQuick.Layouts
 import qs.bar
@@ -162,6 +163,30 @@ SettingsPage {
             BarModuleEditor {
                 id: editor
                 anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.pad(14, 16) }
+            }
+        }
+    }
+
+    SettingsSection {
+        visible: SystemTray.items.values.length > 0
+        title: "Tray"
+        subtitle: "Hidden icons stay in the control center's Tray card."
+
+        Repeater {
+            model: SystemTray.items
+
+            SettingsRow {
+                id: trayRow
+                required property SystemTrayItem modelData
+                readonly property bool shown: !TrayItems.isHidden(modelData)
+                icon: shown ? "visibility" : "visibility_off"
+                title: modelData.tooltipTitle || modelData.title || modelData.id
+                description: shown ? "Shown in the bar" : "Only in the control center"
+
+                Switch {
+                    checked: trayRow.shown
+                    onToggled: TrayItems.setHidden(trayRow.modelData, trayRow.shown)
+                }
             }
         }
     }

@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
@@ -22,7 +21,7 @@ Loader {
         case "recording": return Recorder.active || Privacy.active;
         case "title": return ToplevelManager.activeToplevel !== null && !Theme.barVertical;
         case "media": return Media.active !== null;
-        case "tray": return SystemTray.items.values.length > 0;
+        case "tray": return TrayItems.barCount > 0;
         case "bluetooth": return StatusInfo.btAdapter !== null;
         case "battery": return StatusInfo.battery.isLaptopBattery;
         }

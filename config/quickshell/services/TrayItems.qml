@@ -2,6 +2,7 @@ pragma Singleton
 
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.SystemTray
 import QtQuick
 
 Singleton {
@@ -11,6 +12,19 @@ Singleton {
 
     function refresh() {
         reader.running = true;
+    }
+
+    readonly property int barCount: SystemTray.items.values.filter(i => !isHidden(i)).length
+
+    function isHidden(item) {
+        return (Settings.bar.hiddenTray ?? []).includes(item.id);
+    }
+
+    function setHidden(item, hide) {
+        const list = (Settings.bar.hiddenTray ?? []).filter(id => id !== item.id);
+        if (hide)
+            list.push(item.id);
+        Settings.bar.hiddenTray = list;
     }
 
     function isMenuOnly(item) {

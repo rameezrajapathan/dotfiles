@@ -8,6 +8,7 @@ import qs.widgets
 Repeater {
     id: root
     required property var bar
+    property bool all: false
 
     model: SystemTray.items
     onCountChanged: TrayItems.refresh()
@@ -17,6 +18,7 @@ Repeater {
         id: icon
         required property SystemTrayItem modelData
 
+        visible: root.all || !TrayItems.isHidden(modelData)
         implicitSize: 18
         source: {
             const s = modelData.icon;
@@ -51,7 +53,8 @@ Repeater {
         }
 
         Tooltip {
-            text: icon.modelData.tooltipTitle || icon.modelData.title || icon.modelData.id
+            text: (icon.modelData.tooltipTitle || icon.modelData.title || icon.modelData.id)
+                + (root.all && TrayItems.isHidden(icon.modelData) ? " (hidden from bar)" : "")
             side: Theme.awayFromBar
         }
     }
