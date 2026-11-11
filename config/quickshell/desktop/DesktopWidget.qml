@@ -92,16 +92,23 @@ Item {
     onContentUrlChanged: loadContent()
     Component.onCompleted: loadContent()
 
+    readonly property bool editsInPlace: Desktop.kind(entry.kind)?.editsInPlace === true
+
     Loader {
         id: body
         anchors.fill: parent
-        enabled: !root.editable
+        enabled: !root.editable || root.editsInPlace
+        z: root.editable && root.editsInPlace ? 1 : 0
         clip: true
         onLoaded: {
             item.sizeClass = Qt.binding(() => root.sizeClass);
             item.live = Qt.binding(() => root.live);
             if ("widgetId" in item)
                 item.widgetId = Qt.binding(() => root.preview ? "" : root.entry.id);
+            if ("editing" in item)
+                item.editing = Qt.binding(() => root.editable && !root.preview);
+            if ("screenName" in item)
+                item.screenName = Qt.binding(() => root.screenName);
         }
     }
 
@@ -144,6 +151,7 @@ Item {
     IconButton {
         x: -10
         y: -10
+        z: 2
         width: 30
         height: 30
         visible: root.editable && !root.dragging && !root.resizing
@@ -156,6 +164,7 @@ Item {
 
     Item {
         id: grip
+        z: 2
         visible: root.editable && !root.dragging
         x: root.width - width + 10
         y: root.height - height + 10

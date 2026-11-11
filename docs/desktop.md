@@ -39,8 +39,13 @@ opens with the key that hides it (`bar/SpecialChip.qml`, `overlays/SpecialToast.
 and keys are in `services/Special.qml`). The `minimized` one shows as **Minimized** and has no key:
 its chip hides it again. Its windows get a border in that color.
 
+**Super + Alt + B** switches to the next bar style and **Super + Alt + Shift + B** to the previous
+one, through the ten styles and then Custom (your own setup, once you have one); the new style's
+name shows briefly at the bottom of the screen.
+
 From a script: `qs ipc call bar position top|bottom|left|right` moves the bar, `bar cycle` moves
-it to the next edge, `bar workspaces <style>` (or `next`) changes the workspaces item.
+it to the next edge, `bar style next|prev|<style>` changes the bar style, `bar workspaces <style>`
+(or `next`) changes the workspaces item.
 
 The ten ready-made styles (shown with music paused; while something plays, the clock turns into a
 live spectrum and Now playing shows the track):
@@ -86,7 +91,7 @@ Everything else is in Settings > Dock. From a script: `qs ipc call dock toggle|s
 
 ## Desktop widgets (Super + H)
 
-Cards on the wallpaper, behind your windows. Sixteen kinds:
+Cards on the wallpaper, behind your windows. Seventeen kinds:
 
 | Kind | What it shows |
 |---|---|
@@ -106,10 +111,11 @@ Cards on the wallpaper, behind your windows. Sixteen kinds:
 | System info | Distro logo, kernel, uptime, packages, shell, WM, CPU and memory, fetch style |
 | Photo frame | A slideshow of a folder of pictures |
 | GitHub | Unread notifications |
+| Shortcuts | Apps, folders, files, links and websites, each website in the browser and profile you choose ([more](#shortcuts)) |
 
 Widgets snap to a grid of 120 px cells (an even number across and down) that keeps clear of the
 bar and an always-visible dock. A widget can be any number of cells wide and tall, from 2 × 2
-(2 × 1 for the pixel clock and visualizer) up to 4 × 4, and rearranges itself to fit. Each screen
+(2 × 1 for the pixel clock and visualizer, 1 × 1 for Shortcuts) up to 4 × 4, and rearranges itself to fit. Each screen
 has its own layout, shared by all its workspaces. They use the same glass as the panels (Settings >
 Desktop can make them solid). The pointer shows what a spot does: a hand over things you can click,
 a text cursor in notes and the to-do field.
@@ -124,13 +130,46 @@ a text cursor in notes and the to-do field.
   meeting, run the focus timer. Clicking the weather, calendar, music or system opens its panel.
   Middle-click a photo frame for the next picture.
 - Notes are Markdown files in `~/.local/state/pikadots/notes`, the to-do list is
-  `~/.local/state/pikadots/todo.json`. The layouts are `desktop.layouts` in `settings.json`.
+  `~/.local/state/pikadots/todo.json`, Shortcuts are `~/.local/state/pikadots/shortcuts.json`.
+  The layouts are `desktop.layouts` in `settings.json`.
 
 The widgets live in `quickshell/desktop/`, the catalog and grid in `quickshell/services/Desktop.qml`.
 From a script: `qs ipc call desktop toggle|edit|add|menu|starter|clear|dump`, `desktop load <file>`
 (a JSON list like the one `dump` prints), `desktop place <kind> <small|medium|large>` (`clock`,
 `pixelclock`, `wordclock`, `visualizer`, `media`, `weather`, `sun`, `calendar`, `meeting`, `focus`,
-`notes`, `todo`, `system`, `fetch`, `photos`, `github`).
+`notes`, `todo`, `system`, `fetch`, `photos`, `github`, `shortcuts`).
+
+### Shortcuts
+
+A Shortcuts widget is a grid of tiles, each opening one thing:
+
+- **An app**, picked from the same list as the launcher.
+- **A website**, in the browser and browser profile you choose, or in your default browser. Firefox,
+  Zen, LibreWolf, Floorp and Waterfox profiles come from their `profiles.ini`; Chrome, Chromium,
+  Brave, Edge, Vivaldi, Thorium and Helium profiles from their `Local State`. Each profile shows its picture
+  or colour, its name and the account or folder it belongs to. The pencil next to a profile renames it
+  everywhere in Pikadots (saved as `desktop.profileNames` in `settings.json`); the browser's own name
+  for it stays as it is.
+- **A file or folder** (type a path or use File… / Folder…), or **any other link** such as `mailto:`
+  or `steam://`. These open in the app your system uses for them, terminal apps included
+  (`app.sh open`).
+
+Each widget has its own list and an optional title. A website tile shows the site's icon (fetched from
+the site itself once and kept in `~/.cache/pikadots/favicons`, or its first letter if there is none),
+with a small badge for the browser, or the profile's picture or colour. Apps show their own icon,
+files and folders their type. Any tile can have a Material icon instead.
+
+- **Click** a tile to open it, **right click** for Open in… (another browser or profile, just this
+  once), Edit and Remove.
+- In **Edit Mode** each tile has a pencil and the grid ends in a + tile; the title can be typed in
+  place. The mouse wheel scrolls a full widget, and an empty widget has an Add button any time.
+- If an app, browser or profile has gone, the tile gets a yellow mark in Edit Mode. A website then
+  opens in the browser's usual profile, or in your default browser, with a notification saying so.
+
+The tiles keep their size and the grid scrolls when they don't fit. The widget is
+`quickshell/desktop/ShortcutsWidget.qml` (with `ShortcutSheet`, `ShortcutMenu` and `ShortcutIcon`),
+the data and launching `quickshell/services/Shortcuts.qml`, and the browser and profile lookup
+`hypr/scripts/browsers.py` (`list`, `open <browser> <profile> <url>`, `favicon <url>`).
 
 ## Desktop menu
 
@@ -176,7 +215,7 @@ widgets. Pick its layout on [Settings > Control center](settings.md#control-cent
 - **One glance** (the default): one column with your profile, lock/settings/power, quick tiles,
   volume and brightness, what's playing, the latest notifications, status chips (CPU, memory,
   drives, updates, GitHub, recording) and the tray.
-- **Bento**: three columns: profile & power, small quick tiles, sliders, shortcuts (capture,
+- **Bento**: three columns: profile & power, small quick tiles, sliders, quick actions (capture,
   wallpaper, settings) and the tray; large music, calendar and weather; updates, notifications
   and system usage.
 - **Custom**: any of the widgets in one to three columns, in your order.
@@ -209,7 +248,7 @@ The details pages:
 | Capture | Screenshot or record a region, window or screen; annotate a region (satty) or copy the text in it (tesseract). Screenshot notifications have an Edit button that opens satty |
 | GitHub | Notifications; only after `gh auth login` |
 
-The Tray widget has the tray (click opens the app, right click shows its menu). The wallpaper picker is Super + Shift + W (or the Shortcuts widget) and the launcher
+The Tray widget has the tray (click opens the app, right click shows its menu). The wallpaper picker is Super + Shift + W (or the Quick actions card) and the launcher
 Super + A.
 
 ## Motion
@@ -360,7 +399,9 @@ The easiest way to change these is the Settings app's Default apps page
 ([settings.md](settings.md)); the commands below do the same.
 
 Keybinds, the bar and the launcher never name an app: they open the system's default terminal,
-browser, file manager and editor through `hypr/scripts/app.sh`. Change them with:
+browser, file manager and editor through `hypr/scripts/app.sh` (its `open <path or link>` also
+opens anything else in its default app, terminal apps included, as [Shortcuts](#shortcuts) do).
+Change them with:
 
 | App | Change with | pikadots sets (if unset) |
 |---|---|---|

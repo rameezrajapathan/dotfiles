@@ -46,6 +46,10 @@ _Avoid_: Widget (on its own), desklet, applet, gadget
 One of the cards stacked inside the Control Center, such as quick tiles, sliders or the calendar.
 _Avoid_: Widget (on its own), module
 
+**Quick Actions**:
+The Control Center Card of one-click buttons for capturing the screen, changing the wallpaper and opening Settings.
+_Avoid_: Shortcuts (a Shortcut is a tile in a Shortcuts widget), actions card
+
 **Widget Kind**:
 One sort of content, such as weather or a calendar, that can be shown as a Desktop Widget, a Control Center Card, or both.
 _Avoid_: Widget type, applet
@@ -74,6 +78,14 @@ _Avoid_: Peek, desktop mode
 The menu that opens on a right click on empty desktop, with actions such as changing the wallpaper or adding a Desktop Widget.
 _Avoid_: Context menu (too generic), right-click menu
 
+**Shortcut**:
+One tile in a Shortcuts widget that opens one thing: an app, a folder or file, or an address, with web addresses opening in a chosen browser and browser profile.
+_Avoid_: Bookmark, launcher, link, Pinned App (that's the Dock's)
+
+**Browser Profile**:
+One of a browser's separate identities, with its own sign-in, history and extensions, that a Shortcut can open its web address in.
+_Avoid_: Account, user, browser identity
+
 ## Setup
 
 **First-Run Setup**:
@@ -83,6 +95,12 @@ _Avoid_: Onboarding, wizard
 **Greeter**:
 The login screen shown before anyone is signed in, styled to match the lock screen.
 _Avoid_: Login manager, display manager (that's the program that runs it)
+
+## Bar
+
+**Bar Style**:
+One of the ready-made looks for the Bar, such as Minimalist, Islands or Classic, each a set of layout, size and items; Custom is the user's own changes, kept so they can switch back to it.
+_Avoid_: Bar theme, bar preset, bar layout (the layout is only the pill, islands or full-width shape)
 
 ## Launcher
 

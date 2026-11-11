@@ -10,7 +10,7 @@ hl.window_rule({
 
 hl.window_rule({ match = { class = "thunar", title = "File Operation Progress" }, float = true, center = true })
 hl.window_rule({ match = { class = "thunar", title = ".*Rename.*" }, float = true, center = true })
-hl.window_rule({ match = { class = "xdg-desktop-portal-gtk", title = "^(Open|Save)" }, float = true })
+hl.window_rule({ match = { class = "^(xdg-desktop-portal-gtk|zenity)$" }, float = true, center = true, size = "960 640" })
 hl.window_rule({ match = { class = "blueman-manager" }, float = true })
 hl.window_rule({ match = { class = "steam" }, float = true })
 hl.window_rule({ match = { class = "^org.quickshell$", title = "^Settings$" }, float = true, center = true, size = "1040 720" })

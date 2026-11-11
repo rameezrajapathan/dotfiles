@@ -6,6 +6,8 @@ import QtQuick
 Singleton {
     id: root
 
+    signal switched(string id)
+
     readonly property var modules: [
         { id: "workspaces", label: "Workspaces", icon: "space_dashboard", description: "Workspaces, in the style picked below" },
         { id: "launcher", label: "Apps", icon: "apps", description: "Distro logo that opens the launcher" },
@@ -163,5 +165,19 @@ Singleton {
             return;
         }
         set(presets.find(p => p.id === id));
+    }
+
+    function info(id) {
+        return presets.find(p => p.id === id) ?? { id: "custom", label: "Custom", icon: "tune" };
+    }
+
+    function step(by) {
+        const ids = presets.map(p => p.id);
+        if (Settings.bar.custom || current === "custom")
+            ids.push("custom");
+        const at = ids.indexOf(current);
+        const next = ids[((at < 0 ? 0 : at) + by + ids.length) % ids.length];
+        apply(next);
+        switched(next);
     }
 }

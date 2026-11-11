@@ -226,6 +226,7 @@ Singleton {
                 property bool menu: true
                 property string photos: ""
                 property int photoMinutes: 5
+                property var profileNames: ({})
             }
 
             property JsonObject dock: JsonObject {

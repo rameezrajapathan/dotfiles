@@ -19,7 +19,7 @@ Singleton {
         { id: "calendar", label: "Calendar", icon: "calendar_month", description: "This month" },
         { id: "weather", label: "Weather", icon: "partly_cloudy_day", description: "Now and the next hours" },
         { id: "updates", label: "Updates", icon: "system_update_alt", description: "Package and pikadots updates" },
-        { id: "actions", label: "Shortcuts", icon: "bolt", description: "Capture, wallpaper and settings" },
+        { id: "actions", label: "Quick actions", icon: "bolt", description: "Capture, wallpaper and settings" },
         { id: "tray", label: "Tray", icon: "widgets", description: "Tray icons" }
     ]
 

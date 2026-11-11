@@ -52,13 +52,30 @@ case $kind in
 terminal) terminal "$@" ;;
 browser) launch "$(xdg-settings get default-web-browser 2>/dev/null)" "" "$@" ;;
 files) launch "$(xdg-mime query default inode/directory)" "" "${1:-$HOME}" ;;
+open)
+	target=${1:?usage: app.sh open PATH|URI}
+	[[ $target == "~"* ]] && target=$HOME${target:1}
+	if [[ -d $target ]]; then
+		mime=inode/directory
+	elif [[ -e $target ]]; then
+		mime=$(xdg-mime query filetype "$target" 2>/dev/null)
+	elif [[ $target =~ ^([A-Za-z][A-Za-z0-9+.-]*): ]]; then
+		mime=x-scheme-handler/${BASH_REMATCH[1],,}
+	else
+		notify-send -a Shortcuts -i dialog-warning "Not found" "$target doesn't exist any more." 2>/dev/null || true
+		exit 1
+	fi
+	id=$(xdg-mime query default "$mime" 2>/dev/null)
+	[[ -z $id ]] && exec xdg-open "$target"
+	launch "$id" "" "$target"
+	;;
 editor)
 	dir=
 	(($#)) && [[ -d $1 ]] && dir=$1
 	launch "$(xdg-mime query default text/plain)" "$dir" "$@"
 	;;
 *)
-	echo "usage: app.sh terminal|browser|files|editor [args...]" >&2
+	echo "usage: app.sh terminal|browser|files|editor|open [args...]" >&2
 	exit 2
 	;;
 esac

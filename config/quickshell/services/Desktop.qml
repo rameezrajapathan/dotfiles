@@ -48,7 +48,8 @@ Singleton {
         { id: "system", content: "SystemWidget.qml", title: "System", icon: "memory", card: "system", about: "Processor, memory, disk and battery." },
         { id: "fetch", content: "FetchWidget.qml", title: "System info", icon: "terminal", about: "Your distro, kernel, uptime and packages, fetch style." },
         { id: "photos", content: "PhotoWidget.qml", title: "Photo frame", icon: "photo_library", about: "A slideshow of a folder of pictures." },
-        { id: "github", content: "GitHubWidget.qml", title: "GitHub", icon: "code", about: "Unread GitHub notifications." }
+        { id: "github", content: "GitHubWidget.qml", title: "GitHub", icon: "code", about: "Unread GitHub notifications." },
+        { id: "shortcuts", content: "ShortcutsWidget.qml", title: "Shortcuts", icon: "apps", about: "Apps, folders, files and websites a click away, each website in the browser and profile you choose.", min: { w: 1, h: 1 }, editsInPlace: true }
     ]
 
     readonly property var starter: [
@@ -205,6 +206,7 @@ Singleton {
     function remove(name, id) {
         save(name, layout(name).filter(x => x.id !== id));
         Quickshell.execDetached(["rm", "-f", notesDir + "/" + id + ".md"]);
+        Shortcuts.forget(id);
     }
 
     function addStarter(name) {
@@ -220,6 +222,7 @@ Singleton {
         if (!on)
             catalogScreen = "";
         menu = null;
+        Shortcuts.menu = null;
     }
 
     function openCatalog(name) {
@@ -233,6 +236,8 @@ Singleton {
     }
 
     function dismiss() {
+        if (Shortcuts.close())
+            return;
         if (menu)
             menu = null;
         else if (catalogScreen)

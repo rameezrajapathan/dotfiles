@@ -11,6 +11,7 @@ file manager and editor open your [default apps](desktop.md#default-apps).
 |---|---|
 | Super + A | App launcher |
 | Super + D | Show or hide the dock |
+| Super + Alt + B / Super + Alt + Shift + B | Next / previous bar style (the name shows briefly at the bottom) |
 | Super + H | Show desktop widgets |
 | Super + Shift + H | Edit desktop widgets |
 | Super + P | Projects |

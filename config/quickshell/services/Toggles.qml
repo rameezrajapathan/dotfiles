@@ -112,6 +112,14 @@ Singleton {
             const edges = ["top", "right", "bottom", "left"];
             Settings.bar.position = edges[(edges.indexOf(Theme.barPosition) + 1) % 4];
         }
+        function style(which: string): void {
+            if (which === "next" || which === "prev")
+                BarStyles.step(which === "next" ? 1 : -1);
+            else if (which === "custom" || BarStyles.presets.some(p => p.id === which)) {
+                BarStyles.apply(which);
+                BarStyles.switched(which);
+            }
+        }
         function workspaces(style: string): void {
             const ids = WorkspaceStyles.styles.map(s => s.id);
             if (style === "next")

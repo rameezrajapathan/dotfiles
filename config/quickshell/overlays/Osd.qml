@@ -15,6 +15,8 @@ PanelWindow {
     property string kind: "volume"
     property real keyboard: 0
     property bool open: false
+    property string barStyle: ""
+    readonly property bool labelOnly: kind === "bar"
 
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
@@ -33,6 +35,8 @@ PanelWindow {
             return muted ? "mic_off" : "mic";
         case "brightness":
             return value < 0.34 ? "brightness_low" : value < 0.67 ? "brightness_medium" : "brightness_high";
+        case "bar":
+            return BarStyles.info(barStyle).icon;
         default:
             return value > 0 ? "keyboard" : "keyboard_off";
         }
@@ -50,6 +54,14 @@ PanelWindow {
     }
 
     PwObjectTracker { objects: [root.sink, root.source] }
+
+    Connections {
+        target: BarStyles
+        function onSwitched(id) {
+            root.barStyle = id;
+            root.show("bar");
+        }
+    }
 
     Process {
         id: keyboardReader
@@ -146,8 +158,27 @@ PanelWindow {
                 }
             }
 
+            ColumnLayout {
+                Layout.fillWidth: true
+                visible: root.labelOnly
+                spacing: 0
+                Label {
+                    text: "Bar style"
+                    color: Theme.subtext
+                    font.pixelSize: Theme.fontSize - 2
+                }
+                Label {
+                    Layout.fillWidth: true
+                    text: BarStyles.info(root.barStyle).label
+                    font.bold: true
+                    font.pixelSize: Theme.fontSize + 2
+                    elide: Text.ElideRight
+                }
+            }
+
             Row {
                 Layout.fillWidth: true
+                visible: !root.labelOnly
                 spacing: 4
 
                 Repeater {
@@ -172,6 +203,7 @@ PanelWindow {
             }
 
             Label {
+                visible: !root.labelOnly
                 Layout.preferredWidth: 52
                 horizontalAlignment: Text.AlignRight
                 text: root.muted ? "Muted" : Math.round(root.value * 100) + "%"

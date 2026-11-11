@@ -19,6 +19,9 @@ PanelWindow {
     readonly property var entries: Desktop.layout(screenName)
     readonly property bool menuHere: Desktop.menu !== null && Desktop.menu.screen === screenName
     readonly property bool catalogHere: Desktop.catalogScreen === screenName
+    readonly property bool shortcutMenuHere: Shortcuts.menu !== null && Shortcuts.menu.screen === screenName
+    readonly property bool shortcutSheetHere: Shortcuts.sheet !== null && Shortcuts.sheet.screen === screenName
+    readonly property bool popupHere: menuHere || shortcutMenuHere || shortcutSheetHere
     readonly property bool widgetsShown: raisedLayer ? Desktop.raised : Desktop.enabled && !Desktop.raised
     readonly property bool focusedHere: Desktop.focusedScreen === screenName
     property Item dragged: null
@@ -68,9 +71,9 @@ PanelWindow {
     WlrLayershell.layer: raisedLayer ? WlrLayer.Overlay : WlrLayer.Bottom
     WlrLayershell.namespace: raisedLayer ? "quickshell-desktop-raised" : "quickshell-desktop"
     WlrLayershell.keyboardFocus: !raisedLayer ? (keyboardStage === 1 ? WlrKeyboardFocus.Exclusive : keyboardStage === 2 ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None)
-        : (Desktop.raised || menuHere) && focusedHere ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+        : (Desktop.raised || popupHere) && (focusedHere || shortcutSheetHere) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     color: raisedLayer ? "transparent" : "black"
-    visible: raisedLayer ? Desktop.enabled && (Desktop.raised || menuHere || dim.opacity > 0) : true
+    visible: raisedLayer ? Desktop.enabled && !Shortcuts.picking && (Desktop.raised || popupHere || dim.opacity > 0 || shortcutSheet.visible || shortcutMenu.visible) : true
 
     Loader {
         anchors.fill: parent
@@ -101,6 +104,10 @@ PanelWindow {
         cursorShape: Qt.ArrowCursor
         onPressed: keys.forceActiveFocus()
         onClicked: event => {
+            if (Shortcuts.menu) {
+                Shortcuts.menu = null;
+                return;
+            }
             if (event.button === Qt.RightButton) {
                 if (Settings.desktop.menu || root.raisedLayer)
                     Desktop.openMenu(root.screenName, event.x, event.y);
@@ -250,6 +257,16 @@ PanelWindow {
         open: root.raisedLayer && root.menuHere
         screenName: root.screenName
         at: root.menuHere ? Qt.point(Desktop.menu.x, Desktop.menu.y) : Qt.point(0, 0)
+    }
+
+    ShortcutMenu {
+        id: shortcutMenu
+        open: root.raisedLayer && root.shortcutMenuHere
+    }
+
+    ShortcutSheet {
+        id: shortcutSheet
+        open: root.raisedLayer && root.shortcutSheetHere
     }
 
     Label {
