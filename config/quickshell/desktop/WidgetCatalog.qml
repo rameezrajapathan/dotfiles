@@ -19,7 +19,7 @@ Item {
     }
 
     function add() {
-        if (Desktop.add(screenName, picked, size)) {
+        if (Desktop.add(screenName, picked, sizeClass)) {
             message = "";
             Desktop.catalogScreen = "";
         } else {
