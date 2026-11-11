@@ -48,7 +48,7 @@ monochrome ([below](#liquid-glass)), unless game mode is on.
 | Hyprland borders | Live |
 | kitty (and fastfetch, delta) | Live |
 | Neovim ([`pikadots` colorscheme](#neovim), if your config uses it) | Live |
-| GTK apps (translucent, like kitty) | GTK3 live, GTK4 on restart |
+| GTK apps (translucent, like kitty) | GTK3 live, GTK4 (libadwaita) on restart |
 | Qt and KDE apps ([kdeglobals](#qt-and-kde-apps)) | Live |
 | cava | Live |
 | zsh: eza listings and completion menus ([terminal tools](#terminal-tools)) | Next prompt |
@@ -63,7 +63,7 @@ monochrome ([below](#liquid-glass)), unless game mode is on.
 | fuzzel (colors, and the icon theme in its light or dark variant), peaclock, superfile (spf) | Next launch |
 | Lock screen | Live; hyprlock, the fallback, on its next start |
 | cmatrix (`~/.local/bin/cmatrix`, a wrapper that sets its green to the accent) | Next launch |
-| Papirus folders (opt-in: Settings > Fonts & icons, [settings.md](settings.md#icons)) | Live, asks for your password when the color changes |
+| Papirus folders (opt-in: Settings > Fonts & icons, [settings.md](settings.md#icons)) | Live (Dolphin on restart) |
 | Login screen and boot splash (opt-in: [`pikadots greeter` and `splash`](pikadots.md#login-screen-and-boot-splash)) | When you run the command again |
 | Mouse cursor | Not recolored; pick a theme in Settings > Appearance > Cursor |
 | Alacritty (optional: `~/.local/state/theme/alacritty.toml` is generated for you to import; pikadots doesn't set up Alacritty) | Next launch |
@@ -73,8 +73,13 @@ Catppuccin Mocha, and zsh keeps its greys. GTK apps use plain adw-gtk3, and btop
 superfile point at theme files that don't exist yet. To change which color goes where, edit the
 template for that app.
 
-The GTK 3 and 4 `gtk.css` files (`config/gtk`) import the generated
-`~/.local/state/theme/gtk.css` by a relative path, so they work in any home folder.
+GTK 3 reads `~/.config/gtk-3.0/gtk.css` only when an app starts, so the colors don't go there
+(`config/gtk/gtk-3.0.css` is empty, left for your own rules). `theme.sh` writes two small themes,
+`~/.local/share/themes/pikadots` and `pikadots-dark`, that import adw-gtk3 (or adw-gtk3-dark)
+and then the generated `~/.local/state/theme/gtk.css`, and switches `gtk-theme` to `''` and back,
+which makes open GTK 3 apps load them again. Without adw-gtk3 it sets plain adw-gtk3. GTK 4's
+`gtk.css` (`config/gtk/gtk-4.0.css`) imports the generated file by a relative path, for libadwaita
+apps, which read it at start.
 
 ## Liquid glass
 

@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+import configparser
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
+import time
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
@@ -12,6 +15,8 @@ from pikadots_common import HOME, load_json, settings_section
 COLORS = os.path.join(HOME, ".local/state/theme/quickshell.json")
 CACHE = os.path.join(HOME, ".local/state/pikadots/folder-color")
 ICON_DIRS = [os.path.join(HOME, ".icons"), os.path.join(HOME, ".local/share/icons"), "/usr/local/share/icons", "/usr/share/icons"]
+OVERLAY_DIR = os.path.join(HOME, ".local/share/icons")
+MARKER = ".pikadots-folders"
 THEMES = ["Papirus-Light", "Papirus", "Papirus-Dark"]
 SIZES = ["22x22", "24x24", "32x32", "48x48", "64x64"]
 PALETTE = {
@@ -71,7 +76,7 @@ def theme_dirs():
     for name in THEMES:
         for base in ICON_DIRS:
             path = os.path.join(base, name)
-            if os.path.isfile(os.path.join(path, "index.theme")):
+            if os.path.isfile(os.path.join(path, "index.theme")) and not os.path.exists(os.path.join(path, MARKER)):
                 found.append((name, path))
                 break
     return found
@@ -92,6 +97,72 @@ def current(path):
             colors.add(os.path.basename(os.path.realpath(link))[len("folder-") : -len(".svg")])
     return colors
 
+def writable(path):
+    return os.access(os.path.realpath(os.path.join(path, "48x48/places")), os.W_OK)
+
+def place_dirs(path):
+    cp = configparser.ConfigParser(interpolation=None, strict=False)
+    try:
+        cp.read(os.path.join(path, "index.theme"))
+    except configparser.Error:
+        return []
+    dirs = []
+    for key in ("Directories", "ScaledDirectories"):
+        for d in cp.get("Icon Theme", key, fallback="").split(","):
+            d = d.strip()
+            if d.endswith("/places") and d not in dirs and os.path.isdir(os.path.join(path, d)):
+                dirs.append(d)
+    return dirs
+
+COLORED = re.compile(r"^(folder|user)-(" + "|".join(sorted(PALETTE, key=len, reverse=True)) + r")(-.*)?\.svg$")
+
+def overlay(name, path, color):
+    root = os.path.join(OVERLAY_DIR, name)
+    if os.path.exists(root) and not os.path.exists(os.path.join(root, MARKER)):
+        return
+    os.makedirs(root, exist_ok=True)
+    open(os.path.join(root, MARKER), "w").close()
+    index = os.path.join(root, "index.theme")
+    if os.path.realpath(index) != os.path.realpath(os.path.join(path, "index.theme")):
+        if os.path.lexists(index):
+            os.remove(index)
+        os.symlink(os.path.join(path, "index.theme"), index)
+    for entry in os.listdir(root):
+        full = os.path.join(root, entry)
+        if os.path.isdir(full) and not os.path.islink(full):
+            shutil.rmtree(full)
+    for d in place_dirs(path):
+        src = os.path.join(path, d)
+        dst = os.path.join(root, d)
+        for f in os.listdir(src):
+            if not f.endswith(".svg") or COLORED.match(f):
+                continue
+            real = os.path.realpath(os.path.join(src, f))
+            m = COLORED.match(os.path.basename(real))
+            if not m:
+                continue
+            target = os.path.join(os.path.dirname(real), f"{m.group(1)}-{color}{m.group(3) or ''}.svg")
+            if not os.path.isfile(target):
+                continue
+            os.makedirs(dst, exist_ok=True)
+            os.symlink(target, os.path.join(dst, f))
+    os.utime(root)
+
+def refresh():
+    if shutil.which("gsettings"):
+        key = ["org.gnome.desktop.interface", "icon-theme"]
+        got = subprocess.run(["gsettings", "get", *key], capture_output=True, text=True)
+        theme = got.stdout.strip()
+        if got.returncode == 0 and theme:
+            subprocess.run(["gsettings", "set", *key, "''"], capture_output=True)
+            time.sleep(0.3)
+            subprocess.run(["gsettings", "set", *key, theme], capture_output=True)
+    if shutil.which("gdbus"):
+        emit = ["gdbus", "emit", "--session", "--object-path"]
+        subprocess.run([*emit, "/KIconLoader", "--signal", "org.kde.KIconLoader.iconChanged", "0"], capture_output=True)
+        time.sleep(0.2)
+        subprocess.run([*emit, "/KGlobalSettings", "--signal", "org.kde.KGlobalSettings.notifyChange", "0", "0"], capture_output=True)
+
 def main():
     args = sys.argv[1:]
     dry = "--dry-run" in args
@@ -107,17 +178,15 @@ def main():
     if dry:
         print(color)
         for name, path in themes:
-            state = "ok" if current(path) == {color} else "change"
-            writable = os.access(os.path.realpath(os.path.join(path, "48x48/places")), os.W_OK)
-            print(f"{name} {path} {state} {'user' if writable else 'pkexec'}")
+            shown = path if writable(path) else os.path.join(OVERLAY_DIR, name)
+            state = "ok" if current(shown) == {color} else "change"
+            print(f"{name} {path} {state} {'papirus-folders' if writable(path) else 'overlay'}")
         return
     if not appearance.get("folderAccent", False):
         return
     if not str(appearance.get("iconTheme") or "Papirus").startswith("Papirus"):
         return
     tool = shutil.which("papirus-folders")
-    if not tool:
-        return
     try:
         with open(CACHE, encoding="utf-8") as f:
             last = f.read().strip()
@@ -128,17 +197,13 @@ def main():
     os.makedirs(os.path.dirname(CACHE), exist_ok=True)
     with open(CACHE, "w", encoding="utf-8") as f:
         f.write(color + "\n")
-    todo = [(n, p) for n, p in themes if current(p) != {color}]
-    if not todo:
-        return
-    user = [n for n, p in todo if os.access(os.path.realpath(os.path.join(p, "48x48/places")), os.W_OK)]
-    root = [n for n, p in todo if n not in user]
-    for name in user:
-        subprocess.run([tool, "-C", color, "-t", name], stdin=subprocess.DEVNULL, capture_output=True)
-    if root and shutil.which("pkexec"):
-        script = 'tool=$1 color=$2; shift 2; for t; do "$tool" -C "$color" -t "$t" || exit 1; done'
-        subprocess.run(["pkexec", "/bin/sh", "-c", script, "sh", tool, color, *root],
-                       stdin=subprocess.DEVNULL, capture_output=True)
+    for name, path in themes:
+        if writable(path):
+            if tool and current(path) != {color}:
+                subprocess.run([tool, "-C", color, "-t", name], stdin=subprocess.DEVNULL, capture_output=True)
+        else:
+            overlay(name, path, color)
+    refresh()
 
 if __name__ == "__main__":
     main()

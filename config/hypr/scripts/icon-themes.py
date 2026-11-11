@@ -23,7 +23,7 @@ def themes():
         for name in sorted(os.listdir(base)):
             path = os.path.join(base, name)
             index = os.path.join(path, "index.theme")
-            if name in SKIP or name in found or not os.path.isfile(index):
+            if name in SKIP or name in found or not os.path.isfile(index) or os.path.exists(os.path.join(path, ".pikadots-folders")):
                 continue
             cp = configparser.ConfigParser(interpolation=None, strict=False)
             try:

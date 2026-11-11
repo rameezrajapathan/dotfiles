@@ -106,11 +106,18 @@ them for your user, for example
 **Folder color follows accent** (off by default) recolors Papirus folders to the
 [papirus-folders](https://github.com/PapirusDevelopmentTeam/papirus-folders) color closest to the
 wallpaper's accent, on every wallpaper change (`hypr/scripts/folders.py`; papirus-folders is in
-`aur.txt`). It only shows with a Papirus theme. Papirus usually sits in `/usr/share/icons`, so it
-asks for your password (pkexec) whenever the color changes; the last color is cached in
-`~/.local/state/pikadots/folder-color` so an unchanged accent doesn't ask.
+`aur.txt`). It only shows with a Papirus theme. When Papirus sits in `/usr/share/icons` it doesn't
+touch it (no password): it writes a small overlay per theme in `~/.local/share/icons/<theme>`
+(marked with `.pikadots-folders`; only `index.theme` and the folder links, pointing at the
+system's colored icons, every size including `@2x`, and aliases like `inode-directory`), which GTK
+and Qt read before the system copy. `theme.sh` runs it before it reloads apps, so they never see the
+previous color. When the color changes it switches the GTK icon theme off and back on and sends
+KIconLoader's `iconChanged` plus a palette change, so open GTK and Qt apps redraw. Dolphin's file
+view caches pixmaps by icon name and never drops them, so Dolphin shows the new color after a
+restart. A Papirus you own is
+recolored with papirus-folders. The last color is cached in `~/.local/state/pikadots/folder-color`.
 `hypr/scripts/folders.py --dry-run` shows what it would pick. Turning it off leaves the folders
-as they are; it doesn't put the blue back.
+as they are; it doesn't put the blue back (delete the overlay folders for that).
 
 ## Cursor
 

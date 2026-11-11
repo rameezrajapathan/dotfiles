@@ -70,22 +70,32 @@ if has asusctl; then
 	[[ $scheme == scheme-monochrome ]] && accent=ffffff
 	[[ -n $accent ]] && asusctl aura effect static -c "$accent" >/dev/null 2>&1 || true
 fi
-setsid -f python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 9>&- || true
+python3 -I ~/.config/hypr/scripts/folders.py >/dev/null 2>&1 || true
 has pikadots && { setsid -f pikadots greeter sync --later >/dev/null 2>&1 9>&- || true; }
 [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || exit 0
 hyprctl reload >/dev/null
+gtk_base=adw-gtk3
+[[ $mode == dark ]] && gtk_base=adw-gtk3-dark
+gtk_theme=$gtk_base
+for dir in ~/.local/share/themes ~/.themes /usr/share/themes; do
+	[[ -f $dir/$gtk_base/gtk-3.0/gtk.css ]] || continue
+	gtk_theme=pikadots${gtk_base#adw-gtk3}
+	own=~/.local/share/themes/$gtk_theme
+	mkdir -p "$own/gtk-3.0" "$own/gtk-4.0"
+	printf '[Desktop Entry]\nType=X-GNOME-Metatheme\nName=%s\n\n[X-GNOME-Metatheme]\nGtkTheme=%s\n' "$gtk_theme" "$gtk_theme" >"$own/index.theme"
+	for v in 3.0 4.0; do
+		printf '@import url("file://%s");\n@import url("file://%s");\n' "$dir/$gtk_base/gtk-$v/gtk.css" "$state/gtk.css" >"$own/gtk-$v/gtk.css"
+	done
+	break
+done
+gsettings set org.gnome.desktop.interface gtk-theme "''"
+sleep 0.3
+gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
 if $glass_only; then
 	python3 -I ~/.config/hypr/scripts/vscode-theme.py || true
 	python3 -I ~/.config/hypr/scripts/kde-theme.py || true
 	exit 0
 fi
-if [[ $mode == light ]]; then
-	gtk_theme=adw-gtk3
-else
-	gtk_theme=adw-gtk3-dark
-fi
-gsettings set org.gnome.desktop.interface gtk-theme "''"
-gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
 gsettings set org.gnome.desktop.interface color-scheme "prefer-$mode"
 gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
 prefer_dark=$([[ $mode == dark ]] && echo true || echo false)
