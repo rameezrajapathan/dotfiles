@@ -86,10 +86,21 @@ DesktopWidgetContent {
 
             GridView {
                 id: grid
-                readonly property int columns: Math.max(1, Math.round(width / 96))
+                readonly property int minCell: 64
+                readonly property int preferred: Math.max(1, Math.round(width / 96))
+                readonly property int columns: {
+                    const n = Math.max(1, root.tiles.length);
+                    const most = Math.max(preferred, Math.floor(width / minCell));
+                    for (let c = preferred; c <= most; c++)
+                        if (Math.floor(height / Math.ceil(n / c)) >= minCell)
+                            return c;
+                    return preferred;
+                }
+                readonly property int rows: Math.max(1, Math.ceil(root.tiles.length / columns))
+                readonly property int fitHeight: Math.floor(height / rows)
                 anchors.fill: parent
                 cellWidth: Math.floor(width / columns)
-                cellHeight: root.tiles.length <= columns && !root.showTitle ? Math.max(cellWidth, height) : cellWidth
+                cellHeight: fitHeight < minCell ? cellWidth : rows === 1 ? fitHeight : Math.min(fitHeight, cellWidth)
                 interactive: !root.editing && contentHeight > height
                 boundsBehavior: Flickable.StopAtBounds
                 clip: true
@@ -106,7 +117,7 @@ DesktopWidgetContent {
                     id: tile
                     required property var modelData
                     readonly property bool adder: modelData.add === true
-                    readonly property bool labelled: grid.cellWidth >= 84
+                    readonly property bool labelled: grid.cellWidth >= 84 && grid.cellHeight >= 72
                     readonly property string problem: root.editing && !adder ? Shortcuts.problem(modelData) : ""
                     width: grid.cellWidth
                     height: grid.cellHeight
