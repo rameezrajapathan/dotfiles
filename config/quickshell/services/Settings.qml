@@ -166,6 +166,9 @@ Singleton {
                 property bool emoji: true
                 property bool projects: true
                 property bool clipboard: true
+                property bool web: true
+                property string searchEngine: "google"
+                property string searchUrl: ""
                 property int clipboardSize: 750
                 property bool clipboardPersist: true
             }

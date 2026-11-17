@@ -33,6 +33,7 @@ hl.config({
 	input = {
 		kb_layout = "us",
 		numlock_by_default = true,
+		mouse_refocus = false,
 		touchpad = { natural_scroll = true },
 	},
 

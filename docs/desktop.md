@@ -329,6 +329,11 @@ A first character switches mode:
 | `:` | Emoji | Copy | |
 | `~` | Projects (code folders you visit, [more](developer.md)) | Default editor | Terminal there |
 | `+` | Clipboard history | Copy | |
+| `?` | Web search (`?weather tomorrow`) | Search in the default browser | |
+| `?` | A web address (`?github.com`) | Open it | Search for it instead |
+
+Settings > Launcher picks the search engine (Google, DuckDuckGo, Brave, Bing, Startpage, Ecosia) or
+a custom address with `%s` where the search words go.
 
 In clipboard mode Ctrl + P pins a clip (or unpins it), Shift + Delete removes one and Ctrl + Shift +
 Delete clears the history. Pins are files in `~/.local/share/pikadots/clipboard-pins`, listed first,

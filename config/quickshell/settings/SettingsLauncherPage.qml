@@ -209,7 +209,7 @@ SettingsPage {
 
     SettingsSection {
         title: "Modes"
-        subtitle: "Type the character first, e.g. =2+2 or :smile."
+        subtitle: "Type the character first, e.g. =2+2, :smile or ?weather."
 
         Repeater {
             model: [
@@ -217,7 +217,8 @@ SettingsPage {
                 { key: "run", prefix: ">", icon: "terminal", title: "Run a command", description: "Shift + Enter runs it in a terminal." },
                 { key: "emoji", prefix: ":", icon: "mood", title: "Emoji", description: "Search by name, Enter copies." },
                 { key: "projects", prefix: "~", icon: "folder_code", title: "Projects", description: "Git folders you've visited (zoxide), opened in the editor." },
-                { key: "clipboard", prefix: "+", icon: "content_paste", title: "Clipboard history", description: "Text and images you copied." }
+                { key: "clipboard", prefix: "+", icon: "content_paste", title: "Clipboard history", description: "Text and images you copied." },
+                { key: "web", prefix: "?", icon: "travel_explore", title: "Web search", description: "Searches in your default browser. A web address opens directly." }
             ]
             SettingsSwitchRow {
                 required property var modelData
@@ -226,6 +227,37 @@ SettingsPage {
                 description: modelData.description
                 target: root.l
                 key: modelData.key
+            }
+        }
+    }
+
+    SettingsSection {
+        title: "Web search"
+        subtitle: "Type ? and what to look for, e.g. ?weather tomorrow. It opens in your default browser."
+        visible: root.l.web
+
+        SettingsRow {
+            icon: "travel_explore"
+            title: "Search engine"
+            below: true
+            SettingsChips {
+                options: WebSearch.engines.map(e => ({ value: e.id, label: e.name }))
+                current: root.l.searchEngine
+                onPicked: v => root.l.searchEngine = v
+            }
+        }
+        SettingsRow {
+            visible: root.l.searchEngine === "custom"
+            icon: "link"
+            title: "Search address"
+            description: WebSearch.customValid || root.l.searchUrl === ""
+                ? "Put %s where the search words go, e.g. https://example.com/search?q=%s. Press Enter to save."
+                : "Needs to start with http:// or https://. Google is used until it does."
+            SettingsTextField {
+                implicitWidth: 320
+                text: root.l.searchUrl
+                placeholder: "https://example.com/search?q=%s"
+                onAccepted: t => root.l.searchUrl = t.trim()
             }
         }
     }

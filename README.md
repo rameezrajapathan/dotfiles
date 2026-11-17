@@ -67,7 +67,7 @@ edge of the screen, with the items you pick ([more](docs/desktop.md#the-bar)).
 - **Window rules** per app: floating, a corner, edge or exact spot, size, workspace and opacity.
   Terminal apps such as cava, peaclock or btop get a launcher entry of their own, so they can open
   floating exactly where you want them.
-- **Launcher** with a calculator, commands, emoji, projects and clipboard history with pins.
+- **Launcher** with a calculator, commands, web search, emoji, projects and clipboard history with pins.
 - **Screenshots** to draw on (satty) or read text from (OCR), USB drives that mount with a
   notification, a privacy pill while the mic, camera or screen is in use, password prompts and game
   mode in the shell's own style.

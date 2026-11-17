@@ -35,7 +35,7 @@ Scope {
         { key: "notifications", group: "Shell", title: "Notifications", icon: "notifications",
             keywords: "notifications popups do not disturb dnd quiet hours schedule position timeout", source: "SettingsNotificationsPage.qml" },
         { key: "launcher", group: "Shell", title: "Launcher", icon: "apps",
-            keywords: "launcher app grid columns icons most used calculator emoji clipboard projects run style centered fullscreen spotlight attached dock bar", source: "SettingsLauncherPage.qml" },
+            keywords: "launcher app grid columns icons most used calculator emoji clipboard projects run web search engine google duckduckgo browser internet style centered fullscreen spotlight attached dock bar", source: "SettingsLauncherPage.qml" },
         { key: "weather", group: "Shell", title: "Weather", icon: "partly_cloudy_day",
             keywords: "weather temperature celsius fahrenheit city location forecast", source: "SettingsWeatherPage.qml" },
         { key: "lock", group: "Shell", title: "Lock screen", icon: "lock",

@@ -21,7 +21,8 @@ OverlayWindow {
         ">": { name: "run", hint: "Run command", icon: "terminal" },
         ":": { name: "emoji", hint: "Emoji", icon: "mood" },
         "~": { name: "projects", hint: "Projects", icon: "folder_code" },
-        "+": { name: "clipboard", hint: "Clipboard", icon: "content_paste" }
+        "+": { name: "clipboard", hint: "Clipboard", icon: "content_paste" },
+        "?": { name: "web", hint: "Web", icon: "travel_explore" }
     })
     readonly property var modes: {
         const on = {};
@@ -71,6 +72,19 @@ OverlayWindow {
                     ? Apps.terminal(["sh", "-c", query], ["--hold"])
                     : Quickshell.execDetached(["sh", "-c", query])
             }];
+        case "web": {
+            if (q === "")
+                return [];
+            const address = WebSearch.address(query);
+            return [{
+                title: query,
+                subtitle: address
+                    ? "↵ open " + address + "  ·  shift+↵ search with " + WebSearch.name
+                    : "↵ search with " + WebSearch.name,
+                symbol: address ? "public" : "travel_explore",
+                run: shift => shift ? WebSearch.search(query) : WebSearch.open(query)
+            }];
+        }
         case "emoji":
             return Emoji.search(q)
                 .slice(0, 300)
@@ -446,6 +460,7 @@ OverlayWindow {
                                 font.bold: true
                             }
                             Icon {
+                                visible: !root.spotlight
                                 name: chip.info.icon
                                 size: 16
                                 color: Theme.subtext
