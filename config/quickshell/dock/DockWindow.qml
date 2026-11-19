@@ -239,6 +239,12 @@ PanelWindow {
     }
 
     function activate(key) {
+        if (Dock.windowsOf(key).length > 1) {
+            previewTimer.stop();
+            closeTimer.stop();
+            previewKey = key;
+            return;
+        }
         closePreview();
         Dock.activate(key);
     }

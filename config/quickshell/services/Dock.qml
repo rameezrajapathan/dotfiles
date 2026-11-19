@@ -138,13 +138,9 @@ Singleton {
             launch(key);
             return;
         }
-        const focused = list.find(t => t.activated);
-        if (focused && list.length === 1 && focused.wayland && !Windows.isSpecial(focused))
-            focused.wayland.minimized = true;
-        else if (!focused)
-            Windows.focus(Windows.byRecent(list)[0]);
-        else if (list.length > 1)
-            Windows.focus(list[(list.indexOf(focused) + 1) % list.length]);
+        const target = Windows.byRecent(list)[0];
+        if (!target.activated)
+            Windows.focus(target);
     }
 
     property var launching: ({})

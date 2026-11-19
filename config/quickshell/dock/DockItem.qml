@@ -73,9 +73,13 @@ Item {
         }
 
         AppIcon {
+            readonly property real full: Math.ceil(item.dock.iconSize * Dock.magnifyScale)
             visible: item.kind === "app"
-            anchors.fill: parent
-            implicitSize: Math.ceil(item.dock.iconSize * Dock.magnifyScale)
+            anchors.centerIn: parent
+            width: full
+            height: full
+            scale: item.size / full
+            mipmap: true
             icon: item.entry?.icon ?? item.group?.appId ?? ""
         }
 
